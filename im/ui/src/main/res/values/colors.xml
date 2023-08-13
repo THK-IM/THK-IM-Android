@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#ffffff</color>
+    <color name="gray5">#F5F5F5</color>
+    <color name="hint_color">#9A9A9A</color>
+    <color name="transparent">#00ffffff</color>
+    <color name="default_light_black_color">#424242</color>
+    <color name="chat_list_press">#ECECEC</color>
+    <color name="black">#000000</color>
+    <color name="main_text_color">#0A0E10</color>
+    <color name="group_item_press">#ededed</color>
+    <color name="line">#F5f5f5</color>
+    <color name="main_color">#6E8EFF</color>
+</resources>

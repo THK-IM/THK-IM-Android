@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#00000000"
+    android:orientation="vertical">
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_top_round_bg_white">
+
+        <TextView
+            android:id="@+id/save_imge"
+            android:layout_width="match_parent"
+            android:layout_height="53dp"
+            android:background="@drawable/list_item_bk"
+            android:gravity="center"
+            android:text="@string/take_camera_btn_text"
+            android:textColor="@color/main_text_color"
+            android:textSize="16sp" />
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/line" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/tv_photo"
+            android:layout_width="match_parent"
+            android:layout_height="53dp"
+            android:background="@drawable/list_item_bk"
+            android:gravity="center"
+            android:text="@string/photo"
+            android:textColor="@color/main_text_color"
+            android:textSize="16sp" />
+
+    </FrameLayout>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="@color/line" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="53dp"
+            android:background="@drawable/list_item_bk"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textColor="@color/main_text_color"
+            android:textSize="16sp" />
+    </FrameLayout>
+
+
+</LinearLayout>

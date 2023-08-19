@@ -1,12 +1,9 @@
-package com.thk.android.im.live.participant
+package com.thk.android.im.live.room
 
 import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
 import com.thk.android.im.live.LiveManager
-import com.thk.android.im.live.bean.NewStreamNotify
-import com.thk.android.im.live.bean.NotifyBean
-import com.thk.android.im.live.bean.RemoveStreamNotify
 import com.thk.android.im.live.utils.LLog
 import com.thk.android.im.live.utils.MediaConstraintsHelper
 import com.thk.android.im.live.utils.Utils
@@ -22,6 +19,7 @@ import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceViewRenderer
 import org.webrtc.VideoTrack
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 abstract class BaseParticipant(
@@ -32,11 +30,12 @@ abstract class BaseParticipant(
     private var dataChannelMap: HashMap<String, DataChannel> = HashMap()
     private val audioTracks = mutableListOf<AudioTrack>()
     private val videoTracks = mutableListOf<VideoTrack>()
-    private var innerDataChannel: DataChannel? = null
     protected val compositeDisposable = CompositeDisposable()
     protected var peerConnection: PeerConnection? = null
-    private var svr: SurfaceViewRenderer? = null
     private val handler = Handler(Looper.getMainLooper())
+    private var audioMuted: Boolean = false
+    private var videoMuted: Boolean = false
+    private var svr: SurfaceViewRenderer? = null
 
     open fun initPeerConn() {
         val configuration = PeerConnection.RTCConfiguration(emptyList())
@@ -48,13 +47,6 @@ abstract class BaseParticipant(
     }
 
     open fun startPeerConnection(peerConnection: PeerConnection) {
-        if (this is LocalParticipant) {
-            innerDataChannel = peerConnection.createDataChannel("", DataChannel.Init().apply {
-                ordered = true
-                maxRetransmits = 3
-            })
-            innerDataChannel?.registerObserver(this)
-        }
         peerConnection.createOffer(object : SdpObserver {
             override fun onCreateSuccess(p0: SessionDescription?) {
                 LLog.d("${uid}, createOffer onCreateSuccess")
@@ -80,21 +72,32 @@ abstract class BaseParticipant(
         }, MediaConstraintsHelper.offerOrAnswerConstraint(this is RemoteParticipant))
     }
 
-    fun setAudioEnable(enable: Boolean) {
+    fun setAudioMuted(muted: Boolean) {
         audioTracks.let {
             for (i in it) {
-                i.setEnabled(enable)
+                i.setEnabled(!muted)
             }
         }
+        audioMuted = muted
     }
 
-    fun setVideoEnable(enable: Boolean) {
+    fun getAudioMuted(): Boolean {
+        return audioMuted
+    }
+
+    fun setVideoMuted(muted: Boolean) {
         videoTracks.let {
             for (i in it) {
-                i.setEnabled(enable)
+                i.setEnabled(!muted)
             }
         }
+        videoMuted = muted
     }
+
+    fun getVideoMuted(): Boolean {
+        return videoMuted
+    }
+
 
     fun setVolume(volume: Double) {
         audioTracks.let {
@@ -200,10 +203,10 @@ abstract class BaseParticipant(
     }
 
     override fun onAddStream(p0: MediaStream?) {
-        handler.post {
-            LLog.d("${uid}, onAddStream")
-            p0?.let {
-                LLog.d("${uid}, onAddStream, ${it.audioTracks.size}, ${it.videoTracks.size}")
+        LLog.d("${uid}, onAddStream")
+        p0?.let {
+            LLog.d("${uid}, onAddStream, ${it.audioTracks.size}, ${it.videoTracks.size}")
+            handler.post {
                 if (this is RemoteParticipant) {
                     if (it.videoTracks != null) {
                         for (v in it.videoTracks) {
@@ -257,28 +260,11 @@ abstract class BaseParticipant(
     override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
         super.onAddTrack(p0, p1)
         LLog.d("${uid}, onAddTrack")
-        p0?.let {
-            LLog.d("${uid}, onAddTrack, p0: $p0")
-        }
-        p1?.let {
-            it.forEach { stream ->
-                LLog.d("${uid}, onAddTrack, p1: ${stream.audioTracks.size}, ${stream.videoTracks.size}")
-            }
-        }
     }
 
     override fun onRemoveTrack(receiver: RtpReceiver?) {
         super.onRemoveTrack(receiver)
-//        LLog.d("${uid}, onRemoveTrack")
-//        receiver?.track()?.let {
-//            LLog.d("${uid}, onRemoveTrack: ${it.kind()}, $it")
-//            if (it is AudioTrack) {
-//                removeAudioTrack(it)
-//            }
-//            if (it is VideoTrack) {
-//                removeVideoTrack(it)
-//            }
-//        }
+        LLog.d("${uid}, onRemoveTrack")
     }
 
     override fun onBufferedAmountChange(p0: Long) {
@@ -294,6 +280,7 @@ abstract class BaseParticipant(
             if (it.binary) {
                 it.data?.let { data ->
                     LLog.d("onMessage: " + Utils.byteArray2HexString(data.array()))
+                    this.onNewBufferMessage(it.data)
                 }
             } else {
                 it.data?.let { data ->
@@ -306,24 +293,48 @@ abstract class BaseParticipant(
         }
     }
 
-    private fun onNewMessage(message: String) {
-        val notify = Gson().fromJson(message, NotifyBean::class.java)
-        if (notify.type == "NewStream") {
-            val newStream = Gson().fromJson(notify.message, NewStreamNotify::class.java)
-            val participant =
-                RemoteParticipant(newStream.uid, newStream.roomId, newStream.streamKey)
+    open fun onNewBufferMessage(bb: ByteBuffer) {
+        LiveManager.shared().getRoom()?.let {
             handler.post {
-                val currentRoom = LiveManager.shared().getRoom()
-                currentRoom?.participantJoin(participant)
+                it.receivedDcMsg(bb)
             }
-        } else if (notify.type == "RemoveStream") {
-            val removeStreamNotify = Gson().fromJson(notify.message, RemoveStreamNotify::class.java)
-            handler.post {
-                val currentRoom = LiveManager.shared().getRoom()
-                currentRoom?.participantLeave(
-                    removeStreamNotify.roomId,
-                    removeStreamNotify.streamKey
-                )
+        }
+    }
+
+    open fun onNewMessage(message: String) {
+        val notify = Gson().fromJson(message, NotifyBean::class.java)
+        when (notify.type) {
+            NotifyType.NewStream.value -> {
+                val newStream = Gson().fromJson(notify.message, NewStreamNotify::class.java)
+                val participant =
+                    RemoteParticipant(newStream.uid, newStream.roomId, newStream.streamKey)
+                LiveManager.shared().getRoom()?.let {
+                    handler.post {
+                        it.participantJoin(participant)
+                    }
+                }
+            }
+
+            NotifyType.RemoveStream.value -> {
+                val removeStreamNotify =
+                    Gson().fromJson(notify.message, RemoveStreamNotify::class.java)
+                LiveManager.shared().getRoom()?.let {
+                    handler.post {
+                        it.participantLeave(
+                            removeStreamNotify.roomId,
+                            removeStreamNotify.streamKey
+                        )
+                    }
+                }
+            }
+
+            NotifyType.DataChannelMsg.value -> {
+                val dataChannelMsg = Gson().fromJson(notify.message, DataChannelMsg::class.java)
+                LiveManager.shared().getRoom()?.let {
+                    handler.post {
+                        it.receivedDcMsg(dataChannelMsg.uid, dataChannelMsg.text)
+                    }
+                }
             }
         }
     }
@@ -405,11 +416,6 @@ abstract class BaseParticipant(
         detachViewRender()
         videoTracks.clear()
         audioTracks.clear()
-        innerDataChannel?.let {
-            it.unregisterObserver()
-            it.dispose()
-        }
-        innerDataChannel = null
         for ((_, v) in dataChannelMap) {
             v.unregisterObserver()
             v.dispose()

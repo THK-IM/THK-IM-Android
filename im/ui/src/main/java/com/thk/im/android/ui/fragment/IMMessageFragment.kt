@@ -21,6 +21,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.common.extension.dp2px
+import com.thk.im.android.common.popup.KeyboardPopupWindow
 import com.thk.im.android.core.IMManager
 import com.thk.im.android.core.api.BaseSubscriber
 import com.thk.im.android.core.event.XEventBus

@@ -1,39 +1,49 @@
 package com.thk.android.im.live.room
 
-import com.thk.android.im.live.participant.BaseParticipant
-import com.thk.android.im.live.participant.LocalParticipant
-import com.thk.android.im.live.participant.RemoteParticipant
 import com.thk.android.im.live.LiveManager
 import com.thk.android.im.live.utils.LLog
+import java.nio.ByteBuffer
 
-
-class Room(val id: String, private val mode: Mode, role: Role, members: List<Member>?) {
+class Room(
+    val id: String,
+    val uid: String,
+    private val mode: Mode,
+    role: Role,
+    members: List<Member>?
+) {
     private val observers: MutableList<RoomObserver> = ArrayList()
     private var localParticipant: LocalParticipant? = null
     private var remoteParticipants: MutableList<RemoteParticipant> = ArrayList()
 
     init {
         initLocalParticipant(role)
-        members?.let { ms ->
-            for (m in ms) {
-                m.streamKey?.let {
-                    val remoteParticipant = RemoteParticipant(m.uid, id, it)
-                    this.remoteParticipants.add(remoteParticipant)
-                }
-            }
-        }
+        initRemoteParticipant(members)
     }
+
 
     private fun initLocalParticipant(role: Role) {
         LiveManager.shared().selfId?.let {
             localParticipant = if (role == Role.Broadcaster) {
                 LocalParticipant(
-                    it, id, role, audioEnable = mode >= Mode.Audio, videoEnable = mode == Mode.Video
+                    it,
+                    id,
+                    role,
+                    audioEnable = mode.value >= Mode.Audio.value,
+                    videoEnable = mode.value == Mode.Video.value
                 )
             } else {
                 LocalParticipant(
                     it, id, role, audioEnable = false, videoEnable = false
                 )
+            }
+        }
+    }
+
+    private fun initRemoteParticipant(members: List<Member>?) {
+        members?.let { ms ->
+            for (m in ms) {
+                val remoteParticipant = RemoteParticipant(m.uid, id, m.streamKey)
+                this.remoteParticipants.add(remoteParticipant)
             }
         }
     }
@@ -95,8 +105,8 @@ class Room(val id: String, private val mode: Mode, role: Role, members: List<Mem
     private fun onRemoteParticipantLeave(p: RemoteParticipant) {
         if (remoteParticipants.contains(p)) {
             remoteParticipants.remove(p)
-            notifyLeave(p)
         }
+        notifyLeave(p)
     }
 
     fun destroy() {
@@ -120,12 +130,7 @@ class Room(val id: String, private val mode: Mode, role: Role, members: List<Mem
 
     fun setRole(role: Role) {
         LLog.v("setRole: $role")
-        if (localParticipant == null) {
-            initLocalParticipant(role)
-            localParticipant?.let {
-                participantJoin(it)
-            }
-        } else {
+        if (localParticipant != null) {
             val lp = localParticipant!!
             if (lp.getRole() != role) {
                 lp.onDisConnected()
@@ -134,7 +139,13 @@ class Room(val id: String, private val mode: Mode, role: Role, members: List<Mem
                 localParticipant?.let {
                     participantJoin(it)
                 }
+            } else {
+                return
             }
+        }
+        initLocalParticipant(role)
+        localParticipant?.let {
+            participantJoin(it)
         }
     }
 
@@ -161,6 +172,46 @@ class Room(val id: String, private val mode: Mode, role: Role, members: List<Mem
         LLog.d("notifyLeave, ${p.uid}")
         for (o in observers) {
             o.leave(p)
+        }
+    }
+
+    fun sendMessage(text: String): Boolean {
+        return if (localParticipant != null) {
+            val success = localParticipant!!.sendMessage(text)
+            if (success) {
+                receivedDcMsg(uid, text)
+            }
+            success
+        } else {
+            false
+        }
+    }
+
+    fun sendBytes(ba: ByteArray): Boolean {
+        return if (localParticipant != null) {
+            localParticipant!!.sendBytes(ba)
+        } else {
+            false
+        }
+    }
+
+    fun sendByteBuffer(bb: ByteBuffer): Boolean {
+        return if (localParticipant != null) {
+            localParticipant!!.sendByteBuffer(bb)
+        } else {
+            false
+        }
+    }
+
+    fun receivedDcMsg(uid: String, text: String) {
+        observers.forEach {
+            it.onTextMsgReceived(uid, text)
+        }
+    }
+
+    fun receivedDcMsg(bb: ByteBuffer) {
+        observers.forEach {
+            it.onBufferMsgReceived(bb)
         }
     }
 

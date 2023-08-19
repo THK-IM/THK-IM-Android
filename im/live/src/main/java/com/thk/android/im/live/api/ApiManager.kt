@@ -12,7 +12,7 @@ object ApiManager {
     private const val defaultTimeout: Long = 30
     private const val maxIdleConnection = 8
     private const val keepAliveDuration: Long = 60
-    private var apiEndpoint = "http://192.168.1.4:18100"
+    private var apiEndpoint = "http://192.168.1.3:18100"
 
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(defaultTimeout, TimeUnit.SECONDS)

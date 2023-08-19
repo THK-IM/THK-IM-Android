@@ -1,4 +1,4 @@
-package com.thk.android.im.live.participant
+package com.thk.android.im.live.room
 
 import android.util.Base64
 import com.thk.android.im.live.api.ApiManager
@@ -15,10 +15,10 @@ import java.nio.charset.Charset
 class RemoteParticipant(
     uid: String,
     roomId: String,
-    private val pushStreamKey: String,
+    private val subStreamKey: String,
 ) : BaseParticipant(uid, roomId) {
 
-    private var playStreamKey: String? = null
+    private var streamKey: String? = null
 
     override fun initPeerConn() {
         super.initPeerConn()
@@ -40,7 +40,7 @@ class RemoteParticipant(
         val offer = sdp.description
         val offerBase64 =
             String(Base64.encode(offer.toByteArray(Charset.forName("UTF-8")), Base64.DEFAULT))
-        val bean = PlayReqBean(roomId, uid, offerBase64, streamKey = pushStreamKey)
+        val bean = PlayReqBean(roomId, uid, offerBase64, streamKey = subStreamKey)
         val subscriber = object : BaseSubscriber<PlayResBean>() {
             override fun onNext(t: PlayResBean?) {
                 t?.let {
@@ -50,7 +50,7 @@ class RemoteParticipant(
                             Base64.DEFAULT
                         )
                     )
-                    playStreamKey = t.streamKey
+                    streamKey = t.streamKey
                     val remoteSdp = SessionDescription(SessionDescription.Type.ANSWER, answer)
                     setRemoteSessionDescription(remoteSdp)
                 }
@@ -64,10 +64,10 @@ class RemoteParticipant(
     }
 
     override fun pushStreamKey(): String {
-        return this.pushStreamKey
+        return this.subStreamKey
     }
 
     override fun playStreamKey(): String? {
-        return this.playStreamKey
+        return this.streamKey
     }
 }

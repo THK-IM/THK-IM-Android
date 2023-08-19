@@ -1,7 +1,8 @@
-package com.thk.android.im.live.participant
+package com.thk.android.im.live.room
 
 import android.content.Context
 import android.util.Base64
+import com.google.gson.Gson
 import com.thk.android.im.live.LiveManager
 import com.thk.android.im.live.api.ApiManager
 import com.thk.android.im.live.api.BaseSubscriber
@@ -9,17 +10,21 @@ import com.thk.android.im.live.api.RtcApi
 import com.thk.android.im.live.api.RxTransform
 import com.thk.android.im.live.bean.PublishReqBean
 import com.thk.android.im.live.bean.PublishResBean
+import com.thk.android.im.live.room.BaseParticipant
+import com.thk.android.im.live.room.DataChannelMsg
 import com.thk.android.im.live.room.Role
 import com.thk.android.im.live.utils.LLog
 import com.thk.android.im.live.utils.MediaConstraintsHelper
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer
+import org.webrtc.DataChannel
 import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoCapturer
 import org.webrtc.VideoSource
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 class LocalParticipant(
@@ -34,6 +39,7 @@ class LocalParticipant(
     private var videoSource: VideoSource? = null
     private var videoCapture: VideoCapturer? = null
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
+    private var innerDataChannel: DataChannel? = null
 
     override fun initPeerConn() {
         super.initPeerConn()
@@ -80,10 +86,15 @@ class LocalParticipant(
                             RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY)
                         )
                         it.initialize(surfaceTextureHelper, app, videoSource!!.capturerObserver)
-                        it.startCapture(320, 480, 10)
+                        it.startCapture(160, 240, 5)
                         addVideoTrack(videoTrack)
                     }
                 }
+                innerDataChannel = peerConnection!!.createDataChannel("", DataChannel.Init().apply {
+                    ordered = true
+                    maxRetransmits = 3
+                })
+                innerDataChannel?.registerObserver(this)
             }
             startPeerConnection(peerConnection!!)
         } else {
@@ -147,6 +158,11 @@ class LocalParticipant(
 
     override fun onDisConnected() {
         super.onDisConnected()
+        innerDataChannel?.let {
+            it.unregisterObserver()
+            it.dispose()
+        }
+        innerDataChannel = null
         videoSource?.dispose()
         videoCapture?.dispose()
         surfaceTextureHelper?.dispose()
@@ -165,5 +181,35 @@ class LocalParticipant(
 
     fun getRole(): Role {
         return this.role
+    }
+
+
+    fun sendMessage(text: String): Boolean {
+        return if (innerDataChannel == null) {
+            false
+        } else {
+            val msg = DataChannelMsg(uid, text)
+            val msgStr = Gson().toJson(msg)
+            val buffer = DataChannel.Buffer(ByteBuffer.wrap(msgStr.toByteArray()), false)
+            innerDataChannel!!.send(buffer)
+        }
+    }
+
+    fun sendBytes(ba: ByteArray): Boolean {
+        return if (innerDataChannel == null) {
+            false
+        } else {
+            val buffer = DataChannel.Buffer(ByteBuffer.wrap(ba), true)
+            innerDataChannel!!.send(buffer)
+        }
+    }
+
+    fun sendByteBuffer(bb: ByteBuffer): Boolean {
+        return if (innerDataChannel == null) {
+            false
+        } else {
+            val buffer = DataChannel.Buffer(bb, true)
+            innerDataChannel!!.send(buffer)
+        }
     }
 }

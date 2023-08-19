@@ -1,8 +1,7 @@
-package com.thk.im.android.ui.fragment
+package com.thk.im.android.common.popup
 
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup

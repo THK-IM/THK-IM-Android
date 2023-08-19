@@ -21,4 +21,6 @@ data class CreateRoomResBean(
     var createTime: Long,
     @SerializedName("participants")
     var members: MutableList<Member>,
+    @SerializedName("mode")
+    var mode: Int,
 )

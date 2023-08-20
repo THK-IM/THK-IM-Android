@@ -1,4 +1,4 @@
-package com.thk.im.android.media;
+package com.thk.im.android.media.picker;
 
 import android.content.Context;
 
@@ -9,6 +9,7 @@ import com.luck.picture.lib.style.PictureSelectorStyle;
 import com.luck.picture.lib.style.SelectMainStyle;
 import com.luck.picture.lib.style.TitleBarStyle;
 import com.luck.picture.lib.utils.DensityUtil;
+import com.thk.im.android.media.R;
 
 public class AlbumStyleUtils {
 

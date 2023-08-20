@@ -41,5 +41,6 @@ dependencies {
 //    implementation 'io.github.lucksiege:ucrop:v3.11.1'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
 
-    implementation project(":im:common")
+    implementation 'top.oply.opuslib:opuslib:1.0.2'
+    implementation project(":im:base")
 }

@@ -41,8 +41,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    implementation project(":im:opuslib")
-    implementation project(":im:common")
+    implementation project(":im:base")
     implementation project(":im:core")
     implementation project(":im:db")
     api project(':im:media')

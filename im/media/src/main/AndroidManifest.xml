@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <application>
         <provider
-            android:name="com.thk.im.android.media.FileProvider"
+            android:name="com.thk.im.android.media.picker.FileProvider"
             android:authorities="${applicationId}.IMFileProvider"
             android:exported="false"
             android:grantUriPermissions="true"

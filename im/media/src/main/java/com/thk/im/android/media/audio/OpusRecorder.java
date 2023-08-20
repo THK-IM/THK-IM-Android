@@ -1,11 +1,10 @@
-package com.thk.im.android.opuslib;
+package com.thk.im.android.media.audio;
 
 import android.annotation.SuppressLint;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
-
 
 import java.io.File;
 import java.nio.ByteBuffer;

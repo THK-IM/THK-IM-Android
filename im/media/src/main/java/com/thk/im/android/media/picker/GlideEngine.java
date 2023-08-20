@@ -1,4 +1,4 @@
-package com.thk.im.android.media;
+package com.thk.im.android.media.picker;
 
 import android.content.Context;
 import android.widget.ImageView;
@@ -8,6 +8,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.luck.picture.lib.engine.ImageEngine;
 import com.luck.picture.lib.utils.ActivityCompatHelper;
+import com.thk.im.android.media.R;
 
 public class GlideEngine implements ImageEngine {
 

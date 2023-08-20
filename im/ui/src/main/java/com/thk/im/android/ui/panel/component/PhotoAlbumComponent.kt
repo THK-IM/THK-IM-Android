@@ -12,8 +12,8 @@ import com.luck.picture.lib.interfaces.OnResultCallbackListener
 import com.thk.im.android.core.IMManager
 import com.thk.im.android.core.processor.ImageMsgProcessor
 import com.thk.im.android.db.entity.MsgType
-import com.thk.im.android.media.AlbumStyleUtils
-import com.thk.im.android.media.GlideEngine
+import com.thk.im.android.media.picker.AlbumStyleUtils
+import com.thk.im.android.media.picker.GlideEngine
 import com.thk.im.android.ui.panel.component.internal.BaseMediaComponent
 import top.zibin.luban.CompressionPredicate
 import top.zibin.luban.Luban

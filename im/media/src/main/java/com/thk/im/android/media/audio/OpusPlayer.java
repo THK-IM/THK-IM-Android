@@ -1,4 +1,4 @@
-package com.thk.im.android.opuslib;
+package com.thk.im.android.media.audio;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;

@@ -6,17 +6,6 @@ import com.google.gson.annotations.SerializedName
 import com.thk.im.android.db.entity.Session
 import kotlinx.parcelize.Parcelize
 
-//SId      int64  `json:"s_id"`
-//Name     string `json:"name"`
-//Remark   string `json:"remark"`
-//Type     int    `json:"type"`
-//Status   int    `json:"status"`
-//Role     int    `json:"role"`
-//Mute     int    `json:"mute"`
-//Top      int64  `json:"top"`
-//EntityId int64  `json:"entity_id"`
-//CTime    int64  `json:"c_time"`
-//MTime    int64  `json:"m_time"`
 @Keep
 @Parcelize
 data class SessionBean(

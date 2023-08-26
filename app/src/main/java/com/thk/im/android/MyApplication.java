@@ -30,7 +30,7 @@ public class MyApplication extends Application {
 //            }
 //        });
 //        IMManager.INSTANCE.registerFileLoaderModule(module);
-        IMCoreManager.INSTANCE.init(this, uid, String.valueOf(uid), "ws://192.168.1.4:18002/ws", "http://192.168.1.4:18002/ws");
+        IMCoreManager.INSTANCE.init(this, uid, String.valueOf(uid), "ws://192.168.1.4:18002/ws", "http://192.168.1.4:18002");
         IMItemViewManager.INSTANCE.init();
         LiveManager.Companion.shared().init(this, String.valueOf(uid), true);
     }

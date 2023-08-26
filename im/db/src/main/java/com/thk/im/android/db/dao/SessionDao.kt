@@ -6,8 +6,8 @@ import com.thk.im.android.db.entity.Session
 @Dao
 interface SessionDao {
 
-    @Query("select * from session order by top desc, m_time desc limit :offset, :size")
-    fun querySessionsByMTime(offset: Int, size: Int): List<Session>
+    @Query("select * from session where m_time <= :mTime order by top desc, m_time desc limit 0, :count")
+    fun querySessions(count: Int, mTime: Long): List<Session>
 
     @Query("select * from session order by m_time desc")
     fun querySessionsByMTime(): List<Session>

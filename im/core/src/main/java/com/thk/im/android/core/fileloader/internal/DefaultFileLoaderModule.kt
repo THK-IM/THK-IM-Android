@@ -8,7 +8,10 @@ import com.alibaba.sdk.android.oss.OSSClient
 import com.alibaba.sdk.android.oss.common.auth.OSSFederationCredentialProvider
 import com.thk.im.android.core.fileloader.FileLoaderModule
 import com.thk.im.android.core.fileloader.LoadListener
+import okhttp3.ConnectionPool
+import okhttp3.OkHttpClient
 import java.lang.ref.WeakReference
+import java.util.concurrent.TimeUnit
 
 class DefaultFileLoaderModule(
     app: Application,
@@ -23,6 +26,19 @@ class DefaultFileLoaderModule(
     private val scheme = "https://"
 
     private val ossClient: OSSClient
+
+    private val defaultTimeout: Long = 30
+    private val maxIdleConnection = 8
+    private val keepAliveDuration: Long = 60
+
+    val downloadClient = OkHttpClient.Builder()
+        .connectTimeout(defaultTimeout, TimeUnit.SECONDS)
+        .writeTimeout(defaultTimeout, TimeUnit.SECONDS)
+        .readTimeout(defaultTimeout, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .followRedirects(true)
+        .connectionPool(ConnectionPool(maxIdleConnection, keepAliveDuration, TimeUnit.SECONDS))
+        .build()
 
     init {
         val conf = ClientConfiguration()

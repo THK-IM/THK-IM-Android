@@ -20,15 +20,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.thk.im.android.common.extension.dp2px
-import com.thk.im.android.common.popup.KeyboardPopupWindow
-import com.thk.im.android.core.IMManager
-import com.thk.im.android.core.api.BaseSubscriber
+import com.thk.im.android.base.BaseSubscriber
+import com.thk.im.android.base.LLog
+import com.thk.im.android.base.extension.dp2px
+import com.thk.im.android.base.popup.KeyboardPopupWindow
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.event.XEventType
-import com.thk.im.android.core.utils.LLog
+import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.MsgType
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.databinding.FragmentImMessageBinding
 import com.thk.im.android.ui.fragment.adapter.MessageAdapter
@@ -97,9 +97,10 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
         loadMessages()
         binding.tvSendMsg.setOnClickListener {
             binding.etMessage.text?.let {
-                IMManager.getMessageModule().getMessageProcessor(MsgType.TEXT.value).sendMessage(
-                    it.toString(), sid,
-                )
+                IMCoreManager.getMessageModule().getMsgProcessor(MsgType.TEXT.value)
+                    .sendMessage(
+                        it.toString(), sid,
+                    )
             }
             binding.etMessage.text = null
         }
@@ -143,8 +144,12 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
                 bottomHeight = 200.dp2px()
                 layoutRefresh(bottomHeight, false)
             } else {
-                bottomHeight = 0
-                IMKeyboardUtils.showSoftInput(binding.etMessage)
+                if (keyboardPopupWindow.keyboardHeight > 0) {
+                    IMKeyboardUtils.showSoftInput(binding.etMessage)
+                } else {
+                    bottomHeight = 0
+                    layoutRefresh(bottomHeight, false)
+                }
             }
         }
 
@@ -164,7 +169,7 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
                 } else {
                     layoutRefresh(bottomHeight, false)
                 }
-            } else  {
+            } else {
                 if (it != 0) {
                     layoutRefresh(it, true)
                 } else {
@@ -222,13 +227,21 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
         }
         msgAnimator.setTarget(binding.rcvMessage)
         msgAnimator.duration = 150
-        val animator = ObjectAnimator.ofFloat(binding.llAlwaysShow, "translationY", (0-bottomHeight).toFloat())
+        val animator = ObjectAnimator.ofFloat(
+            binding.llAlwaysShow,
+            "translationY",
+            (0 - bottomHeight).toFloat()
+        )
         animator.duration = 150
         if (closeBottomPanel) {
             val lp = binding.llBottomPanel.layoutParams
             lp.height = bottomHeight
             binding.llBottomPanel.layoutParams = lp
-            val bottomAnimator = ObjectAnimator.ofFloat(binding.llBottomPanel, "translationY", (0-bottomHeight).toFloat())
+            val bottomAnimator = ObjectAnimator.ofFloat(
+                binding.llBottomPanel,
+                "translationY",
+                (0 - bottomHeight).toFloat()
+            )
             bottomAnimator.duration = 150
             animators.play(msgAnimator).with(animator).with(bottomAnimator)
         } else {
@@ -296,7 +309,7 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
     private fun loadMessages() {
         if (!hasMore || isLoading) return
         if (msgAdapter.getMessageCount() == 0) {
-            cTime = IMManager.getSignalModule().severTime
+            cTime = IMCoreManager.getSignalModule().severTime
         }
         isLoading = true
         val subscriber = object : BaseSubscriber<List<Message>>() {
@@ -319,7 +332,7 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
                 isLoading = false
             }
         }
-        IMManager.getMessageModule().queryLocalMessages(sid, cTime, count).subscribe(subscriber)
+        IMCoreManager.getMessageModule().queryLocalMessages(sid, cTime, count).subscribe(subscriber)
         composite.add(subscriber)
     }
 

@@ -1,8 +1,8 @@
 package com.thk.im.android.core.module;
 
-import com.thk.im.android.core.bean.ContactorApplyBean
-import com.thk.im.android.core.bean.ContactorApplyMessageBean
-import com.thk.im.android.core.bean.ContactorBean
+import com.thk.im.android.core.api.bean.ContactorApplyBean
+import com.thk.im.android.core.api.bean.ContactorApplyMessageBean
+import com.thk.im.android.core.api.bean.ContactorBean
 import io.reactivex.Flowable
 
 interface ContactorModule: CommonModule {

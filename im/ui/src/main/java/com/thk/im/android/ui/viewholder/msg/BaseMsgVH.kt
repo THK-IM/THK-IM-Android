@@ -1,24 +1,18 @@
 package com.thk.im.android.ui.viewholder.msg
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup.LayoutParams
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.lifecycle.LifecycleOwner
-import com.thk.im.android.common.AppUtils
-import com.thk.im.android.common.IMImageLoader
-import com.thk.im.android.common.extension.dp2px
-import com.thk.im.android.core.IMManager
-import com.thk.im.android.core.api.BaseSubscriber
+import com.thk.im.android.base.AppUtils
+import com.thk.im.android.base.BaseSubscriber
+import com.thk.im.android.base.IMImageLoader
+import com.thk.im.android.base.extension.dp2px
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.event.XEventType
 import com.thk.im.android.core.fileloader.FileLoaderModule
@@ -27,9 +21,9 @@ import com.thk.im.android.core.module.ContactorModule
 import com.thk.im.android.core.module.GroupModule
 import com.thk.im.android.core.module.MessageModule
 import com.thk.im.android.core.module.UserModule
-import com.thk.im.android.db.dao.SessionType
+import com.thk.im.android.db.MsgSendStatus
+import com.thk.im.android.db.SessionType
 import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.MsgStatus
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.db.entity.User
 import com.thk.im.android.ui.R
@@ -68,7 +62,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
 //            }
 //        }
 
-        val flContent : LinearLayout = itemView.findViewById(R.id.fl_content)
+        val flContent: LinearLayout = itemView.findViewById(R.id.fl_content)
         contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
         flContent.addView(contentContainer)
 
@@ -79,7 +73,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
      */
     open fun onViewBind(msg: Message, ses: Session) {
 //        onViewCreated()
-        var flContainer : LinearLayout? = null
+        var flContainer: LinearLayout? = null
         if (viewType % 3 == 0) {
             flContainer = itemView.findViewById(R.id.fl_container_mid)
             val lp = flContainer.layoutParams
@@ -124,13 +118,13 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             disposable.add(subscriber)
         }
 
-        when (msg.status) {
-            MsgStatus.SendFailed.value -> {
+        when (msg.sendStatus) {
+            MsgSendStatus.SendFailed.value -> {
                 pbMsgFailedView?.visibility = View.GONE
                 ivMsgFailedView?.visibility = View.VISIBLE
             }
 
-            MsgStatus.SorRSuccess.value, MsgStatus.AlreadyRead.value -> {
+            MsgSendStatus.SorRSuccess.value -> {
                 pbMsgFailedView?.visibility = View.GONE
                 ivMsgFailedView?.visibility = View.GONE
             }
@@ -147,7 +141,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     }
 
     open fun resend() {
-        val msgProcessor = IMManager.getMsgProcessor(messsage.type)
+        val msgProcessor = IMCoreManager.getMessageModule().getMsgProcessor(messsage.type)
         msgProcessor.resend(messsage)
     }
 
@@ -172,32 +166,32 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     }
 
     fun getUserModule(): UserModule {
-        return IMManager.getUserModule()
+        return IMCoreManager.getUserModule()
     }
 
     fun getGroupModule(): GroupModule {
-        return IMManager.getGroupModule()
+        return IMCoreManager.getGroupModule()
     }
 
     fun getMessageModule(): MessageModule {
-        return IMManager.getMessageModule()
+        return IMCoreManager.getMessageModule()
     }
 
     fun getContactorModule(): ContactorModule {
-        return IMManager.getContactorModule()
+        return IMCoreManager.getContactorModule()
     }
 
     fun getFileLoaderModule(): FileLoaderModule {
-        return IMManager.getFileLoaderModule()
+        return IMCoreManager.getFileLoaderModule()
     }
 
     open fun displayAvatar(imageView: ImageView, id: Long, url: String, type: Int = 1) {
-        val path = IMManager.getStorageModule().allocAvatarPath(id, url, type)
+        val path = IMCoreManager.getStorageModule().allocAvatarPath(id, url, type)
         val file = File(path)
         if (file.exists()) {
             IMImageLoader.displayImageByPath(imageView, path)
         } else {
-            IMManager.getFileLoaderModule().download(url, path, object : LoadListener {
+            IMCoreManager.getFileLoaderModule().download(url, path, object : LoadListener {
                 override fun onProgress(progress: Int, state: Int, url: String, path: String) {
                     if (state == LoadListener.Success) {
                         XEventBus.post(XEventType.MsgUpdate.value, messsage)

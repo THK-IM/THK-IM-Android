@@ -1,8 +1,8 @@
 package com.thk.im.android.ui.voice
 
 import android.content.Context
-import com.thk.im.android.core.IMManager
-import com.thk.im.android.opuslib.OpusRecorder
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.media.audio.OpusRecorder
 
 class DefaultRecorder(val context: Context, val sid: Long) : IRecorder {
 
@@ -58,10 +58,10 @@ class DefaultRecorder(val context: Context, val sid: Long) : IRecorder {
     }
 
     override fun getFilePath(): String {
-        val pair = IMManager.getStorageModule()
+        val pair = IMCoreManager.getStorageModule()
             .allocSessionFilePath(
                 sid,
-                IMManager.getUid(),
+                IMCoreManager.getUid(),
                 System.currentTimeMillis().toString() + ".spx",
                 "voice"
             )

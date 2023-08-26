@@ -8,11 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.thk.im.android.core.IMManager
-import com.thk.im.android.core.api.BaseSubscriber
+import com.thk.im.android.base.BaseSubscriber
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.event.XEventType
-import com.thk.im.android.db.entity.MsgType
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.adapter.SessionAdapter
@@ -126,7 +125,8 @@ class SessionFragment : Fragment() {
                 isLoading = false
             }
         }
-        IMManager.getMessageModule().queryLocalSessions(sessionAdapter.itemCount, count)
+        val current = IMCoreManager.getSignalModule().severTime
+        IMCoreManager.getMessageModule().queryLocalSessions(sessionAdapter.itemCount, current)
             .subscribe(subscriber)
         composite.add(subscriber)
     }

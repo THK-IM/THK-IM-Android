@@ -12,7 +12,7 @@ import com.thk.android.im.live.room.Member
 import com.thk.android.im.live.room.Mode
 import com.thk.android.im.live.room.PCFactoryWrapper
 import com.thk.android.im.live.room.Role
-import com.thk.android.im.live.utils.LLog
+import com.thk.im.android.base.LLog
 import io.reactivex.Flowable
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory

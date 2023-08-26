@@ -2,7 +2,7 @@ package com.thk.im.android.ui.viewholder.session
 
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
-import com.thk.im.android.core.IMManager
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.module.GroupModule
 import com.thk.im.android.core.module.UserModule
 import com.thk.im.android.core.signal.SignalType
@@ -21,11 +21,11 @@ abstract class BaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
     }
 
     fun getUserModule(): UserModule {
-        return IMManager.getModule(SignalType.User.value) as UserModule
+        return IMCoreManager.getModule(SignalType.User.value) as UserModule
     }
 
     fun getGroupModule(): GroupModule {
-        return IMManager.getModule(SignalType.Group.value) as GroupModule
+        return IMCoreManager.getModule(SignalType.Group.value) as GroupModule
     }
 
 

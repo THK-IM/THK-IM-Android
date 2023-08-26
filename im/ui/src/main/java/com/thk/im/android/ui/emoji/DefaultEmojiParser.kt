@@ -4,7 +4,7 @@ import android.content.Context
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import androidx.core.content.ContextCompat
-import com.thk.im.android.common.extension.dp2px
+import com.thk.im.android.base.extension.dp2px
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.emoji.span.CenterImageSpan
 import java.util.regex.Pattern

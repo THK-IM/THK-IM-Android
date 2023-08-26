@@ -4,11 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
-import com.thk.im.android.core.IMManager
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.viewholder.msg.BaseMsgVH
-import com.thk.im.android.ui.viewholder.msg.VoiceMsgVH
 
 abstract class MsgItemViewProvider {
 
@@ -20,7 +19,7 @@ abstract class MsgItemViewProvider {
     }
 
     open fun getSelfId(): Long {
-        return IMManager.getUid()
+        return IMCoreManager.getUid()
     }
 
     /**

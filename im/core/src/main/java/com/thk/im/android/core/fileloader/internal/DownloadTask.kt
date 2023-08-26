@@ -1,8 +1,7 @@
 package com.thk.im.android.core.fileloader.internal
 
-import com.thk.im.android.core.api.ApiManager
+import com.thk.im.android.base.LLog
 import com.thk.im.android.core.fileloader.LoadListener
-import com.thk.im.android.core.utils.LLog
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -30,7 +29,7 @@ class DownloadTask(
 
     override fun start() {
         notify(0, LoadListener.Init)
-        val okHttpClient = ApiManager.getDownloadHttpClient()
+        val okHttpClient = fileLoaderModule.downloadClient
         val request = Request.Builder()
             .addHeader("token", fileLoaderModule.token)
             //访问路径

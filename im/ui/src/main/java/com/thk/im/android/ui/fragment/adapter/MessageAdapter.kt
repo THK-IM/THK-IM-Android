@@ -48,7 +48,7 @@ class MessageAdapter(
     private fun newTimelineMessage(cTime: Long): Message {
         return Message(
             0L, 0L, 0L, 0L, timeLineMsgType, cTime.toString(),
-            0, null, null, null, cTime, 0L
+            0, 0, cTime, 0L, null, null, null
         )
     }
 
@@ -101,7 +101,7 @@ class MessageAdapter(
         }
     }
 
-    fun insertNew(message: Message) : Int {
+    fun insertNew(message: Message): Int {
         synchronized(this) {
             val pos = findPosition(message)
             if (pos >= 0 && pos < messageList.size) {

@@ -5,7 +5,7 @@ import android.app.Application
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.thk.im.android.core.IMManager
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.panel.emoji.bean.EmoBean
 import com.thk.im.android.ui.panel.emoji.bean.EmoImageBean
@@ -44,7 +44,7 @@ object EmojiManager {
         val recentEmojiIndexList = getRecentEmojiIndexes()
         if (recentEmojiIndexList.size > 0) {
             val emoImageBean = EmoTextBean()
-            emoImageBean.title = IMManager.getApplication().getString(R.string.latest_emoji)
+            emoImageBean.title = IMCoreManager.getApplication().getString(R.string.latest_emoji)
             recentEmojiList.add(emoImageBean)
             val emoResIdList: IntArray = parser.getEmojiIds()
             for (indexValue in recentEmojiIndexList) {
@@ -68,7 +68,7 @@ object EmojiManager {
         val emojiList: MutableList<EmoBean> = mutableListOf()
         //全部表情标题
         val emoImageBean = EmoTextBean()
-        emoImageBean.title = IMManager.getApplication().getString(R.string.all_emoji)
+        emoImageBean.title = IMCoreManager.getApplication().getString(R.string.all_emoji)
         emojiList.add(emoImageBean)
         // 全部表情的id,添加到集合里面
         if (emoResIdList.isNotEmpty()) {
@@ -85,9 +85,9 @@ object EmojiManager {
      * 获取最近表情的下标
      */
     fun getRecentEmojiIndexes(): LinkedList<Int> {
-        val uid = IMManager.getUid()
+        val uid = IMCoreManager.getUid()
         val sharedPreferences =
-            IMManager.getApplication()
+            IMCoreManager.getApplication()
                 .getSharedPreferences(EMOJI_RECENT + "$uid", Context.MODE_PRIVATE)
         val recentList = sharedPreferences.getString(USER_EMO_RECENT_LIST, "")
         return if (recentList.isNullOrEmpty()) {
@@ -114,9 +114,9 @@ object EmojiManager {
         }
 
         val toJSONString = Gson().toJson(lastList)
-        val uid = IMManager.getUid()
+        val uid = IMCoreManager.getUid()
         val sharedPreferences =
-            IMManager.getApplication()
+            IMCoreManager.getApplication()
                 .getSharedPreferences(EMOJI_RECENT + "$uid", Context.MODE_PRIVATE)
         sharedPreferences.edit().putString(USER_EMO_RECENT_LIST, toJSONString).apply()
     }

@@ -1,12 +1,12 @@
 package com.thk.im.android.core.module.internal
 
-import com.thk.im.android.core.IMManager
-import com.thk.im.android.core.api.BaseSubscriber
-import com.thk.im.android.core.api.RxTransform
-import com.thk.im.android.core.bean.GroupApplyBean
-import com.thk.im.android.core.bean.GroupApplyMessageBean
-import com.thk.im.android.core.bean.GroupBean
-import com.thk.im.android.core.bean.GroupMemberBean
+import com.thk.im.android.base.BaseSubscriber
+import com.thk.im.android.base.RxTransform
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.api.bean.GroupApplyBean
+import com.thk.im.android.core.api.bean.GroupApplyMessageBean
+import com.thk.im.android.core.api.bean.GroupBean
+import com.thk.im.android.core.api.bean.GroupMemberBean
 import com.thk.im.android.core.module.GroupModule
 import com.thk.im.android.db.entity.Group
 import com.thk.im.android.db.entity.GroupMember
@@ -16,11 +16,11 @@ import io.reactivex.Flowable
 open class DefaultGroupModule : GroupModule {
 
     override fun onNewGroup(groupBean: GroupBean) {
-        IMManager.getImDataBase().groupDao().insertGroup(groupBean.toGroup())
+        IMCoreManager.getImDataBase().groupDao().insertGroup(groupBean.toGroup())
     }
 
     override fun onLeveGroup(reason: Int, groupId: Long) {
-        IMManager.getImDataBase().groupDao().deleteGroupById(groupId)
+        IMCoreManager.getImDataBase().groupDao().deleteGroupById(groupId)
     }
 
     override fun onGroupInfoUpdate(groupBean: GroupBean) {
@@ -36,17 +36,18 @@ open class DefaultGroupModule : GroupModule {
     }
 
     override fun onNewGroupMember(groupMember: GroupMember) {
-        IMManager.getImDataBase().groupMemberDao().insertGroupMembers(groupMember)
+        IMCoreManager.getImDataBase().groupMemberDao().insertGroupMembers(groupMember)
     }
 
     override fun onRemoveGroupMember(groupMember: GroupMember) {
-        IMManager.getImDataBase().groupMemberDao().deleteGroupMemberById(groupMember.gid, groupMember.uid)
+        IMCoreManager.getImDataBase().groupMemberDao()
+            .deleteGroupMemberById(groupMember.gid, groupMember.uid)
     }
 
 
     override fun createGroup(name: String, members: List<Int>): Flowable<GroupBean> {
         return createGroupByApi(name, members).flatMap {
-            IMManager.getImDataBase().groupDao().insertGroup(it.toGroup())
+            IMCoreManager.getImDataBase().groupDao().insertGroup(it.toGroup())
             Flowable.just(it)
         }
 
@@ -74,7 +75,7 @@ open class DefaultGroupModule : GroupModule {
 
     override fun getGroupInfo(gid: Long): Flowable<Group> {
         return Flowable.create<Group>({
-            val group = IMManager.getImDataBase().groupDao().findGroup(gid)
+            val group = IMCoreManager.getImDataBase().groupDao().findGroup(gid)
             if (group != null) {
                 it.onNext(group)
             } else {
@@ -84,7 +85,7 @@ open class DefaultGroupModule : GroupModule {
             if (it.cTime == 0L) {
                 return@flatMap getServerGroupInfo(it.id).flatMap { bean ->
                     val group = bean.toGroup()
-                    IMManager.getImDataBase().groupDao().insertGroup(group)
+                    IMCoreManager.getImDataBase().groupDao().insertGroup(group)
                     Flowable.just(group)
                 }
             } else {
@@ -116,12 +117,12 @@ open class DefaultGroupModule : GroupModule {
 
     override fun queryGroupMembers(gid: Long): Flowable<List<GroupMember>> {
         return Flowable.create<List<GroupMember>>({
-            val groupMembers = IMManager.getImDataBase().groupMemberDao().queryGroupMembers(gid)
+            val groupMembers = IMCoreManager.getImDataBase().groupMemberDao().queryGroupMembers(gid)
             it.onNext(groupMembers)
         }, BackpressureStrategy.LATEST).flatMap {
             if (it.isEmpty()) {
                 return@flatMap queryGroupMembersFromServer(gid).flatMap { list ->
-                    IMManager.getImDataBase().groupMemberDao()
+                    IMCoreManager.getImDataBase().groupMemberDao()
                         .insertGroupMembers(*list.map { l ->
                             l.toGroupMember()
                         }.toTypedArray())
@@ -137,7 +138,7 @@ open class DefaultGroupModule : GroupModule {
 
     override fun queryGroupMemberByUid(gid: Long, uid: Long): Flowable<GroupMember> {
         return Flowable.create<GroupMember>({
-            val groupMember = IMManager.getImDataBase().groupMemberDao().queryGroupMember(uid)
+            val groupMember = IMCoreManager.getImDataBase().groupMemberDao().queryGroupMember(uid)
             if (groupMember == null) {
                 it.onNext(GroupMember(0L, 0L))
             } else {
@@ -146,7 +147,7 @@ open class DefaultGroupModule : GroupModule {
         }, BackpressureStrategy.LATEST).flatMap {
             if (it.gid == 0L && it.uid == 0L) {
                 return@flatMap queryGroupMemberByUidFromServer(gid, uid).flatMap { member ->
-                    IMManager.getImDataBase().groupMemberDao()
+                    IMCoreManager.getImDataBase().groupMemberDao()
                         .insertGroupMembers(member.toGroupMember())
                     Flowable.just(member.toGroupMember())
                 }

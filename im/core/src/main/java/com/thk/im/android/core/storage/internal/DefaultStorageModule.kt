@@ -3,7 +3,7 @@ package com.thk.im.android.core.storage.internal
 import android.app.Application
 import android.graphics.Bitmap
 import android.util.Base64
-import com.thk.im.android.core.IMManager
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.storage.StorageModule
 import okhttp3.internal.and
 import java.io.*
@@ -176,7 +176,7 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
         format: String
     ): Pair<String, String> {
         val key =
-            "im/session_${sid}/${uid}/" + IMManager.getSignalModule().severTime + "_${fileName}"
+            "im/session_${sid}/${uid}/" + IMCoreManager.getSignalModule().severTime + "_${fileName}"
 
         val rootPath = "${getSessionRootPath(sid)}/$format"
         val dir = File(rootPath)
@@ -217,7 +217,7 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
         uid: Long,
         fileName: String
     ): String {
-        return "im/session_${sid}/${uid}/" + IMManager.getSignalModule().severTime + "_${fileName}"
+        return "im/session_${sid}/${uid}/" + IMCoreManager.getSignalModule().severTime + "_${fileName}"
     }
 
     override fun allocLocalFilePath(sid: Long, fileName: String, format: String): String {

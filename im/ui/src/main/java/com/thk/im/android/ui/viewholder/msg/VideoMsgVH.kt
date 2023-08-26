@@ -6,13 +6,13 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
-import com.thk.im.android.common.IMImageLoader
-import com.thk.im.android.common.extension.dp2px
-import com.thk.im.android.core.IMManager
+import com.thk.im.android.base.IMImageLoader
+import com.thk.im.android.base.extension.dp2px
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.body.VideoBody
+import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.MsgType
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMItemViewManager
@@ -38,8 +38,8 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         } else if (!body.url.isNullOrEmpty()) {
             val fileName = body.url!!.substringAfterLast("/", "")
             val localPath =
-                IMManager.getStorageModule().allocLocalFilePath(msg.sid, fileName, "video")
-            IMManager.getFileLoaderModule().download(body.url!!, localPath, object : LoadListener {
+                IMCoreManager.getStorageModule().allocLocalFilePath(msg.sid, fileName, "video")
+            IMCoreManager.getFileLoaderModule().download(body.url!!, localPath, object : LoadListener {
 
                 override fun onProgress(progress: Int, state: Int, url: String, path: String) {
                     if (state == LoadListener.Success) {
@@ -55,7 +55,7 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                             body.duration = assembleBody.duration
                             body.ratio = assembleBody.ratio
                             msg.content = Gson().toJson(body)
-                            IMManager.getMessageModule().getMessageProcessor(MsgType.VIDEO.value)
+                            IMCoreManager.getMessageModule().getMsgProcessor(MsgType.VIDEO.value)
                                 .updateDb(msg)
                         }
                     }

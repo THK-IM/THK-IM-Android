@@ -1,9 +1,9 @@
 package com.thk.im.android.core.module;
 
-import com.thk.im.android.core.bean.GroupApplyBean
-import com.thk.im.android.core.bean.GroupApplyMessageBean
-import com.thk.im.android.core.bean.GroupBean
-import com.thk.im.android.core.bean.GroupMemberBean
+import com.thk.im.android.core.api.bean.GroupApplyBean
+import com.thk.im.android.core.api.bean.GroupApplyMessageBean
+import com.thk.im.android.core.api.bean.GroupBean
+import com.thk.im.android.core.api.bean.GroupMemberBean
 import com.thk.im.android.db.entity.Group
 import com.thk.im.android.db.entity.GroupMember
 import io.reactivex.Flowable

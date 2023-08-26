@@ -9,9 +9,9 @@ import com.luck.picture.lib.config.SelectMimeType
 import com.luck.picture.lib.engine.CompressFileEngine
 import com.luck.picture.lib.entity.LocalMedia
 import com.luck.picture.lib.interfaces.OnResultCallbackListener
-import com.thk.im.android.core.IMManager
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.processor.ImageMsgProcessor
-import com.thk.im.android.db.entity.MsgType
+import com.thk.im.android.db.MsgType
 import com.thk.im.android.ui.panel.component.internal.BaseMediaComponent
 import top.zibin.luban.Luban
 import top.zibin.luban.OnNewCompressListener
@@ -28,8 +28,8 @@ class CameraComponent(name: String, @DrawableRes id: Int) :
 
 
     override fun onComponentCreate() {
-        imageMsgProcessor = IMManager.getMessageModule()
-            .getMessageProcessor(MsgType.IMAGE.value) as ImageMsgProcessor
+        imageMsgProcessor = IMCoreManager.getMessageModule()
+            .getMsgProcessor(MsgType.IMAGE.value) as ImageMsgProcessor
     }
 
 

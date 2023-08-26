@@ -1,8 +1,8 @@
 package com.thk.im.android.core.module.internal
 
-import com.thk.im.android.core.IMManager
-import com.thk.im.android.core.api.RxTransform
-import com.thk.im.android.core.bean.UserBean
+import com.thk.im.android.base.RxTransform
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.api.bean.UserBean
 import com.thk.im.android.core.module.UserModule
 import com.thk.im.android.db.entity.User
 import io.reactivex.BackpressureStrategy
@@ -21,7 +21,7 @@ open class DefaultUserModule : UserModule {
 
     override fun getUserInfo(id: Long): Flowable<User> {
         return Flowable.create<User>({
-            val user = IMManager.getImDataBase().userDao().queryUser(id)
+            val user = IMCoreManager.getImDataBase().userDao().queryUser(id)
             if (user != null) {
                 it.onNext(user)
             } else {
@@ -31,7 +31,7 @@ open class DefaultUserModule : UserModule {
             if (it.cTime == 0L) {
                 return@flatMap getServerUserInfo(it.id).flatMap { bean ->
                     val user = bean.toUser()
-                    IMManager.getImDataBase().userDao().insertUsers(user)
+                    IMCoreManager.getImDataBase().userDao().insertUsers(user)
                     Flowable.just(user)
                 }
             } else {

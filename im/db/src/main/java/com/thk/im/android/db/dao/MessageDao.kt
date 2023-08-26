@@ -1,20 +1,21 @@
 package com.thk.im.android.db.dao
 
 import androidx.room.*
+import com.thk.im.android.db.MsgOperateStatus
+import com.thk.im.android.db.MsgSendStatus
 import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.MsgStatus
 
 @Dao
 interface MessageDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMessages(vararg messages: Message)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertMessages(messages: List<Message>)
 
     @Update
-    fun updateMessages(vararg messages: Message)
+    fun updateMessages(messages: List<Message>)
 
     @Delete
-    fun deleteMessages(vararg messages: Message)
+    fun deleteMessages(messages: List<Message>)
 
     @Query("delete from message where sid= :sid and c_time > :startTime and c_time < :endTime")
     fun deleteMessageByCTimeExclude(sid: Long, startTime: Long, endTime: Long)
@@ -22,14 +23,14 @@ interface MessageDao {
     @Query("delete from message where sid= :sid and c_time >= :startTime and c_time <= :endTime")
     fun deleteMessageByCTimeInclude(sid: Long, startTime: Long, endTime: Long)
 
-    @Query("select * from message where sid = :sid and type > 0 and status <= 5 and c_time < :cTime order by c_time desc limit :size")
+    @Query("select * from message where sid = :sid and type > 0 and c_time < :cTime order by c_time desc limit :size")
     fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, size: Int): List<Message>
 
-    @Query("update message set status = :status where status < :status")
-    fun resetSendingMsg(status: Int = MsgStatus.SendFailed.value)
+    @Query("update message set send_status = :status where send_status < :status")
+    fun resetSendingMsg(status: Int = MsgSendStatus.SendFailed.value)
 
-    @Query("select count(id) from message where sid = :id and f_uid != :selfId and status = 4")
-    fun getUnReadCount(id: Long, selfId: Long): Int
+    @Query("select count(id) from message where sid = :id and opr_status & :oprStatus = 0")
+    fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
 
     @Query("select * from message where id = :id")
     fun findMessage(id: Long): Message?
@@ -37,30 +38,32 @@ interface MessageDao {
     @Query("select count(id) from message")
     fun getMessageCount(): Long
 
-    @Query("select msg_id from message where sid = :sid and f_uid != :myId and msg_id in(:msgIds)")
+    @Query("select msg_id from message where sid = :sid and f_uid != :myId and msg_id in (:msgIds)")
     fun findUnReadMessage(myId: Long, sid: Long, msgIds: List<Long>): List<Long>
 
-    @Query("update message set status = 5 where sid = :sid and f_uid != :myId and msg_id in(:msgIds)")
-    fun updateMessagesRead(myId: Long, sid: Long, msgIds: List<Long>)
+    @Query("update message set opr_status = opr_status | (:oprStatus) where sid = :sid and msg_id in (:msgIds)")
+    fun updateMessagesOprStatus(sid: Long, msgIds: List<Long>, oprStatus: Int)
 
-    @Query("update message set status = :status, msg_id = :msgId, ext_data = :ext_data, c_time = :cTime where id = :id")
-    fun updateMessageState(id: Long, status: Int, msgId: Long, ext_data: String, cTime: Long)
+    @Query("update message set send_status = :sendStatus, msg_id = :msgId, m_time = :mTime where id = :id")
+    fun updateMessageSendStatus(
+        id: Long,
+        sendStatus: Int,
+        msgId: Long,
+        mTime: Long
+    )
 
     @Query("update message set content = :content where id = :id")
     fun updateMessageContent(id: Long, content: String)
 
-    @Query("select max(c_time) from message where status >= 4")
-    fun findLatestMessageCTime(): Long
-
     /**
      * 更新会话的所有消息为已读
      */
-    @Query("update message set status = 5 where status = 4 and sid = :sid")
-    fun updateMessagesRead(sid: Long)
+    @Query("update message set opr_status = opr_status | :oprStatus where sid = :sid")
+    fun updateSessionMessageStatus(sid: Long, oprStatus: Int)
 
     /**
-     * 更新会话的所有消息为已读
+     * 更新所有消息的发送状态
      */
-    @Query("update message set status = 5 where status = 4 and sid = :sid and msg_id in(:msgIds)")
-    fun updateMessagesRead(sid: Long, msgIds: List<Long>)
+    @Query("update message set send_status = :sendStatus where send_status < :sendStatus")
+    fun resetSendingMessagesStatus(sendStatus: Int)
 }

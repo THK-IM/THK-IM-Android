@@ -14,12 +14,12 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.thk.im.android.core.IMManager;
-import com.thk.im.android.core.api.BaseSubscriber;
+import com.thk.im.android.base.BaseSubscriber;
+import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.databinding.ActivityMainBinding;
+import com.thk.im.android.db.SessionType;
 import com.thk.im.android.db.entity.Session;
 
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
 
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "创建失败:" + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         };
-        IMManager.INSTANCE.getMessageModule().getSession(uid, new HashMap<>()).subscribe(subscriber);
+        IMCoreManager.INSTANCE.getMessageModule().createSession(uid, SessionType.Single.getValue()).subscribe(subscriber);
         disposable.add(subscriber);
     }
 

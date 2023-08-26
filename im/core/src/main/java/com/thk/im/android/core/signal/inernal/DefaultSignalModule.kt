@@ -8,10 +8,10 @@ import com.carlt.networklibs.NetworkManager
 import com.carlt.networklibs.annotation.NetWork
 import com.carlt.networklibs.utils.NetworkUtils
 import com.google.gson.Gson
+import com.thk.im.android.base.LLog
 import com.thk.im.android.core.signal.Signal
 import com.thk.im.android.core.signal.SignalListener
 import com.thk.im.android.core.signal.SignalModule
-import com.thk.im.android.core.utils.LLog
 import okhttp3.*
 import java.util.concurrent.TimeUnit
 

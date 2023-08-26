@@ -1,6 +1,6 @@
 package com.thk.im.android.core.processor
 
-import com.thk.im.android.db.entity.MsgType
+import com.thk.im.android.db.MsgType
 
 class UnSupportMsgProcessor : BaseMsgProcessor() {
 

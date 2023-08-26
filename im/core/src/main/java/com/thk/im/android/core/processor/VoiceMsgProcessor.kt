@@ -1,16 +1,14 @@
 package com.thk.im.android.core.processor
 
 import com.google.gson.Gson
-import com.thk.im.android.core.IMManager
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.event.XEventType
 import com.thk.im.android.core.exception.UploadException
-
 import com.thk.im.android.core.fileloader.LoadListener
-import com.thk.im.android.core.processor.body.ImageBody
 import com.thk.im.android.core.processor.body.VoiceBody
+import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.MsgType
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.File
@@ -35,12 +33,12 @@ class VoiceMsgProcessor : BaseMsgProcessor() {
             }, BackpressureStrategy.LATEST)
         } else {
             return Flowable.create({
-                val key = IMManager.getStorageModule().allocSessionFilePath(
+                val key = IMCoreManager.getStorageModule().allocSessionFilePath(
                     entity.sid, entity.fUid,
                     fileName,
                     format
                 ).second
-                IMManager.getFileLoaderModule()
+                IMCoreManager.getFileLoaderModule()
                     .upload(key, voiceBody.path!!, object : LoadListener {
 
                         override fun onProgress(

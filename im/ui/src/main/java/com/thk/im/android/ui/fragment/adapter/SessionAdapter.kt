@@ -3,7 +3,7 @@ package com.thk.im.android.ui.fragment.adapter
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
-import com.thk.im.android.core.utils.LLog
+import com.thk.im.android.base.LLog
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.manager.IMItemViewManager
 import com.thk.im.android.ui.viewholder.session.BaseSessionVH

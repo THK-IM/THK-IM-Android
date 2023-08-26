@@ -4,13 +4,13 @@ import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
-import com.thk.im.android.common.IMImageLoader
-import com.thk.im.android.common.extension.dp2px
-import com.thk.im.android.core.IMManager
+import com.thk.im.android.base.IMImageLoader
+import com.thk.im.android.base.extension.dp2px
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.body.ImageBody
+import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.MsgType
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 
@@ -51,15 +51,15 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         } else if (!body.url.isNullOrEmpty()) {
             val fileName = body.url!!.substringAfterLast("/", "")
             val localPath =
-                IMManager.getStorageModule().allocLocalFilePath(msg.sid, fileName, "img")
-            IMManager.getFileLoaderModule().download(body.url!!, localPath, object : LoadListener {
+                IMCoreManager.getStorageModule().allocLocalFilePath(msg.sid, fileName, "img")
+            IMCoreManager.getFileLoaderModule().download(body.url!!, localPath, object : LoadListener {
 
                 override fun onProgress(progress: Int, state: Int, url: String, path: String) {
                     if (state == LoadListener.Success) {
                         body.path = path
                         msg.content = Gson().toJson(body)
-                        IMManager.getMessageModule()
-                            .getMessageProcessor(MsgType.IMAGE.value)
+                        IMCoreManager.getMessageModule()
+                            .getMsgProcessor(MsgType.IMAGE.value)
                             .updateDb(msg)
                     }
                 }

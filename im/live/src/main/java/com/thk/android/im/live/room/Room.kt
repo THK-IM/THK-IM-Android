@@ -7,7 +7,7 @@ import java.nio.ByteBuffer
 class Room(
     val id: String,
     val uid: String,
-    private val mode: Mode,
+    val mode: Mode,
     role: Role,
     members: List<Member>?
 ) {
@@ -28,8 +28,8 @@ class Room(
                     it,
                     id,
                     role,
-                    audioEnable = mode.value >= Mode.Audio.value,
-                    videoEnable = mode.value == Mode.Video.value
+                    audioEnable = mode == Mode.Audio || mode == Mode.Video,
+                    videoEnable = mode == Mode.Video
                 )
             } else {
                 LocalParticipant(
@@ -42,7 +42,15 @@ class Room(
     private fun initRemoteParticipant(members: List<Member>?) {
         members?.let { ms ->
             for (m in ms) {
-                val remoteParticipant = RemoteParticipant(m.uid, id, m.streamKey)
+                val role = when (m.role) {
+                    Role.Broadcaster.value -> Role.Broadcaster
+                    else -> {
+                        Role.Audience
+                    }
+                }
+                val audioEnable = mode == Mode.Audio || mode == Mode.Video
+                val videoEnable = mode == Mode.Video
+                val remoteParticipant = RemoteParticipant(m.uid, id, role, m.streamKey, audioEnable, videoEnable)
                 this.remoteParticipants.add(remoteParticipant)
             }
         }
@@ -132,7 +140,7 @@ class Room(
         LLog.v("setRole: $role")
         if (localParticipant != null) {
             val lp = localParticipant!!
-            if (lp.getRole() != role) {
+            if (lp.role != role) {
                 lp.onDisConnected()
                 lp.leave()
                 initLocalParticipant(role)
@@ -150,7 +158,7 @@ class Room(
     }
 
     fun getRole(): Role? {
-        return this.localParticipant?.getRole()
+        return this.localParticipant?.role
     }
 
     fun registerObserver(observer: RoomObserver) {
@@ -213,6 +221,10 @@ class Room(
         observers.forEach {
             it.onBufferMsgReceived(bb)
         }
+    }
+
+    fun switchCamera() {
+        localParticipant?.switchCamera()
     }
 
 }

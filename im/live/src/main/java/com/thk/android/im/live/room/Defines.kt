@@ -36,6 +36,8 @@ data class NewStreamNotify(
     var uid: String,
     @SerializedName("stream_key")
     var streamKey: String,
+    @SerializedName("role")
+    var role: Int
 )
 
 data class RemoveStreamNotify(

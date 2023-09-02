@@ -25,6 +25,7 @@ import java.nio.charset.Charset
 abstract class BaseParticipant(
     val uid: String,
     val roomId: String,
+    val role: Role,
 ) : PeerConnection.Observer, DataChannel.Observer {
 
     private var dataChannelMap: HashMap<String, DataChannel> = HashMap()
@@ -302,17 +303,29 @@ abstract class BaseParticipant(
     }
 
     open fun onNewMessage(message: String) {
+        LLog.d("$uid, onNewMessage: $message")
         val notify = Gson().fromJson(message, NotifyBean::class.java)
         when (notify.type) {
             NotifyType.NewStream.value -> {
                 val newStream = Gson().fromJson(notify.message, NewStreamNotify::class.java)
-                val participant =
-                    RemoteParticipant(newStream.uid, newStream.roomId, newStream.streamKey)
-                LiveManager.shared().getRoom()?.let {
-                    handler.post {
-                        it.participantJoin(participant)
+                val role = when (newStream.role) {
+                    Role.Broadcaster.value -> Role.Broadcaster
+                    else -> {
+                        Role.Audience
                     }
                 }
+                val room = LiveManager.shared().getRoom()
+                room?.let {
+                    val audioEnable = it.mode == Mode.Audio || it.mode == Mode.Video
+                    val videoEnable = it.mode == Mode.Video
+                    val remoteParticipant = RemoteParticipant(newStream.uid, newStream.roomId, role, newStream.streamKey, audioEnable, videoEnable)
+                    LiveManager.shared().getRoom()?.let {
+                        handler.post {
+                            it.participantJoin(remoteParticipant)
+                        }
+                    }
+                }
+
             }
 
             NotifyType.RemoveStream.value -> {

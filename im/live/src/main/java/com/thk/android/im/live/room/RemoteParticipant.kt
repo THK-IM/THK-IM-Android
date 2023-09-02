@@ -11,26 +11,32 @@ import org.webrtc.MediaStreamTrack
 import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 import java.nio.charset.Charset
-
 class RemoteParticipant(
     uid: String,
     roomId: String,
+    role: Role,
     private val subStreamKey: String,
-) : BaseParticipant(uid, roomId) {
+    private val audioEnable: Boolean,
+    private val videoEnable: Boolean
+) : BaseParticipant(uid, roomId, role) {
 
     private var streamKey: String? = null
 
     override fun initPeerConn() {
         super.initPeerConn()
         peerConnection?.let {
-            it.addTransceiver(
-                MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO,
-                RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.RECV_ONLY)
-            )
-            it.addTransceiver(
-                MediaStreamTrack.MediaType.MEDIA_TYPE_VIDEO,
-                RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.RECV_ONLY)
-            )
+            if (audioEnable && role == Role.Broadcaster) {
+                it.addTransceiver(
+                    MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO,
+                    RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.RECV_ONLY)
+                )
+            }
+            if (videoEnable && role == Role.Broadcaster) {
+                it.addTransceiver(
+                    MediaStreamTrack.MediaType.MEDIA_TYPE_VIDEO,
+                    RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.RECV_ONLY)
+                )
+            }
             startPeerConnection(it)
         }
     }

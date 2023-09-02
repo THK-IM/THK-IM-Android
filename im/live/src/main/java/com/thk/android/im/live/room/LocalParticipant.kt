@@ -23,20 +23,20 @@ import org.webrtc.VideoCapturer
 import org.webrtc.VideoSource
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
-
 class LocalParticipant(
     uid: String,
     roomId: String,
-    private var role: Role,
+    role: Role,
     private val audioEnable: Boolean,
     private val videoEnable: Boolean
-) : BaseParticipant(uid, roomId) {
+) : BaseParticipant(uid, roomId, role) {
 
     private var pushStreamKey: String? = null
     private var videoSource: VideoSource? = null
-    private var videoCapture: VideoCapturer? = null
+    private var videoCapture: CameraVideoCapturer? = null
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
     private var innerDataChannel: DataChannel? = null
+    private var cameraName: String? = null
 
     override fun initPeerConn() {
         super.initPeerConn()
@@ -63,7 +63,7 @@ class LocalParticipant(
 
             if (videoEnable && role == Role.Broadcaster) {
                 LiveManager.shared().app?.let { app ->
-                    videoCapture = createVideoCapture(app)
+                    videoCapture = createVideoCapture()
                     videoCapture?.let {
                         surfaceTextureHelper =
                             SurfaceTextureHelper.create(
@@ -72,7 +72,6 @@ class LocalParticipant(
                             )
                         videoSource =
                             pcFactoryWrapper.factory.createVideoSource(it.isScreencast)
-
                         val videoTrack =
                             pcFactoryWrapper.factory.createVideoTrack(
                                 "video/$roomId/$uid",
@@ -87,12 +86,12 @@ class LocalParticipant(
                         addVideoTrack(videoTrack)
                     }
                 }
-                innerDataChannel = peerConnection!!.createDataChannel("", DataChannel.Init().apply {
-                    ordered = true
-                    maxRetransmits = 3
-                })
-                innerDataChannel?.registerObserver(this)
             }
+            innerDataChannel = peerConnection!!.createDataChannel("", DataChannel.Init().apply {
+                ordered = true
+                maxRetransmits = 3
+            })
+            innerDataChannel?.registerObserver(this)
             startPeerConnection(peerConnection!!)
         } else {
             LLog.e("peerConnection create failed")
@@ -133,7 +132,8 @@ class LocalParticipant(
         compositeDisposable.add(subscriber)
     }
 
-    private fun createVideoCapture(context: Context): CameraVideoCapturer? {
+    private fun createVideoCapture(): CameraVideoCapturer? {
+        val context = LiveManager.shared().app ?: return null
         //优先使用Camera2
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
@@ -141,16 +141,58 @@ class LocalParticipant(
         //前置
         for (name in deviceNames) {
             if (enumerator.isFrontFacing(name)) {
+                cameraName = name
                 return enumerator.createCapturer(name, null)
             }
         }
         //后置
         for (name in deviceNames) {
             if (enumerator.isBackFacing(name)) {
+                cameraName = name
                 return enumerator.createCapturer(name, null)
             }
         }
         return null
+    }
+
+    private fun getFrontCameraName(): String? {
+        val context = LiveManager.shared().app ?: return null
+        val enumerator =
+            if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
+        val deviceNames = enumerator.deviceNames
+        //前置
+        for (name in deviceNames) {
+            if (enumerator.isFrontFacing(name)) {
+                return name
+            }
+        }
+        return null
+    }
+
+    private fun getBackCameraName(): String? {
+        val context = LiveManager.shared().app ?: return null
+        val enumerator =
+            if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
+        val deviceNames = enumerator.deviceNames
+        //前置
+        for (name in deviceNames) {
+            if (enumerator.isBackFacing(name)) {
+                return name
+            }
+        }
+        return null
+    }
+    fun switchCamera() {
+        if (cameraName == null) return
+        val context = LiveManager.shared().app ?: return
+        val enumerator =
+            if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
+        cameraName = if (enumerator.isFrontFacing(cameraName)) {
+            getBackCameraName()
+        } else {
+            getFrontCameraName()
+        }
+        videoCapture?.switchCamera(null, cameraName)
     }
 
     override fun onDisConnected() {
@@ -174,10 +216,6 @@ class LocalParticipant(
 
     override fun playStreamKey(): String? {
         return null
-    }
-
-    fun getRole(): Role {
-        return this.role
     }
 
 

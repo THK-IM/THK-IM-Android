@@ -24,7 +24,6 @@ data class User(
 ) : Parcelable {
 
     @Ignore
-    constructor(id: Long) : this(id, "", null, null, null, null, 0L, 0L) {
-    }
+    constructor(id: Long) : this(id, "", null, null, null, null, 0L, 0L)
 
 }

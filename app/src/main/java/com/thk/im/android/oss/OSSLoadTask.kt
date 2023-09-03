@@ -1,6 +1,6 @@
-package com.thk.im.android.core.fileloader.internal
+package com.thk.im.android.oss
 
-abstract class FileTask(val taskId : String) {
+abstract class OSSLoadTask(val taskId : String) {
 
     abstract fun start()
 

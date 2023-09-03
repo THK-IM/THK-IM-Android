@@ -9,7 +9,11 @@ class IMDataBase(val app: Application, private val uId: Long, private val debug:
     private var db: DataBase? = null
     private val prefix = "im"
 
-    fun open() {
+    init {
+        this.open()
+        this.initData()
+    }
+    private fun open() {
         if (db == null) {
             val dbname = if (debug) {
                 "${prefix}_${uId}_debug"
@@ -21,7 +25,7 @@ class IMDataBase(val app: Application, private val uId: Long, private val debug:
         }
     }
 
-    fun initData() {
+    private fun initData() {
         messageDao().resetSendingMsg()
     }
 

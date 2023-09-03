@@ -1,15 +1,16 @@
 package com.thk.im.android.core.processor
 
 import androidx.annotation.WorkerThread
+import com.google.gson.Gson
 import com.thk.im.android.base.BaseSubscriber
+import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.event.XEventType
 import com.thk.im.android.db.MsgOperateStatus
 import com.thk.im.android.db.MsgSendStatus
 import com.thk.im.android.db.entity.Message
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 
 abstract class BaseMsgProcessor {
@@ -18,9 +19,16 @@ abstract class BaseMsgProcessor {
      * 创建发送消息
      */
     open fun buildSendMsg(
-        body: String, sid: Long,
+        body: Any, sid: Long,
         atUsers: String? = null, rMsgId: Long? = null
     ): Message {
+        var content = ""
+        var data = ""
+        if (body is String) {
+            content = body
+        } else {
+            data = Gson().toJson(body)
+        }
         val id = IMCoreManager.getMessageModule().generateNewMsgId()
         val oprStatus = MsgOperateStatus.Ack.value or
                 MsgOperateStatus.ClientRead.value or
@@ -28,115 +36,110 @@ abstract class BaseMsgProcessor {
         val sendStatus = MsgSendStatus.Init.value
         val type = this.messageType()
         val fUId = IMCoreManager.getUid()
-        val cTime = IMCoreManager.getSignalModule().severTime
-        val extData: String? = null
+        val cTime = IMCoreManager.signalModule.severTime
         // tips：msgId初始值给-id,发送成功后更新为服务端返回的msgId
         return Message(
-            id, fUId, sid, 0 - id, type, body, oprStatus, sendStatus,
-            cTime, cTime, extData, rMsgId, atUsers
+            id, fUId, sid, 0 - id, type, content, oprStatus, sendStatus,
+            cTime, cTime, data, rMsgId, atUsers
         )
     }
 
     /**
      * 发送消息,逻辑流程:
-     * 1、写入数据库,发送{新消息}通知更新ui
-     * 2、如果有附件上传, 就上传, 附件上传完成后，更新本地数据库, 发送{消息更新}通知更新ui
-     * 3、调用api发送消息到服务器,api调用结果更新本地数据库,发送{消息更新}通知更新ui
+     * 1、写入数据库,
+     * 2、消息处理，图片压缩/视频抽帧等
+     * 3、文件上传
+     * 4、调用api发送消息到服务器
      */
     open fun sendMessage(
-        body: String, sid: Long,
+        body: Any, sid: Long,
         atUsers: String? = null, rMsgId: Long? = null, map: Map<String, Any> = mutableMapOf()
-    ) {
-        val msg = buildSendMsg(body, sid, atUsers, rMsgId)
-        val subscriber = object : BaseSubscriber<Message>() {
-            override fun onNext(t: Message) {
-                super.onComplete()
-                msg.msgId = t.msgId
-                msg.sendStatus = MsgSendStatus.SorRSuccess.value
-                msg.cTime = t.cTime
-                updateDb(msg)
-            }
-
-            override fun onError(t: Throwable?) {
-                super.onError(t)
-                msg.sendStatus = MsgSendStatus.SendFailed.value
-                msg.cTime = IMCoreManager.getSignalModule().severTime
-                updateDb(msg)
-            }
+    ): Boolean {
+        try {
+            val msg = buildSendMsg(body, sid, atUsers, rMsgId)
+            this.resend(msg)
+        } catch (e: Exception) {
+            e.message?.let { LLog.e(it) }
+            return false
         }
-        Flowable.create<Message>({
-            try {
-                insertDb(msg)
-                it.onNext(msg)
-            } catch (e: Exception) {
-                it.onError(e)
-            }
-        }, BackpressureStrategy.LATEST).flatMap {
-            it.sendStatus = MsgSendStatus.Sending.value
-            updateDb(msg)
-            val uploadFlowable = uploadFlowable(it)
-            if (uploadFlowable == null) {
-                return@flatMap Flowable.just(it)
-            } else {
-                return@flatMap uploadFlowable
-            }
-        }.flatMap {
-            val msgModule = IMCoreManager.getMessageModule()
-            msgModule.sendMessageToServer(it)
-        }.compose(RxTransform.flowableToIo()).subscribe(subscriber)
+        return true
     }
 
     /**
      * 重发
      */
     open fun resend(msg: Message) {
+        var originMsg = msg
         val subscriber = object : BaseSubscriber<Message>() {
             override fun onNext(t: Message) {
                 super.onComplete()
-                msg.msgId = t.msgId
-                msg.sendStatus = MsgSendStatus.SorRSuccess.value
-                msg.cTime = t.cTime
-                updateDb(msg)
+                insertOrUpdateDb(t)
             }
 
             override fun onError(t: Throwable?) {
                 super.onError(t)
-                msg.sendStatus = MsgSendStatus.SendFailed.value
-                msg.cTime = IMCoreManager.getSignalModule().severTime
-                updateDb(msg)
+                originMsg.sendStatus = MsgSendStatus.SendFailed.value
+                updateFailedMsgStatus(originMsg)
             }
         }
         Flowable.just(msg).flatMap {
-            it.sendStatus = MsgSendStatus.Sending.value
-            updateDb(msg)
-            val uploadFlowable = uploadFlowable(it)
-            if (uploadFlowable == null) {
-                return@flatMap Flowable.just(it)
+            // 消息二次处理
+            val flowable = this.reprocessingFlowable(it)
+            if (flowable != null) {
+                return@flatMap flowable
             } else {
-                return@flatMap uploadFlowable
+                return@flatMap Flowable.just(it)
             }
         }.flatMap {
+            originMsg = it
+            // 消息内容上传
+            it.sendStatus = MsgSendStatus.Uploading.value
+            insertOrUpdateDb(it)
+            val flowable = uploadFlowable(it)
+            if (flowable != null) {
+                return@flatMap flowable
+            } else {
+                return@flatMap Flowable.just(it)
+            }
+        }.flatMap {
+            originMsg = it
+            // 消息发送到服务器
+            it.sendStatus = MsgSendStatus.Sending.value
+            insertOrUpdateDb(it)
             IMCoreManager.getMessageModule().sendMessageToServer(it)
         }.compose(RxTransform.flowableToIo()).subscribe(subscriber)
     }
 
 
     /**
-     * 写db,有些消息除了插入本条记录，还需更新其他消息数据，如已读/已接收/撤回/评论
+     * 【插入或更新消息状态】
      */
-    open fun insertDb(msg: Message) {
+    open fun insertOrUpdateDb(msg: Message, notify: Boolean = true) {
         val msgDao = IMCoreManager.getImDataBase().messageDao()
         msgDao.insertMessages(mutableListOf(msg))
-        XEventBus.post(XEventType.MsgNew.value, msg)
+        if (notify) {
+            XEventBus.post(IMEvent.MsgNew.value, msg)
+        }
+        if (msg.sendStatus == MsgSendStatus.Sending.value
+            || msg.sendStatus == MsgSendStatus.SendFailed.value
+            || msg.sendStatus == MsgSendStatus.Success.value
+        ) {
+            IMCoreManager.getMessageModule().processSessionByMessage(msg)
+        }
     }
 
     /**
-     * 更新db
+     * 【更新消息状态】用于在调用api发送消息失败时更新本地数据库消息状态
      */
-    open fun updateDb(msg: Message) {
+    open fun updateFailedMsgStatus(msg: Message) {
         val msgDao = IMCoreManager.getImDataBase().messageDao()
-        msgDao.updateMessages(mutableListOf(msg))
-        XEventBus.post(XEventType.MsgUpdate.value, msg)
+        msgDao.updateSendStatus(msg.sid, msg.id, MsgSendStatus.SendFailed.value, msg.fUid)
+        if (msg.sendStatus == MsgSendStatus.Sending.value
+            || msg.sendStatus == MsgSendStatus.SendFailed.value
+            || msg.sendStatus == MsgSendStatus.Success.value
+        ) {
+            IMCoreManager.getMessageModule().processSessionByMessage(msg)
+        }
     }
 
 
@@ -148,12 +151,38 @@ abstract class BaseMsgProcessor {
         // 默认插入数据库
         val dbMsg = IMCoreManager.getImDataBase().messageDao().findMessage(msg.id)
         if (dbMsg == null) {
-            insertDb(msg)
+            if (msg.fUid == IMCoreManager.getUid()) {
+                // 如果发件人为自己，插入前补充消息状态为已接受并已读
+                msg.oprStatus = msg.oprStatus or
+                        MsgOperateStatus.Ack.value or
+                        MsgOperateStatus.ClientRead.value or
+                        MsgOperateStatus.ServerRead.value
+                msg.sendStatus = MsgSendStatus.Success.value
+            }
+            insertOrUpdateDb(msg)
+        } else {
+            if (dbMsg.sendStatus != MsgSendStatus.Success.value) {
+                msg.data = dbMsg.data
+                msg.oprStatus = dbMsg.oprStatus
+                msg.msgId = dbMsg.msgId
+                msg.sendStatus = MsgSendStatus.Success.value
+                insertOrUpdateDb(msg)
+            }
+            if (dbMsg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
+                IMCoreManager.getMessageModule().ackMessageToCache(msg.sid, msg.msgId)
+            }
         }
     }
 
     open fun getSessionDesc(msg: Message): String {
         return msg.content
+    }
+
+    /**
+     * 图片压缩/视频抽帧等操作二次处理
+     */
+    open fun reprocessingFlowable(message: Message): Flowable<Message>? {
+        return null
     }
 
     /**
@@ -175,14 +204,14 @@ abstract class BaseMsgProcessor {
      * 消息是否可以删除
      */
     open fun canDeleted(msg: Message): Boolean {
-        return true
+        return isShow(msg)
     }
 
     /**
      * 消息是否可以撤回
      */
     open fun canRevoke(msg: Message): Boolean {
-        return false
+        return canDeleted(msg)
     }
 
     /**

@@ -41,10 +41,6 @@ class CameraComponent(name: String, @DrawableRes id: Int) :
         requestPermissions(Permission.READ_EXTERNAL_STORAGE, Permission.CAMERA)
     }
 
-    override fun onPermissionDenied(permissions: List<String>) {
-        super.onPermissionDenied(permissions)
-    }
-
     override fun onPermissionGranted(permissions: List<String>) {
         cameraMedia(context)
     }

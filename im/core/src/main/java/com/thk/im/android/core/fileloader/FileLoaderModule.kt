@@ -2,6 +2,27 @@ package com.thk.im.android.core.fileloader
 
 interface FileLoaderModule {
 
+
+    /**
+     * 获取任务id
+     * @param key 任务key
+     * @param path 本地路径
+     * @param type 类型 "Upload" or "Download"
+     * @return 任务id
+     */
+    fun getTaskId(key: String, path: String, type: String): String
+
+
+    /**
+     * 获取上传key
+     * @param sId session id
+     * @param uId 用户id
+     * @param fileName 文件命名
+     * @param msgClientId 客户端消息id
+     * @return 任务id
+     */
+    fun getUploadKey(sId: Long, uId: Long, fileName: String, msgClientId: Long): String
+
     /**
      *  下载
      * @param url 网路地址

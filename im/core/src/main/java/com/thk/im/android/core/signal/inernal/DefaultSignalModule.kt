@@ -66,7 +66,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             }
             try {
                 val signal = Gson().fromJson(text, Signal::class.java)
-                signalListener?.onNewMessage(signal.type, signal.subType, signal.Body)
+                signalListener?.onNewSignal(signal.type, signal.subType, signal.Body)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -125,8 +125,8 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             onStatusChange(SignalListener.StatusConnecting)
             NetworkManager.getInstance().registerObserver(this)
             val request = Request.Builder()
-                .header("uid", token)
-                .header("platform", "1")
+                .header("token", token)
+                .header("platform", "android")
                 .url(wsUrl)
                 .build()
             val client = OkHttpClient.Builder()
@@ -168,7 +168,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
     private fun onStatusChange(status: Int) {
         this.status = status
-        signalListener?.onStatusChange(status)
+        signalListener?.onSignalStatusChange(status)
     }
 
     private fun reconnect() {

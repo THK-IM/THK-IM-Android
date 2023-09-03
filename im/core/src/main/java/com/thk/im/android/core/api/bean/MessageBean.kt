@@ -12,7 +12,7 @@ import kotlinx.parcelize.Parcelize
 data class MessageBean(
     @SerializedName("c_id")
     var clientId: Long = 0,
-    @SerializedName("f_uid")
+    @SerializedName("f_u_id")
     var fUId: Long = 0,
     @SerializedName("s_id")
     var sessionId: Long = 0,

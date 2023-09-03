@@ -10,13 +10,32 @@ enum class SessionType(val value: Int) {
 }
 
 /**
+ * session 禁言
+ */
+enum class SessionMuted(val value: Int) {
+    Normal(0),
+    All(1),
+    MySelf(2),
+}
+
+/**
+ * session  消息提示
+ */
+enum class SessionPrompt(val value: Int) {
+    Normal(0),
+    Reject(1),
+    Silent(2),
+}
+
+/**
  * 消息发送状态
  */
 enum class MsgSendStatus(val value: Int) {
     Init(0),                // 初始
-    Sending(1),             // 发送中
-    SendFailed(2),          // 发送失败
-    SorRSuccess(3),         // 发送或接收成功
+    Uploading(1),             // 上传中
+    Sending(2),             // 发送中
+    SendFailed(3),          // 发送失败
+    Success(4),         // 发送或接收成功
 }
 
 /**
@@ -38,7 +57,7 @@ enum class MsgType(var value: Int) {
     UnSupport(0),  // 未知
     TEXT(1),     // 文本
     EMOJI(2),    // 表情图片
-    VOICE(3),    // 语音
+    Audio(3),    // 语音
     IMAGE(4),    // 图片
     RICH(5),     // 富文本
     VIDEO(6),    // 视频

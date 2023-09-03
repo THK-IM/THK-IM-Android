@@ -1,4 +1,4 @@
-package com.thk.im.android.core.module;
+package com.thk.im.android.core.module
 
 import com.thk.im.android.core.api.bean.ContactorApplyBean
 import com.thk.im.android.core.api.bean.ContactorApplyMessageBean

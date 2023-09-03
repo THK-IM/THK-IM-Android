@@ -9,5 +9,4 @@ data class CreateSessionBean(
     val entityId: Long?,
     @SerializedName("members")
     val members: Set<Long>,
-) {
-}
+)

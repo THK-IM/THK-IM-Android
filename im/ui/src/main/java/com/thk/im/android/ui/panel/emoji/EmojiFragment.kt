@@ -26,7 +26,7 @@ class EmojiFragment(val emojiPanelCallback: EmojiPanelCallback?) : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentEmojiBinding.inflate(layoutInflater, container, false)
         return binding.root
     }

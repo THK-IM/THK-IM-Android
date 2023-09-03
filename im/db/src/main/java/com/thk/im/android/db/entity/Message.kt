@@ -26,7 +26,7 @@ data class Message(
     @ColumnInfo(name = "opr_status") var oprStatus: Int = 0,            // 消息操作状态
     @ColumnInfo(name = "c_time") var cTime: Long = 0,
     @ColumnInfo(name = "m_time") val mTime: Long = 0,
-    @ColumnInfo(name = "ext_data") var extData: String? = "",    //扩展字段
+    @ColumnInfo(name = "data") var data: String = "",    //扩展字段
     @ColumnInfo(name = "r_msg_id") var rMsgId: Long? = 0,
     @ColumnInfo(name = "at_users") var atUsers: String? = "",    //@用户uid1#uid2
 ) : Parcelable {
@@ -34,7 +34,7 @@ data class Message(
     @Ignore
     constructor() : this(
         0L, 0, 0L, 0, 0, "", 0, 0,
-        0L, 0L, null, null, null,
+        0L, 0L, "", null, null,
     )
 
 }

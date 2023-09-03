@@ -1,4 +1,4 @@
-package com.thk.im.android.core.fileloader.internal
+package com.thk.im.android.oss
 
 import com.thk.im.android.base.LLog
 import com.thk.im.android.core.fileloader.LoadListener
@@ -12,12 +12,12 @@ import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 
 
-class DownloadTask(
+class OSSDownloadTask(
     private val url: String,
     private val path: String,
     taskId: String,
-    private val fileLoaderModule: DefaultFileLoaderModule
-) : FileTask(taskId) {
+    private val fileLoaderModule: OSSFileLoaderModule
+) : OSSLoadTask(taskId) {
 
     private val tag = "DownloadTask"
     private var running = AtomicBoolean(true)

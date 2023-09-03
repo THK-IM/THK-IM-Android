@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.thk.im.android.base.BaseSubscriber;
+import com.thk.im.android.base.RxTransform;
 import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.databinding.ActivityMainBinding;
 import com.thk.im.android.db.SessionType;
@@ -23,7 +24,9 @@ import com.thk.im.android.db.entity.Session;
 import java.util.Objects;
 import java.util.Random;
 
+import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Function;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -109,7 +112,17 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "创建失败:" + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         };
-        IMCoreManager.INSTANCE.getMessageModule().createSession(uid, SessionType.Single.getValue()).subscribe(subscriber);
+        IMCoreManager.INSTANCE.getMessageModule()
+                .createSession(uid, SessionType.Single.getValue())
+                .flatMap(new Function<Session, Flowable<Session>>() {
+                    @Override
+                    public Flowable<Session> apply(Session session) throws Exception {
+                        IMCoreManager.INSTANCE.getImDataBase().sessionDao().insertSessions(session);
+                        return Flowable.just(session);
+                    }
+                })
+                .compose(RxTransform.INSTANCE.flowableToMain())
+                .subscribe(subscriber);
         disposable.add(subscriber);
     }
 

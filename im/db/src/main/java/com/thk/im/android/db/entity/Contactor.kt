@@ -21,6 +21,4 @@ data class Contactor(
     @ColumnInfo(name = "ext_data") val ext_data: String?,   //扩展字段
     @ColumnInfo(name = "c_time") val cTime: Long,
     @ColumnInfo(name = "m_time") val mTime: Long,
-) : Parcelable {
-
-}
+) : Parcelable

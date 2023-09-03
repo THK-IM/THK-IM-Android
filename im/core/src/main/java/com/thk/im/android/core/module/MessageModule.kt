@@ -64,6 +64,18 @@ interface MessageModule : CommonModule {
     fun generateNewMsgId(): Long
 
     /**
+     * 发送消息
+     */
+    fun sendMessage(
+        body: Any,
+        sessionId: Long,
+        type: Int,
+        atUser: String? = null,
+        replyMsgId: Long? = null
+    ): Boolean
+
+
+    /**
      * 消息发送到服务端
      */
     fun sendMessageToServer(message: Message): Flowable<Message>
@@ -71,7 +83,7 @@ interface MessageModule : CommonModule {
     /**
      * 标记消息已读
      */
-    fun readMessages(sessionId: Long, msgIds: Set<Long>) : Flowable<Boolean>
+    fun readMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Boolean>
 
     /**
      * 撤回消息

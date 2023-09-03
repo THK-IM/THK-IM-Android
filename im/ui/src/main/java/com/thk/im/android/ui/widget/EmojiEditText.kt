@@ -41,10 +41,6 @@ class EmojiEditText @JvmOverloads constructor(
         return super.onTextContextMenuItem(id)
     }
 
-    override fun onSelectionChanged(selStart: Int, selEnd: Int) {
-        super.onSelectionChanged(selStart, selEnd)
-    }
-
     private var mAtListener: AtListener? = null
 
     private var beforeText: String = ""
@@ -146,7 +142,5 @@ class EmojiEditText @JvmOverloads constructor(
     /**
      * 保存艾特用户的信息
      */
-    interface AtUserBean {
-
-    }
+    interface AtUserBean
 }

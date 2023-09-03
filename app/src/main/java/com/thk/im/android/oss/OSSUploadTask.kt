@@ -1,4 +1,4 @@
-package com.thk.im.android.core.fileloader.internal
+package com.thk.im.android.oss
 
 import com.alibaba.sdk.android.oss.ClientException
 import com.alibaba.sdk.android.oss.ServiceException
@@ -9,12 +9,12 @@ import com.alibaba.sdk.android.oss.model.PutObjectResult
 import com.thk.im.android.core.fileloader.LoadListener
 import java.util.concurrent.atomic.AtomicBoolean
 
-class UploadTask(
+class OSSUploadTask(
     private val key: String,
     private val path: String,
     taskId: String,
-    private val fileLoaderModule: DefaultFileLoaderModule
-) : FileTask(taskId) {
+    private val fileLoaderModule: OSSFileLoaderModule
+) : OSSLoadTask(taskId) {
 
     private var running = AtomicBoolean(true)
 

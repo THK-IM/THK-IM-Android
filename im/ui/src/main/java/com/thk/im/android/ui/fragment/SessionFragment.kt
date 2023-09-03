@@ -9,9 +9,10 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.base.BaseSubscriber
+import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.event.XEventType
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.adapter.SessionAdapter
@@ -83,17 +84,17 @@ class SessionFragment : Fragment() {
     }
 
     private fun initEventBus() {
-        XEventBus.observe(this, XEventType.SessionNew.value, Observer<Session> {
+        XEventBus.observe(this, IMEvent.SessionNew.value, Observer<Session> {
             it?.let {
                 sessionAdapter.insertNew(it)
             }
         })
-        XEventBus.observe(this, XEventType.SessionUpdate.value, Observer<Session> {
+        XEventBus.observe(this, IMEvent.SessionUpdate.value, Observer<Session> {
             it?.let {
                 sessionAdapter.update(it)
             }
         })
-        XEventBus.observe(this, XEventType.SessionDeleted.value, Observer<Session> {
+        XEventBus.observe(this, IMEvent.SessionDelete.value, Observer<Session> {
             it?.let {
                 sessionAdapter.delete(it)
             }
@@ -125,8 +126,9 @@ class SessionFragment : Fragment() {
                 isLoading = false
             }
         }
-        val current = IMCoreManager.getSignalModule().severTime
-        IMCoreManager.getMessageModule().queryLocalSessions(sessionAdapter.itemCount, current)
+        val current = IMCoreManager.signalModule.severTime
+        IMCoreManager.getMessageModule().queryLocalSessions(10, current)
+            .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         composite.add(subscriber)
     }

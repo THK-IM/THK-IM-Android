@@ -1,54 +1,65 @@
 package com.thk.im.android.base
 
+import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.media.MediaMetadataRetriever
-import java.io.*
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import top.zibin.luban.Luban
+import top.zibin.luban.OnCompressListener
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.IOException
 import kotlin.math.roundToInt
 
 object MediaUtils {
 
-    fun compass(pathUrl: String): Bitmap? {
-        if (!File(pathUrl).exists()) {
-            return null
-        }
-        var bufferedInputStream: BufferedInputStream? = null
-        try {
-            val degree: Int = readPictureDegree(pathUrl)
-            bufferedInputStream = BufferedInputStream(FileInputStream(File(pathUrl)))
-            val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            BitmapFactory.decodeStream(bufferedInputStream, null, options)
-            options.inSampleSize = calculateInSampleSize(options, 400, 600)
-            options.inJustDecodeBounds = false
-            val bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options)
-            return rotatingImageView(degree, bitmap)
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        } finally {
-            bufferedInputStream?.close()
-        }
-        return null
+    fun compress(app: Application, src: String, size: Int): Flowable<String> {
+        return Flowable.create({
+            Luban.with(app)
+                .ignoreBy(size)
+                .setFocusAlpha(true).load(src)
+                .setCompressListener(object : OnCompressListener {
+                    override fun onStart() {
+                        LLog.d("compress onStart $src")
+                    }
+
+                    override fun onSuccess(index: Int, compressFile: File?) {
+                        if (compressFile != null) {
+                            it.onNext(compressFile.absolutePath)
+                        } else {
+                            it.onError(FileNotFoundException())
+                        }
+                    }
+
+                    override fun onError(index: Int, e: Throwable) {
+                        LLog.e("compress onStart $src $e")
+                        it.onError(e)
+                    }
+
+                })
+                .launch()
+        }, BackpressureStrategy.LATEST)
     }
 
     /**
      * 获取bitmap的长宽
      */
     fun getBitmapAspect(path: String): Pair<Int, Int> {
-        val inputStream = FileInputStream(File(path))
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
-        BitmapFactory.decodeStream(inputStream, null, options)
-        inputStream.close()
+        BitmapFactory.decodeFile(path, options)
         return Pair(options.outWidth, options.outHeight)
     }
 
     fun readPictureDegree(path: String): Int {
         var degree = 0
         try {
-            val exifInterface = ExifInterface(path!!)
+            val exifInterface = ExifInterface(path)
             val orientation = exifInterface.getAttributeInt(
                 ExifInterface.TAG_ORIENTATION,
                 ExifInterface.ORIENTATION_NORMAL
@@ -107,15 +118,14 @@ object MediaUtils {
     /**
      * 获取视频封面
      */
-    fun getVideoParams(filePath: String?, frameTime: Long = 1000): Pair<Bitmap, Long>? {
+    fun getVideoParams(filePath: String, frameTime: Long = 1000): Pair<Bitmap, Int>? {
         val retriever = MediaMetadataRetriever()
         try {
             retriever.setDataSource(filePath)
             val b = retriever.getFrameAtTime(frameTime, MediaMetadataRetriever.OPTION_CLOSEST)
                 ?: return null
-            val duration =
-                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toString()
-                    .toLong() / 1000 //时长(秒)
+            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                .toString().toInt() / 1000 + 1 // 时长(秒)
             return Pair(b, duration)
         } catch (e: IllegalArgumentException) {
             e.printStackTrace()

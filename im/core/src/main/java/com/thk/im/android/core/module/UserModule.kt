@@ -1,4 +1,4 @@
-package com.thk.im.android.core.module;
+package com.thk.im.android.core.module
 
 import com.thk.im.android.core.api.bean.UserBean
 import com.thk.im.android.db.entity.User

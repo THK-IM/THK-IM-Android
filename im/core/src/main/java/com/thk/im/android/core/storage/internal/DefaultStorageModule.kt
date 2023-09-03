@@ -3,11 +3,9 @@ package com.thk.im.android.core.storage.internal
 import android.app.Application
 import android.graphics.Bitmap
 import android.util.Base64
-import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.storage.StorageModule
 import okhttp3.internal.and
 import java.io.*
-import java.net.URL
 import java.nio.charset.Charset
 import java.security.MessageDigest
 
@@ -38,7 +36,7 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
             sb.append(hexChar)
         }
 
-        return sb.toString();
+        return sb.toString()
     }
 
     private fun getFileName(url: String): String {
@@ -48,19 +46,19 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
         return toHexString(digest)
     }
 
-    private fun getFileExt(fileName: String): Pair<String, String> {
-        val i = fileName.lastIndexOf(".")
-        return if (i <= 0 || i >= fileName.length) {
-            Pair(fileName, "")
+    override fun getFileExt(path: String): Pair<String, String> {
+        val i = path.lastIndexOf(".")
+        return if (i <= 0 || i >= path.length) {
+            Pair(path, "")
         } else {
-            Pair(fileName.substring(0, i), fileName.substring(i + 1))
+            Pair(path.substring(0, i), path.substring(i + 1))
         }
     }
 
-    override fun getPathsFromFullPath(fullPath: String): Pair<String, String>? {
+    override fun getPathsFromFullPath(fullPath: String): Pair<String, String> {
         val i = fullPath.lastIndexOf("/")
         return if (i <= 0 || i >= fullPath.length) {
-            null
+            Pair("", fullPath)
         } else {
             Pair(fullPath.substring(0, i), fullPath.substring(i + 1))
         }
@@ -70,15 +68,10 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
         return "$rootPath/session-${sid}"
     }
 
-    override fun getFileExtFromUrl(url: String): String {
-        val uRL = URL(url)
-        val path = uRL.path
-        return getFileExt(path).second
-    }
 
     @Throws(IOException::class)
     override fun saveImageInto(fullPath: String, b: Bitmap) {
-        val pair = getPathsFromFullPath(fullPath) ?: throw IOException("path error")
+        val pair = getPathsFromFullPath(fullPath)
         val dirFile = File(pair.first)
         if (!dirFile.exists()) {
             if (!dirFile.mkdirs()) {
@@ -161,66 +154,15 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
     }
 
     override fun allocAvatarPath(id: Long, avatarUrl: String, type: Int): String {
-        var ext = getFileExtFromUrl(avatarUrl)
-        if (ext == "") {
-            ext = "jpeg"
+        val names = getFileExt(avatarUrl)
+        var ext = "jpeg"
+        if (names.second != "") {
+            ext = names.second
         }
         return "${rootPath}/avatar/${type}/user-${id}.${ext}"
     }
 
-    @Throws(IOException::class)
-    override fun allocSessionFilePath(
-        sid: Long,
-        uid: Long,
-        fileName: String,
-        format: String
-    ): Pair<String, String> {
-        val key =
-            "im/session_${sid}/${uid}/" + IMCoreManager.getSignalModule().severTime + "_${fileName}"
-
-        val rootPath = "${getSessionRootPath(sid)}/$format"
-        val dir = File(rootPath)
-        if (dir.exists()) {
-            if (dir.isDirectory) {
-                val p = getFileExt(fileName)
-                val name = p.first
-                val ext = ".${p.second}"
-                val fullPath = "/$rootPath/${name}"
-                var i: Int? = null
-                while (true) {
-                    if (i == null) {
-                        val file = File("${fullPath}$ext")
-                        if (file.exists()) {
-                            i = 1
-                        } else {
-
-                            return Pair(file.absolutePath, key)
-                        }
-                    } else {
-                        val file = File("${fullPath}.$i$ext")
-                        if (file.exists()) {
-                            i++
-                        } else {
-                            return Pair(file.absolutePath, key)
-                        }
-                    }
-                }
-            }
-        } else {
-            dir.mkdirs()
-        }
-        return Pair("$rootPath/$fileName", key)
-    }
-
-    override fun allocServerFilePath(
-        sid: Long,
-        uid: Long,
-        fileName: String
-    ): String {
-        return "im/session_${sid}/${uid}/" + IMCoreManager.getSignalModule().severTime + "_${fileName}"
-    }
-
-    override fun allocLocalFilePath(sid: Long, fileName: String, format: String): String {
+    override fun allocSessionFilePath(sid: Long, fileName: String, format: String): String {
         val rootPath = "${getSessionRootPath(sid)}/$format"
         val dir = File(rootPath)
         if (dir.exists()) {
@@ -256,8 +198,8 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
 
     override fun isAssignedPath(
         path: String,
-        fileName: String,
-        format: String, sid: Long
+        format: String,
+        sid: Long
     ): Boolean {
         val p = "${getSessionRootPath(sid)}/$format"
         return path.startsWith(p)

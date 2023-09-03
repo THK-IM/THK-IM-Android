@@ -19,6 +19,4 @@ data class ContactorApplyMsg(
     @ColumnInfo(name = "message") val message: String,
     @ColumnInfo(name = "c_time") val cTime: Long,
     @ColumnInfo(name = "m_time") val mTime: Long,
-) : Parcelable {
-
-}
+) : Parcelable

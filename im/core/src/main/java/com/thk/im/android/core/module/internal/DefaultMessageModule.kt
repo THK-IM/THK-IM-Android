@@ -5,9 +5,9 @@ import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.api.bean.MessageBean
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.event.XEventType
 import com.thk.im.android.core.module.MessageModule
 import com.thk.im.android.core.processor.BaseMsgProcessor
 import com.thk.im.android.db.SessionType
@@ -51,7 +51,7 @@ open class DefaultMessageModule : MessageModule {
                 t?.printStackTrace()
             }
         }
-        IMCoreManager.getIMApi().getLatestMessages(IMCoreManager.getUid(), lastTime, count)
+        IMCoreManager.imApi.getLatestMessages(IMCoreManager.getUid(), lastTime, count)
             .compose(RxTransform.flowableToIo())
             .subscribe(disposable)
         this.disposes.add(disposable)
@@ -79,7 +79,7 @@ open class DefaultMessageModule : MessageModule {
                 if (sessionType == SessionType.Single.value) {
                     members.add(entityId)
                 }
-                return@flatMap IMCoreManager.getIMApi()
+                return@flatMap IMCoreManager.imApi
                     .createSession(sessionType, entityId, members)
             }
         }
@@ -99,7 +99,7 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap Flowable.just(session)
             } else {
                 val uId = IMCoreManager.getUid()
-                return@flatMap IMCoreManager.getIMApi().querySession(uId, sessionId)
+                return@flatMap IMCoreManager.imApi.querySession(uId, sessionId)
             }
         }
     }
@@ -133,12 +133,14 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun onNewMessage(msg: Message) {
-        TODO("Not yet implemented")
+        synchronized(this) {
+            getMsgProcessor(msg.type).received(msg)
+        }
     }
 
     override fun generateNewMsgId(): Long {
         synchronized(this) {
-            val current = IMCoreManager.getSignalModule().severTime
+            val current = IMCoreManager.signalModule.severTime
             if (current == lastTimestamp) {
                 lastSequence++
             } else {
@@ -149,23 +151,34 @@ open class DefaultMessageModule : MessageModule {
         }
     }
 
+    override fun sendMessage(
+        body: Any,
+        sessionId: Long,
+        type: Int,
+        atUser: String?,
+        replyMsgId: Long?
+    ): Boolean {
+        val processor = getMsgProcessor(type)
+        return processor.sendMessage(body, sessionId, atUser, replyMsgId)
+    }
+
     override fun sendMessageToServer(message: Message): Flowable<Message> {
-        return IMCoreManager.getIMApi().sendMessageToServer(message)
+        return IMCoreManager.imApi.sendMessageToServer(message)
     }
 
     override fun readMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Boolean> {
         val uId = IMCoreManager.getUid()
-        return IMCoreManager.getIMApi().readMessages(uId, sessionId, msgIds)
+        return IMCoreManager.imApi.readMessages(uId, sessionId, msgIds)
     }
 
     override fun revokeMessage(message: Message): Flowable<Boolean> {
         val uId = IMCoreManager.getUid()
-        return IMCoreManager.getIMApi().revokeMessage(uId, message.sid, message.msgId)
+        return IMCoreManager.imApi.revokeMessage(uId, message.sid, message.msgId)
     }
 
     override fun reeditMessage(message: Message): Flowable<Boolean> {
         val uId = IMCoreManager.getUid()
-        return IMCoreManager.getIMApi()
+        return IMCoreManager.imApi
             .reeditMessage(uId, message.sid, message.msgId, message.content)
     }
 
@@ -199,7 +212,7 @@ open class DefaultMessageModule : MessageModule {
                 }
             }
         }
-        IMCoreManager.getIMApi().ackMessages(uId, sessionId, msgIds)
+        IMCoreManager.imApi.ackMessages(uId, sessionId, msgIds)
             .compose(RxTransform.flowableToIo())
             .subscribe(disposable)
         this.disposes.add(disposable)
@@ -215,7 +228,7 @@ open class DefaultMessageModule : MessageModule {
 
     private fun deleteSeverMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Boolean> {
         val uId = IMCoreManager.getUid()
-        return IMCoreManager.getIMApi().deleteMessages(uId, sessionId, msgIds)
+        return IMCoreManager.imApi.deleteMessages(uId, sessionId, msgIds)
     }
 
     private fun deleteLocalMessages(messages: List<Message>): Flowable<Boolean> {
@@ -260,7 +273,7 @@ open class DefaultMessageModule : MessageModule {
                     t.mTime = msg.cTime
                     t.unRead = messageDao.getUnReadCount(t.id)
                     sessionDao.updateSession(t)
-                    XEventBus.post(XEventType.SessionNew.value, t)
+                    XEventBus.post(IMEvent.SessionNew.value, t)
                 }
 
             }

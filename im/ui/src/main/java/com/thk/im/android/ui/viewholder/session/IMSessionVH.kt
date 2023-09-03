@@ -7,9 +7,10 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.base.BaseSubscriber
+import com.thk.im.android.base.IMImageLoader
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.event.XEventType
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.db.entity.Group
 import com.thk.im.android.db.entity.Session
@@ -89,12 +90,12 @@ class IMSessionVH(
         val path = IMCoreManager.getStorageModule().allocAvatarPath(id, url, type)
         val file = File(path)
         if (file.exists()) {
-            com.thk.im.android.base.IMImageLoader.displayImageByPath(imageView, path)
+            IMImageLoader.displayImageByPath(imageView, path)
         } else {
-            IMCoreManager.getFileLoaderModule().download(url, path, object : LoadListener {
+            IMCoreManager.fileLoaderModule.download(url, path, object : LoadListener {
                 override fun onProgress(progress: Int, state: Int, url: String, path: String) {
                     if (state == LoadListener.Success) {
-                        XEventBus.post(XEventType.SessionUpdate.value, session)
+                        XEventBus.post(IMEvent.SessionUpdate.value, session)
                     }
                 }
 

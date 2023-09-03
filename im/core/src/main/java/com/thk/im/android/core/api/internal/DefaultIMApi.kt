@@ -8,6 +8,9 @@ import com.thk.im.android.core.api.bean.MessageBean
 import com.thk.im.android.core.api.bean.ReadMsgBean
 import com.thk.im.android.core.api.bean.ReeditMsgBean
 import com.thk.im.android.core.api.bean.RevokeMsgBean
+import com.thk.im.android.db.MsgOperateStatus
+import com.thk.im.android.db.MsgSendStatus
+import com.thk.im.android.db.SessionType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import io.reactivex.Flowable
@@ -74,7 +77,11 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         entityId: Long?,
         members: Set<Long>
     ): Flowable<Session> {
-        val bean = CreateSessionBean(sessionType, entityId, members)
+        var reqEntityId = entityId
+        if (sessionType == SessionType.Single.value) {
+            reqEntityId = null
+        }
+        val bean = CreateSessionBean(sessionType, reqEntityId, members)
         return sessionApi.createSession(bean).flatMap {
             Flowable.just(it.toSession())
         }
@@ -83,7 +90,13 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     override fun sendMessageToServer(msg: Message): Flowable<Message> {
         val bean = MessageBean.buildMessageBean(msg)
         return messageApi.sendMsg(bean).flatMap {
-            Flowable.just(it.toMessage())
+            msg.msgId = it.msgId
+            msg.cTime = it.cTime
+            msg.sendStatus = MsgSendStatus.Success.value
+            msg.oprStatus = MsgOperateStatus.Ack.value or
+                    MsgOperateStatus.ClientRead.value or
+                    MsgOperateStatus.ServerRead.value
+            Flowable.just(msg)
         }
     }
 

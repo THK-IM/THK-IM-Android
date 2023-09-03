@@ -1,4 +1,4 @@
-package com.thk.im.android.core.event;
+package com.thk.im.android.core.event
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer

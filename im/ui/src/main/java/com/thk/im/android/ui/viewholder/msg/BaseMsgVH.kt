@@ -13,14 +13,9 @@ import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.IMImageLoader
 import com.thk.im.android.base.extension.dp2px
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.event.XEventType
-import com.thk.im.android.core.fileloader.FileLoaderModule
 import com.thk.im.android.core.fileloader.LoadListener
-import com.thk.im.android.core.module.ContactorModule
-import com.thk.im.android.core.module.GroupModule
-import com.thk.im.android.core.module.MessageModule
-import com.thk.im.android.core.module.UserModule
 import com.thk.im.android.db.MsgSendStatus
 import com.thk.im.android.db.SessionType
 import com.thk.im.android.db.entity.Message
@@ -114,7 +109,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 }
             }
 
-            getUserModule().getUserInfo(msg.fUid).subscribe(subscriber)
+            IMCoreManager.getUserModule().getUserInfo(msg.fUid).subscribe(subscriber)
             disposable.add(subscriber)
         }
 
@@ -124,7 +119,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 ivMsgFailedView?.visibility = View.VISIBLE
             }
 
-            MsgSendStatus.SorRSuccess.value -> {
+            MsgSendStatus.Success.value -> {
                 pbMsgFailedView?.visibility = View.GONE
                 ivMsgFailedView?.visibility = View.GONE
             }
@@ -165,25 +160,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         disposable.clear()
     }
 
-    fun getUserModule(): UserModule {
-        return IMCoreManager.getUserModule()
-    }
-
-    fun getGroupModule(): GroupModule {
-        return IMCoreManager.getGroupModule()
-    }
-
-    fun getMessageModule(): MessageModule {
-        return IMCoreManager.getMessageModule()
-    }
-
-    fun getContactorModule(): ContactorModule {
-        return IMCoreManager.getContactorModule()
-    }
-
-    fun getFileLoaderModule(): FileLoaderModule {
-        return IMCoreManager.getFileLoaderModule()
-    }
 
     open fun displayAvatar(imageView: ImageView, id: Long, url: String, type: Int = 1) {
         val path = IMCoreManager.getStorageModule().allocAvatarPath(id, url, type)
@@ -191,10 +167,10 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         if (file.exists()) {
             IMImageLoader.displayImageByPath(imageView, path)
         } else {
-            IMCoreManager.getFileLoaderModule().download(url, path, object : LoadListener {
+            IMCoreManager.fileLoaderModule.download(url, path, object : LoadListener {
                 override fun onProgress(progress: Int, state: Int, url: String, path: String) {
                     if (state == LoadListener.Success) {
-                        XEventBus.post(XEventType.MsgUpdate.value, messsage)
+                        XEventBus.post(IMEvent.MsgUpdate.value, messsage)
                     }
                 }
 

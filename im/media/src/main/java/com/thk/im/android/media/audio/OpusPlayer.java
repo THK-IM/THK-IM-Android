@@ -42,7 +42,7 @@ public class OpusPlayer {
     int bufferSize = 0;
     private int channel = 0;
 
-    private long lastNotificationTime = 0;
+    private final long lastNotificationTime = 0;
     private String currentFileName = "";
 
     private volatile Thread playTread = new Thread();

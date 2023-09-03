@@ -39,7 +39,7 @@ class ComponentPanelFragment(private val uiComponentManager: UIComponentManager)
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentComponentPanelBinding.inflate(layoutInflater)
         return binding.root
     }

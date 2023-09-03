@@ -8,7 +8,7 @@ import com.thk.im.android.db.entity.Message
 @Dao
 interface MessageDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMessages(messages: List<Message>)
 
     @Update
@@ -26,8 +26,8 @@ interface MessageDao {
     @Query("select * from message where sid = :sid and type > 0 and c_time < :cTime order by c_time desc limit :size")
     fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, size: Int): List<Message>
 
-    @Query("update message set send_status = :status where send_status < :status")
-    fun resetSendingMsg(status: Int = MsgSendStatus.SendFailed.value)
+    @Query("update message set send_status = :status where send_status < :successStatus")
+    fun resetSendingMsg(status: Int = MsgSendStatus.SendFailed.value, successStatus: Int = MsgSendStatus.Success.value)
 
     @Query("select count(id) from message where sid = :id and opr_status & :oprStatus = 0")
     fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
@@ -42,14 +42,14 @@ interface MessageDao {
     fun findUnReadMessage(myId: Long, sid: Long, msgIds: List<Long>): List<Long>
 
     @Query("update message set opr_status = opr_status | (:oprStatus) where sid = :sid and msg_id in (:msgIds)")
-    fun updateMessagesOprStatus(sid: Long, msgIds: List<Long>, oprStatus: Int)
+    fun updateOprStatus(sid: Long, msgIds: List<Long>, oprStatus: Int)
 
-    @Query("update message set send_status = :sendStatus, msg_id = :msgId, m_time = :mTime where id = :id")
-    fun updateMessageSendStatus(
+    @Query("update message set send_status = :sendStatus where id = :id and sid = :sId and f_uid = :fUId")
+    fun updateSendStatus(
+        sId: Long,
         id: Long,
         sendStatus: Int,
-        msgId: Long,
-        mTime: Long
+        fUId: Long
     )
 
     @Query("update message set content = :content where id = :id")

@@ -15,7 +15,7 @@ import com.carlt.networklibs.utils.Constants;
 public class NetworkManager {
     private static volatile NetworkManager       manager;
     private                 Application          application;
-    private                 NetworkStateReceiver receiver;
+    private final NetworkStateReceiver receiver;
 
     private NetworkManager() {
         receiver = new NetworkStateReceiver();

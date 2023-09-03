@@ -11,10 +11,10 @@ open class DefaultCommonModule : CommonModule {
         } else if (subType == CommonSubType.ServerTime.value) {
             val time = body.toLong()
             if (time != 0L) {
-                IMCoreManager.getSignalModule().severTime = time
+                IMCoreManager.signalModule.severTime = time
             }
         } else if (subType == CommonSubType.ConnId.value) {
-            IMCoreManager.getSignalModule().connId = body
+            IMCoreManager.signalModule.connId = body
             IMCoreManager.getMessageModule().syncOfflineMessages()
         }
     }

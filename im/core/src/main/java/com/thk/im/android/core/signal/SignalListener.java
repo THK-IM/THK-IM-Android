@@ -13,15 +13,15 @@ public interface SignalListener {
      *
      * @param status 0:初始化, 1:连接中, 2:已连接, 3:连接已断开
      */
-    void onStatusChange(int status);
+    void onSignalStatusChange(int status);
 
     /**
-     * 收到新消息
+     * 收到信令
      *
-     * @param type    消息类型
-     * @param subType 消息子类型
-     * @param msg     消息正文
+     * @param type    信令类型
+     * @param subType 信令子类型
+     * @param signal  信令正文
      */
-    void onNewMessage(int type, int subType, String msg);
+    void onNewSignal(int type, int subType, String signal);
 
 }

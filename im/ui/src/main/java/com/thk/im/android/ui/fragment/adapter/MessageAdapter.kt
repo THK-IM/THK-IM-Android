@@ -48,7 +48,7 @@ class MessageAdapter(
     private fun newTimelineMessage(cTime: Long): Message {
         return Message(
             0L, 0L, 0L, 0L, timeLineMsgType, cTime.toString(),
-            0, 0, cTime, 0L, null, null, null
+            0, 0, cTime, 0L, "", null, null
         )
     }
 

@@ -10,6 +10,10 @@ public interface LoadListener {
     int Success = 3;
     int Failed = 4;
 
+    String DownLoadType = "download";
+
+    String UploadType = "upload";
+
     /**
      * 下载/上传进度
      *

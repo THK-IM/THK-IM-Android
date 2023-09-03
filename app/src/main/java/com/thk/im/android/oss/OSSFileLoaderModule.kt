@@ -1,4 +1,4 @@
-package com.thk.im.android.core.fileloader.internal
+package com.thk.im.android.oss
 
 import android.app.Application
 import android.os.Handler
@@ -6,6 +6,7 @@ import android.os.Looper
 import com.alibaba.sdk.android.oss.ClientConfiguration
 import com.alibaba.sdk.android.oss.OSSClient
 import com.alibaba.sdk.android.oss.common.auth.OSSFederationCredentialProvider
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.fileloader.FileLoaderModule
 import com.thk.im.android.core.fileloader.LoadListener
 import okhttp3.ConnectionPool
@@ -13,7 +14,7 @@ import okhttp3.OkHttpClient
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 
-class DefaultFileLoaderModule(
+class OSSFileLoaderModule(
     app: Application,
     private val bucket: String,
     private val endpoint: String,
@@ -58,9 +59,9 @@ class DefaultFileLoaderModule(
     }
 
     private val downloadTaskMap =
-        HashMap<String, Pair<FileTask, MutableList<WeakReference<LoadListener>>>>()
+        HashMap<String, Pair<OSSLoadTask, MutableList<WeakReference<LoadListener>>>>()
     private val uploadTaskMap =
-        HashMap<String, Pair<FileTask, MutableList<WeakReference<LoadListener>>>>()
+        HashMap<String, Pair<OSSLoadTask, MutableList<WeakReference<LoadListener>>>>()
 
 
     fun notifyListeners(
@@ -119,16 +120,20 @@ class DefaultFileLoaderModule(
         }
     }
 
-    private fun taskId(url: String, path: String, type: String): String {
-        return "{$type}{$url}${path}"
+    override fun getTaskId(key: String, path: String, type: String): String {
+        return "{$type}/{$key}/${path}"
+    }
+
+    override fun getUploadKey(sId: Long, uId: Long, fileName: String, msgClientId: Long): String {
+        return "im/session_${sId}/${uId}/" + IMCoreManager.signalModule.severTime + "_${fileName}"
     }
 
     override fun download(url: String, path: String, listener: LoadListener): String {
         synchronized(this) {
-            val taskId = taskId(url, path, "download")
+            val taskId = getTaskId(url, path, "download")
             val p = downloadTaskMap[taskId]
             if (p == null) {
-                val dTask = DownloadTask(url, path, taskId, this)
+                val dTask = OSSDownloadTask(url, path, taskId, this)
                 dTask.start()
                 val listeners = mutableListOf(WeakReference(listener))
                 downloadTaskMap[taskId] = Pair(dTask, listeners)
@@ -141,10 +146,10 @@ class DefaultFileLoaderModule(
 
     override fun upload(key: String, path: String, listener: LoadListener): String {
         synchronized(this) {
-            val taskId = taskId(key, path, "upload")
+            val taskId = getTaskId(key, path, "upload")
             val p = uploadTaskMap[taskId]
             if (p == null) {
-                val uTask = UploadTask(key, path, taskId, this)
+                val uTask = OSSUploadTask(key, path, taskId, this)
                 uTask.start()
                 val listeners = mutableListOf(WeakReference(listener))
                 uploadTaskMap[taskId] = Pair(uTask, listeners)

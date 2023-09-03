@@ -18,6 +18,4 @@ data class ContactorApply(
     @ColumnInfo(name = "status") val status: Int,
     @ColumnInfo(name = "c_time") val cTime: Long,
     @ColumnInfo(name = "m_time") val mTime: Long,
-) : Parcelable {
-
-}
+) : Parcelable

@@ -58,15 +58,12 @@ class DefaultRecorder(val context: Context, val sid: Long) : IRecorder {
     }
 
     override fun getFilePath(): String {
-        val pair = IMCoreManager.getStorageModule()
+        return IMCoreManager.getStorageModule()
             .allocSessionFilePath(
                 sid,
-                IMCoreManager.getUid(),
                 System.currentTimeMillis().toString() + ".spx",
                 "voice"
             )
-        currentFileName = pair.first
-        return currentFileName
     }
 
     override fun getFileName(): String {

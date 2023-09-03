@@ -9,7 +9,7 @@ import com.thk.im.android.ui.viewholder.msg.VoiceMsgVH
 
 class VoiceMsgIVProvider : MsgItemViewProvider() {
     override fun messageType(): Int {
-        return MsgType.VOICE.value
+        return MsgType.Audio.value
     }
 
 

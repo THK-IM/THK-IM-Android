@@ -22,11 +22,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
+import com.thk.im.android.base.RxTransform
 import com.thk.im.android.base.extension.dp2px
 import com.thk.im.android.base.popup.KeyboardPopupWindow
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.event.XEventType
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
@@ -275,7 +276,7 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
     }
 
     private fun initEventBus() {
-        XEventBus.observe(this, XEventType.MsgNew.value, Observer<Message> {
+        XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
             it?.let {
                 if (it.sid == sid) {
                     val pos = msgAdapter.insertNew(it)
@@ -285,14 +286,14 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
                 }
             }
         })
-        XEventBus.observe(this, XEventType.MsgUpdate.value, Observer<Message> {
+        XEventBus.observe(this, IMEvent.MsgUpdate.value, Observer<Message> {
             it?.let {
                 if (it.sid == sid) {
                     msgAdapter.update(it)
                 }
             }
         })
-        XEventBus.observe(this, XEventType.MsgDeleted.value, Observer<Message> {
+        XEventBus.observe(this, IMEvent.MsgDelete.value, Observer<Message> {
             it?.let {
                 if (it.sid == sid) {
                     msgAdapter.delete(it)
@@ -309,7 +310,7 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
     private fun loadMessages() {
         if (!hasMore || isLoading) return
         if (msgAdapter.getMessageCount() == 0) {
-            cTime = IMCoreManager.getSignalModule().severTime
+            cTime = IMCoreManager.signalModule.severTime
         }
         isLoading = true
         val subscriber = object : BaseSubscriber<List<Message>>() {
@@ -332,7 +333,9 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
                 isLoading = false
             }
         }
-        IMCoreManager.getMessageModule().queryLocalMessages(sid, cTime, count).subscribe(subscriber)
+        IMCoreManager.getMessageModule().queryLocalMessages(sid, cTime, count)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
         composite.add(subscriber)
     }
 

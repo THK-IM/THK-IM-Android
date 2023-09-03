@@ -11,13 +11,6 @@ import com.thk.im.android.ui.viewholder.msg.BaseMsgVH
 
 abstract class MsgItemViewProvider {
 
-    /**
-     * 组装消息内容
-     */
-    open fun assembleMsgContent(sid: Long, params: String): String? {
-        return params
-    }
-
     open fun getSelfId(): Long {
         return IMCoreManager.getUid()
     }

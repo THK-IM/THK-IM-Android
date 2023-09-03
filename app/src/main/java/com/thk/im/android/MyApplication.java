@@ -6,6 +6,7 @@ import com.alibaba.sdk.android.oss.common.auth.OSSFederationCredentialProvider;
 import com.alibaba.sdk.android.oss.common.auth.OSSFederationToken;
 import com.thk.android.im.live.LiveManager;
 import com.thk.im.android.base.AppUtils;
+import com.thk.im.android.base.LLog;
 import com.thk.im.android.base.ToastUtils;
 import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.core.api.internal.DefaultIMApi;

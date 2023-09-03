@@ -6,15 +6,15 @@ import androidx.annotation.NonNull;
 
 public class LLog {
 
-    public static final int VERBOSE = 2;
-    public static final int DEBUG = 3;
-    public static final int INFO = 4;
-    public static final int WARN = 5;
-    public static final int ERROR = 6;
-    public static final int ASSERT = 7;
+    public static final int VERBOSE = 1;
+    public static final int DEBUG = 2;
+    public static final int INFO = 3;
+    public static final int WARN = 4;
+    public static final int ERROR = 5;
+    public static final int ASSERT = 6;
 
     private static int level = VERBOSE;
-    private static String tag = "RTC";
+    private static String tag = "THK_IM";
 
     /**
      * @param tag:   tag

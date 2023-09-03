@@ -271,7 +271,7 @@ open class DefaultMessageModule : MessageModule {
                 t.lastMsg = processor.getSessionDesc(msg)
                 t.mTime = msg.cTime
                 t.unRead = messageDao.getUnReadCount(t.id)
-                sessionDao.updateSession(t)
+                sessionDao.insertSessions(t)
                 XEventBus.post(IMEvent.SessionNew.value, t)
             }
         }

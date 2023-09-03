@@ -40,7 +40,6 @@ class LiveManager private constructor() {
     private var _room: Room? = null
 
     fun init(app: Application, selfId: String, debug: Boolean) {
-        LLog.init("LiveKit", if (debug) LLog.DEBUG else LLog.ERROR)
         this.app = app
         this.selfId = selfId
         PeerConnectionFactory.initialize(

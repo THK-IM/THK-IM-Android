@@ -27,6 +27,8 @@ data class SessionBean(
     var status: Int = 0,
     @SerializedName("mute")
     var mute: Int = 0,
+    @SerializedName("ext_data")
+    var extData: String? = null,
     @SerializedName("c_time")
     var cTime: Long = 0,
     @SerializedName("m_time")
@@ -35,7 +37,7 @@ data class SessionBean(
     fun toSession(): Session {
         return Session(
             id, type, entityId, name, remark, mute, status, role, top, cTime,
-            mTime, 0, null, null, null
+            mTime, 0, null, null, extData
         )
     }
 

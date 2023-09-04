@@ -13,7 +13,10 @@ interface SessionDao {
     fun querySessionsByMTime(): List<Session>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertSessions(vararg sessions: Session)
+    fun insertOrUpdateSessions(vararg sessions: Session)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertOrIgnoreSessions(vararg sessions: Session)
 
     @Query("select * from session where entity_id = :entityId and type = :type")
     fun findSessionByEntity(entityId: Long, type: Int): Session?

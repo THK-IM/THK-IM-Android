@@ -9,7 +9,10 @@ import com.thk.im.android.db.entity.Message
 interface MessageDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMessages(messages: List<Message>)
+    fun insertOrUpdateMessages(messages: List<Message>)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertOrIgnoreMessages(messages: List<Message>)
 
     @Update
     fun updateMessages(messages: List<Message>)
@@ -27,7 +30,10 @@ interface MessageDao {
     fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, size: Int): List<Message>
 
     @Query("update message set send_status = :status where send_status < :successStatus")
-    fun resetSendingMsg(status: Int = MsgSendStatus.SendFailed.value, successStatus: Int = MsgSendStatus.Success.value)
+    fun resetSendingMsg(
+        status: Int = MsgSendStatus.SendFailed.value,
+        successStatus: Int = MsgSendStatus.Success.value
+    )
 
     @Query("select count(id) from message where sid = :id and opr_status & :oprStatus = 0")
     fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int

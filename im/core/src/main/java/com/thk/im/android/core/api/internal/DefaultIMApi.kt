@@ -72,16 +72,14 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         }
     }
 
+
     override fun createSession(
+        uId: Long,
         sessionType: Int,
-        entityId: Long?,
-        members: Set<Long>
+        entityId: Long,
+        members: Set<Long>?
     ): Flowable<Session> {
-        var reqEntityId = entityId
-        if (sessionType == SessionType.Single.value) {
-            reqEntityId = null
-        }
-        val bean = CreateSessionBean(sessionType, reqEntityId, members)
+        val bean = CreateSessionBean(uId, sessionType, entityId, members)
         return sessionApi.createSession(bean).flatMap {
             Flowable.just(it.toSession())
         }

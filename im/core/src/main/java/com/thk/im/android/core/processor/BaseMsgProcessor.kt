@@ -116,7 +116,7 @@ abstract class BaseMsgProcessor {
      */
     open fun insertOrUpdateDb(msg: Message, notify: Boolean = true) {
         val msgDao = IMCoreManager.getImDataBase().messageDao()
-        msgDao.insertMessages(mutableListOf(msg))
+        msgDao.insertOrUpdateMessages(mutableListOf(msg))
         if (notify) {
             XEventBus.post(IMEvent.MsgNew.value, msg)
         }

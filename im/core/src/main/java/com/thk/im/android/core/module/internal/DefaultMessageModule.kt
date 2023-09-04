@@ -1,5 +1,6 @@
 package com.thk.im.android.core.module.internal
 
+import android.content.Context.MODE_PRIVATE
 import com.google.gson.Gson
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
@@ -10,6 +11,8 @@ import com.thk.im.android.core.api.bean.MessageBean
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.module.MessageModule
 import com.thk.im.android.core.processor.BaseMsgProcessor
+import com.thk.im.android.db.MsgOperateStatus
+import com.thk.im.android.db.MsgSendStatus
 import com.thk.im.android.db.SessionType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
@@ -22,6 +25,8 @@ import io.reactivex.disposables.CompositeDisposable
  */
 open class DefaultMessageModule : MessageModule {
 
+    private val spName = "THK_IM"
+    private val lastSyncMsgTime = "Last_Sync_Message_Time"
     private val processorMap: MutableMap<Int, BaseMsgProcessor> = HashMap()
     private var lastTimestamp: Long = 0
     private var lastSequence: Int = 0
@@ -41,9 +46,52 @@ open class DefaultMessageModule : MessageModule {
     override fun syncOfflineMessages() {
         val lastTime = this.getOfflineMsgLastSyncTime()
         val count = 200
+        LLog.v("syncOfflineMessages $lastTime")
         val disposable = object : BaseSubscriber<List<Message>>() {
-            override fun onNext(t: List<Message>) {
+            override fun onNext(messages: List<Message>) {
+                try {
+                    val sessionMessages = mutableMapOf<Long, MutableList<Message>>()
+                    for (m in messages) {
+                        if (m.fUid == IMCoreManager.getUid()) {
+                            m.oprStatus = m.oprStatus or
+                                    MsgOperateStatus.Ack.value or
+                                    MsgOperateStatus.ClientRead.value or
+                                    MsgOperateStatus.ServerRead.value
+                        }
+                        m.sendStatus = MsgSendStatus.Success.value
+                        if (sessionMessages[m.sid] == null) {
+                            sessionMessages[m.sid] = mutableListOf(m)
+                        } else {
+                            sessionMessages[m.sid]!!.add(m)
+                        }
+                    }
 
+                    if (messages.isNotEmpty()) {
+                        // 插入数据库
+                        IMCoreManager.getImDataBase().messageDao()
+                            .insertOrIgnoreMessages(messages)
+                    }
+
+                    // 更新每个session的最后一条消息
+                    for (sessionMessage in sessionMessages) {
+                        XEventBus.post(IMEvent.BatchMsgNew.value, sessionMessage.value)
+                        val lastMsg = sessionMessage.value.last()
+                        processSessionByMessage(lastMsg)
+                    }
+
+                } catch (e: Exception) {
+                    e.message?.let { LLog.e(it) }
+                }
+
+                if (messages.isNotEmpty()) {
+                    val severTime = messages.last().cTime
+                    val success = setOfflineMsgSyncTime(severTime)
+                    if (success) {
+                        if (messages.count() >= count) {
+                            syncOfflineMessages()
+                        }
+                    }
+                }
             }
 
             override fun onError(t: Throwable?) {
@@ -61,7 +109,9 @@ open class DefaultMessageModule : MessageModule {
 
     }
 
-    override fun createSession(entityId: Long, sessionType: Int): Flowable<Session> {
+    override fun createSingleSession(entityId: Long): Flowable<Session> {
+        LLog.v("createSingleSession $entityId")
+        val sessionType = SessionType.Single.value
         return Flowable.create<Session>({
             val session = IMCoreManager.getImDataBase().sessionDao()
                 .findSessionByEntity(entityId, sessionType)
@@ -75,12 +125,9 @@ open class DefaultMessageModule : MessageModule {
             if (session.id > 0) {
                 return@flatMap Flowable.just(session)
             } else {
-                val members = mutableSetOf(IMCoreManager.getUid())
-                if (sessionType == SessionType.Single.value) {
-                    members.add(entityId)
-                }
+                val uId = IMCoreManager.getUid()
                 return@flatMap IMCoreManager.imApi
-                    .createSession(sessionType, entityId, members)
+                    .createSession(uId, sessionType, entityId, null)
             }
         }
     }
@@ -262,6 +309,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun processSessionByMessage(msg: Message) {
+        LLog.v("processSessionByMessage ${msg.sid}")
         val messageDao = IMCoreManager.getImDataBase().messageDao()
         val sessionDao = IMCoreManager.getImDataBase().sessionDao()
         val dispose = object : BaseSubscriber<Session>() {
@@ -271,7 +319,7 @@ open class DefaultMessageModule : MessageModule {
                 t.lastMsg = processor.getSessionDesc(msg)
                 t.mTime = msg.cTime
                 t.unRead = messageDao.getUnReadCount(t.id)
-                sessionDao.insertSessions(t)
+                sessionDao.insertOrUpdateSessions(t)
                 XEventBus.post(IMEvent.SessionNew.value, t)
             }
         }
@@ -296,10 +344,16 @@ open class DefaultMessageModule : MessageModule {
     }
 
     private fun setOfflineMsgSyncTime(time: Long): Boolean {
-        return true
+        val app = IMCoreManager.getApplication()
+        val sp = app.getSharedPreferences(spName, MODE_PRIVATE)
+        val editor = sp.edit()
+        editor.putLong(lastSyncMsgTime, time)
+        return editor.commit()
     }
 
     private fun getOfflineMsgLastSyncTime(): Long {
-        return 0
+        val app = IMCoreManager.getApplication()
+        val sp = app.getSharedPreferences(spName, MODE_PRIVATE)
+        return sp.getLong(lastSyncMsgTime, 0)
     }
 }

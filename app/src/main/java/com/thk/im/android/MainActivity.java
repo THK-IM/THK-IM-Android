@@ -113,11 +113,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         IMCoreManager.INSTANCE.getMessageModule()
-                .createSession(uid, SessionType.Single.getValue())
+                .createSingleSession(uid)
                 .flatMap(new Function<Session, Flowable<Session>>() {
                     @Override
                     public Flowable<Session> apply(Session session) throws Exception {
-                        IMCoreManager.INSTANCE.getImDataBase().sessionDao().insertSessions(session);
+                        IMCoreManager.INSTANCE.getImDataBase().sessionDao().insertOrUpdateSessions(session);
                         return Flowable.just(session);
                     }
                 })

@@ -160,6 +160,9 @@ abstract class BaseMsgProcessor {
                 msg.sendStatus = MsgSendStatus.Success.value
             }
             insertOrUpdateDb(msg)
+            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
+                IMCoreManager.getMessageModule().ackMessageToCache(msg)
+            }
             IMCoreManager.getMessageModule().processSessionByMessage(msg)
         } else {
             if (dbMsg.sendStatus != MsgSendStatus.Success.value) {
@@ -170,7 +173,7 @@ abstract class BaseMsgProcessor {
                 insertOrUpdateDb(msg)
             }
             if (dbMsg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
-                IMCoreManager.getMessageModule().ackMessageToCache(msg.sid, msg.msgId)
+                IMCoreManager.getMessageModule().ackMessageToCache(msg)
             }
             if (dbMsg.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) {
                 IMCoreManager.getMessageModule().processSessionByMessage(msg)

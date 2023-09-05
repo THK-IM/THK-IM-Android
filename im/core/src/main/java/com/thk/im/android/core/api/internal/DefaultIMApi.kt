@@ -10,7 +10,6 @@ import com.thk.im.android.core.api.bean.ReeditMsgBean
 import com.thk.im.android.core.api.bean.RevokeMsgBean
 import com.thk.im.android.db.MsgOperateStatus
 import com.thk.im.android.db.MsgSendStatus
-import com.thk.im.android.db.SessionType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import io.reactivex.Flowable
@@ -98,25 +97,25 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         }
     }
 
-    override fun ackMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Boolean> {
+    override fun ackMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
         val bean = AckMsgBean(sessionId, uId, msgIds)
-        return messageApi.ackMsg(bean).flatMap {
-            Flowable.just(true)
+        if (msgIds.isEmpty()) {
+            return Flowable.empty()
         }
+        return messageApi.ackMsg(bean)
     }
 
-    override fun readMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Boolean> {
+    override fun readMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
         val bean = ReadMsgBean(sessionId, uId, msgIds)
-        return messageApi.readMsg(bean).flatMap {
-            Flowable.just(true)
+        if (msgIds.isEmpty()) {
+            return Flowable.empty()
         }
+        return messageApi.readMsg(bean)
     }
 
-    override fun revokeMessage(uId: Long, sessionId: Long, msgId: Long): Flowable<Boolean> {
+    override fun revokeMessage(uId: Long, sessionId: Long, msgId: Long): Flowable<Void> {
         val bean = RevokeMsgBean(sessionId, uId, msgId)
-        return messageApi.revokeMsg(bean).flatMap {
-            Flowable.just(true)
-        }
+        return messageApi.revokeMsg(bean)
     }
 
     override fun reeditMessage(
@@ -124,18 +123,17 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         sessionId: Long,
         msgId: Long,
         body: String
-    ): Flowable<Boolean> {
+    ): Flowable<Void> {
         val bean = ReeditMsgBean(sessionId, uId, msgId, body)
-        return messageApi.reeditMsg(bean).flatMap {
-            Flowable.just(true)
-        }
+        return messageApi.reeditMsg(bean)
     }
 
-    override fun deleteMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Boolean> {
+    override fun deleteMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
         val bean = DeleteMsgBean(sessionId, uId, msgIds)
-        return messageApi.deleteMessages(bean).flatMap {
-            Flowable.just(true)
+        if (msgIds.isEmpty()) {
+            return Flowable.empty()
         }
+        return messageApi.deleteMessages(bean)
     }
 
     override fun getLatestMessages(uId: Long, cTime: Long, count: Int): Flowable<List<Message>> {

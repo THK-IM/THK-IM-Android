@@ -72,6 +72,10 @@ open class DefaultMessageModule : MessageModule {
                             .insertOrIgnoreMessages(messages)
                     }
 
+                    for (m in messages) {
+                        ackMessageToCache(m)
+                    }
+
                     // 更新每个session的最后一条消息
                     for (sessionMessage in sessionMessages) {
                         XEventBus.post(IMEvent.BatchMsgNew.value, sessionMessage.value)
@@ -213,28 +217,32 @@ open class DefaultMessageModule : MessageModule {
         return IMCoreManager.imApi.sendMessageToServer(message)
     }
 
-    override fun readMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Boolean> {
+    override fun readMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
         val uId = IMCoreManager.getUid()
         return IMCoreManager.imApi.readMessages(uId, sessionId, msgIds)
     }
 
-    override fun revokeMessage(message: Message): Flowable<Boolean> {
+    override fun revokeMessage(message: Message): Flowable<Void> {
         val uId = IMCoreManager.getUid()
         return IMCoreManager.imApi.revokeMessage(uId, message.sid, message.msgId)
     }
 
-    override fun reeditMessage(message: Message): Flowable<Boolean> {
+    override fun reeditMessage(message: Message): Flowable<Void> {
         val uId = IMCoreManager.getUid()
         return IMCoreManager.imApi
             .reeditMessage(uId, message.sid, message.msgId, message.content)
     }
 
-    override fun ackMessageToCache(sessionId: Long, msgId: Long) {
+    override fun ackMessageToCache(message: Message) {
         synchronized(this) {
-            if (needAckMap[sessionId] == null) {
-                needAckMap[sessionId] = mutableSetOf()
+            if (message.sid > 0 && message.msgId > 0) {
+                if (message.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
+                    if (needAckMap[message.sid] == null) {
+                        needAckMap[message.sid] = mutableSetOf()
+                    }
+                    needAckMap[message.sid]?.add(message.msgId)
+                }
             }
-            needAckMap[sessionId]?.add(msgId)
         }
     }
 
@@ -250,13 +258,20 @@ open class DefaultMessageModule : MessageModule {
 
     private fun ackServerMessage(sessionId: Long, msgIds: Set<Long>) {
         val uId = IMCoreManager.getUid()
-        val disposable = object : BaseSubscriber<Boolean>() {
-            override fun onNext(t: Boolean?) {
-                t?.let {
-                    if (it) {
-                        ackMessagesSuccess(sessionId, msgIds)
-                    }
-                }
+        val disposable = object : BaseSubscriber<Void>() {
+
+            override fun onComplete() {
+                super.onComplete()
+                ackMessagesSuccess(sessionId, msgIds)
+            }
+
+            override fun onNext(t: Void?) {
+                ackMessagesSuccess(sessionId, msgIds)
+            }
+
+            override fun onError(t: Throwable?) {
+                super.onError(t)
+                t?.message?.let { LLog.e(it) }
             }
         }
         IMCoreManager.imApi.ackMessages(uId, sessionId, msgIds)
@@ -268,20 +283,21 @@ open class DefaultMessageModule : MessageModule {
     override fun ackMessagesToServer() {
         synchronized(this) {
             this.needAckMap.forEach {
-                this.ackServerMessage(it.key, it.value)
+                if (it.value.isNotEmpty()) {
+                    this.ackServerMessage(it.key, it.value)
+                }
             }
         }
     }
 
-    private fun deleteSeverMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Boolean> {
+    private fun deleteSeverMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
         val uId = IMCoreManager.getUid()
         return IMCoreManager.imApi.deleteMessages(uId, sessionId, msgIds)
     }
 
-    private fun deleteLocalMessages(messages: List<Message>): Flowable<Boolean> {
+    private fun deleteLocalMessages(messages: List<Message>): Flowable<Void> {
         return Flowable.create({
             IMCoreManager.getImDataBase().messageDao().deleteMessages(messages)
-            it.onNext(true)
             it.onComplete()
         }, BackpressureStrategy.LATEST)
     }
@@ -290,21 +306,17 @@ open class DefaultMessageModule : MessageModule {
         sessionId: Long,
         messages: List<Message>,
         deleteServer: Boolean
-    ): Flowable<Boolean> {
-        if (deleteServer) {
+    ): Flowable<Void> {
+        return if (deleteServer) {
             val msgIds = mutableSetOf<Long>()
             messages.forEach {
                 msgIds.add(it.msgId)
             }
-            return this.deleteSeverMessages(sessionId, msgIds).flatMap {
-                if (it) {
-                    return@flatMap deleteLocalMessages(messages)
-                } else {
-                    return@flatMap Flowable.just(false)
-                }
+            this.deleteSeverMessages(sessionId, msgIds).concatMap {
+                deleteLocalMessages(messages)
             }
         } else {
-            return deleteLocalMessages(messages)
+            deleteLocalMessages(messages)
         }
     }
 

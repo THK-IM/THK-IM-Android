@@ -29,27 +29,27 @@ interface IMApi {
     /**
      * 消息设置ack
      */
-    fun ackMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Boolean>
+    fun ackMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Void>
 
     /**
      * 消息设置已读
      */
-    fun readMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Boolean>
+    fun readMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Void>
 
     /**
      * 撤回消息
      */
-    fun revokeMessage(uId: Long, sessionId: Long, msgId: Long): Flowable<Boolean>
+    fun revokeMessage(uId: Long, sessionId: Long, msgId: Long): Flowable<Void>
 
     /**
      * 重新编辑消息
      */
-    fun reeditMessage(uId: Long, sessionId: Long, msgId: Long, body: String): Flowable<Boolean>
+    fun reeditMessage(uId: Long, sessionId: Long, msgId: Long, body: String): Flowable<Void>
 
     /**
      * 删除消息
      */
-    fun deleteMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Boolean>
+    fun deleteMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Void>
 
     /**
      * 获取cTime之后创建的消息

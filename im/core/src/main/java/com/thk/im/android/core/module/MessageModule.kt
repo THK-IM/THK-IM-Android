@@ -82,23 +82,23 @@ interface MessageModule : CommonModule {
     /**
      * 标记消息已读
      */
-    fun readMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Boolean>
+    fun readMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Void>
 
     /**
      * 撤回消息
      */
-    fun revokeMessage(message: Message): Flowable<Boolean>
+    fun revokeMessage(message: Message): Flowable<Void>
 
 
     /**
      * 重新编辑消息
      */
-    fun reeditMessage(message: Message): Flowable<Boolean>
+    fun reeditMessage(message: Message): Flowable<Void>
 
     /**
      * 消息ack:需要ack的消息存入客户端缓存,批量按sessionId进行ack
      */
-    fun ackMessageToCache(sessionId: Long, msgId: Long)
+    fun ackMessageToCache(message: Message)
 
     /**
      * 消息ack:发送到服务端
@@ -112,7 +112,7 @@ interface MessageModule : CommonModule {
         sessionId: Long,
         messages: List<Message>,
         deleteServer: Boolean
-    ): Flowable<Boolean>
+    ): Flowable<Void>
 
 
     /**

@@ -12,7 +12,11 @@ import com.thk.im.android.base.LLog
 import com.thk.im.android.core.signal.Signal
 import com.thk.im.android.core.signal.SignalListener
 import com.thk.im.android.core.signal.SignalModule
-import okhttp3.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
 import java.util.concurrent.TimeUnit
 
 
@@ -60,7 +64,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             super.onMessage(webSocket, text)
-            LLog.v("onMessage: $text")
+            LLog.v("Receive Signal: $text")
             if (reconnectTimes != 0) {
                 reconnectTimes = 0
             }
@@ -147,10 +151,10 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         if (status != SignalListener.StatusConnected) {
             throw RuntimeException("disconnected")
         }
-        LLog.v("sendMessage: $msg")
+        LLog.v("Send Signal: $msg")
         val success = webSocket?.send(msg)
         if (success == false) {
-            throw RuntimeException("send result false")
+            LLog.e("send result false")
         }
     }
 
@@ -192,6 +196,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
                 reconnectTimes = 0
                 reconnect()
             }
+
             NetType.NONE -> LLog.d("无网络")
             else -> {}
         }

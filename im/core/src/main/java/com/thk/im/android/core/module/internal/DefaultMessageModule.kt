@@ -312,9 +312,8 @@ open class DefaultMessageModule : MessageModule {
             messages.forEach {
                 msgIds.add(it.msgId)
             }
-            this.deleteSeverMessages(sessionId, msgIds).concatMap {
-                deleteLocalMessages(messages)
-            }
+            this.deleteSeverMessages(sessionId, msgIds)
+                .concatWith(deleteLocalMessages(messages))
         } else {
             deleteLocalMessages(messages)
         }

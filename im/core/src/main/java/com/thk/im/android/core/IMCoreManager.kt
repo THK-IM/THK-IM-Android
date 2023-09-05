@@ -3,7 +3,6 @@ package com.thk.im.android.core
 import android.app.Application
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.thk.im.android.base.AppUtils
-import com.thk.im.android.base.LLog
 import com.thk.im.android.base.ToastUtils
 import com.thk.im.android.core.api.IMApi
 import com.thk.im.android.core.event.XEventBus
@@ -95,7 +94,6 @@ object IMCoreManager {
             }
 
             override fun onNewSignal(type: Int, subType: Int, signal: String) {
-                LLog.d("signal: $signal")
                 val module = moduleMap[type]
                 module?.onSignalReceived(subType, signal)
             }

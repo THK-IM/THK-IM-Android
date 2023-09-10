@@ -94,7 +94,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        showSoftInput(this);
+        binding.buttonAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, MediaTestActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void createSingleSession(long uid) {
@@ -131,15 +138,5 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         disposable.clear();
     }
-
-    public void showSoftInput(Activity activity) {
-        if (activity != null) {
-            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm != null && imm.isActive() && activity.getCurrentFocus() != null) {
-                imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-        }
-    }
-
 
 }

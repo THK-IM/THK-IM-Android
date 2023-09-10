@@ -48,4 +48,15 @@
         android:textAlignment="center"/>
 
 
+    <Button
+        android:id="@+id/button_audio"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textAlignment="center"
+        android:layout_margin="15dp"
+        android:text="Audio"
+        android:background="@color/purple_500"
+        android:textColor="@color/white" />
+
+
 </LinearLayout>

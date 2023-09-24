@@ -3,6 +3,7 @@ package com.thk.im.android.core.processor
 import com.google.gson.Gson
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.MediaUtils
+import com.thk.im.android.core.IMAudioMsgBody
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
@@ -188,10 +189,13 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
     private fun uploadCoverImage(entity: Message): Flowable<Message> {
         try {
             val videoData = Gson().fromJson(entity.data, IMVideoMsgData::class.java)
-            val videoBody = Gson().fromJson(entity.content, IMVideoMsgBody::class.java)
-            if (!videoBody.thumbnailUrl.isNullOrEmpty()) {
-                return Flowable.just(entity)
-            } else if (videoData.thumbnailPath.isNullOrEmpty()) {
+            var videoBody = Gson().fromJson(entity.content, IMVideoMsgBody::class.java)
+            if (videoBody != null) {
+                if (!videoBody.thumbnailUrl.isNullOrEmpty()) {
+                    return Flowable.just(entity)
+                }
+            }
+            if (videoData == null || videoData.thumbnailPath.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
                 val pair =
@@ -223,6 +227,9 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                     }
 
                                     LoadListener.Success -> {
+                                        if (videoBody == null) {
+                                            videoBody = IMVideoMsgBody()
+                                        }
                                         videoBody.thumbnailUrl = url
                                         videoBody.duration = videoData.duration
                                         videoBody.width = videoData.width
@@ -230,6 +237,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                         entity.content = Gson().toJson(videoBody)
                                         insertOrUpdateDb(entity, false)
                                         it.onNext(entity)
+                                        it.onComplete()
                                     }
 
                                     else -> {
@@ -253,10 +261,13 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
     private fun uploadVideo(entity: Message): Flowable<Message> {
         try {
             val videoData = Gson().fromJson(entity.data, IMVideoMsgData::class.java)
-            val videoBody = Gson().fromJson(entity.content, IMVideoMsgBody::class.java)
-            if (!videoBody.url.isNullOrEmpty()) {
-                return Flowable.just(entity)
-            } else if (videoData.path.isNullOrEmpty()) {
+            var videoBody = Gson().fromJson(entity.content, IMVideoMsgBody::class.java)
+            if (videoBody != null) {
+                if (!videoBody.url.isNullOrEmpty()) {
+                    return Flowable.just(entity)
+                }
+            }
+            if (videoData == null || videoData.path.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
                 val pair = IMCoreManager.getStorageModule().getPathsFromFullPath(videoData.path!!)
@@ -287,9 +298,13 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                     }
 
                                     LoadListener.Success -> {
+                                        if (videoBody == null) {
+                                            videoBody = IMVideoMsgBody()
+                                        }
                                         videoBody.url = url
                                         entity.content = Gson().toJson(videoBody)
                                         it.onNext(entity)
+                                        it.onComplete()
                                     }
 
                                     else -> {

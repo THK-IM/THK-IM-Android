@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.luck.picture.lib.entity.LocalMedia
 import com.thk.im.android.base.LLog
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMImageMsgData
 import com.thk.im.android.db.MsgType
 
 abstract class BaseMediaComponent(name: String, @DrawableRes id: Int) :
@@ -30,15 +31,15 @@ abstract class BaseMediaComponent(name: String, @DrawableRes id: Int) :
 //                        processor.sendMessage(it, componentManager.mSid)
 //                    }
                 } else {
-//                    val processor =
-//                        IMCoreManager.getMessageModule().getMsgProcessor(MsgType.IMAGE.value)
-//                    var path = media.compressPath
-//                    if (path == null || media.isOriginal) {
-//                        path = media.realPath
-//                    }
-//                    val body =
-//                        ImageBody(null, path, media.width, media.height)
-//                    processor.sendMessage(Gson().toJson(body), componentManager.mSid)
+                    val processor =
+                        IMCoreManager.getMessageModule().getMsgProcessor(MsgType.IMAGE.value)
+                    var path = media.compressPath
+                    if (path == null || media.isOriginal) {
+                        path = media.realPath
+                    }
+                    val imageMsgData = IMImageMsgData()
+                    imageMsgData.path = path
+                    processor.sendMessage(imageMsgData, componentManager.mSid)
                 }
 
             }

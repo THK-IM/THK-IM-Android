@@ -1,13 +1,16 @@
 package com.thk.im.android.ui.manager
 
+import android.app.Application
 import com.thk.im.android.ui.provider.MsgItemViewProvider
 import com.thk.im.android.ui.provider.SessionItemViewProvider
-import com.thk.im.android.ui.provider.internal.*
 import com.thk.im.android.ui.provider.internal.DefaultSsIVProvider
+import com.thk.im.android.ui.provider.internal.ImageMsgIVProvider
 import com.thk.im.android.ui.provider.internal.TextMsgIVProvider
 import com.thk.im.android.ui.provider.internal.TimeLineMsgIVProvider
 import com.thk.im.android.ui.provider.internal.UnSupportMsgIVProvider
+import com.thk.im.android.ui.provider.internal.VideoMsgIVProvider
 import com.thk.im.android.ui.provider.internal.VoiceMsgIVProvider
+import com.thk.im.android.ui.utils.IMKeyboardUtils
 
 object IMItemViewManager {
 
@@ -39,7 +42,8 @@ object IMItemViewManager {
         return sessionItemViewProvider
     }
 
-    fun init() {
+    fun init(app: Application) {
+        IMKeyboardUtils.init(app)
         val providers = arrayOf(
             TimeLineMsgIVProvider(),
             UnSupportMsgIVProvider(),

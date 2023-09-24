@@ -27,6 +27,7 @@ open class DefaultUserModule : UserModule {
             } else {
                 it.onNext(User(id))
             }
+            it.onComplete()
         }, BackpressureStrategy.LATEST).flatMap {
             if (it.cTime == 0L) {
                 return@flatMap getServerUserInfo(it.id).flatMap { bean ->

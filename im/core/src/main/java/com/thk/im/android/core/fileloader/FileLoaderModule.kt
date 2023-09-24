@@ -19,9 +19,14 @@ interface FileLoaderModule {
      * @param uId 用户id
      * @param fileName 文件命名
      * @param msgClientId 客户端消息id
-     * @return 任务id
+     * @return key
      */
     fun getUploadKey(sId: Long, uId: Long, fileName: String, msgClientId: Long): String
+
+    /**
+     * 从上传key中解析出 sId, uId, fileName
+     */
+    fun parserUploadKey(key: String): Triple<Long, Long, String>?
 
     /**
      *  下载

@@ -14,10 +14,9 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import com.luck.picture.lib.utils.ToastUtils
+import com.thk.im.android.media.audio.AudioCallback
+import com.thk.im.android.media.audio.AudioStatus
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.voice.IRecorder
-import com.thk.im.android.ui.voice.RecordCallback
 import kotlin.math.abs
 
 /**
@@ -27,21 +26,10 @@ class RecordButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = androidx.appcompat.R.attr.buttonStyle,
-) : AppCompatButton(context, attrs, defStyleAttr), RecordCallback {
+) : AppCompatButton(context, attrs, defStyleAttr), AudioCallback {
 
     private var v1: Float = 0f
     private var v2: Float = 0f
-
-    private var mRecorder: IRecorder? = null
-
-    var recordListener: RecordListener? = null
-
-    fun setRecorder(recorder: IRecorder, maxDuration: Int) {
-        mRecorder = recorder
-        mRecorder?.setRecordCallback(this)
-        mRecorder?.setMaxDuration(maxDuration)
-    }
-
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -50,7 +38,6 @@ class RecordButton @JvmOverloads constructor(
                 v1 = event.y
                 setBackgroundResource(R.drawable.shape_edt_round_press)
                 text = context.getString(R.string.release_to_send_voice)
-                mRecorder?.startRecord()
                 showVolumeDialog()
             } else if (event?.action == MotionEvent.ACTION_MOVE) {
                 v2 = event.y
@@ -62,7 +49,6 @@ class RecordButton @JvmOverloads constructor(
             } else if (event?.action == MotionEvent.ACTION_UP) {
                 setBackgroundResource(R.drawable.shape_edt_round)
                 text = context.getString(R.string.tip_for_voice_forward)
-                mRecorder?.stopRecord()
                 hideVolumeDialog()
             }
             return true
@@ -163,35 +149,7 @@ class RecordButton @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
-    interface RecordListener {
-        /**
-         * 录制完成的回调
-         * @param recorder recorder
-         * @param duration 录制时长
-         */
-        fun onRecordFinish(recorder: IRecorder, duration: Int)
+    override fun notify(path: String, second: Int, db: Double, state: AudioStatus) {
 
-        /**
-         * 录制取消
-         * @param recorder recorder
-         */
-        fun onRecordCancel(recorder: IRecorder)
-    }
-
-    override fun onVolumeChange(recorder: IRecorder, volume: Int) {
-        onReceiveMaxVolume(volume)
-    }
-
-    override fun onProcess(recorder: IRecorder, duration: Int) {
-
-    }
-
-    override fun onRecordFinish(recorder: IRecorder, duration: Int) {
-        hideVolumeDialog()
-        if (duration < 1f) {
-            ToastUtils.showToast(context, context.getString(R.string.record_too_short))
-            return
-        }
-        recordListener?.onRecordFinish(recorder, duration)
     }
 }

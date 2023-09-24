@@ -1,4 +1,4 @@
-package com.thk.im.android.oss
+package com.thk.im.android.minio
 
 import com.thk.im.android.base.LLog
 import com.thk.im.android.core.fileloader.LoadListener
@@ -11,13 +11,12 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 
-
-class OSSDownloadTask(
+class MinioDownloadTask(
     private val url: String,
     private val path: String,
     taskId: String,
-    private val fileLoaderModule: OSSFileLoaderModule
-) : OSSLoadTask(taskId) {
+    private val fileLoaderModule: MinioFileLoadModule
+) : MinioLoadTask(taskId) {
 
     private val tag = "DownloadTask"
     private var running = AtomicBoolean(true)
@@ -30,12 +29,10 @@ class OSSDownloadTask(
 
     override fun start() {
         notify(0, LoadListener.Init)
-        val okHttpClient = fileLoaderModule.downloadClient
-        val request = Request.Builder()
-            .addHeader("token", fileLoaderModule.token)
+        val request = Request.Builder().addHeader("token", fileLoaderModule.token)
             //访问路径
             .url(url).build()
-        call = okHttpClient.newCall(request)
+        call = fileLoaderModule.okHttpClient.newCall(request)
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 notify(0, LoadListener.Failed)
@@ -102,7 +99,6 @@ class OSSDownloadTask(
                 }
             }
         })
-
     }
 
     override fun cancel() {
@@ -116,6 +112,9 @@ class OSSDownloadTask(
     }
 
     override fun notify(progress: Int, state: Int) {
+        if (!running.get()) {
+            return
+        }
         LLog.v(tag, "$taskId, $progress, $state")
         // 下载成功时把文件拷贝到最终路径上
         if (state == LoadListener.Success) {
@@ -124,11 +123,7 @@ class OSSDownloadTask(
             if (file.exists()) {
                 if (!file.delete()) {
                     fileLoaderModule.notifyListeners(
-                        taskId,
-                        progress,
-                        LoadListener.Failed,
-                        url,
-                        path
+                        taskId, progress, LoadListener.Failed, url, path
                     )
                     return
                 }

@@ -24,8 +24,8 @@ class ComponentPanel(
         val adapter = ComponentPagerAdapter(
             activity, uiComponentManager
         )
-        val viewPager2 = itemView.findViewById<ViewPager2>(R.id.viewpager2)
-        viewPager2.adapter = adapter
+        val featureViewPager = itemView.findViewById<ViewPager2>(R.id.viewpager_feature)
+        featureViewPager.adapter = adapter
     }
 
     override fun show() {

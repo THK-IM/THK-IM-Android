@@ -7,6 +7,7 @@ import com.thk.im.android.core.IMAudioMsgData
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
+import com.thk.im.android.core.IMImageMsgBody
 import com.thk.im.android.core.IMUploadProgress
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.exception.UploadException
@@ -78,10 +79,13 @@ class AudioMsgProcessor : BaseMsgProcessor() {
     private fun uploadAudio(entity: Message): Flowable<Message> {
         try {
             val audioData = Gson().fromJson(entity.data, IMAudioMsgData::class.java)
-            val audioBody = Gson().fromJson(entity.content, IMAudioMsgBody::class.java)
-            if (!audioBody.url.isNullOrEmpty()) {
-                return Flowable.just(entity)
-            } else if (audioData.path.isNullOrEmpty()) {
+            var audioBody = Gson().fromJson(entity.content, IMAudioMsgBody::class.java)
+            if (audioBody != null) {
+                if (!audioBody.url.isNullOrEmpty()) {
+                    return Flowable.just(entity)
+                }
+            }
+            if (audioData == null || audioData.path.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
                 val pair = IMCoreManager.getStorageModule().getPathsFromFullPath(audioData.path!!)
@@ -112,11 +116,15 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                                     }
 
                                     LoadListener.Success -> {
+                                        if (audioBody == null) {
+                                            audioBody = IMAudioMsgBody()
+                                        }
                                         audioBody.url = url
                                         audioBody.duration = audioData.duration!!
                                         entity.content = Gson().toJson(audioBody)
                                         entity.sendStatus = MsgSendStatus.Sending.value
                                         it.onNext(entity)
+                                        it.onComplete()
                                     }
 
                                     else -> {

@@ -81,6 +81,7 @@ open class DefaultGroupModule : GroupModule {
             } else {
                 it.onNext(Group(gid))
             }
+            it.onComplete()
         }, BackpressureStrategy.LATEST).flatMap {
             if (it.cTime == 0L) {
                 return@flatMap getServerGroupInfo(it.id).flatMap { bean ->
@@ -119,6 +120,7 @@ open class DefaultGroupModule : GroupModule {
         return Flowable.create<List<GroupMember>>({
             val groupMembers = IMCoreManager.getImDataBase().groupMemberDao().queryGroupMembers(gid)
             it.onNext(groupMembers)
+            it.onComplete()
         }, BackpressureStrategy.LATEST).flatMap {
             if (it.isEmpty()) {
                 return@flatMap queryGroupMembersFromServer(gid).flatMap { list ->
@@ -144,6 +146,7 @@ open class DefaultGroupModule : GroupModule {
             } else {
                 it.onNext(groupMember)
             }
+            it.onComplete()
         }, BackpressureStrategy.LATEST).flatMap {
             if (it.gid == 0L && it.uid == 0L) {
                 return@flatMap queryGroupMemberByUidFromServer(gid, uid).flatMap { member ->

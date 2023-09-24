@@ -18,7 +18,6 @@ import com.thk.im.android.db.entity.Message
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.FileNotFoundException
-import java.io.IOException
 
 class ImageMsgProcessor : BaseMsgProcessor() {
 
@@ -80,16 +79,16 @@ class ImageMsgProcessor : BaseMsgProcessor() {
         imageData: IMImageMsgData,
         entity: Message
     ): Flowable<Message> {
-        return MediaUtils.compress(IMCoreManager.getApplication(), imageData.path!!, 100).flatMap {
-            val paths = storageModule.getPathsFromFullPath(imageData.path!!)
-            val names = storageModule.getFileExt(paths.second)
-            val thumbName = "${names.first}_thumb.${names.second}"
-            val thumbPath =
-                storageModule.allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
-            val success = storageModule.copyFile(it, thumbPath)
-            if (!success) {
-                return@flatMap Flowable.error(IOException("copy $it to $thumbPath error"))
-            }
+        val paths = storageModule.getPathsFromFullPath(imageData.path!!)
+        val names = storageModule.getFileExt(paths.second)
+        val thumbName = "${names.first}_thumb.${names.second}"
+        val thumbPath =
+            storageModule.allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
+        return MediaUtils.compress(
+            imageData.path!!,
+            100 * 1024,
+            thumbPath
+        ).flatMap {
             val size = MediaUtils.getBitmapAspect(imageData.path!!)
             imageData.thumbnailPath = thumbPath
             imageData.width = size.first
@@ -108,10 +107,13 @@ class ImageMsgProcessor : BaseMsgProcessor() {
     private fun uploadThumbImage(entity: Message): Flowable<Message> {
         try {
             val imageData = Gson().fromJson(entity.data, IMImageMsgData::class.java)
-            val imageBody = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
-            if (!imageBody.thumbnailUrl.isNullOrEmpty()) {
-                return Flowable.just(entity)
-            } else if (imageData.thumbnailPath.isNullOrEmpty()) {
+            var imageBody = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
+            if (imageBody != null) {
+                if (!imageBody.thumbnailUrl.isNullOrEmpty()) {
+                    return Flowable.just(entity)
+                }
+            }
+            if (imageData == null || imageData.thumbnailPath.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
                 val pair =
@@ -143,12 +145,16 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                     }
 
                                     LoadListener.Success -> {
+                                        if (imageBody == null) {
+                                            imageBody = IMImageMsgBody()
+                                        }
                                         imageBody.thumbnailUrl = url
                                         imageBody.width = imageData.width
                                         imageBody.height = imageData.height
                                         entity.content = Gson().toJson(imageBody)
                                         insertOrUpdateDb(entity, false)
                                         it.onNext(entity)
+                                        it.onComplete()
                                     }
 
                                     else -> {
@@ -172,12 +178,20 @@ class ImageMsgProcessor : BaseMsgProcessor() {
     private fun uploadOriginImage(entity: Message): Flowable<Message> {
         try {
             val imageData = Gson().fromJson(entity.data, IMImageMsgData::class.java)
-            val imageBody = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
-            if (!imageBody.url.isNullOrEmpty()) {
-                return Flowable.just(entity)
-            } else if (imageData.path.isNullOrEmpty()) {
+            var imageBody = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
+            if (imageBody != null) {
+                if (!imageBody.url.isNullOrEmpty()) {
+                    return Flowable.just(entity)
+                }
+            }
+            if (imageData == null || imageData.path.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
+                if (imageData.path.equals(imageData.thumbnailPath)) {
+                    imageBody.url = imageBody.thumbnailUrl
+                    entity.content = Gson().toJson(imageBody)
+                    return Flowable.just(entity)
+                }
                 val pair = IMCoreManager.getStorageModule().getPathsFromFullPath(imageData.path!!)
                 return Flowable.create({
                     val key = IMCoreManager.fileLoaderModule.getUploadKey(
@@ -206,9 +220,13 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                     }
 
                                     LoadListener.Success -> {
+                                        if (imageBody == null) {
+                                            imageBody = IMImageMsgBody()
+                                        }
                                         imageBody.url = url
                                         entity.content = Gson().toJson(imageBody)
                                         it.onNext(entity)
+                                        it.onComplete()
                                     }
 
                                     else -> {

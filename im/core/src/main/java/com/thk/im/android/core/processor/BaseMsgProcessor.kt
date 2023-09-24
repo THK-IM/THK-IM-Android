@@ -19,8 +19,7 @@ abstract class BaseMsgProcessor {
      * 创建发送消息
      */
     open fun buildSendMsg(
-        body: Any, sid: Long,
-        atUsers: String? = null, rMsgId: Long? = null
+        body: Any, sid: Long, atUsers: String? = null, rMsgId: Long? = null
     ): Message {
         var content = ""
         var data = ""
@@ -30,17 +29,27 @@ abstract class BaseMsgProcessor {
             data = Gson().toJson(body)
         }
         val id = IMCoreManager.getMessageModule().generateNewMsgId()
-        val oprStatus = MsgOperateStatus.Ack.value or
-                MsgOperateStatus.ClientRead.value or
-                MsgOperateStatus.ServerRead.value
+        val oprStatus =
+            MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
         val sendStatus = MsgSendStatus.Init.value
         val type = this.messageType()
         val fUId = IMCoreManager.getUid()
         val cTime = IMCoreManager.signalModule.severTime
         // tips：msgId初始值给-id,发送成功后更新为服务端返回的msgId
         return Message(
-            id, fUId, sid, 0 - id, type, content, oprStatus, sendStatus,
-            cTime, cTime, data, rMsgId, atUsers
+            id,
+            fUId,
+            sid,
+            0 - id,
+            type,
+            content,
+            oprStatus,
+            sendStatus,
+            cTime,
+            cTime,
+            data,
+            rMsgId,
+            atUsers
         )
     }
 
@@ -52,8 +61,11 @@ abstract class BaseMsgProcessor {
      * 4、调用api发送消息到服务器
      */
     open fun sendMessage(
-        body: Any, sid: Long,
-        atUsers: String? = null, rMsgId: Long? = null, map: Map<String, Any> = mutableMapOf()
+        body: Any,
+        sid: Long,
+        atUsers: String? = null,
+        rMsgId: Long? = null,
+        map: Map<String, Any> = mutableMapOf()
     ): Boolean {
         try {
             val msg = buildSendMsg(body, sid, atUsers, rMsgId)
@@ -120,10 +132,7 @@ abstract class BaseMsgProcessor {
         if (notify) {
             XEventBus.post(IMEvent.MsgNew.value, msg)
         }
-        if (msg.sendStatus == MsgSendStatus.Sending.value
-            || msg.sendStatus == MsgSendStatus.SendFailed.value
-            || msg.sendStatus == MsgSendStatus.Success.value
-        ) {
+        if (msg.sendStatus == MsgSendStatus.Sending.value || msg.sendStatus == MsgSendStatus.SendFailed.value || msg.sendStatus == MsgSendStatus.Success.value) {
             IMCoreManager.getMessageModule().processSessionByMessage(msg)
         }
     }
@@ -134,10 +143,7 @@ abstract class BaseMsgProcessor {
     open fun updateFailedMsgStatus(msg: Message) {
         val msgDao = IMCoreManager.getImDataBase().messageDao()
         msgDao.updateSendStatus(msg.sid, msg.id, MsgSendStatus.SendFailed.value, msg.fUid)
-        if (msg.sendStatus == MsgSendStatus.Sending.value
-            || msg.sendStatus == MsgSendStatus.SendFailed.value
-            || msg.sendStatus == MsgSendStatus.Success.value
-        ) {
+        if (msg.sendStatus == MsgSendStatus.Sending.value || msg.sendStatus == MsgSendStatus.SendFailed.value || msg.sendStatus == MsgSendStatus.Success.value) {
             IMCoreManager.getMessageModule().processSessionByMessage(msg)
         }
     }
@@ -153,10 +159,8 @@ abstract class BaseMsgProcessor {
         if (dbMsg == null) {
             if (msg.fUid == IMCoreManager.getUid()) {
                 // 如果发件人为自己，插入前补充消息状态为已接受并已读
-                msg.oprStatus = msg.oprStatus or
-                        MsgOperateStatus.Ack.value or
-                        MsgOperateStatus.ClientRead.value or
-                        MsgOperateStatus.ServerRead.value
+                msg.oprStatus =
+                    msg.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
                 msg.sendStatus = MsgSendStatus.Success.value
             }
             insertOrUpdateDb(msg)

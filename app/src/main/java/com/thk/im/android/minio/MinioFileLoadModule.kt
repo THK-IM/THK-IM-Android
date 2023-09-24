@@ -1,11 +1,9 @@
-package com.thk.im.android.oss
+package com.thk.im.android.minio
 
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
-import com.alibaba.sdk.android.oss.ClientConfiguration
-import com.alibaba.sdk.android.oss.OSSClient
-import com.alibaba.sdk.android.oss.common.auth.OSSFederationCredentialProvider
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.fileloader.FileLoaderModule
 import com.thk.im.android.core.fileloader.LoadListener
 import okhttp3.ConnectionPool
@@ -13,53 +11,30 @@ import okhttp3.OkHttpClient
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 
-class OSSFileLoaderModule(
+class MinioFileLoadModule(
     app: Application,
-    private val bucket: String,
-    private val endpoint: String,
+    val endpoint: String,
     val token: String,
-    credentialProvider: OSSFederationCredentialProvider
 ) : FileLoaderModule {
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private val scheme = "https://"
-
-    private val ossClient: OSSClient
-
     private val defaultTimeout: Long = 30
     private val maxIdleConnection = 8
     private val keepAliveDuration: Long = 60
+    private val tokenInterceptor = TokenInterceptor(token)
 
-    val downloadClient = OkHttpClient.Builder().connectTimeout(defaultTimeout, TimeUnit.SECONDS)
+    val okHttpClient = OkHttpClient.Builder().connectTimeout(defaultTimeout, TimeUnit.SECONDS)
         .writeTimeout(defaultTimeout, TimeUnit.SECONDS)
         .readTimeout(defaultTimeout, TimeUnit.SECONDS).retryOnConnectionFailure(true)
-        .followRedirects(true)
+        .followRedirects(true).addInterceptor(tokenInterceptor)
         .connectionPool(ConnectionPool(maxIdleConnection, keepAliveDuration, TimeUnit.SECONDS))
         .build()
 
-    init {
-        val conf = ClientConfiguration()
-        conf.connectionTimeout = 15 * 1000
-        conf.socketTimeout = 15 * 1000
-        conf.maxConcurrentRequest = 5
-        conf.maxErrorRetry = 2
-        ossClient = OSSClient(app, endpoint, credentialProvider, conf)
-    }
-
-    fun getOssClient(): OSSClient {
-        return ossClient
-    }
-
-    fun getBucketName(): String {
-        return bucket
-    }
-
     private val downloadTaskMap =
-        HashMap<String, Pair<OSSLoadTask, MutableList<WeakReference<LoadListener>>>>()
+        HashMap<String, Pair<MinioLoadTask, MutableList<WeakReference<LoadListener>>>>()
     private val uploadTaskMap =
-        HashMap<String, Pair<OSSLoadTask, MutableList<WeakReference<LoadListener>>>>()
-
+        HashMap<String, Pair<MinioLoadTask, MutableList<WeakReference<LoadListener>>>>()
 
     fun notifyListeners(
         taskId: String, progress: Int, state: Int, url: String, path: String
@@ -92,11 +67,11 @@ class OSSFileLoaderModule(
                         if (l.notifyOnUiThread()) {
                             handler.post {
                                 l.onProgress(
-                                    progress, state, "$scheme$bucket.$endpoint/${url}", path
+                                    progress, state, url, path
                                 )
                             }
                         } else {
-                            l.onProgress(progress, state, "$scheme$bucket.$endpoint/${url}", path)
+                            l.onProgress(progress, state, url, path)
                         }
                     }
                 }
@@ -112,7 +87,7 @@ class OSSFileLoaderModule(
     }
 
     override fun getUploadKey(sId: Long, uId: Long, fileName: String, msgClientId: Long): String {
-        return "im/session_${sId}/${uId}/" + msgClientId + "_${fileName}"
+        return "im/session_${sId}/${uId}/" + IMCoreManager.signalModule.severTime + "_${fileName}"
     }
 
     override fun parserUploadKey(key: String): Triple<Long, Long, String>? {
@@ -125,7 +100,7 @@ class OSSFileLoaderModule(
             if (sessions.size != 2) {
                 return null
             }
-            return Triple(sessions[1].toLong(), sessions[2].toLong(), sessions[3])
+            return Triple(sessions[1].toLong(), paths[2].toLong(), paths[3])
         } catch (e: Exception) {
             e.printStackTrace()
             return null
@@ -137,7 +112,7 @@ class OSSFileLoaderModule(
             val taskId = getTaskId(url, path, "download")
             val p = downloadTaskMap[taskId]
             if (p == null) {
-                val dTask = OSSDownloadTask(url, path, taskId, this)
+                val dTask = MinioDownloadTask(url, path, taskId, this)
                 dTask.start()
                 val listeners = mutableListOf(WeakReference(listener))
                 downloadTaskMap[taskId] = Pair(dTask, listeners)
@@ -153,7 +128,7 @@ class OSSFileLoaderModule(
             val taskId = getTaskId(key, path, "upload")
             val p = uploadTaskMap[taskId]
             if (p == null) {
-                val uTask = OSSUploadTask(key, path, taskId, this)
+                val uTask = MinioUploadTask(key, path, taskId, this)
                 uTask.start()
                 val listeners = mutableListOf(WeakReference(listener))
                 uploadTaskMap[taskId] = Pair(uTask, listeners)

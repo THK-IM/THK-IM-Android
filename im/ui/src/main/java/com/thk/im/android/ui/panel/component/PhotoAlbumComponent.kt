@@ -9,6 +9,7 @@ import com.luck.picture.lib.config.SelectMimeType
 import com.luck.picture.lib.engine.CompressFileEngine
 import com.luck.picture.lib.entity.LocalMedia
 import com.luck.picture.lib.interfaces.OnResultCallbackListener
+import com.thk.im.android.base.MediaUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.processor.ImageMsgProcessor
 import com.thk.im.android.db.MsgType
@@ -50,7 +51,7 @@ class PhotoAlbumComponent(name: String, @DrawableRes id: Int) :
                         .filter(object : CompressionPredicate {
                             override fun apply(path: String?): Boolean {
                                 path?.let {
-                                    val isGif = com.thk.im.android.base.MediaUtils.isGif(it)
+                                    val isGif = MediaUtils.isGif(it)
                                     return !isGif
                                 }
                                 return true

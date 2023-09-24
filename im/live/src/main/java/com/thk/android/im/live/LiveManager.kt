@@ -19,6 +19,7 @@ import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.audio.JavaAudioDeviceModule
+import org.webrtc.audio.JavaAudioDeviceModule.SamplesReadyCallback
 
 class LiveManager private constructor() {
 
@@ -104,6 +105,12 @@ class LiveManager private constructor() {
                 val encoderFactory = DefaultVideoEncoderFactory(eglBaseContext, true, true)
                 val decoderFactory = DefaultVideoDecoderFactory(eglBaseContext)
                 val audioDeviceModule = JavaAudioDeviceModule.builder(this.app)
+                    .setSamplesReadyCallback(object : SamplesReadyCallback {
+                        override fun onWebRtcAudioRecordSamplesReady(p0: JavaAudioDeviceModule.AudioSamples?) {
+
+                        }
+
+                    })
                     .createAudioDeviceModule()
                 val peerConnectionFactory = PeerConnectionFactory.builder().setOptions(options)
                     .setVideoEncoderFactory(encoderFactory).setVideoDecoderFactory(decoderFactory)

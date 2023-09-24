@@ -1,6 +1,5 @@
 package com.thk.im.android.base
 
-import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -8,42 +7,86 @@ import android.media.ExifInterface
 import android.media.MediaMetadataRetriever
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import top.zibin.luban.Luban
-import top.zibin.luban.OnCompressListener
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.io.IOException
+import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
+
 
 object MediaUtils {
 
-    fun compress(app: Application, src: String, size: Int): Flowable<String> {
+    fun compress(srcPath: String, size: Int, desPath: String): Flowable<String> {
         return Flowable.create({
-            Luban.with(app)
-                .ignoreBy(size)
-                .setFocusAlpha(true).load(src)
-                .setCompressListener(object : OnCompressListener {
-                    override fun onStart() {
-                        LLog.d("compress onStart $src")
-                    }
+            val length = File(srcPath).length()
+            if (length <= size) {
+                it.onNext(desPath)
+                it.onComplete()
+                return@create
+            }
+            val options = BitmapFactory.Options()
+            val rate = (length / size).toInt()
+            var sample = 2
+            while (sample < rate / 2) {
+                sample *= 2
+            }
+            options.inSampleSize = sample
 
-                    override fun onSuccess(index: Int, compressFile: File?) {
-                        if (compressFile != null) {
-                            it.onNext(compressFile.absolutePath)
-                        } else {
-                            it.onError(FileNotFoundException())
-                        }
-                    }
+            val tagBitmap = BitmapFactory.decodeFile(srcPath, options)
+            val stream = ByteArrayOutputStream()
 
-                    override fun onError(index: Int, e: Throwable) {
-                        LLog.e("compress onStart $src $e")
-                        it.onError(e)
-                    }
-
-                })
-                .launch()
+            tagBitmap!!.compress(
+                if (tagBitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
+                60,
+                stream
+            )
+            tagBitmap.recycle()
+            val desFile = File(desPath)
+            if (desFile.exists()) {
+                desFile.delete()
+            }
+            val success = desFile.createNewFile()
+            if (!success) {
+                it.onError(FileNotFoundException())
+                return@create
+            }
+            val fos = FileOutputStream(desPath)
+            fos.write(stream.toByteArray())
+            fos.flush()
+            fos.close()
+            stream.close()
+            LLog.v("MediaUtils compress :${options.inSampleSize} from $length to ${desFile.length()}")
+            it.onNext(desPath)
+            it.onComplete()
         }, BackpressureStrategy.LATEST)
+    }
+
+    private fun computeSize(width: Int, height: Int): Int {
+        val srcWidth = if (width % 2 == 1) width + 1 else width
+        val srcHeight = if (height % 2 == 1) height + 1 else height
+        val longSide: Int = max(srcWidth, srcHeight)
+        val shortSide: Int = min(srcWidth, srcHeight)
+        val scale = shortSide.toFloat() / longSide
+        return if (scale <= 1 && scale > 0.5625) {
+            if (longSide < 600) {
+                1
+            } else if (longSide < 1200) {
+                2
+            } else if (longSide in 1200..2400) {
+                4
+            } else {
+                longSide / 600
+            }
+        } else if (scale <= 0.5625 && scale > 0.5) {
+            if (longSide / 600 == 0) 1 else longSide / 600
+        } else {
+            ceil(longSide / (600.0 / scale)).toInt()
+        }
     }
 
     /**
@@ -61,8 +104,7 @@ object MediaUtils {
         try {
             val exifInterface = ExifInterface(path)
             val orientation = exifInterface.getAttributeInt(
-                ExifInterface.TAG_ORIENTATION,
-                ExifInterface.ORIENTATION_NORMAL
+                ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL
             )
             when (orientation) {
                 ExifInterface.ORIENTATION_ROTATE_90 -> degree = 90
@@ -76,8 +118,7 @@ object MediaUtils {
     }
 
     fun calculateInSampleSize(
-        options: BitmapFactory.Options,
-        reqWidth: Int, reqHeight: Int
+        options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int
     ): Int {
         // 源图片的高度和宽度
         val height = options.outHeight
@@ -109,8 +150,7 @@ object MediaUtils {
         matrix.postRotate(angle.toFloat())
         // 创建新的图片
         return Bitmap.createBitmap(
-            bitmap, 0, 0,
-            bitmap.width, bitmap.height, matrix, true
+            bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
         )
     }
 
@@ -124,8 +164,9 @@ object MediaUtils {
             retriever.setDataSource(filePath)
             val b = retriever.getFrameAtTime(frameTime, MediaMetadataRetriever.OPTION_CLOSEST)
                 ?: return null
-            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                .toString().toInt() / 1000 + 1 // 时长(秒)
+            val duration =
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toString()
+                    .toInt() / 1000 + 1 // 时长(秒)
             return Pair(b, duration)
         } catch (e: IllegalArgumentException) {
             e.printStackTrace()

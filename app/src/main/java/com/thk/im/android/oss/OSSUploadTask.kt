@@ -4,6 +4,7 @@ import com.alibaba.sdk.android.oss.ClientException
 import com.alibaba.sdk.android.oss.ServiceException
 import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback
 import com.alibaba.sdk.android.oss.callback.OSSProgressCallback
+import com.alibaba.sdk.android.oss.internal.OSSAsyncTask
 import com.alibaba.sdk.android.oss.model.PutObjectRequest
 import com.alibaba.sdk.android.oss.model.PutObjectResult
 import com.thk.im.android.core.fileloader.LoadListener
@@ -17,6 +18,7 @@ class OSSUploadTask(
 ) : OSSLoadTask(taskId) {
 
     private var running = AtomicBoolean(true)
+    private var task: OSSAsyncTask<PutObjectResult>? = null
 
     init {
         notify(0, LoadListener.Wait)
@@ -31,7 +33,7 @@ class OSSUploadTask(
             progress = (currentSize * 1.0f / totalSize * 100f).toInt()
             notify(progress, LoadListener.Ing)
         }
-        fileLoaderModule.getOssClient().asyncPutObject(request, object :
+        task = fileLoaderModule.getOssClient().asyncPutObject(request, object :
             OSSCompletedCallback<PutObjectRequest, PutObjectResult> {
             override fun onSuccess(request: PutObjectRequest?, result: PutObjectResult?) {
                 notify(progress, LoadListener.Success)
@@ -48,6 +50,12 @@ class OSSUploadTask(
     }
 
     override fun cancel() {
+        task?.let {
+            if (!it.isCanceled) {
+                it.cancel()
+            }
+        }
+        task = null
         running.set(false)
     }
 

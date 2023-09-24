@@ -3,6 +3,7 @@ package com.thk.im.android.ui.fragment
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -12,7 +13,9 @@ import android.text.Editable
 import android.text.Selection
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.widget.addTextChangedListener
@@ -31,10 +34,13 @@ import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
+import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.FragmentImMessageBinding
 import com.thk.im.android.ui.fragment.adapter.MessageAdapter
+import com.thk.im.android.ui.panel.component.CameraComponent
 import com.thk.im.android.ui.panel.component.ComponentPanel
 import com.thk.im.android.ui.panel.component.ComponentViewHolder
+import com.thk.im.android.ui.panel.component.PhotoAlbumComponent
 import com.thk.im.android.ui.panel.component.internal.BaseComponentViewHolder
 import com.thk.im.android.ui.panel.component.internal.UIComponentManager
 import com.thk.im.android.ui.panel.emoji.EmojiPanel
@@ -67,7 +73,6 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
             override fun provideViewHolder(parent: ViewGroup): BaseComponentViewHolder {
                 return ComponentViewHolder.create(parent)
             }
-
         })
 
     override fun onCreateView(
@@ -92,6 +97,9 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+        uiComponentManager.init(view.context, sid)
+        uiComponentManager.registerComponent(CameraComponent("拍照", R.drawable.chat_camera))
+        uiComponentManager.registerComponent(PhotoAlbumComponent("相册", R.drawable.chat_album))
         initKeyboardWindow()
         initMessageRecyclerView(view)
         initEventBus()
@@ -273,6 +281,16 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
         val linearLayoutManager =
             (binding.rcvMessage.layoutManager as LinearLayoutManager)
         linearLayoutManager.stackFromEnd = true
+
+        binding.rcvMessage.setOnTouchListener { _, _ ->
+            if (bottomHeight > 0 || keyboardShowing) {
+                bottomHeight = 0
+                layoutRefresh(bottomHeight, false)
+                true
+            } else {
+                false
+            }
+        }
     }
 
     private fun initEventBus() {

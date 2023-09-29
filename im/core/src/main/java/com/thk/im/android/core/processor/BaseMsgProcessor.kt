@@ -15,6 +15,52 @@ import io.reactivex.Flowable
 
 abstract class BaseMsgProcessor {
 
+
+    /**
+     * 收到消息
+     */
+    @WorkerThread
+    open fun received(msg: Message) {
+        // 默认插入数据库
+        val dbMsg = IMCoreManager.getImDataBase().messageDao().findMessage(msg.id)
+        if (dbMsg == null) {
+            if (msg.fUid == IMCoreManager.getUid()) {
+                // 如果发件人为自己，插入前补充消息状态为已接受并已读
+                msg.oprStatus =
+                    msg.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
+                msg.sendStatus = MsgSendStatus.Success.value
+            }
+            insertOrUpdateDb(msg,
+                notify = true,
+                notifySession = true,
+            )
+            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
+                IMCoreManager.getMessageModule().ackMessageToCache(msg)
+            }
+            IMCoreManager.getMessageModule().processSessionByMessage(msg)
+        } else {
+            if (dbMsg.sendStatus != MsgSendStatus.Success.value) {
+                msg.data = dbMsg.data
+                msg.sendStatus = MsgSendStatus.Success.value
+                if (msg.fUid == IMCoreManager.getUid()) {
+                    // 如果发件人为自己，插入前补充消息状态为已接受并已读
+                    msg.oprStatus =
+                        msg.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
+                }
+                insertOrUpdateDb(msg,
+                    notify = true,
+                    notifySession = true,
+                )
+            }
+            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
+                IMCoreManager.getMessageModule().ackMessageToCache(msg)
+            }
+            if (msg.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) {
+                IMCoreManager.getMessageModule().processSessionByMessage(msg)
+            }
+        }
+    }
+
     /**
      * 创建发送消息
      */
@@ -69,7 +115,7 @@ abstract class BaseMsgProcessor {
     ): Boolean {
         try {
             val msg = buildSendMsg(body, sid, atUsers, rMsgId)
-            this.resend(msg)
+            this.send(msg)
         } catch (e: Exception) {
             e.message?.let { LLog.e(it) }
             return false
@@ -77,15 +123,22 @@ abstract class BaseMsgProcessor {
         return true
     }
 
+    open fun resend(msg: Message) {
+        send(msg, true)
+    }
+
     /**
      * 重发
      */
-    open fun resend(msg: Message) {
+    open fun send(msg: Message, resend: Boolean = false) {
         var originMsg = msg
         val subscriber = object : BaseSubscriber<Message>() {
             override fun onNext(t: Message) {
                 super.onComplete()
-                insertOrUpdateDb(t)
+                insertOrUpdateDb(msg,
+                    notify = true,
+                    notifySession = true,
+                )
             }
 
             override fun onError(t: Throwable?) {
@@ -95,6 +148,12 @@ abstract class BaseMsgProcessor {
             }
         }
         Flowable.just(msg).flatMap {
+            if (!resend) {
+                insertOrUpdateDb(msg,
+                    notify = true,
+                    notifySession = true,
+                )
+            }
             // 消息二次处理
             val flowable = this.reprocessingFlowable(it)
             if (flowable != null) {
@@ -108,17 +167,22 @@ abstract class BaseMsgProcessor {
             if (flowable != null) {
                 // 消息内容上传
                 it.sendStatus = MsgSendStatus.Uploading.value
-                insertOrUpdateDb(it)
+                insertOrUpdateDb(msg,
+                    notify = true,
+                    notifySession = false,
+                )
                 return@flatMap flowable
             } else {
-                insertOrUpdateDb(it)
                 return@flatMap Flowable.just(it)
             }
         }.flatMap {
             originMsg = it
             // 消息发送到服务器
             it.sendStatus = MsgSendStatus.Sending.value
-            insertOrUpdateDb(it)
+            insertOrUpdateDb(msg,
+                notify = false,
+                notifySession = false,
+            )
             IMCoreManager.getMessageModule().sendMessageToServer(it)
         }.compose(RxTransform.flowableToIo()).subscribe(subscriber)
     }
@@ -128,12 +192,13 @@ abstract class BaseMsgProcessor {
      * 【插入或更新消息状态】
      */
     open fun insertOrUpdateDb(msg: Message, notify: Boolean = true, notifySession: Boolean = true) {
+        LLog.v("insertOrUpdateDb  ${Gson().toJson(msg)}, ${notify}, $notifySession")
         val msgDao = IMCoreManager.getImDataBase().messageDao()
         msgDao.insertOrUpdateMessages(mutableListOf(msg))
         if (notify) {
             XEventBus.post(IMEvent.MsgNew.value, msg)
         }
-        if (notifySession) {
+        if (notify && notifySession) {
             if (msg.sendStatus == MsgSendStatus.Sending.value || msg.sendStatus == MsgSendStatus.SendFailed.value || msg.sendStatus == MsgSendStatus.Success.value) {
                 IMCoreManager.getMessageModule().processSessionByMessage(msg)
             }
@@ -152,41 +217,6 @@ abstract class BaseMsgProcessor {
     }
 
 
-    /**
-     * 收到消息
-     */
-    @WorkerThread
-    open fun received(msg: Message) {
-        // 默认插入数据库
-        val dbMsg = IMCoreManager.getImDataBase().messageDao().findMessage(msg.id)
-        if (dbMsg == null) {
-            if (msg.fUid == IMCoreManager.getUid()) {
-                // 如果发件人为自己，插入前补充消息状态为已接受并已读
-                msg.oprStatus =
-                    msg.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
-                msg.sendStatus = MsgSendStatus.Success.value
-            }
-            insertOrUpdateDb(msg)
-            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
-                IMCoreManager.getMessageModule().ackMessageToCache(msg)
-            }
-            IMCoreManager.getMessageModule().processSessionByMessage(msg)
-        } else {
-            if (dbMsg.sendStatus != MsgSendStatus.Success.value) {
-                msg.data = dbMsg.data
-                msg.oprStatus = dbMsg.oprStatus
-                msg.msgId = dbMsg.msgId
-                msg.sendStatus = MsgSendStatus.Success.value
-                insertOrUpdateDb(msg)
-            }
-            if (dbMsg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
-                IMCoreManager.getMessageModule().ackMessageToCache(msg)
-            }
-            if (dbMsg.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) {
-                IMCoreManager.getMessageModule().processSessionByMessage(msg)
-            }
-        }
-    }
 
     open fun getSessionDesc(msg: Message): String {
         return msg.content

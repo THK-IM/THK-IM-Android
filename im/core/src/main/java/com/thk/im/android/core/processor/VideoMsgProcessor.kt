@@ -197,7 +197,8 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             if (videoData == null || videoData.thumbnailPath.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
-                val pair = IMCoreManager.storageModule.getPathsFromFullPath(videoData.thumbnailPath!!)
+                val pair =
+                    IMCoreManager.storageModule.getPathsFromFullPath(videoData.thumbnailPath!!)
                 return Flowable.create({
                     val key = IMCoreManager.fileLoaderModule.getUploadKey(
                         entity.sid,
@@ -233,7 +234,11 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                         videoBody.width = videoData.width
                                         videoBody.height = videoData.height
                                         entity.content = Gson().toJson(videoBody)
-                                        insertOrUpdateDb(entity, false)
+                                        insertOrUpdateDb(
+                                            entity,
+                                            notify = false,
+                                            notifySession = false,
+                                        )
                                         it.onNext(entity)
                                         it.onComplete()
                                     }

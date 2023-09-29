@@ -15,7 +15,6 @@ import com.thk.im.android.core.IMImageMsgData
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
@@ -28,12 +27,10 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     override fun onViewBind(message: Message, session: Session) {
-        super.onViewBind(message, session)
         LLog.v("onViewBind")
+        super.onViewBind(message, session)
+        onViewDetached()
         XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
-        if (message.type != MsgType.IMAGE.value) {
-            return
-        }
         if (message.data.isNotEmpty() && message.data.isNotBlank()) {
             val imageMsgData = Gson().fromJson(message.data, IMImageMsgData::class.java)
             imageMsgData?.let { data ->
@@ -71,11 +68,12 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
             lp.width = calWidth
             lp.height = calHeight
         }
+        imageView.layoutParams = lp
         IMImageLoader.displayImageByPath(imageView, path)
     }
 
-    override fun onViewRecycled() {
-        super.onViewRecycled()
+    override fun onViewDetached() {
+        super.onViewDetached()
         LLog.v("onViewRecycled")
         XEventBus.unObserve(IMEvent.MsgLoadStatusUpdate.value, this)
     }

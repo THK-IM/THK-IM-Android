@@ -30,8 +30,8 @@ class MessageAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseMsgVH {
         val provider = IMItemViewManager.getMsgIVProviderByViewType(viewType)
-        val holder = provider.viewHolder(lifecycleOwner, viewType, parent)
-        holder.onViewCreated()
+        val holder =  provider.viewHolder(lifecycleOwner, viewType, parent)
+        holder.resetLayout()
         return holder
     }
 

@@ -51,7 +51,7 @@ class SessionAdapter(private val lifecycleOwner: LifecycleOwner) :
     override fun onViewRecycled(holder: BaseSessionVH) {
         super.onViewRecycled(holder)
         LLog.v("onViewRecycled")
-        holder.onViewRecycled()
+        holder.onViewDetached()
     }
 
     override fun getItemCount(): Int {

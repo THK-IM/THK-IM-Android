@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.viewholder
 
 import android.view.View
+import android.view.View.OnAttachStateChangeListener
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -11,44 +12,59 @@ abstract class BaseVH(private val liftOwner: LifecycleOwner, itemView: View) :
     private val lifecycleObserver = object : DefaultLifecycleObserver {
         override fun onDestroy(owner: LifecycleOwner) {
             super.onDestroy(owner)
-            onViewRecycled()
-            onViewDestroy()
+            onLifeOwnerDestroy()
         }
 
         override fun onPause(owner: LifecycleOwner) {
             super.onPause(owner)
-            onViewPause()
+            onLifeOwnerPause()
         }
 
         override fun onResume(owner: LifecycleOwner) {
             super.onResume(owner)
-            onViewResume()
+            onLifeOwnerResume()
         }
     }
 
-    open fun onViewCreated() {
+    init {
         liftOwner.lifecycle.addObserver(this.lifecycleObserver)
+        itemView.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(p0: View) {
+                onViewAttached()
+            }
+
+            override fun onViewDetachedFromWindow(p0: View) {
+                onViewDetached()
+            }
+
+        })
+    }
+
+    open fun onViewAttached() {
+
     }
 
     /**
      * ViewHolder离开屏幕触发，此处可以释放一些和界面渲染无关的资源
      */
-    open fun onViewRecycled() {
+    open fun onViewDetached() {
         liftOwner.lifecycle.removeObserver(this.lifecycleObserver)
     }
 
     /**
      * recyclerView adapter的lifeOwner resume时触发
      */
-    abstract fun onViewResume()
+    open fun onLifeOwnerResume() {}
 
     /**
      * recyclerView adapter的lifeOwner pause时触发
      */
-    abstract fun onViewPause()
+    open fun onLifeOwnerPause() {}
 
     /**
      * recyclerView adapter的lifeOwner销毁时触发, 此处应该彻底断开ViewHolder被其他对象的引用
      */
-    abstract fun onViewDestroy()
+    open fun onLifeOwnerDestroy() {
+        onViewDetached()
+    }
 }

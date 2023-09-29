@@ -156,7 +156,10 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                         imageBody.width = imageData.width
                                         imageBody.height = imageData.height
                                         entity.content = Gson().toJson(imageBody)
-                                        insertOrUpdateDb(entity, false)
+                                        insertOrUpdateDb(entity,
+                                            notify = false,
+                                            notifySession = false,
+                                        )
                                         it.onNext(entity)
                                         it.onComplete()
                                     }

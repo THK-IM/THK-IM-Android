@@ -353,6 +353,7 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
                 isLoading = false
             }
         }
+        LLog.d("Load $sid $cTime $count")
         IMCoreManager.getMessageModule().queryLocalMessages(sid, cTime, count)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)

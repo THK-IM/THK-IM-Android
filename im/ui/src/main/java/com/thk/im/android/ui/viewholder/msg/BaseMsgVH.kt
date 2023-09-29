@@ -2,6 +2,7 @@ package com.thk.im.android.ui.viewholder.msg
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -42,32 +43,8 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     @LayoutRes
     abstract fun getContentId(): Int
 
-    override fun onViewCreated() {
-        super.onViewCreated()
-        // 包裹视图layout
-        var flContainer: LinearLayout? = null
-        if (viewType % 3 == MsgPosType.Mid.value) {
-            flContainer = itemView.findViewById(R.id.fl_container_mid)
-            val lp = flContainer.layoutParams
-            lp.width = AppUtils.instance().screenWidth
-            flContainer.layoutParams = lp
-        } else if (viewType % 3 == MsgPosType.Left.value) {
-            flContainer = itemView.findViewById(R.id.fl_container_left)
-            val lp = flContainer.layoutParams
-            lp.width = 300.dp2px()
-            flContainer.layoutParams = lp
-        } else {
-            flContainer = itemView.findViewById(R.id.fl_container_right)
-            val lp = flContainer.layoutParams
-            lp.width = 300.dp2px()
-            flContainer.layoutParams = lp
-        }
-        // 内容视图layout
-        val flContent: LinearLayout = itemView.findViewById(R.id.fl_content)
-        contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
-        flContent.addView(contentContainer)
-        contentContainer.setOnClickListener(this)
-        contentContainer.setOnLongClickListener(this)
+    override fun onViewAttached() {
+        super.onViewAttached()
     }
 
     /**
@@ -76,8 +53,39 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     open fun onViewBind(message: Message, session: Session) {
         this.message = message
         this.session = session
+
         renderUserInfo()
         renderMsgStatus()
+    }
+
+    fun resetLayout() {
+        // 包裹视图layout
+        val flContainer: LinearLayout?
+        if (viewType % 3 == MsgPosType.Mid.value) {
+            flContainer = itemView.findViewById(R.id.fl_container_mid)
+            val lp = flContainer.layoutParams
+            lp.width = AppUtils.instance().screenWidth
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            flContainer.layoutParams = lp
+        } else if (viewType % 3 == MsgPosType.Left.value) {
+            flContainer = itemView.findViewById(R.id.fl_container_left)
+            val lp = flContainer.layoutParams
+            lp.width = 300.dp2px()
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            flContainer.layoutParams = lp
+        } else {
+            flContainer = itemView.findViewById(R.id.fl_container_right)
+            val lp = flContainer.layoutParams
+            lp.width = 300.dp2px()
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            flContainer.layoutParams = lp
+        }
+        // 内容视图layout
+        val flContent: LinearLayout = itemView.findViewById(R.id.fl_content)
+        contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
+        flContent.addView(contentContainer)
+        contentContainer.setOnClickListener(this)
+        contentContainer.setOnLongClickListener(this)
     }
 
     open fun renderUserInfo() {
@@ -137,22 +145,10 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         return viewType % 3
     }
 
-    override fun onViewResume() {
-    }
-
-    override fun onViewPause() {
-    }
-
-    override fun onViewRecycled() {
-        super.onViewRecycled()
+    override fun onViewDetached() {
+        super.onViewDetached()
         disposable.clear()
     }
-
-    override fun onViewDestroy() {
-        super.onViewRecycled()
-        disposable.clear()
-    }
-
 
     open fun displayAvatar(imageView: ImageView, id: Long, url: String, type: Int = 1) {
         val path = IMCoreManager.storageModule.allocAvatarPath(id, url, type)

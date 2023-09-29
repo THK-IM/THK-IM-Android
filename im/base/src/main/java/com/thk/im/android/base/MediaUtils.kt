@@ -13,10 +13,13 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 
 object MediaUtils {
@@ -25,14 +28,20 @@ object MediaUtils {
         return Flowable.create({
             val length = File(srcPath).length()
             if (length <= size) {
-                it.onNext(desPath)
-                it.onComplete()
-                return@create
+                val success = copyFile(srcPath, desPath)
+                if (success) {
+                    it.onNext(desPath)
+                    it.onComplete()
+                    return@create
+                } else {
+                    it.onError(IOException())
+                    return@create
+                }
             }
             val options = BitmapFactory.Options()
-            val rate = (length / size).toInt()
+            val rate = sqrt((length / size).toDouble()).toInt()
             var sample = 2
-            while (sample < rate / 2) {
+            while (sample < rate) {
                 sample *= 2
             }
             options.inSampleSize = sample
@@ -42,7 +51,7 @@ object MediaUtils {
 
             tagBitmap!!.compress(
                 if (tagBitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
-                60,
+                if (tagBitmap.hasAlpha()) 100 else 60,
                 stream
             )
             tagBitmap.recycle()
@@ -204,6 +213,34 @@ object MediaUtils {
             e.printStackTrace()
         }
         return false
+    }
+
+    private fun copyFile(srcPath: String, desPath: String): Boolean {
+        var input: InputStream? = null
+        var output: OutputStream? = null
+        var res = false
+        try {
+            val desFile = File(desPath)
+            if (!desFile.exists()) {
+                if (!desFile.createNewFile()) {
+                    return false
+                }
+            }
+            input = FileInputStream(File(srcPath))
+            output = FileOutputStream(File(desPath))
+            val buf = ByteArray(1024)
+            var bytesRead: Int
+            while (input.read(buf).also { bytesRead = it } > 0) {
+                output.write(buf, 0, bytesRead)
+            }
+            res = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            input?.close()
+            output?.close()
+        }
+        return res
     }
 
 

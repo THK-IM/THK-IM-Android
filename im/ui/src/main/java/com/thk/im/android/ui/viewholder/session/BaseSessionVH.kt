@@ -13,11 +13,13 @@ import com.thk.im.android.ui.viewholder.BaseVH
 abstract class BaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
     BaseVH(liftOwner, itemView) {
 
+    lateinit var session: Session
+
     /**
      * ViewHolder 绑定数据触发设置界面ui
      */
     open fun onViewBind(session: Session) {
-        super.onViewCreated()
+        this.session = session
     }
 
     fun getUserModule(): UserModule {

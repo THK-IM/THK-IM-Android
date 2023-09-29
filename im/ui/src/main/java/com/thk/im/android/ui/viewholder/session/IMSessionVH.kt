@@ -27,7 +27,6 @@ class IMSessionVH(
 ) : BaseSessionVH(
     lifecycleOwner, LayoutInflater.from(parent.context).inflate(resId, parent, false)
 ) {
-    private lateinit var session:Session
     val nickView: AppCompatTextView = itemView.findViewById(R.id.tv_nickname)
     val avatarView: AppCompatImageView = itemView.findViewById(R.id.iv_avatar)
     private val lastMsgView: AppCompatTextView = itemView.findViewById(R.id.tv_last_message)
@@ -36,7 +35,6 @@ class IMSessionVH(
 
     override fun onViewBind(session: Session) {
         super.onViewBind(session)
-        this.session = session
         lastMsgView.text = session.lastMsg
         lastTimeView.text = DateUtil.getTimeline(session.mTime)
         if (session.type == 1) {
@@ -46,18 +44,14 @@ class IMSessionVH(
         }
     }
 
-    override fun onViewRecycled() {
+    override fun onViewDetached() {
         disposable.clear()
     }
 
-    override fun onViewResume() {
+    override fun onLifeOwnerResume() {
     }
 
-    override fun onViewPause() {
-    }
-
-    override fun onViewDestroy() {
-        disposable.clear()
+    override fun onLifeOwnerPause() {
     }
 
     private fun showUserInfo(session: Session) {

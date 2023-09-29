@@ -23,15 +23,12 @@ class TimeLineMsgVH(
         tvTime.text = DateUtil.getTimeline(msg.cTime)
     }
 
-    override fun onViewRecycled() {
+    override fun onViewDetached() {
     }
 
-    override fun onViewDestroy() {
+    override fun onLifeOwnerResume() {
     }
 
-    override fun onViewResume() {
-    }
-
-    override fun onViewPause() {
+    override fun onLifeOwnerPause() {
     }
 }

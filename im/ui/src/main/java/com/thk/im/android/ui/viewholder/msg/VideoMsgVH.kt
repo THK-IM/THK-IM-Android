@@ -14,11 +14,6 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         return R.layout.itemview_msg_video
     }
 
-    override fun onViewCreated() {
-        super.onViewCreated()
-        contentContainer.setOnClickListener(this)
-    }
-
     private fun showView() {
 //        val ivMsgThumbnail: ImageView = contentContainer.findViewById(R.id.iv_msg_video_thumbnail)
 //        val rlMsgPrompt: RelativeLayout = contentContainer.findViewById(R.id.rl_msg_video_prompt)

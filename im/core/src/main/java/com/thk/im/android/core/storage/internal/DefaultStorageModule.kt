@@ -96,11 +96,7 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
     @Throws(IOException::class)
     override fun saveInto(fullPath: String, b: ByteArray) {
         val pair = getPathsFromFullPath(fullPath)
-        if (pair != null) {
-            saveInto(pair.first, pair.second, b)
-        } else {
-            throw IOException("path error")
-        }
+        saveInto(pair.first, pair.second, b)
     }
 
     @Throws(IOException::class)

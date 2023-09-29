@@ -16,13 +16,11 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
     private val rootDir: File = File(rootPath)
 
     init {
-        for (type in 1..3) {
-            val dir = File("${rootPath}/avatar/${type}")
-            if (dir.exists() && !dir.isDirectory) {
-                dir.delete()
-            } else {
-                dir.mkdirs()
-            }
+        val dir = File("${rootPath}/avatar")
+        if (dir.exists() && !dir.isDirectory) {
+            dir.delete()
+        } else {
+            dir.mkdirs()
         }
     }
 
@@ -149,13 +147,13 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
         return res
     }
 
-    override fun allocAvatarPath(id: Long, avatarUrl: String, type: Int): String {
+    override fun allocAvatarPath(id: Long, avatarUrl: String): String {
         val names = getFileExt(avatarUrl)
         var ext = "jpeg"
         if (names.second != "") {
             ext = names.second
         }
-        return "${rootPath}/avatar/${type}/user-${id}.${ext}"
+        return "${rootPath}/avatar/user-${id}.${ext}"
     }
 
     override fun allocSessionFilePath(sid: Long, fileName: String, format: String): String {

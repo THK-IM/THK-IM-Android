@@ -59,7 +59,7 @@ class IMSessionVH(
             override fun onNext(t: User) {
                 nickView.text = t.name
                 t.avatar?.let {
-                    displayAvatar(avatarView, t.id, it, 1)
+                    displayAvatar(avatarView, t.id, it)
                 }
             }
         }
@@ -72,7 +72,7 @@ class IMSessionVH(
             override fun onNext(t: Group) {
                 nickView.text = t.name
                 t.avatar?.let {
-                    displayAvatar(avatarView, t.id, it, 2)
+                    displayAvatar(avatarView, t.id, it)
                 }
             }
         }
@@ -80,8 +80,8 @@ class IMSessionVH(
         disposable.add(subscriber)
     }
 
-    fun displayAvatar(imageView: ImageView, id: Long, url: String, type: Int = 1) {
-        val path = IMCoreManager.storageModule.allocAvatarPath(id, url, type)
+    fun displayAvatar(imageView: ImageView, id: Long, url: String) {
+        val path = IMCoreManager.storageModule.allocAvatarPath(id, url)
         val file = File(path)
         if (file.exists()) {
             IMImageLoader.displayImageByPath(imageView, path)

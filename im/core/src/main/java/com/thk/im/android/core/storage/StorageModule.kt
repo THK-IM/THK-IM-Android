@@ -33,7 +33,7 @@ interface StorageModule {
     /**
      * 申请存放用户头像的地址
      */
-    fun allocAvatarPath(id: Long, avatarUrl: String, type: Int): String
+    fun allocAvatarPath(id: Long, avatarUrl: String): String
 
 
     /**

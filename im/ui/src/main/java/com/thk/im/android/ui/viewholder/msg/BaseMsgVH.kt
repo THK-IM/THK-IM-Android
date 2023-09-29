@@ -103,7 +103,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                     tvNicknameView?.text = t.name
                     ivAvatarView?.let { iv ->
                         t.avatar?.let { it ->
-                            displayAvatar(iv, t.id, it, 1)
+                            displayAvatar(iv, t.id, it)
                         }
                     }
                 }
@@ -150,8 +150,8 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         disposable.clear()
     }
 
-    open fun displayAvatar(imageView: ImageView, id: Long, url: String, type: Int = 1) {
-        val path = IMCoreManager.storageModule.allocAvatarPath(id, url, type)
+    open fun displayAvatar(imageView: ImageView, id: Long, url: String) {
+        val path = IMCoreManager.storageModule.allocAvatarPath(id, url)
         val file = File(path)
         if (file.exists()) {
             IMImageLoader.displayImageByPath(imageView, path)

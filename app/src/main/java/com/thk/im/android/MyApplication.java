@@ -2,21 +2,16 @@ package com.thk.im.android;
 
 import android.app.Application;
 
-import com.alibaba.sdk.android.oss.common.auth.OSSFederationCredentialProvider;
-import com.alibaba.sdk.android.oss.common.auth.OSSFederationToken;
 import com.thk.android.im.live.LiveManager;
 import com.thk.im.android.base.AppUtils;
-import com.thk.im.android.base.LLog;
 import com.thk.im.android.base.ToastUtils;
 import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.core.api.internal.DefaultIMApi;
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule;
 import com.thk.im.android.minio.MinioFileLoadModule;
-import com.thk.im.android.oss.OSSFileLoaderModule;
 import com.thk.im.android.ui.emoji.DefaultEmojiParser;
 import com.thk.im.android.ui.emoji.EmojiManager;
 import com.thk.im.android.ui.manager.IMItemViewManager;
-import com.thk.im.android.ui.panel.component.internal.UIComponentManager;
 
 public class MyApplication extends Application {
 
@@ -48,7 +43,7 @@ public class MyApplication extends Application {
                 IMCoreManager.INSTANCE.setSignalModule(new DefaultSignalModule(MyApplication.this, wsEndpoint, uid.toString()));
                 IMCoreManager.INSTANCE.setImApi(new DefaultIMApi(endpoint, token));
                 IMCoreManager.INSTANCE.init(MyApplication.this, uid, true);
-                IMCoreManager.INSTANCE.setFileLoaderModule(fileLoaderModule);
+                IMCoreManager.INSTANCE.setFileLoadModule(fileLoaderModule);
                 IMCoreManager.INSTANCE.connect();
                 LiveManager.Companion.shared().init(MyApplication.this, String.valueOf(uid), true);
             }

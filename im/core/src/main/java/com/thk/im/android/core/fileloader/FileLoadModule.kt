@@ -1,6 +1,6 @@
 package com.thk.im.android.core.fileloader
 
-interface FileLoaderModule {
+interface FileLoadModule {
 
 
     /**

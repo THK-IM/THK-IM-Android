@@ -6,7 +6,7 @@ import com.thk.im.android.base.AppUtils
 import com.thk.im.android.base.ToastUtils
 import com.thk.im.android.core.api.IMApi
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.fileloader.FileLoaderModule
+import com.thk.im.android.core.fileloader.FileLoadModule
 import com.thk.im.android.core.module.CommonModule
 import com.thk.im.android.core.module.ContactorModule
 import com.thk.im.android.core.module.GroupModule
@@ -49,11 +49,11 @@ object IMCoreManager {
             this.innerImApi = value
         }
 
-    private var innerFileLoaderModule: FileLoaderModule? = null
-    var fileLoaderModule: FileLoaderModule
-        get() = this.innerFileLoaderModule!!
+    private var innerFileLoadModule: FileLoadModule? = null
+    var fileLoadModule: FileLoadModule
+        get() = this.innerFileLoadModule!!
         set(value) {
-            this.innerFileLoaderModule = value
+            this.innerFileLoadModule = value
         }
 
     private var innerStorageModule: StorageModule? = null

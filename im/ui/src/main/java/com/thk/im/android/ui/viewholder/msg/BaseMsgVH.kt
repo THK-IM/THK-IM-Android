@@ -156,7 +156,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         if (file.exists()) {
             IMImageLoader.displayImageByPath(imageView, path)
         } else {
-            IMCoreManager.fileLoaderModule.download(url, path, object : LoadListener {
+            IMCoreManager.fileLoadModule.download(url, path, object : LoadListener {
                 override fun onProgress(progress: Int, state: Int, url: String, path: String) {
                     if (state == LoadListener.Success) {
                         XEventBus.post(IMEvent.MsgUpdate.value, message)

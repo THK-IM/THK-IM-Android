@@ -132,7 +132,7 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
             }
             input = FileInputStream(File(srcPath))
             output = FileOutputStream(File(desPath))
-            val buf = ByteArray(1024)
+            val buf = ByteArray(16 * 1024)
             var bytesRead: Int
             while (input.read(buf).also { bytesRead = it } > 0) {
                 output.write(buf, 0, bytesRead)

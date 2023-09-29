@@ -16,7 +16,7 @@ class OSSDownloadTask(
     private val url: String,
     private val path: String,
     taskId: String,
-    private val fileLoaderModule: OSSFileLoaderModule
+    private val fileLoaderModule: OSSFileLoadModule
 ) : OSSLoadTask(taskId) {
 
     private val tag = "DownloadTask"

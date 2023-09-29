@@ -89,13 +89,13 @@ class AudioMsgProcessor : BaseMsgProcessor() {
             } else {
                 val pair = IMCoreManager.storageModule.getPathsFromFullPath(audioData.path!!)
                 return Flowable.create({
-                    val key = IMCoreManager.fileLoaderModule.getUploadKey(
+                    val key = IMCoreManager.fileLoadModule.getUploadKey(
                         entity.sid,
                         entity.fUid,
                         pair.second,
                         entity.id
                     )
-                    IMCoreManager.fileLoaderModule
+                    IMCoreManager.fileLoadModule
                         .upload(key, audioData.path!!, object : LoadListener {
 
                             override fun onProgress(

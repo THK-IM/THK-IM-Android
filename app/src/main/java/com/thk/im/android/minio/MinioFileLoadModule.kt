@@ -3,8 +3,7 @@ package com.thk.im.android.minio
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
-import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.fileloader.FileLoaderModule
+import com.thk.im.android.core.fileloader.FileLoadModule
 import com.thk.im.android.core.fileloader.LoadListener
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
@@ -15,7 +14,7 @@ class MinioFileLoadModule(
     app: Application,
     val endpoint: String,
     val token: String,
-) : FileLoaderModule {
+) : FileLoadModule {
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -87,7 +86,7 @@ class MinioFileLoadModule(
     }
 
     override fun getUploadKey(sId: Long, uId: Long, fileName: String, msgClientId: Long): String {
-        return "im/session_${sId}/${uId}/" + IMCoreManager.signalModule.severTime + "_${fileName}"
+        return "im/session_${sId}/${uId}/" + msgClientId + "_${fileName}"
     }
 
     override fun parserUploadKey(key: String): Triple<Long, Long, String>? {

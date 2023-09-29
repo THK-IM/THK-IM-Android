@@ -14,7 +14,7 @@ class OSSUploadTask(
     private val key: String,
     private val path: String,
     taskId: String,
-    private val fileLoaderModule: OSSFileLoaderModule
+    private val fileLoaderModule: OSSFileLoadModule
 ) : OSSLoadTask(taskId) {
 
     private var running = AtomicBoolean(true)

@@ -123,13 +123,13 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                 val pair =
                     IMCoreManager.storageModule.getPathsFromFullPath(imageData.thumbnailPath!!)
                 return Flowable.create({
-                    val key = IMCoreManager.fileLoaderModule.getUploadKey(
+                    val key = IMCoreManager.fileLoadModule.getUploadKey(
                         entity.sid,
                         entity.fUid,
                         pair.second,
                         entity.id
                     )
-                    IMCoreManager.fileLoaderModule
+                    IMCoreManager.fileLoadModule
                         .upload(key, imageData.thumbnailPath!!, object : LoadListener {
 
                             override fun onProgress(
@@ -201,13 +201,13 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                 }
                 val pair = IMCoreManager.storageModule.getPathsFromFullPath(imageData.path!!)
                 return Flowable.create({
-                    val key = IMCoreManager.fileLoaderModule.getUploadKey(
+                    val key = IMCoreManager.fileLoadModule.getUploadKey(
                         entity.sid,
                         entity.fUid,
                         pair.second,
                         entity.id
                     )
-                    IMCoreManager.fileLoaderModule
+                    IMCoreManager.fileLoadModule
                         .upload(key, imageData.path!!, object : LoadListener {
 
                             override fun onProgress(
@@ -323,7 +323,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                     }
 
                 }
-                IMCoreManager.fileLoaderModule.download(
+                IMCoreManager.fileLoadModule.download(
                     downloadUrl,
                     localPath,
                     listener

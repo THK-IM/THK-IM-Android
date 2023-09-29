@@ -200,13 +200,13 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                 val pair =
                     IMCoreManager.storageModule.getPathsFromFullPath(videoData.thumbnailPath!!)
                 return Flowable.create({
-                    val key = IMCoreManager.fileLoaderModule.getUploadKey(
+                    val key = IMCoreManager.fileLoadModule.getUploadKey(
                         entity.sid,
                         entity.fUid,
                         pair.second,
                         entity.id
                     )
-                    IMCoreManager.fileLoaderModule
+                    IMCoreManager.fileLoadModule
                         .upload(key, videoData.thumbnailPath!!, object : LoadListener {
 
                             override fun onProgress(
@@ -275,13 +275,13 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             } else {
                 val pair = IMCoreManager.storageModule.getPathsFromFullPath(videoData.path!!)
                 return Flowable.create({
-                    val key = IMCoreManager.fileLoaderModule.getUploadKey(
+                    val key = IMCoreManager.fileLoadModule.getUploadKey(
                         entity.sid,
                         entity.fUid,
                         pair.second,
                         entity.id
                     )
-                    IMCoreManager.fileLoaderModule
+                    IMCoreManager.fileLoadModule
                         .upload(key, videoData.path!!, object : LoadListener {
 
                             override fun onProgress(

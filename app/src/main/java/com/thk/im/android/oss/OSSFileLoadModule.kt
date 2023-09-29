@@ -6,20 +6,20 @@ import android.os.Looper
 import com.alibaba.sdk.android.oss.ClientConfiguration
 import com.alibaba.sdk.android.oss.OSSClient
 import com.alibaba.sdk.android.oss.common.auth.OSSFederationCredentialProvider
-import com.thk.im.android.core.fileloader.FileLoaderModule
+import com.thk.im.android.core.fileloader.FileLoadModule
 import com.thk.im.android.core.fileloader.LoadListener
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 
-class OSSFileLoaderModule(
+class OSSFileLoadModule(
     app: Application,
     private val bucket: String,
     private val endpoint: String,
     val token: String,
     credentialProvider: OSSFederationCredentialProvider
-) : FileLoaderModule {
+) : FileLoadModule {
 
     private val handler = Handler(Looper.getMainLooper())
 

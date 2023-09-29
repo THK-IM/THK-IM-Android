@@ -3,11 +3,11 @@ package com.thk.im.android.core.processor
 import com.google.gson.Gson
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.MediaUtils
-import com.thk.im.android.core.IMAudioMsgBody
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
-import com.thk.im.android.core.IMUploadProgress
+import com.thk.im.android.core.IMLoadProgress
+import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMVideoMsgBody
 import com.thk.im.android.core.IMVideoMsgData
 import com.thk.im.android.core.event.XEventBus
@@ -108,15 +108,14 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {
         try {
-            val storageModule = IMCoreManager.getStorageModule()
             var videoData = Gson().fromJson(message.data, IMVideoMsgData::class.java)
             if (videoData.path == null) {
                 return Flowable.error(FileNotFoundException())
             }
-            val pair = checkDir(storageModule, videoData, message)
+            val pair = checkDir(IMCoreManager.storageModule, videoData, message)
             videoData = pair.first
             return if (videoData.thumbnailPath == null) {
-                extractVideoFrame(storageModule, videoData, pair.second)
+                extractVideoFrame(IMCoreManager.storageModule, videoData, pair.second)
             } else {
                 Flowable.just(pair.second)
             }
@@ -160,12 +159,12 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
         try {
             val videoParams = MediaUtils.getVideoParams(videoData.path!!)
                 ?: return Flowable.error(IOException("extractVideoFrame error: ${videoData.path!!}"))
-            val paths = IMCoreManager.getStorageModule().getPathsFromFullPath(videoData.path!!)
-            val names = IMCoreManager.getStorageModule().getFileExt(paths.second)
+            val paths = storageModule.getPathsFromFullPath(videoData.path!!)
+            val names = storageModule.getFileExt(paths.second)
             val thumbName = "${names.first}_cover.jpg"
-            val thumbnailPath = IMCoreManager.getStorageModule()
+            val thumbnailPath = IMCoreManager.storageModule
                 .allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
-            IMCoreManager.getStorageModule().saveImageInto(thumbnailPath, videoParams.first)
+            storageModule.saveImageInto(thumbnailPath, videoParams.first)
             videoParams.first.recycle()
             val sizePair = MediaUtils.getBitmapAspect(thumbnailPath)
             videoData.thumbnailPath = thumbnailPath
@@ -198,8 +197,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             if (videoData == null || videoData.thumbnailPath.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
-                val pair =
-                    IMCoreManager.getStorageModule().getPathsFromFullPath(videoData.thumbnailPath!!)
+                val pair = IMCoreManager.storageModule.getPathsFromFullPath(videoData.thumbnailPath!!)
                 return Flowable.create({
                     val key = IMCoreManager.fileLoaderModule.getUploadKey(
                         entity.sid,
@@ -216,14 +214,14 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                 url: String,
                                 path: String
                             ) {
+                                XEventBus.post(
+                                    IMEvent.MsgLoadStatusUpdate.value,
+                                    IMLoadProgress(IMLoadType.Upload.value, key, state, progress)
+                                )
                                 when (state) {
                                     LoadListener.Init,
                                     LoadListener.Wait,
                                     LoadListener.Ing -> {
-                                        XEventBus.post(
-                                            IMEvent.MsgUploadProgressUpdate.value,
-                                            IMUploadProgress(key, state, progress)
-                                        )
                                     }
 
                                     LoadListener.Success -> {
@@ -270,7 +268,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             if (videoData == null || videoData.path.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
-                val pair = IMCoreManager.getStorageModule().getPathsFromFullPath(videoData.path!!)
+                val pair = IMCoreManager.storageModule.getPathsFromFullPath(videoData.path!!)
                 return Flowable.create({
                     val key = IMCoreManager.fileLoaderModule.getUploadKey(
                         entity.sid,
@@ -287,14 +285,14 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                 url: String,
                                 path: String
                             ) {
+                                XEventBus.post(
+                                    IMEvent.MsgLoadStatusUpdate.value,
+                                    IMLoadProgress(IMLoadType.Upload.value, key, state, progress)
+                                )
                                 when (state) {
                                     LoadListener.Init,
                                     LoadListener.Wait,
                                     LoadListener.Ing -> {
-                                        XEventBus.post(
-                                            IMEvent.MsgUploadProgressUpdate.value,
-                                            IMUploadProgress(key, state, progress)
-                                        )
                                     }
 
                                     LoadListener.Success -> {

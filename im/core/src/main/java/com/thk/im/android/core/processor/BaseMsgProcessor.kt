@@ -104,13 +104,14 @@ abstract class BaseMsgProcessor {
             }
         }.flatMap {
             originMsg = it
-            // 消息内容上传
-            it.sendStatus = MsgSendStatus.Uploading.value
-            insertOrUpdateDb(it)
             val flowable = uploadFlowable(it)
             if (flowable != null) {
+                // 消息内容上传
+                it.sendStatus = MsgSendStatus.Uploading.value
+                insertOrUpdateDb(it)
                 return@flatMap flowable
             } else {
+                insertOrUpdateDb(it)
                 return@flatMap Flowable.just(it)
             }
         }.flatMap {
@@ -126,14 +127,16 @@ abstract class BaseMsgProcessor {
     /**
      * 【插入或更新消息状态】
      */
-    open fun insertOrUpdateDb(msg: Message, notify: Boolean = true) {
+    open fun insertOrUpdateDb(msg: Message, notify: Boolean = true, notifySession: Boolean = true) {
         val msgDao = IMCoreManager.getImDataBase().messageDao()
         msgDao.insertOrUpdateMessages(mutableListOf(msg))
         if (notify) {
             XEventBus.post(IMEvent.MsgNew.value, msg)
         }
-        if (msg.sendStatus == MsgSendStatus.Sending.value || msg.sendStatus == MsgSendStatus.SendFailed.value || msg.sendStatus == MsgSendStatus.Success.value) {
-            IMCoreManager.getMessageModule().processSessionByMessage(msg)
+        if (notifySession) {
+            if (msg.sendStatus == MsgSendStatus.Sending.value || msg.sendStatus == MsgSendStatus.SendFailed.value || msg.sendStatus == MsgSendStatus.Success.value) {
+                IMCoreManager.getMessageModule().processSessionByMessage(msg)
+            }
         }
     }
 
@@ -190,18 +193,23 @@ abstract class BaseMsgProcessor {
     }
 
     /**
-     * 图片压缩/视频抽帧等操作二次处理
+     * 图片压缩/视频抽帧等消息内容操作二次处理
      */
     open fun reprocessingFlowable(message: Message): Flowable<Message>? {
         return null
     }
 
     /**
-     * 消息上传器
+     * 消息内容上传
      */
     open fun uploadFlowable(entity: Message): Flowable<Message>? {
         return null
     }
+
+    /**
+     * 消息内容下载
+     */
+    open fun downloadMsgContent(entity: Message, resourceType: String) {}
 
 
     /**

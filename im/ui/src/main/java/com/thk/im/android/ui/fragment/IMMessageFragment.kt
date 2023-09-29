@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
@@ -296,6 +297,7 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
             it?.let {
+                LLog.v("IMEvent.MsgNew.value ${Gson().toJson(it)}")
                 if (it.sid == sid) {
                     val pos = msgAdapter.insertNew(it)
                     if (pos == 0) {

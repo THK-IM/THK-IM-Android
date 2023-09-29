@@ -88,7 +88,7 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         val bean = MessageBean.buildMessageBean(msg)
         return messageApi.sendMsg(bean).flatMap {
             msg.msgId = it.msgId
-            msg.cTime = it.cTime
+            msg.mTime = it.cTime
             msg.sendStatus = MsgSendStatus.Success.value
             msg.oprStatus = MsgOperateStatus.Ack.value or
                     MsgOperateStatus.ClientRead.value or

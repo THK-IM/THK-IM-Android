@@ -12,10 +12,10 @@ enum class IMEvent(val value: String) {
     MsgNew("IMEventMsgNew"),
     MsgUpdate("IMEventMsgUpdate"),
     MsgDelete("IMEventOnlineStatusUpdate"),
-    MsgUploadProgressUpdate("IMEventMsgUploadProgressUpdate"),
     SessionNew("IMEventSessionNew"),
     SessionUpdate("IMEventSessionUpdate"),
     SessionDelete("IMEventSessionDelete"),
+    MsgLoadStatusUpdate("IMEventMsgLoadStatusUpdate"),
 }
 
 enum class IMFileFormat(val value: String) {
@@ -26,7 +26,9 @@ enum class IMFileFormat(val value: String) {
     Other("other"),
 }
 
-data class IMUploadProgress(
+data class IMLoadProgress(
+    @SerializedName("type")
+    var type: String,
     @SerializedName("key")
     var key: String,
     @SerializedName("state")
@@ -34,3 +36,13 @@ data class IMUploadProgress(
     @SerializedName("progress")
     var progress: Int
 )
+
+enum class IMLoadType(val value: String) {
+    Upload("upload"),
+    Download("download"),
+}
+
+enum class IMMsgResourceType(val value: String) {
+    Thumbnail("thumbnail"),
+    Source("source"),
+}

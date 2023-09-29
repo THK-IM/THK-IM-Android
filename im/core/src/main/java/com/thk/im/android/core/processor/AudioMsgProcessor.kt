@@ -7,8 +7,8 @@ import com.thk.im.android.core.IMAudioMsgData
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
-import com.thk.im.android.core.IMImageMsgBody
-import com.thk.im.android.core.IMUploadProgress
+import com.thk.im.android.core.IMLoadProgress
+import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.exception.UploadException
 import com.thk.im.android.core.fileloader.LoadListener
@@ -34,12 +34,11 @@ class AudioMsgProcessor : BaseMsgProcessor() {
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {
         try {
-            val storageModule = IMCoreManager.getStorageModule()
             val audioData = Gson().fromJson(message.data, IMAudioMsgData::class.java)
             if (audioData.path == null || audioData.duration == null) {
                 return Flowable.error(FileNotFoundException())
             }
-            val pair = checkDir(storageModule, audioData, message)
+            val pair = checkDir(IMCoreManager.storageModule, audioData, message)
             return Flowable.just(pair.second)
         } catch (e: Exception) {
             e.message?.let { LLog.e(it) }
@@ -88,7 +87,7 @@ class AudioMsgProcessor : BaseMsgProcessor() {
             if (audioData == null || audioData.path.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
-                val pair = IMCoreManager.getStorageModule().getPathsFromFullPath(audioData.path!!)
+                val pair = IMCoreManager.storageModule.getPathsFromFullPath(audioData.path!!)
                 return Flowable.create({
                     val key = IMCoreManager.fileLoaderModule.getUploadKey(
                         entity.sid,
@@ -105,14 +104,15 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                                 url: String,
                                 path: String
                             ) {
+                                XEventBus.post(
+                                    IMEvent.MsgLoadStatusUpdate.value,
+                                    IMLoadProgress(IMLoadType.Upload.value, key, state, progress)
+                                )
                                 when (state) {
                                     LoadListener.Init,
                                     LoadListener.Wait,
                                     LoadListener.Ing -> {
-                                        XEventBus.post(
-                                            IMEvent.MsgUploadProgressUpdate.value,
-                                            IMUploadProgress(key, state, progress)
-                                        )
+
                                     }
 
                                     LoadListener.Success -> {

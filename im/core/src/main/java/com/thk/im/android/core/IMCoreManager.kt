@@ -56,7 +56,13 @@ object IMCoreManager {
             this.innerFileLoaderModule = value
         }
 
-    private lateinit var storageModule: StorageModule
+    private var innerStorageModule: StorageModule? = null
+    var storageModule: StorageModule
+        get() = this.innerStorageModule!!
+        set(value) {
+            this.innerStorageModule = value
+        }
+
     private lateinit var db: IMDataBase
     private var uid: Long = 0L
     private lateinit var application: Application
@@ -72,7 +78,7 @@ object IMCoreManager {
         this.uid = uid
         db = IMDataBase(app, uid)
 
-        registerStorageModule(DefaultStorageModule(app, uid))
+        innerStorageModule = DefaultStorageModule(app, uid)
 
         registerModule(SignalType.Common.value, DefaultCommonModule())
         registerModule(SignalType.User.value, DefaultUserModule())
@@ -133,11 +139,6 @@ object IMCoreManager {
 
     fun getContactorModule(): ContactorModule {
         return getModule(SignalType.Contactor.value) as ContactorModule
-    }
-
-
-    fun getStorageModule(): StorageModule {
-        return this.storageModule
     }
 
     fun registerStorageModule(storageModule: StorageModule) {

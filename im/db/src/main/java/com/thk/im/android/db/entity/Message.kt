@@ -25,7 +25,7 @@ data class Message(
     @ColumnInfo(name = "send_status") var sendStatus: Int = 0,          // 消息状态0入库,1发送中,2成功,3失败
     @ColumnInfo(name = "opr_status") var oprStatus: Int = 0,            // 消息操作状态
     @ColumnInfo(name = "c_time") var cTime: Long = 0,
-    @ColumnInfo(name = "m_time") val mTime: Long = 0,
+    @ColumnInfo(name = "m_time") var mTime: Long = 0,
     @ColumnInfo(name = "data") var data: String = "",             //本地数据字段
     @ColumnInfo(name = "r_msg_id") var rMsgId: Long? = 0,
     @ColumnInfo(name = "at_users") var atUsers: String? = "",    //@用户uid1#uid2

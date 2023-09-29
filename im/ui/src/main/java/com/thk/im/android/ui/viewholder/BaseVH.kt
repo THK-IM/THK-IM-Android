@@ -5,7 +5,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 
-abstract class BaseVH(private val liftOwner: LifecycleOwner, itemView: View) : RecyclerView.ViewHolder(itemView) {
+abstract class BaseVH(private val liftOwner: LifecycleOwner, itemView: View) :
+    RecyclerView.ViewHolder(itemView) {
 
     private val lifecycleObserver = object : DefaultLifecycleObserver {
         override fun onDestroy(owner: LifecycleOwner) {

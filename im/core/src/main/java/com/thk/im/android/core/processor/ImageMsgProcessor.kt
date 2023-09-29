@@ -1,15 +1,20 @@
 package com.thk.im.android.core.processor
 
 import com.google.gson.Gson
+import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.MediaUtils
+import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.IMImageMsgBody
 import com.thk.im.android.core.IMImageMsgData
-import com.thk.im.android.core.IMUploadProgress
+import com.thk.im.android.core.IMLoadProgress
+import com.thk.im.android.core.IMLoadType
+import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.core.exception.DownloadException
 import com.thk.im.android.core.exception.UploadException
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.storage.StorageModule
@@ -31,15 +36,14 @@ class ImageMsgProcessor : BaseMsgProcessor() {
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {
         try {
-            val storageModule = IMCoreManager.getStorageModule()
             var imageData = Gson().fromJson(message.data, IMImageMsgData::class.java)
             if (imageData.path == null) {
                 return Flowable.error(FileNotFoundException())
             }
-            val pair = checkDir(storageModule, imageData, message)
+            val pair = checkDir(IMCoreManager.storageModule, imageData, message)
             imageData = pair.first
             return if (imageData.thumbnailPath == null) {
-                compress(storageModule, imageData, pair.second)
+                compress(IMCoreManager.storageModule, imageData, pair.second)
             } else {
                 Flowable.just(pair.second)
             }
@@ -117,7 +121,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                 return Flowable.error(FileNotFoundException())
             } else {
                 val pair =
-                    IMCoreManager.getStorageModule().getPathsFromFullPath(imageData.thumbnailPath!!)
+                    IMCoreManager.storageModule.getPathsFromFullPath(imageData.thumbnailPath!!)
                 return Flowable.create({
                     val key = IMCoreManager.fileLoaderModule.getUploadKey(
                         entity.sid,
@@ -134,14 +138,14 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                 url: String,
                                 path: String
                             ) {
+                                XEventBus.post(
+                                    IMEvent.MsgLoadStatusUpdate.value,
+                                    IMLoadProgress(IMLoadType.Upload.value, key, state, progress)
+                                )
                                 when (state) {
                                     LoadListener.Init,
                                     LoadListener.Wait,
                                     LoadListener.Ing -> {
-                                        XEventBus.post(
-                                            IMEvent.MsgUploadProgressUpdate.value,
-                                            IMUploadProgress(key, state, progress)
-                                        )
                                     }
 
                                     LoadListener.Success -> {
@@ -192,7 +196,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                     entity.content = Gson().toJson(imageBody)
                     return Flowable.just(entity)
                 }
-                val pair = IMCoreManager.getStorageModule().getPathsFromFullPath(imageData.path!!)
+                val pair = IMCoreManager.storageModule.getPathsFromFullPath(imageData.path!!)
                 return Flowable.create({
                     val key = IMCoreManager.fileLoaderModule.getUploadKey(
                         entity.sid,
@@ -209,14 +213,15 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                 url: String,
                                 path: String
                             ) {
+                                XEventBus.post(
+                                    IMEvent.MsgLoadStatusUpdate.value,
+                                    IMLoadProgress(IMLoadType.Upload.value, key, state, progress)
+                                )
+
                                 when (state) {
                                     LoadListener.Init,
                                     LoadListener.Wait,
                                     LoadListener.Ing -> {
-                                        XEventBus.post(
-                                            IMEvent.MsgUploadProgressUpdate.value,
-                                            IMUploadProgress(key, state, progress)
-                                        )
                                     }
 
                                     LoadListener.Success -> {
@@ -245,6 +250,84 @@ class ImageMsgProcessor : BaseMsgProcessor() {
             e.message?.let { LLog.e(it) }
             return Flowable.error(e)
         }
+    }
+
+    override fun downloadMsgContent(entity: Message, resourceType: String) {
+        val subscriber = object : BaseSubscriber<Message>() {
+            override fun onNext(t: Message) {
+                super.onComplete()
+                insertOrUpdateDb(t, notify = true, notifySession = false)
+            }
+        }
+        Flowable.create(
+            {
+                var imageData = Gson().fromJson(entity.data, IMImageMsgData::class.java)
+                val imageBody = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
+
+                val downloadUrl = if (resourceType == IMMsgResourceType.Thumbnail.value) {
+                    imageBody.thumbnailUrl!!
+                } else {
+                    imageBody.url!!
+                }
+
+                val fileName = downloadUrl.substringAfterLast("/", "")
+                val localPath = IMCoreManager.storageModule.allocSessionFilePath(
+                    entity.sid,
+                    fileName,
+                    "img"
+                )
+
+                val listener = object : LoadListener {
+                    override fun onProgress(
+                        progress: Int,
+                        state: Int,
+                        url: String,
+                        path: String
+                    ) {
+                        XEventBus.post(
+                            IMEvent.MsgLoadStatusUpdate.value,
+                            IMLoadProgress(IMLoadType.Download.value, url, state, progress)
+                        )
+                        when (state) {
+                            LoadListener.Init,
+                            LoadListener.Wait,
+                            LoadListener.Ing -> {
+                            }
+                            LoadListener.Success -> {
+                                if (imageData == null) {
+                                    imageData = IMImageMsgData()
+                                }
+                                imageData.height = imageBody.height
+                                imageData.width = imageBody.width
+                                if (resourceType == IMMsgResourceType.Thumbnail.value) {
+                                    imageData.thumbnailPath = path
+                                } else {
+                                    imageData.path = path
+                                }
+                                entity.data = Gson().toJson(imageData)
+                                it.onNext(entity)
+                                it.onComplete()
+                            }
+
+                            else -> {
+                                it.onError(DownloadException())
+                            }
+                        }
+                    }
+
+                    override fun notifyOnUiThread(): Boolean {
+                        return false
+                    }
+
+                }
+                IMCoreManager.fileLoaderModule.download(
+                    downloadUrl,
+                    localPath,
+                    listener
+                )
+
+            }, BackpressureStrategy.LATEST
+        ).compose(RxTransform.flowableToIo()).subscribe(subscriber)
     }
 
 }

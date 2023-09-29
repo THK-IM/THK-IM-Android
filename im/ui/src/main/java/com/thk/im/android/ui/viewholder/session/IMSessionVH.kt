@@ -87,7 +87,7 @@ class IMSessionVH(
     }
 
     fun displayAvatar(imageView: ImageView, id: Long, url: String, type: Int = 1) {
-        val path = IMCoreManager.getStorageModule().allocAvatarPath(id, url, type)
+        val path = IMCoreManager.storageModule.allocAvatarPath(id, url, type)
         val file = File(path)
         if (file.exists()) {
             IMImageLoader.displayImageByPath(imageView, path)

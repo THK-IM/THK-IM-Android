@@ -43,6 +43,7 @@ data class MessageBean(
         message.atUsers = atUsers
         message.rMsgId = rMsgId
         message.cTime = cTime
+        message.mTime = cTime
         status?.let {
             message.oprStatus = it
         }

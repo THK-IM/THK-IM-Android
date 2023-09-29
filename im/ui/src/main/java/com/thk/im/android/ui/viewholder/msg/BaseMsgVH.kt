@@ -27,54 +27,31 @@ import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 
 abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val viewType: Int) :
-    BaseVH(liftOwner, itemView) {
+    BaseVH(liftOwner, itemView), View.OnClickListener, View.OnLongClickListener {
 
-    open lateinit var messsage: Message
+    open lateinit var message: Message
     open lateinit var session: Session
     lateinit var contentContainer: View
 
-    protected open val disposable = CompositeDisposable()
-    protected open val ivAvatarView: ImageView? = itemView.findViewById(R.id.iv_avatar)
-    protected open val tvNicknameView: TextView? = itemView.findViewById(R.id.tv_nickname)
-    protected open val ivMsgFailedView: ImageView? = itemView.findViewById(R.id.iv_msg_fail)
-    protected open val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
+    open val disposable = CompositeDisposable()
+    open val ivAvatarView: ImageView? = itemView.findViewById(R.id.iv_avatar)
+    open val tvNicknameView: TextView? = itemView.findViewById(R.id.tv_nickname)
+    open val ivMsgFailedView: ImageView? = itemView.findViewById(R.id.iv_msg_fail)
+    open val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
 
     @LayoutRes
     abstract fun getContentId(): Int
 
     override fun onViewCreated() {
         super.onViewCreated()
-//        val flContent: LinearLayout = when (viewType % 3) {
-//            1 -> {
-//                itemView.findViewById(R.id.fl_content_left)
-//            }
-//            2 -> {
-//                itemView.findViewById(R.id.fl_content_right)
-//            }
-//
-//            else -> {
-//                itemView.findViewById(R.id.fl_content_mid)
-//            }
-//        }
-
-        val flContent: LinearLayout = itemView.findViewById(R.id.fl_content)
-        contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
-        flContent.addView(contentContainer)
-
-    }
-
-    /**
-     * ViewHolder 绑定数据触发设置界面ui
-     */
-    open fun onViewBind(msg: Message, ses: Session) {
-//        onViewCreated()
+        // 包裹视图layout
         var flContainer: LinearLayout? = null
-        if (viewType % 3 == 0) {
+        if (viewType % 3 == MsgPosType.Mid.value) {
             flContainer = itemView.findViewById(R.id.fl_container_mid)
             val lp = flContainer.layoutParams
             lp.width = AppUtils.instance().screenWidth
             flContainer.layoutParams = lp
-        } else if (viewType % 3 == 1) {
+        } else if (viewType % 3 == MsgPosType.Left.value) {
             flContainer = itemView.findViewById(R.id.fl_container_left)
             val lp = flContainer.layoutParams
             lp.width = 300.dp2px()
@@ -85,19 +62,34 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             lp.width = 300.dp2px()
             flContainer.layoutParams = lp
         }
+        // 内容视图layout
+        val flContent: LinearLayout = itemView.findViewById(R.id.fl_content)
+        contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
+        flContent.addView(contentContainer)
+        contentContainer.setOnClickListener(this)
+        contentContainer.setOnLongClickListener(this)
+    }
 
-        messsage = msg
-        session = ses
+    /**
+     * ViewHolder 绑定数据触发设置界面ui
+     */
+    open fun onViewBind(message: Message, session: Session) {
+        this.message = message
+        this.session = session
+        renderUserInfo()
+        renderMsgStatus()
+    }
 
+    open fun renderUserInfo() {
         tvNicknameView?.let {
-            if (ses.type != SessionType.Single.value) {
+            if (session.type != SessionType.Single.value) {
                 it.visibility = View.VISIBLE
             } else {
                 it.visibility = View.GONE
             }
         }
 
-        if (msg.fUid != 0L) {
+        if (message.fUid != 0L) {
             val subscriber = object : BaseSubscriber<User>() {
                 override fun onNext(t: User) {
                     tvNicknameView?.text = t.name
@@ -108,12 +100,13 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                     }
                 }
             }
-
-            IMCoreManager.getUserModule().getUserInfo(msg.fUid).subscribe(subscriber)
+            IMCoreManager.getUserModule().getUserInfo(message.fUid).subscribe(subscriber)
             disposable.add(subscriber)
         }
+    }
 
-        when (msg.sendStatus) {
+    open fun renderMsgStatus() {
+        when (message.sendStatus) {
             MsgSendStatus.SendFailed.value -> {
                 pbMsgFailedView?.visibility = View.GONE
                 ivMsgFailedView?.visibility = View.VISIBLE
@@ -136,8 +129,8 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     }
 
     open fun resend() {
-        val msgProcessor = IMCoreManager.getMessageModule().getMsgProcessor(messsage.type)
-        msgProcessor.resend(messsage)
+        val msgProcessor = IMCoreManager.getMessageModule().getMsgProcessor(message.type)
+        msgProcessor.resend(message)
     }
 
     fun getType(): Int {
@@ -162,7 +155,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
 
 
     open fun displayAvatar(imageView: ImageView, id: Long, url: String, type: Int = 1) {
-        val path = IMCoreManager.getStorageModule().allocAvatarPath(id, url, type)
+        val path = IMCoreManager.storageModule.allocAvatarPath(id, url, type)
         val file = File(path)
         if (file.exists()) {
             IMImageLoader.displayImageByPath(imageView, path)
@@ -170,7 +163,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             IMCoreManager.fileLoaderModule.download(url, path, object : LoadListener {
                 override fun onProgress(progress: Int, state: Int, url: String, path: String) {
                     if (state == LoadListener.Success) {
-                        XEventBus.post(IMEvent.MsgUpdate.value, messsage)
+                        XEventBus.post(IMEvent.MsgUpdate.value, message)
                     }
                 }
 
@@ -179,5 +172,13 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 }
             })
         }
+    }
+
+    override fun onClick(p0: View?) {
+
+    }
+
+    override fun onLongClick(p0: View?): Boolean {
+        return false
     }
 }

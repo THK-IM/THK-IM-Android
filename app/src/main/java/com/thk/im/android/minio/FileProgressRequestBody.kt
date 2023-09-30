@@ -54,6 +54,6 @@ class FileProgressRequestBody(
     }
 
     companion object {
-        const val SEGMENT_SIZE = 10 * 1024L // okio.Segment.SIZE
+        const val SEGMENT_SIZE = 64 * 1024L // okio.Segment.SIZE
     }
 }

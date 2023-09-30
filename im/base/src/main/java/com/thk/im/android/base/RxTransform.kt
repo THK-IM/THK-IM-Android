@@ -7,7 +7,7 @@ import java.util.concurrent.Executors
 
 object RxTransform {
 
-    private val schedulers = Schedulers.from(Executors.newFixedThreadPool(8))
+    private val schedulers = Schedulers.from(Executors.newFixedThreadPool(4))
 
     /**
      * Flowable 主线程订阅

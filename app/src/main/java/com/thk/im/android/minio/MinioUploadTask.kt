@@ -1,6 +1,7 @@
 package com.thk.im.android.minio
 
 import com.google.gson.Gson
+import com.thk.im.android.base.LLog
 import com.thk.im.android.core.fileloader.LoadListener
 import okhttp3.Call
 import okhttp3.Callback
@@ -29,6 +30,7 @@ class MinioUploadTask(
     }
 
     override fun start() {
+        LLog.i("MinioUploadTask start")
         val params = fileLoaderModule.parserUploadKey(key)
         if (params == null) {
             notify(0, LoadListener.Failed)
@@ -41,11 +43,13 @@ class MinioUploadTask(
         fileLoaderModule.okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 notify(0, LoadListener.Failed)
+                LLog.e("MinioUploadTask failed $e")
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     if (response.body == null) {
+                        LLog.e("MinioUploadTask failed get params error")
                         notify(0, LoadListener.Failed)
                     } else {
                         val json = response.body?.string()
@@ -53,6 +57,7 @@ class MinioUploadTask(
                         startUpload(uploadParams)
                     }
                 } else {
+                    LLog.e("MinioUploadTask failed get params ${response.code}")
                     notify(0, LoadListener.Failed)
                 }
             }
@@ -60,10 +65,11 @@ class MinioUploadTask(
     }
 
     private fun startUpload(uploadParams: UploadParams) {
-        notify(0, LoadListener.Init)
         if (!running.get()) {
+            notify(0, LoadListener.Failed)
             return
         }
+        notify(0, LoadListener.Init)
         val requestBodyBuilder = MultipartBody.Builder()
         requestBodyBuilder.setType(MultipartBody.FORM)
         for ((k, v) in uploadParams.params) {
@@ -83,13 +89,16 @@ class MinioUploadTask(
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 notify(0, LoadListener.Failed)
+                LLog.e("MinioUploadTask failed $e")
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
+                    LLog.i("MinioUploadTask success ${response.code}")
                     keyUrl = "${fileLoaderModule.endpoint}/object/${uploadParams.id}"
                     notify(100, LoadListener.Success)
                 } else {
+                    LLog.i("MinioUploadTask failed ${response.code}")
                     notify(0, LoadListener.Failed)
                 }
             }
@@ -107,13 +116,11 @@ class MinioUploadTask(
     }
 
     override fun notify(progress: Int, state: Int) {
-        if (running.get()) {
-            val url = if (keyUrl != null) {
-                keyUrl!!
-            } else {
-                key
-            }
-            fileLoaderModule.notifyListeners(taskId, progress, state, url, path)
+        val url = if (keyUrl != null) {
+            keyUrl!!
+        } else {
+            key
         }
+        fileLoaderModule.notifyListeners(taskId, progress, state, url, path)
     }
 }

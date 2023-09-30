@@ -110,6 +110,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
 
     private fun uploadThumbImage(entity: Message): Flowable<Message> {
         try {
+            LLog.v("uploadThumbImage start")
             val imageData = Gson().fromJson(entity.data, IMImageMsgData::class.java)
             var imageBody = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
             if (imageBody != null) {
@@ -163,9 +164,11 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                         )
                                         it.onNext(entity)
                                         it.onComplete()
+                                        LLog.v("uploadThumbImage success")
                                     }
 
                                     else -> {
+                                        LLog.v("uploadThumbImage error")
                                         it.onError(UploadException())
                                     }
                                 }
@@ -175,7 +178,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
-                }, BackpressureStrategy.LATEST)
+                }, BackpressureStrategy.BUFFER)
             }
         } catch (e: Exception) {
             e.message?.let { LLog.e(it) }
@@ -184,6 +187,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
     }
 
     private fun uploadOriginImage(entity: Message): Flowable<Message> {
+        LLog.v("uploadOriginImage start")
         try {
             val imageData = Gson().fromJson(entity.data, IMImageMsgData::class.java)
             var imageBody = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
@@ -237,9 +241,11 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                         entity.content = Gson().toJson(imageBody)
                                         it.onNext(entity)
                                         it.onComplete()
+                                        LLog.v("uploadOriginImage end")
                                     }
 
                                     else -> {
+                                        LLog.v("uploadOriginImage error")
                                         it.onError(UploadException())
                                     }
                                 }
@@ -249,7 +255,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
-                }, BackpressureStrategy.LATEST)
+                }, BackpressureStrategy.BUFFER)
             }
         } catch (e: Exception) {
             e.message?.let { LLog.e(it) }
@@ -336,7 +342,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                     listener
                 )
 
-            }, BackpressureStrategy.LATEST
+            }, BackpressureStrategy.BUFFER
         ).compose(RxTransform.flowableToIo()).subscribe(subscriber)
     }
 

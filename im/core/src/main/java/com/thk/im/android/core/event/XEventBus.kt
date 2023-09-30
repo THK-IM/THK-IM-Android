@@ -10,6 +10,10 @@ import com.jeremyliao.liveeventbus.LiveEventBus
  */
 object XEventBus {
 
+    fun <T> postOrderly(eventName: String, message: T) {
+        LiveEventBus.get<T>(eventName).postOrderly(message)
+    }
+
     fun <T> post(eventName: String, message: T) {
         LiveEventBus.get<T>(eventName).post(message)
     }

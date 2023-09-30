@@ -19,7 +19,7 @@ class MinioFileLoadModule(
     private val handler = Handler(Looper.getMainLooper())
 
     private val defaultTimeout: Long = 30
-    private val maxIdleConnection = 8
+    private val maxIdleConnection = 4
     private val keepAliveDuration: Long = 60
     private val tokenInterceptor = TokenInterceptor(token)
 

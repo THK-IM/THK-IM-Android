@@ -12,9 +12,11 @@ import com.thk.im.android.db.MsgOperateStatus
 import com.thk.im.android.db.MsgSendStatus
 import com.thk.im.android.db.entity.Message
 import io.reactivex.Flowable
+import io.reactivex.disposables.CompositeDisposable
 
 abstract class BaseMsgProcessor {
 
+    protected val disposables = CompositeDisposable()
 
     /**
      * 收到消息
@@ -30,7 +32,8 @@ abstract class BaseMsgProcessor {
                     msg.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
                 msg.sendStatus = MsgSendStatus.Success.value
             }
-            insertOrUpdateDb(msg,
+            insertOrUpdateDb(
+                msg,
                 notify = true,
                 notifySession = true,
             )
@@ -46,7 +49,8 @@ abstract class BaseMsgProcessor {
                     msg.oprStatus =
                         msg.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
                 }
-                insertOrUpdateDb(msg,
+                insertOrUpdateDb(
+                    msg,
                     notify = true,
                     notifySession = true,
                 )
@@ -85,8 +89,8 @@ abstract class BaseMsgProcessor {
             0 - id,
             type,
             content,
-            oprStatus,
             sendStatus,
+            oprStatus,
             cTime,
             cTime,
             data,
@@ -130,22 +134,32 @@ abstract class BaseMsgProcessor {
         var originMsg = msg
         val subscriber = object : BaseSubscriber<Message>() {
             override fun onNext(t: Message) {
-                super.onComplete()
-                insertOrUpdateDb(msg,
+                onComplete()
+                disposables.remove(this)
+                insertOrUpdateDb(
+                    msg,
                     notify = true,
                     notifySession = true,
                 )
             }
 
+            override fun onComplete() {
+                super.onComplete()
+                LLog.i("Message Send onComplete")
+            }
+
             override fun onError(t: Throwable?) {
                 super.onError(t)
+                disposables.remove(this)
                 originMsg.sendStatus = MsgSendStatus.SendFailed.value
+                LLog.v("Insert", "insertOrUpdateMessages ${originMsg.id} ${originMsg.sendStatus}")
                 updateFailedMsgStatus(originMsg)
             }
         }
         Flowable.just(msg).flatMap {
             if (!resend) {
-                insertOrUpdateDb(msg,
+                insertOrUpdateDb(
+                    msg,
                     notify = true,
                     notifySession = true,
                 )
@@ -163,7 +177,8 @@ abstract class BaseMsgProcessor {
             if (flowable != null) {
                 // 消息内容上传
                 it.sendStatus = MsgSendStatus.Uploading.value
-                insertOrUpdateDb(msg,
+                insertOrUpdateDb(
+                    msg,
                     notify = true,
                     notifySession = false,
                 )
@@ -175,12 +190,14 @@ abstract class BaseMsgProcessor {
             originMsg = it
             // 消息发送到服务器
             it.sendStatus = MsgSendStatus.Sending.value
-            insertOrUpdateDb(msg,
+            insertOrUpdateDb(
+                msg,
                 notify = false,
                 notifySession = false,
             )
             IMCoreManager.getMessageModule().sendMessageToServer(it)
         }.compose(RxTransform.flowableToIo()).subscribe(subscriber)
+        disposables.add(subscriber)
     }
 
 
@@ -188,7 +205,7 @@ abstract class BaseMsgProcessor {
      * 【插入或更新消息状态】
      */
     open fun insertOrUpdateDb(msg: Message, notify: Boolean = true, notifySession: Boolean = true) {
-        LLog.v("insertOrUpdateDb  ${Gson().toJson(msg)}, ${notify}, $notifySession")
+        LLog.i("insertOrUpdateMessages ${msg.id} ${msg.sendStatus}, ${notify}, $notifySession")
         val msgDao = IMCoreManager.getImDataBase().messageDao()
         msgDao.insertOrUpdateMessages(mutableListOf(msg))
         if (notify) {
@@ -204,14 +221,16 @@ abstract class BaseMsgProcessor {
     /**
      * 【更新消息状态】用于在调用api发送消息失败时更新本地数据库消息状态
      */
-    open fun updateFailedMsgStatus(msg: Message) {
+    open fun updateFailedMsgStatus(msg: Message, notify: Boolean = true) {
         val msgDao = IMCoreManager.getImDataBase().messageDao()
         msgDao.updateSendStatus(msg.sid, msg.id, MsgSendStatus.SendFailed.value, msg.fUid)
-        if (msg.sendStatus == MsgSendStatus.Sending.value || msg.sendStatus == MsgSendStatus.SendFailed.value || msg.sendStatus == MsgSendStatus.Success.value) {
-            IMCoreManager.getMessageModule().processSessionByMessage(msg)
+        if (notify) {
+            XEventBus.post(IMEvent.MsgNew.value, msg)
+            if (msg.sendStatus == MsgSendStatus.Sending.value || msg.sendStatus == MsgSendStatus.SendFailed.value || msg.sendStatus == MsgSendStatus.Success.value) {
+                IMCoreManager.getMessageModule().processSessionByMessage(msg)
+            }
         }
     }
-
 
 
     open fun getSessionDesc(msg: Message): String {

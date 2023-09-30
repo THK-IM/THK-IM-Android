@@ -39,7 +39,7 @@ object MediaUtils {
                 }
             }
             val options = BitmapFactory.Options()
-            val rate = sqrt((length / size).toDouble()).toInt()
+            val rate = sqrt((length / size).toDouble()).toInt() * 2
             var sample = 2
             while (sample < rate) {
                 sample *= 2

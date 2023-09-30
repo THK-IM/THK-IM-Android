@@ -1,6 +1,8 @@
 package com.thk.im.android.core.module.internal
 
 import android.content.Context.MODE_PRIVATE
+import android.os.Handler
+import android.os.Looper
 import com.google.gson.Gson
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
@@ -19,20 +21,26 @@ import com.thk.im.android.db.entity.Session
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * 内部默认的消息处理器
  */
 open class DefaultMessageModule : MessageModule {
 
+    private val startSequence = 0
     private val spName = "THK_IM"
     private val lastSyncMsgTime = "Last_Sync_Message_Time"
     private val processorMap: MutableMap<Int, BaseMsgProcessor> = HashMap()
     private var lastTimestamp: Long = 0
     private var lastSequence: Int = 0
     private val needAckMap = HashMap<Long, MutableSet<Long>>()
-    private var lastAckTime = 0L
     private val disposes = CompositeDisposable()
+    private val idLock = ReentrantLock()
+    private val ackLock = ReentrantReadWriteLock()
+    private val eventLock = ReentrantLock()
 
     override fun registerMsgProcessor(processor: BaseMsgProcessor) {
         processorMap[processor.messageType()] = processor
@@ -184,22 +192,26 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun onNewMessage(msg: Message) {
-        synchronized(this) {
-            getMsgProcessor(msg.type).received(msg)
-        }
+        getMsgProcessor(msg.type).received(msg)
     }
 
     override fun generateNewMsgId(): Long {
-        synchronized(this) {
+        try {
+            idLock.tryLock(1, TimeUnit.SECONDS)
             val current = IMCoreManager.signalModule.severTime
             if (current == lastTimestamp) {
                 lastSequence++
             } else {
                 lastTimestamp = current
-                lastSequence = 0
+                lastSequence = startSequence
             }
-            return current * 100 + lastSequence
+            val seq = current * 1000 + lastSequence
+            idLock.unlock()
+            return seq
+        } catch (e: Exception) {
+            LLog.e("generateNewMsgId err: $e")
         }
+        return IMCoreManager.signalModule.severTime * 1000 + 500 + startSequence
     }
 
     override fun sendMessage(
@@ -234,7 +246,8 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun ackMessageToCache(message: Message) {
-        synchronized(this) {
+        try {
+            ackLock.writeLock().tryLock(1, TimeUnit.SECONDS)
             if (message.sid > 0 && message.msgId > 0) {
                 if (message.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
                     if (needAckMap[message.sid] == null) {
@@ -243,16 +256,23 @@ open class DefaultMessageModule : MessageModule {
                     needAckMap[message.sid]?.add(message.msgId)
                 }
             }
+            ackLock.writeLock().unlock()
+        } catch (e: Exception) {
+            LLog.e("ackMessageToCache $e")
         }
     }
 
     private fun ackMessagesSuccess(sessionId: Long, msgIds: Set<Long>) {
-        synchronized(this) {
+        try {
+            ackLock.writeLock().tryLock(1, TimeUnit.SECONDS)
             val cacheMsgIds = needAckMap[sessionId]
             cacheMsgIds?.let {
                 it.removeAll(msgIds)
                 needAckMap[sessionId] = it
             }
+            ackLock.writeLock().unlock()
+        } catch (e: Exception) {
+            LLog.e("ackMessageToCache $e")
         }
     }
 
@@ -281,12 +301,16 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun ackMessagesToServer() {
-        synchronized(this) {
+        try {
+            ackLock.readLock().tryLock(1, TimeUnit.SECONDS)
             this.needAckMap.forEach {
                 if (it.value.isNotEmpty()) {
                     this.ackServerMessage(it.key, it.value)
                 }
             }
+            ackLock.readLock().unlock()
+        } catch (e: Exception) {
+            LLog.e("ackMessageToCache $e")
         }
     }
 
@@ -320,24 +344,29 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun processSessionByMessage(msg: Message) {
-        LLog.v("processSessionByMessage ${msg.sid}")
-        val messageDao = IMCoreManager.getImDataBase().messageDao()
-        val sessionDao = IMCoreManager.getImDataBase().sessionDao()
-        val dispose = object : BaseSubscriber<Session>() {
-            override fun onNext(t: Session) {
-                super.onComplete()
-                val processor = getMsgProcessor(msg.type)
-                t.lastMsg = processor.getSessionDesc(msg)
-                t.mTime = msg.cTime
-                t.unRead = messageDao.getUnReadCount(t.id)
-                sessionDao.insertOrUpdateSessions(t)
-                XEventBus.post(IMEvent.SessionNew.value, t)
+//        mainHandler.post {
+            val messageDao = IMCoreManager.getImDataBase().messageDao()
+            val sessionDao = IMCoreManager.getImDataBase().sessionDao()
+            val dispose = object : BaseSubscriber<Session>() {
+                override fun onNext(t: Session) {
+                    val processor = getMsgProcessor(msg.type)
+                    t.lastMsg = processor.getSessionDesc(msg)
+                    t.mTime = msg.cTime
+                    t.unRead = messageDao.getUnReadCount(t.id)
+                    sessionDao.insertOrUpdateSessions(t)
+                    XEventBus.post(IMEvent.SessionNew.value, t)
+                }
+
+                override fun onError(t: Throwable?) {
+                    super.onError(t)
+                    LLog.e("processSessionByMessage error $t")
+                }
             }
-        }
-        getSession(msg.sid)
-            .compose(RxTransform.flowableToIo())
-            .subscribe(dispose)
-        disposes.add(dispose)
+            getSession(msg.sid)
+                .compose(RxTransform.flowableToIo())
+                .subscribe(dispose)
+            disposes.add(dispose)
+//        }
     }
 
     override fun onSignalReceived(subType: Int, body: String) {

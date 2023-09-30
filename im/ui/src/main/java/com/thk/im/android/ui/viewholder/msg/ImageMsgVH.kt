@@ -86,9 +86,9 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     override fun onChanged(t: IMLoadProgress?) {
-        t?.let {
-            LLog.v("IMLoadProgress ${it.type} ${it.state} ${it.progress} ${it.key}")
-        }
+//        t?.let {
+//            LLog.v("IMLoadProgress ${it.type} ${it.state} ${it.progress} ${it.key}")
+//        }
     }
 
 }

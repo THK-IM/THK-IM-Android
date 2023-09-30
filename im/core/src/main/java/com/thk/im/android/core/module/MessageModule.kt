@@ -114,7 +114,6 @@ interface MessageModule : CommonModule {
         deleteServer: Boolean
     ): Flowable<Void>
 
-
     /**
      * 处理session
      */

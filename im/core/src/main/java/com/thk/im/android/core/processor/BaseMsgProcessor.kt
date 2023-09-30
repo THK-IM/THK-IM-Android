@@ -30,8 +30,8 @@ abstract class BaseMsgProcessor {
                 // 如果发件人为自己，插入前补充消息状态为已接受并已读
                 msg.oprStatus =
                     msg.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
-                msg.sendStatus = MsgSendStatus.Success.value
             }
+            msg.sendStatus = MsgSendStatus.Success.value
             insertOrUpdateDb(
                 msg,
                 notify = true,
@@ -143,16 +143,11 @@ abstract class BaseMsgProcessor {
                 )
             }
 
-            override fun onComplete() {
-                super.onComplete()
-                LLog.i("Message Send onComplete")
-            }
-
             override fun onError(t: Throwable?) {
                 super.onError(t)
+                LLog.e("Message Send err $t")
                 disposables.remove(this)
                 originMsg.sendStatus = MsgSendStatus.SendFailed.value
-                LLog.v("Insert", "insertOrUpdateMessages ${originMsg.id} ${originMsg.sendStatus}")
                 updateFailedMsgStatus(originMsg)
             }
         }

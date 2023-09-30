@@ -365,7 +365,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                     fileName,
                     IMFileFormat.Image.value
                 )
-
+                var over = false
                 val listener = object : LoadListener {
                     override fun onProgress(
                         progress: Int,
@@ -396,10 +396,12 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                 entity.data = Gson().toJson(data)
                                 it.onNext(entity)
                                 it.onComplete()
+                                over = true
                             }
 
                             else -> {
                                 it.onError(DownloadException())
+                                over = true
                             }
                         }
                     }
@@ -415,6 +417,10 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                     listener
                 )
 
+                // 防止线程被回收
+                while (!over) {
+                    Thread.sleep(200)
+                }
             }, BackpressureStrategy.LATEST
         ).compose(RxTransform.flowableToIo()).subscribe(subscriber)
     }

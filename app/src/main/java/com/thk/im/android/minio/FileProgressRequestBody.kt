@@ -3,6 +3,7 @@ package com.thk.im.android.minio
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
+import okhttp3.internal.closeQuietly
 import okio.BufferedSink
 import okio.Source
 import okio.source
@@ -10,6 +11,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.net.URLConnection
+import kotlin.math.min
 
 
 class FileProgressRequestBody(
@@ -39,21 +41,23 @@ class FileProgressRequestBody(
     @Throws(IOException::class)
     override fun writeTo(sink: BufferedSink) {
         val source: Source = FileInputStream(file).source()
-        source.use { it ->
+        source.use {
             var total: Long = 0
-            var read: Long
-            while (it.read(sink.buffer, SEGMENT_SIZE).also {
-                    read = it
+            var count: Long
+            val readCount = min(contentLength() / 10, SEGMENT_SIZE)
+            while (it.read(sink.buffer, readCount).also { size ->
+                    count = size
                 } != -1L) {
-                total += read
-                sink.flush()
+                total += count
                 val progress = (total * 100 / contentLength()).toInt()
                 listener.transferred(total, progress)
             }
+            source.close()
         }
+        sink.flush()
     }
 
     companion object {
-        const val SEGMENT_SIZE = 64 * 1024L // okio.Segment.SIZE
+        const val SEGMENT_SIZE = 256 * 1024L // okio.Segment.SIZE
     }
 }

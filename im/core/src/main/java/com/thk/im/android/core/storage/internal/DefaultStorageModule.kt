@@ -148,12 +148,7 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
     }
 
     override fun allocAvatarPath(id: Long, avatarUrl: String): String {
-        val names = getFileExt(avatarUrl)
-        var ext = "jpeg"
-        if (names.second != "") {
-            ext = names.second
-        }
-        return "${rootPath}/avatar/user-${id}.${ext}"
+        return "${rootPath}/avatar/user-${id}.jpeg"
     }
 
     override fun allocSessionFilePath(sid: Long, fileName: String, format: String): String {

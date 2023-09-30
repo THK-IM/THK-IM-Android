@@ -68,7 +68,7 @@ class MinioDownloadTask(
                 val fos = FileOutputStream(file)
                 // 储存下载文件的目录
                 try {
-                    val buf = ByteArray(128 * 1024)
+                    val buf = ByteArray(256 * 1024)
                     val total = response.body!!.contentLength()
                     var sum = 0L
                     while (running.get()) {

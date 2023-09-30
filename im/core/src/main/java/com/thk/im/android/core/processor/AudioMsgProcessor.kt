@@ -102,6 +102,7 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                         pair.second,
                         entity.id
                     )
+                    var over = false
                     IMCoreManager.fileLoadModule
                         .upload(key, audioData.path!!, object : LoadListener {
 
@@ -133,9 +134,11 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                                         entity.sendStatus = MsgSendStatus.Sending.value
                                         it.onNext(entity)
                                         it.onComplete()
+                                        over = true
                                     }
 
                                     else -> {
+                                        over = true
                                         it.onError(UploadException())
                                     }
                                 }
@@ -145,6 +148,10 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
+                    // 防止线程被回收
+                    while (!over) {
+                        Thread.sleep(200)
+                    }
                 }, BackpressureStrategy.LATEST)
             }
         } catch (e: Exception) {
@@ -182,7 +189,7 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                     fileName,
                     IMFileFormat.Image.value
                 )
-
+                var over = false
                 val listener = object : LoadListener {
                     override fun onProgress(
                         progress: Int,
@@ -212,10 +219,12 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                                 entity.data = Gson().toJson(data)
                                 it.onNext(entity)
                                 it.onComplete()
+                                over = true
                             }
 
                             else -> {
                                 it.onError(DownloadException())
+                                over = true
                             }
                         }
                     }
@@ -230,7 +239,10 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                     localPath,
                     listener
                 )
-
+                // 防止线程被回收
+                while (!over) {
+                    Thread.sleep(200)
+                }
             }, BackpressureStrategy.LATEST
         ).compose(RxTransform.flowableToIo()).subscribe(subscriber)
     }

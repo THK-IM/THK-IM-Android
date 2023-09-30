@@ -124,6 +124,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                 val pair =
                     IMCoreManager.storageModule.getPathsFromFullPath(imageData.thumbnailPath!!)
                 return Flowable.create({
+                    var over = false
                     val key = IMCoreManager.fileLoadModule.getUploadKey(
                         entity.sid,
                         entity.fUid,
@@ -165,11 +166,13 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                         it.onNext(entity)
                                         it.onComplete()
                                         LLog.v("uploadThumbImage success")
+                                        over = true
                                     }
 
                                     else -> {
                                         LLog.v("uploadThumbImage error")
                                         it.onError(UploadException())
+                                        over = true
                                     }
                                 }
                             }
@@ -178,7 +181,11 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
-                }, BackpressureStrategy.BUFFER)
+                    // 防止线程被回收
+                    while (!over) {
+                        Thread.sleep(200)
+                    }
+                }, BackpressureStrategy.LATEST)
             }
         } catch (e: Exception) {
             e.message?.let { LLog.e(it) }
@@ -206,6 +213,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                 }
                 val pair = IMCoreManager.storageModule.getPathsFromFullPath(imageData.path!!)
                 return Flowable.create({
+                    var over = false
                     val key = IMCoreManager.fileLoadModule.getUploadKey(
                         entity.sid,
                         entity.fUid,
@@ -242,11 +250,13 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                         it.onNext(entity)
                                         it.onComplete()
                                         LLog.v("uploadOriginImage end")
+                                        over = true
                                     }
 
                                     else -> {
                                         LLog.v("uploadOriginImage error")
                                         it.onError(UploadException())
+                                        over = true
                                     }
                                 }
                             }
@@ -255,7 +265,11 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
-                }, BackpressureStrategy.BUFFER)
+                    // 防止线程被回收
+                    while (!over) {
+                        Thread.sleep(200)
+                    }
+                }, BackpressureStrategy.LATEST)
             }
         } catch (e: Exception) {
             e.message?.let { LLog.e(it) }
@@ -292,7 +306,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                     fileName,
                     IMFileFormat.Image.value
                 )
-
+                var over = false
                 val listener = object : LoadListener {
                     override fun onProgress(
                         progress: Int,
@@ -323,9 +337,11 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                 entity.data = Gson().toJson(data)
                                 it.onNext(entity)
                                 it.onComplete()
+                                over = true
                             }
 
                             else -> {
+                                over = true
                                 it.onError(DownloadException())
                             }
                         }
@@ -341,8 +357,11 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                     localPath,
                     listener
                 )
-
-            }, BackpressureStrategy.BUFFER
+                // 防止线程被回收
+                while (!over) {
+                    Thread.sleep(200)
+                }
+            }, BackpressureStrategy.LATEST
         ).compose(RxTransform.flowableToIo()).subscribe(subscriber)
     }
 

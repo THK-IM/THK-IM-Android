@@ -11,6 +11,7 @@ import com.thk.im.android.core.fileloader.LoadListener
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import java.lang.ref.WeakReference
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 class OSSFileLoadModule(
@@ -56,53 +57,51 @@ class OSSFileLoadModule(
     }
 
     private val downloadTaskMap =
-        HashMap<String, Pair<OSSLoadTask, MutableList<WeakReference<LoadListener>>>>()
+        ConcurrentHashMap<String, Pair<OSSLoadTask, MutableList<WeakReference<LoadListener>>>>()
     private val uploadTaskMap =
-        HashMap<String, Pair<OSSLoadTask, MutableList<WeakReference<LoadListener>>>>()
+        ConcurrentHashMap<String, Pair<OSSLoadTask, MutableList<WeakReference<LoadListener>>>>()
 
 
     fun notifyListeners(
         taskId: String, progress: Int, state: Int, url: String, path: String
     ) {
-        synchronized(this) {
-            val dListeners = downloadTaskMap[taskId]?.second
-            dListeners?.let { ls ->
-                ls.forEach {
-                    it.get()?.let { l ->
-                        if (l.notifyOnUiThread()) {
-                            handler.post {
-                                l.onProgress(
-                                    progress, state, url, path
-                                )
-                            }
-                        } else {
-                            l.onProgress(progress, state, url, path)
+        val dListeners = downloadTaskMap[taskId]?.second
+        dListeners?.let { ls ->
+            ls.forEach {
+                it.get()?.let { l ->
+                    if (l.notifyOnUiThread()) {
+                        handler.post {
+                            l.onProgress(
+                                progress, state, url, path
+                            )
                         }
+                    } else {
+                        l.onProgress(progress, state, url, path)
                     }
-                }
-                if (state == LoadListener.Failed || state == LoadListener.Success) {
-                    cancelDownload(taskId)
                 }
             }
+            if (state == LoadListener.Failed || state == LoadListener.Success) {
+                cancelDownload(taskId)
+            }
+        }
 
-            val uListeners = uploadTaskMap[taskId]?.second
-            uListeners?.let { ls ->
-                ls.forEach {
-                    it.get()?.let { l ->
-                        if (l.notifyOnUiThread()) {
-                            handler.post {
-                                l.onProgress(
-                                    progress, state, "$scheme$bucket.$endpoint/${url}", path
-                                )
-                            }
-                        } else {
-                            l.onProgress(progress, state, "$scheme$bucket.$endpoint/${url}", path)
+        val uListeners = uploadTaskMap[taskId]?.second
+        uListeners?.let { ls ->
+            ls.forEach {
+                it.get()?.let { l ->
+                    if (l.notifyOnUiThread()) {
+                        handler.post {
+                            l.onProgress(
+                                progress, state, "$scheme$bucket.$endpoint/${url}", path
+                            )
                         }
+                    } else {
+                        l.onProgress(progress, state, "$scheme$bucket.$endpoint/${url}", path)
                     }
                 }
-                if (state == LoadListener.Failed || state == LoadListener.Success) {
-                    cancelUpload(taskId)
-                }
+            }
+            if (state == LoadListener.Failed || state == LoadListener.Success) {
+                cancelUpload(taskId)
             }
         }
     }
@@ -133,70 +132,58 @@ class OSSFileLoadModule(
     }
 
     override fun download(url: String, path: String, listener: LoadListener): String {
-        synchronized(this) {
-            val taskId = getTaskId(url, path, "download")
-            val p = downloadTaskMap[taskId]
-            if (p == null) {
-                val dTask = OSSDownloadTask(url, path, taskId, this)
-                dTask.start()
-                val listeners = mutableListOf(WeakReference(listener))
-                downloadTaskMap[taskId] = Pair(dTask, listeners)
-            } else {
-                p.second.add(WeakReference(listener))
-            }
-            return taskId
+        val taskId = getTaskId(url, path, "download")
+        val p = downloadTaskMap[taskId]
+        if (p == null) {
+            val dTask = OSSDownloadTask(url, path, taskId, this)
+            dTask.start()
+            val listeners = mutableListOf(WeakReference(listener))
+            downloadTaskMap[taskId] = Pair(dTask, listeners)
+        } else {
+            p.second.add(WeakReference(listener))
         }
+        return taskId
     }
 
     override fun upload(key: String, path: String, listener: LoadListener): String {
-        synchronized(this) {
-            val taskId = getTaskId(key, path, "upload")
-            val p = uploadTaskMap[taskId]
-            if (p == null) {
-                val uTask = OSSUploadTask(key, path, taskId, this)
-                uTask.start()
-                val listeners = mutableListOf(WeakReference(listener))
-                uploadTaskMap[taskId] = Pair(uTask, listeners)
-            } else {
-                p.second.add(WeakReference(listener))
-            }
-            return taskId
+        val taskId = getTaskId(key, path, "upload")
+        val p = uploadTaskMap[taskId]
+        if (p == null) {
+            val uTask = OSSUploadTask(key, path, taskId, this)
+            uTask.start()
+            val listeners = mutableListOf(WeakReference(listener))
+            uploadTaskMap[taskId] = Pair(uTask, listeners)
+        } else {
+            p.second.add(WeakReference(listener))
         }
+        return taskId
     }
 
     override fun cancelDownload(taskId: String) {
-        synchronized(this) {
-            val p = downloadTaskMap[taskId]
-            if (p != null) {
-                p.first.cancel()
-                p.second.clear()
-                downloadTaskMap.remove(taskId)
-            }
+        val p = downloadTaskMap[taskId]
+        if (p != null) {
+            p.first.cancel()
+            p.second.clear()
+            downloadTaskMap.remove(taskId)
         }
     }
 
     override fun cancelDownloadListener(taskId: String) {
-        synchronized(this) {
-            val p = downloadTaskMap[taskId]
-            p?.second?.clear()
-        }
+        val p = downloadTaskMap[taskId]
+        p?.second?.clear()
     }
 
     override fun cancelUpload(taskId: String) {
-        synchronized(this) {
-            val p = uploadTaskMap[taskId]
-            if (p != null) {
-                p.first.cancel()
-                p.second.clear()
-                uploadTaskMap.remove(taskId)
-            }
+        val p = uploadTaskMap[taskId]
+        if (p != null) {
+            p.first.cancel()
+            p.second.clear()
+            uploadTaskMap.remove(taskId)
         }
     }
 
     override fun cancelUploadListener(taskId: String) {
-        synchronized(this) {
-            val p = uploadTaskMap[taskId]
-            p?.second?.clear()
-        }
+        val p = uploadTaskMap[taskId]
+        p?.second?.clear()
     }
 }

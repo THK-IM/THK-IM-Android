@@ -40,6 +40,16 @@ class MessageAdapter(
         holder.onViewBind(message, session)
     }
 
+    override fun onViewRecycled(holder: BaseMsgVH) {
+        super.onViewRecycled(holder)
+        holder.onViewDetached()
+    }
+
+    override fun onFailedToRecycleView(holder: BaseMsgVH): Boolean {
+        holder.onViewDetached()
+        return super.onFailedToRecycleView(holder)
+    }
+
     override fun getItemCount(): Int {
         return messageList.size
     }

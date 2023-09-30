@@ -12,6 +12,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.base.AppUtils
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.IMImageLoader
+import com.thk.im.android.base.LLog
 import com.thk.im.android.base.extension.dp2px
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
@@ -39,6 +40,8 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     open val tvNicknameView: TextView? = itemView.findViewById(R.id.tv_nickname)
     open val ivMsgFailedView: ImageView? = itemView.findViewById(R.id.iv_msg_fail)
     open val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
+
+    private var avatarTaskId: String? = null
 
     @LayoutRes
     abstract fun getContentId(): Int
@@ -90,11 +93,12 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
 
     open fun renderUserInfo() {
         tvNicknameView?.let {
-            if (session.type != SessionType.Single.value) {
-                it.visibility = View.VISIBLE
-            } else {
-                it.visibility = View.GONE
-            }
+//            if (session.type != SessionType.Single.value) {
+//                it.visibility = View.VISIBLE
+//            } else {
+//                it.visibility = View.GONE
+//            }
+            it.visibility = View.VISIBLE
         }
 
         if (message.fUid != 0L) {
@@ -102,7 +106,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 override fun onNext(t: User) {
                     tvNicknameView?.text = t.name
                     ivAvatarView?.let { iv ->
-                        t.avatar?.let { it ->
+                        t.avatar?.let {
                             displayAvatar(iv, t.id, it)
                         }
                     }
@@ -148,6 +152,9 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     override fun onViewDetached() {
         super.onViewDetached()
         disposable.clear()
+        avatarTaskId?.let {
+            IMCoreManager.fileLoadModule.cancelDownloadListener(it)
+        }
     }
 
     open fun displayAvatar(imageView: ImageView, id: Long, url: String) {
@@ -156,17 +163,17 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         if (file.exists()) {
             IMImageLoader.displayImageByPath(imageView, path)
         } else {
-//            IMCoreManager.fileLoadModule.download(url, path, object : LoadListener {
-//                override fun onProgress(progress: Int, state: Int, url: String, path: String) {
-//                    if (state == LoadListener.Success) {
-//                        XEventBus.post(IMEvent.MsgUpdate.value, message)
-//                    }
-//                }
-//
-//                override fun notifyOnUiThread(): Boolean {
-//                    return true
-//                }
-//            })
+            avatarTaskId = IMCoreManager.fileLoadModule.download(url, path, object : LoadListener {
+                override fun onProgress(progress: Int, state: Int, url: String, path: String) {
+                    if (state == LoadListener.Success) {
+                        XEventBus.post(IMEvent.MsgUpdate.value, message)
+                    }
+                }
+
+                override fun notifyOnUiThread(): Boolean {
+                    return true
+                }
+            })
         }
     }
 

@@ -1,5 +1,6 @@
 package com.thk.im.android.core.module.internal
 
+import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.api.bean.UserBean
@@ -13,7 +14,7 @@ open class DefaultUserModule : UserModule {
     override fun getServerUserInfo(id: Long): Flowable<UserBean> {
         val now = System.currentTimeMillis()
         val userBean = UserBean(
-            id, "user$id", "https://picsum.photos/id/${id % 1000}/200/200",
+            id, "user$id", "https://picsum.photos/300/300",
             (id % 2).toInt(), now, now
         )
         return Flowable.just(userBean)

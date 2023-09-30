@@ -17,10 +17,10 @@ object IMImageLoader {
             val roundedCorners = GranularRoundedCorners(corner, corner, corner, corner)
             val isGif = MediaUtils.isGif(path)
             if (isGif) {
-                Glide.with(imageView.context).asGif().load(File(path))
+                Glide.with(imageView.context.applicationContext).asGif().load(File(path))
                     .apply(RequestOptions().transform(roundedCorners)).into(imageView)
             } else {
-                Glide.with(imageView.context).asBitmap().load(File(path))
+                Glide.with(imageView.context.applicationContext).asBitmap().load(File(path))
                     .apply(RequestOptions().transform(roundedCorners)).into(imageView)
             }
         }

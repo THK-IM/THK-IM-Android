@@ -27,9 +27,8 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     override fun onViewBind(message: Message, session: Session) {
-        LLog.v("onViewBind")
         super.onViewBind(message, session)
-        onViewDetached()
+        XEventBus.unObserve(IMEvent.MsgLoadStatusUpdate.value, this)
         XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
         if (message.data.isNotEmpty() && message.data.isNotBlank()) {
             val imageMsgData = Gson().fromJson(message.data, IMImageMsgData::class.java)
@@ -81,7 +80,6 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
 
     override fun onViewDetached() {
         super.onViewDetached()
-        LLog.v("onViewRecycled")
         XEventBus.unObserve(IMEvent.MsgLoadStatusUpdate.value, this)
     }
 

@@ -1,16 +1,22 @@
 package com.thk.im.android.core.processor
 
 import com.google.gson.Gson
+import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.MediaUtils
+import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
+import com.thk.im.android.core.IMImageMsgBody
+import com.thk.im.android.core.IMImageMsgData
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
+import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.IMVideoMsgBody
 import com.thk.im.android.core.IMVideoMsgData
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.core.exception.DownloadException
 import com.thk.im.android.core.exception.UploadException
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.storage.StorageModule
@@ -229,6 +235,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                         if (videoBody == null) {
                                             videoBody = IMVideoMsgBody()
                                         }
+                                        videoBody.name = pair.second
                                         videoBody.thumbnailUrl = url
                                         videoBody.duration = videoData.duration
                                         videoBody.width = videoData.width
@@ -304,6 +311,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                         if (videoBody == null) {
                                             videoBody = IMVideoMsgBody()
                                         }
+                                        videoBody.name = pair.second
                                         videoBody.url = url
                                         entity.content = Gson().toJson(videoBody)
                                         it.onNext(entity)
@@ -326,5 +334,88 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             e.message?.let { LLog.e(it) }
             return Flowable.error(e)
         }
+    }
+
+    override fun downloadMsgContent(entity: Message, resourceType: String) {
+        val subscriber = object : BaseSubscriber<Message>() {
+            override fun onNext(t: Message) {
+                super.onComplete()
+                insertOrUpdateDb(t, notify = true, notifySession = false)
+            }
+        }
+        Flowable.create(
+            {
+                var data = Gson().fromJson(entity.data, IMVideoMsgData::class.java)
+                val body = Gson().fromJson(entity.content, IMVideoMsgBody::class.java)
+
+                val downloadUrl = if (resourceType == IMMsgResourceType.Thumbnail.value) {
+                    body.thumbnailUrl
+                } else {
+                    body.url
+                }
+
+                val fileName = body.name
+                if (downloadUrl == null || fileName == null) {
+                    it.onError(DownloadException())
+                    return@create
+                }
+
+                val localPath = IMCoreManager.storageModule.allocSessionFilePath(
+                    entity.sid,
+                    fileName,
+                    IMFileFormat.Image.value
+                )
+
+                val listener = object : LoadListener {
+                    override fun onProgress(
+                        progress: Int,
+                        state: Int,
+                        url: String,
+                        path: String
+                    ) {
+                        XEventBus.post(
+                            IMEvent.MsgLoadStatusUpdate.value,
+                            IMLoadProgress(IMLoadType.Download.value, url, state, progress)
+                        )
+                        when (state) {
+                            LoadListener.Init,
+                            LoadListener.Wait,
+                            LoadListener.Ing -> {
+                            }
+                            LoadListener.Success -> {
+                                if (data == null) {
+                                    data = IMVideoMsgData()
+                                }
+                                data.height = body.height
+                                data.width = body.width
+                                if (resourceType == IMMsgResourceType.Thumbnail.value) {
+                                    data.thumbnailPath = path
+                                } else {
+                                    data.path = path
+                                }
+                                entity.data = Gson().toJson(data)
+                                it.onNext(entity)
+                                it.onComplete()
+                            }
+
+                            else -> {
+                                it.onError(DownloadException())
+                            }
+                        }
+                    }
+
+                    override fun notifyOnUiThread(): Boolean {
+                        return false
+                    }
+
+                }
+                IMCoreManager.fileLoadModule.download(
+                    downloadUrl,
+                    localPath,
+                    listener
+                )
+
+            }, BackpressureStrategy.LATEST
+        ).compose(RxTransform.flowableToIo()).subscribe(subscriber)
     }
 }

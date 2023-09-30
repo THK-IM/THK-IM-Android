@@ -153,6 +153,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                             imageBody = IMImageMsgBody()
                                         }
                                         imageBody.thumbnailUrl = url
+                                        imageBody.name = pair.second
                                         imageBody.width = imageData.width
                                         imageBody.height = imageData.height
                                         entity.content = Gson().toJson(imageBody)
@@ -232,6 +233,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                             imageBody = IMImageMsgBody()
                                         }
                                         imageBody.url = url
+                                        imageBody.name = pair.second
                                         entity.content = Gson().toJson(imageBody)
                                         it.onNext(entity)
                                         it.onComplete()
@@ -264,20 +266,25 @@ class ImageMsgProcessor : BaseMsgProcessor() {
         }
         Flowable.create(
             {
-                var imageData = Gson().fromJson(entity.data, IMImageMsgData::class.java)
-                val imageBody = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
+                var data = Gson().fromJson(entity.data, IMImageMsgData::class.java)
+                val body = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
 
                 val downloadUrl = if (resourceType == IMMsgResourceType.Thumbnail.value) {
-                    imageBody.thumbnailUrl!!
+                    body.thumbnailUrl
                 } else {
-                    imageBody.url!!
+                    body.url
                 }
 
-                val fileName = downloadUrl.substringAfterLast("/", "")
+                val fileName = body.name
+                if (downloadUrl == null || fileName == null) {
+                    it.onError(DownloadException())
+                    return@create
+                }
+
                 val localPath = IMCoreManager.storageModule.allocSessionFilePath(
                     entity.sid,
                     fileName,
-                    "img"
+                    IMFileFormat.Image.value
                 )
 
                 val listener = object : LoadListener {
@@ -297,17 +304,17 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                             LoadListener.Ing -> {
                             }
                             LoadListener.Success -> {
-                                if (imageData == null) {
-                                    imageData = IMImageMsgData()
+                                if (data == null) {
+                                    data = IMImageMsgData()
                                 }
-                                imageData.height = imageBody.height
-                                imageData.width = imageBody.width
+                                data.height = body.height
+                                data.width = body.width
                                 if (resourceType == IMMsgResourceType.Thumbnail.value) {
-                                    imageData.thumbnailPath = path
+                                    data.thumbnailPath = path
                                 } else {
-                                    imageData.path = path
+                                    data.path = path
                                 }
-                                entity.data = Gson().toJson(imageData)
+                                entity.data = Gson().toJson(data)
                                 it.onNext(entity)
                                 it.onComplete()
                             }

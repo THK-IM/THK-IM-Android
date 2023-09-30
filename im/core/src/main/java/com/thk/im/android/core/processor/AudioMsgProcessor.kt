@@ -1,15 +1,21 @@
 package com.thk.im.android.core.processor
 
 import com.google.gson.Gson
+import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
+import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMAudioMsgBody
 import com.thk.im.android.core.IMAudioMsgData
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
+import com.thk.im.android.core.IMImageMsgBody
+import com.thk.im.android.core.IMImageMsgData
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
+import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.core.exception.DownloadException
 import com.thk.im.android.core.exception.UploadException
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.storage.StorageModule
@@ -89,6 +95,7 @@ class AudioMsgProcessor : BaseMsgProcessor() {
             } else {
                 val pair = IMCoreManager.storageModule.getPathsFromFullPath(audioData.path!!)
                 return Flowable.create({
+
                     val key = IMCoreManager.fileLoadModule.getUploadKey(
                         entity.sid,
                         entity.fUid,
@@ -120,6 +127,7 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                                             audioBody = IMAudioMsgBody()
                                         }
                                         audioBody.url = url
+                                        audioBody.name = pair.second
                                         audioBody.duration = audioData.duration!!
                                         entity.content = Gson().toJson(audioBody)
                                         entity.sendStatus = MsgSendStatus.Sending.value
@@ -143,5 +151,87 @@ class AudioMsgProcessor : BaseMsgProcessor() {
             e.message?.let { LLog.e(it) }
             return Flowable.error(e)
         }
+    }
+
+    override fun downloadMsgContent(entity: Message, resourceType: String) {
+        val subscriber = object : BaseSubscriber<Message>() {
+            override fun onNext(t: Message) {
+                super.onComplete()
+                insertOrUpdateDb(t, notify = true, notifySession = false)
+            }
+        }
+        Flowable.create(
+            {
+                var data = Gson().fromJson(entity.data, IMAudioMsgData::class.java)
+                val body = Gson().fromJson(entity.content, IMAudioMsgBody::class.java)
+
+                val downloadUrl = if (resourceType == IMMsgResourceType.Thumbnail.value) {
+                    body.url
+                } else {
+                    body.url
+                }
+
+                val fileName = body.name
+                if (downloadUrl == null || fileName == null) {
+                    it.onError(DownloadException())
+                    return@create
+                }
+
+                val localPath = IMCoreManager.storageModule.allocSessionFilePath(
+                    entity.sid,
+                    fileName,
+                    IMFileFormat.Image.value
+                )
+
+                val listener = object : LoadListener {
+                    override fun onProgress(
+                        progress: Int,
+                        state: Int,
+                        url: String,
+                        path: String
+                    ) {
+                        XEventBus.post(
+                            IMEvent.MsgLoadStatusUpdate.value,
+                            IMLoadProgress(IMLoadType.Download.value, url, state, progress)
+                        )
+                        when (state) {
+                            LoadListener.Init,
+                            LoadListener.Wait,
+                            LoadListener.Ing -> {
+                            }
+                            LoadListener.Success -> {
+                                if (data == null) {
+                                    data = IMAudioMsgData()
+                                }
+                                data.duration = body.duration
+                                if (resourceType == IMMsgResourceType.Thumbnail.value) {
+                                    data.path = path
+                                } else {
+                                    data.path = path
+                                }
+                                entity.data = Gson().toJson(data)
+                                it.onNext(entity)
+                                it.onComplete()
+                            }
+
+                            else -> {
+                                it.onError(DownloadException())
+                            }
+                        }
+                    }
+
+                    override fun notifyOnUiThread(): Boolean {
+                        return false
+                    }
+
+                }
+                IMCoreManager.fileLoadModule.download(
+                    downloadUrl,
+                    localPath,
+                    listener
+                )
+
+            }, BackpressureStrategy.LATEST
+        ).compose(RxTransform.flowableToIo()).subscribe(subscriber)
     }
 }

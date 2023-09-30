@@ -35,6 +35,7 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
             val imageMsgData = Gson().fromJson(message.data, IMImageMsgData::class.java)
             imageMsgData?.let { data ->
                 if (data.thumbnailPath != null && data.width != null && data.height != null) {
+                    setLayoutParams(data.width!!, data.height!!)
                     renderImageData(data)
                     return@onViewBind
                 }
@@ -42,6 +43,9 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         }
         if (message.content.isNotEmpty() && message.content.isNotBlank()) {
             val imageMsgBody = Gson().fromJson(message.content, IMImageMsgBody::class.java)
+            if (imageMsgBody.width != null && imageMsgBody.height != null) {
+                setLayoutParams(imageMsgBody.width!!, imageMsgBody.height!!)
+            }
             if (!imageMsgBody.thumbnailUrl.isNullOrEmpty()) {
                 IMCoreManager.getMessageModule().getMsgProcessor(message.type)
                     .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
@@ -49,27 +53,30 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         }
     }
 
-    private fun renderImageData(imageMsgData: IMImageMsgData) {
-        val width = imageMsgData.width!!
-        val height = imageMsgData.height!!
-        val path = imageMsgData.thumbnailPath!!
+    private fun setLayoutParams(width: Int, height: Int) {
         val imageView: ImageView = contentContainer.findViewById(R.id.iv_msg_content)
         val lp = imageView.layoutParams
         if (width > height) {
-            var calWidth = minOf(150.dp2px(), width)
-            calWidth = maxOf(60.dp2px(), calWidth)
+            val calWidth = maxOf(80.dp2px(), minOf(200.dp2px(), width))
             val calHeight = maxOf(calWidth * height / width, 60.dp2px())
             lp.width = calWidth
             lp.height = calHeight
         } else {
-            var calHeight = minOf(150.dp2px(), height)
-            calHeight = maxOf(60.dp2px(), calHeight)
+            val calHeight = maxOf(80.dp2px(), minOf(200.dp2px(), height))
             val calWidth = maxOf(calHeight * width / height, 60.dp2px())
             lp.width = calWidth
             lp.height = calHeight
         }
         imageView.layoutParams = lp
-        IMImageLoader.displayImageByPath(imageView, path)
+        imageView.visibility = View.INVISIBLE
+    }
+
+    private fun renderImageData(imageMsgData: IMImageMsgData) {
+        imageMsgData.thumbnailPath?.let {
+            val imageView: ImageView = contentContainer.findViewById(R.id.iv_msg_content)
+            imageView.visibility = View.VISIBLE
+            IMImageLoader.displayImageByPath(imageView, it)
+        }
     }
 
     override fun onViewDetached() {

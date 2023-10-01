@@ -5,14 +5,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
-import com.thk.im.android.ui.manager.IMItemViewManager
-import com.thk.im.android.ui.viewholder.msg.BaseMsgVH
+import com.thk.im.android.ui.manager.IMUIManager
+import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import kotlin.math.abs
 
 class MessageAdapter(
     private val session: Session,
-    private val lifecycleOwner: LifecycleOwner,
-    private val recyclerView: RecyclerView
+    private val lifecycleOwner: LifecycleOwner
 ) :
     RecyclerView.Adapter<BaseMsgVH>() {
 
@@ -24,12 +23,12 @@ class MessageAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val message = messageList[position]
-        val provider = IMItemViewManager.getMsgIVProviderByMsgType(message.type)
+        val provider = IMUIManager.getMsgIVProviderByMsgType(message.type)
         return provider.viewType(message)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseMsgVH {
-        val provider = IMItemViewManager.getMsgIVProviderByViewType(viewType)
+        val provider = IMUIManager.getMsgIVProviderByViewType(viewType)
         val holder =  provider.viewHolder(lifecycleOwner, viewType, parent)
         holder.resetLayout()
         return holder

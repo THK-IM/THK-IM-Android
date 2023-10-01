@@ -11,7 +11,7 @@ enum class IMEvent(val value: String) {
     BatchMsgNew("IMEventBatchMsgNew"),
     MsgNew("IMEventMsgNew"),
     MsgUpdate("IMEventMsgUpdate"),
-    MsgDelete("IMEventOnlineStatusUpdate"),
+    MsgDelete("IMEventMsgDelete"),
     SessionNew("IMEventSessionNew"),
     SessionUpdate("IMEventSessionUpdate"),
     SessionDelete("IMEventSessionDelete"),

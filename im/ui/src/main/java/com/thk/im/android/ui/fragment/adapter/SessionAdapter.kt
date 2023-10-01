@@ -5,8 +5,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.base.LLog
 import com.thk.im.android.db.entity.Session
-import com.thk.im.android.ui.manager.IMItemViewManager
-import com.thk.im.android.ui.viewholder.session.BaseSessionVH
+import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
+import com.thk.im.android.ui.manager.IMUIManager
 
 class SessionAdapter(private val lifecycleOwner: LifecycleOwner) :
     RecyclerView.Adapter<BaseSessionVH>() {
@@ -22,18 +22,16 @@ class SessionAdapter(private val lifecycleOwner: LifecycleOwner) :
 
     override fun getItemViewType(position: Int): Int {
         val session = sessionList[position]
-        val provider = IMItemViewManager.getSessionIVProvider()
+        val provider = IMUIManager.getSessionIVProvider(session.type)
         return provider.viewType(session)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSessionVH {
-        LLog.v("onCreateViewHolder, viewType: $viewType")
-        val provider = IMItemViewManager.getSessionIVProvider()
+        val provider = IMUIManager.getSessionIVProvider(viewType)
         return provider.viewHolder(lifecycleOwner, viewType, parent)
     }
 
     override fun onBindViewHolder(holder: BaseSessionVH, position: Int) {
-        LLog.v("onViewBind, position: $position")
         val session = sessionList[position]
         holder.onViewBind(session)
         holder.itemView.setOnClickListener {
@@ -60,22 +58,15 @@ class SessionAdapter(private val lifecycleOwner: LifecycleOwner) :
 
     fun setData(sessions: List<Session>) {
         synchronized(this) {
-            LLog.v("session", "setData : $sessions")
             val oldSize = sessionList.size
             sessionList.clear()
             notifyItemRangeRemoved(0, oldSize)
             sessionList.addAll(sessions)
             notifyItemRangeInserted(0, sessionList.size)
-            LLog.v("session", "setData end: ${sessionList.size}")
         }
     }
 
     fun addData(sessions: List<Session>) {
-//        synchronized(this) {
-//            val oldSize = sessionList.size
-//            sessionList.addAll(sessions)
-//            notifyItemRangeInserted(oldSize, sessions.size)
-//        }
         for (s in sessions) {
             insertNew(s)
         }
@@ -86,32 +77,30 @@ class SessionAdapter(private val lifecycleOwner: LifecycleOwner) :
     }
 
     fun update(session: Session) {
-        synchronized(this) {
-            // 当前位置
-            val pos = findPosition(session)
-            if (pos >= 0 && pos < sessionList.size) {
-                // 应该摆放的位置
-                val position = findInsertPosition(session)
-                if (position < pos) {
-                    // 应该摆放的位置靠上
-                    for (i in pos downTo position) {
-                        if (i == position) {
-                            sessionList[i] = session
-                        } else {
-                            sessionList[i] = sessionList[i - 1]
-                        }
+        // 当前位置
+        val pos = findPosition(session)
+        if (pos >= 0 && pos < sessionList.size) {
+            // 应该摆放的位置
+            val position = findInsertPosition(session)
+            if (position < pos) {
+                // 应该摆放的位置靠上
+                for (i in pos downTo position) {
+                    if (i == position) {
+                        sessionList[i] = session
+                    } else {
+                        sessionList[i] = sessionList[i - 1]
                     }
-                    notifyItemRangeChanged(position, pos - position + 1)
-                } else {
-                    // 应该摆放的位置靠下，还是放在原位
-                    sessionList[pos] = session
-                    notifyItemChanged(pos)
                 }
+                notifyItemRangeChanged(position, pos - position + 1)
             } else {
-                val position = findInsertPosition(session)
-                sessionList.add(position, session)
-                notifyItemInserted(position)
+                // 应该摆放的位置靠下，还是放在原位
+                sessionList[pos] = session
+                notifyItemChanged(pos)
             }
+        } else {
+            val position = findInsertPosition(session)
+            sessionList.add(position, session)
+            notifyItemInserted(position)
         }
     }
 
@@ -139,12 +128,10 @@ class SessionAdapter(private val lifecycleOwner: LifecycleOwner) :
     }
 
     fun delete(session: Session) {
-        synchronized(this) {
-            val pos = findPosition(session)
-            if (pos >= 0) {
-                sessionList.removeAt(pos)
-                notifyItemRemoved(pos)
-            }
+        val pos = findPosition(session)
+        if (pos >= 0) {
+            sessionList.removeAt(pos)
+            notifyItemRemoved(pos)
         }
     }
 }

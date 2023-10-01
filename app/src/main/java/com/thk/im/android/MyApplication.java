@@ -9,9 +9,7 @@ import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.core.api.internal.DefaultIMApi;
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule;
 import com.thk.im.android.minio.MinioFileLoadModule;
-import com.thk.im.android.ui.emoji.DefaultEmojiParser;
-import com.thk.im.android.ui.emoji.EmojiManager;
-import com.thk.im.android.ui.manager.IMItemViewManager;
+import com.thk.im.android.ui.manager.IMUIManager;
 
 public class MyApplication extends Application {
 
@@ -20,8 +18,7 @@ public class MyApplication extends Application {
         super.onCreate();
         AppUtils.instance().init(this);
         ToastUtils.init(this);
-        IMItemViewManager.INSTANCE.init(this);
-        EmojiManager.INSTANCE.init(this, new DefaultEmojiParser(this));
+        IMUIManager.INSTANCE.init(this);
         new Thread() {
             public void run() {
 //                String bucket = "bucket";

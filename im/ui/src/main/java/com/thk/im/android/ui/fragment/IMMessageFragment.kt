@@ -3,85 +3,37 @@ package com.thk.im.android.ui.fragment
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.ResultReceiver
-import android.text.Editable
-import android.text.Selection
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.core.widget.addTextChangedListener
+import androidx.core.animation.doOnEnd
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
-import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
-import com.thk.im.android.base.RxTransform
-import com.thk.im.android.base.extension.dp2px
 import com.thk.im.android.base.popup.KeyboardPopupWindow
-import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
-import com.thk.im.android.ui.R
-import com.thk.im.android.ui.databinding.FragmentImMessageBinding
-import com.thk.im.android.ui.fragment.adapter.MessageAdapter
-import com.thk.im.android.ui.panel.component.CameraComponent
-import com.thk.im.android.ui.panel.component.ComponentPanel
-import com.thk.im.android.ui.panel.component.ComponentViewHolder
-import com.thk.im.android.ui.panel.component.PhotoAlbumComponent
-import com.thk.im.android.ui.panel.component.internal.BaseComponentViewHolder
-import com.thk.im.android.ui.panel.component.internal.UIComponentManager
-import com.thk.im.android.ui.panel.emoji.EmojiPanel
-import com.thk.im.android.ui.panel.emoji.EmojiPanelCallback
-import com.thk.im.android.ui.utils.IMKeyboardUtils
-import io.reactivex.disposables.CompositeDisposable
+import com.thk.im.android.ui.databinding.FragmentMessageBinding
+import com.thk.im.android.ui.protocol.IMMsgPreviewer
+import com.thk.im.android.ui.protocol.IMMsgSender
 
-class IMMessageFragment : Fragment(), EmojiPanelCallback {
+class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow
-    private lateinit var msgAdapter: MessageAdapter
-    private lateinit var emojiPanel: EmojiPanel
-    private lateinit var featurePanel: ComponentPanel
-    private val composite = CompositeDisposable()
-    private val sid: Long by lazy {
-        session.id
-    }
-    private val session: Session by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return@lazy arguments?.getParcelable("session", Session::class.java) as Session
-        } else {
-            return@lazy arguments?.getParcelable<Session?>("session")!!
-        }
-    }
-    private var _binding: FragmentImMessageBinding? = null
-    private val binding get() = _binding!!
-    private var bottomHeight = 0
-
-    private val uiComponentManager =
-        UIComponentManager(object : UIComponentManager.IViewHolderProvider {
-            override fun provideViewHolder(parent: ViewGroup): BaseComponentViewHolder {
-                return ComponentViewHolder.create(parent)
-            }
-        })
+    private var keyboardShowing = false
+    private var session: Session? = null
+    private lateinit var binding: FragmentMessageBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentImMessageBinding.inflate(
+        binding = FragmentMessageBinding.inflate(
             inflater,
             container,
             false
@@ -91,144 +43,39 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
         keyboardPopupWindow.dismiss()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        session = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable("session", Session::class.java) as Session
+        } else {
+            arguments?.getParcelable("session")!!
+        }
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
-        uiComponentManager.init(view.context, sid)
-        uiComponentManager.registerComponent(CameraComponent("拍照", R.drawable.chat_camera))
-        uiComponentManager.registerComponent(PhotoAlbumComponent("相册", R.drawable.chat_album))
+        binding.rcvMessage.init(this, this, this)
+        binding.llInputLayout.init(this, this, this)
+        binding.llBottomLayout.init(this, this, this)
         initKeyboardWindow()
-        initMessageRecyclerView(view)
         initEventBus()
-        loadMessages()
-        binding.tvSendMsg.setOnClickListener {
-            binding.etMessage.text?.let {
-                IMCoreManager.getMessageModule().getMsgProcessor(MsgType.TEXT.value)
-                    .sendMessage(
-                        it.toString(), sid,
-                    )
-            }
-            binding.etMessage.text = null
-        }
-
-        binding.etMessage.addTextChangedListener {
-            if ((it?.length ?: 0) > 0) {
-                binding.tvSendMsg.visibility = View.VISIBLE
-                binding.ivAddMore.visibility = View.GONE
-            } else {
-                binding.tvSendMsg.visibility = View.GONE
-                binding.ivAddMore.visibility = View.VISIBLE
-            }
-        }
-
-        binding.ivEmo.setOnClickListener {
-            binding.ivVoice.isSelected = false
-            binding.ivAddMore.isSelected = false
-            binding.btRecordVoice.visibility = View.GONE
-            binding.etMessage.visibility = View.VISIBLE
-            binding.ivEmo.isSelected = !binding.ivEmo.isSelected
-            if (binding.ivEmo.isSelected) {
-                featurePanel.hide()
-                emojiPanel.show()
-                bottomHeight = 300.dp2px()
-                layoutRefresh(bottomHeight, false)
-            } else {
-                bottomHeight = 0
-                IMKeyboardUtils.showSoftInput(binding.etMessage)
-            }
-        }
-
-        binding.ivAddMore.setOnClickListener {
-            binding.ivVoice.isSelected = false
-            binding.ivEmo.isSelected = false
-            binding.btRecordVoice.visibility = View.GONE
-            binding.etMessage.visibility = View.VISIBLE
-            binding.ivAddMore.isSelected = !binding.ivAddMore.isSelected
-            if (binding.ivAddMore.isSelected) {
-                featurePanel.show()
-                emojiPanel.hide()
-                bottomHeight = 200.dp2px()
-                layoutRefresh(bottomHeight, false)
-            } else {
-                if (keyboardPopupWindow.keyboardHeight > 0) {
-                    IMKeyboardUtils.showSoftInput(binding.etMessage)
-                } else {
-                    bottomHeight = 0
-                    layoutRefresh(bottomHeight, false)
-                }
-            }
-        }
-
-        emojiPanel = EmojiPanel(requireActivity(), binding.clEmoji, this)
-        featurePanel = ComponentPanel(requireActivity(), binding.clFeature, uiComponentManager)
     }
 
     private fun initKeyboardWindow() {
         keyboardPopupWindow = KeyboardPopupWindow(binding.root) {
-            Log.v("IMMessageFragment", "$it, $bottomHeight")
-            if (it == 0) {
+            if (it > 0) {
+                keyboardShowing = true
+                moveLayout(true, it, 150)
+            } else {
                 keyboardShowing = false
-            }
-            if (bottomHeight != 0) {
-                if (it != 0) {
-                    layoutRefresh(it, true)
-                } else {
-                    layoutRefresh(bottomHeight, false)
-                }
-            } else {
-                if (it != 0) {
-                    layoutRefresh(it, true)
-                } else {
-                    layoutRefresh(it, false)
-                }
+                val height = binding.llBottomLayout.getContentHeight()
+                moveLayout(false, height, 150)
             }
         }
     }
 
-    private fun getMessageContentHeight(): Int {
-        var totalHeight = 0
-        binding.rcvMessage.adapter?.let {
-            for (i in 0 until it.itemCount) {
-                val itemView: View? = binding.rcvMessage.layoutManager?.findViewByPosition(i)
-                itemView?.let { iv ->
-                    iv.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-                    totalHeight += iv.measuredHeight
-                }
-            }
-        }
-        return totalHeight
-    }
-
-    private val handler = Handler(Looper.getMainLooper())
-    private var keyboardShowing = false
-    private fun layoutRefresh(bottomHeight: Int, keyboardShow: Boolean) {
-        if (keyboardShow) {
-            binding.llBottomPanel.visibility = View.GONE
-            moveLayout(bottomHeight)
-        } else {
-            if (keyboardShowing) {
-                IMKeyboardUtils.hideSoftInput(binding.etMessage, object : ResultReceiver(handler) {
-                    override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
-                        super.onReceiveResult(resultCode, resultData)
-                        moveLayout(bottomHeight, false)
-                    }
-                })
-            } else {
-                binding.llBottomPanel.visibility = View.VISIBLE
-                moveLayout(bottomHeight)
-            }
-        }
-        keyboardShowing = keyboardShow
-        if (keyboardShowing) {
-            binding.ivEmo.isSelected = false
-        }
-    }
-
-    private fun moveLayout(bottomHeight: Int, closeBottomPanel: Boolean = true) {
+    private fun moveLayout(isKeyboardShow: Boolean, bottomHeight: Int, duration: Long) {
+        LLog.v("KeyboardWindow", "$isKeyboardShow, $bottomHeight, $duration")
         val animators = AnimatorSet()
         val msgAnimator = ValueAnimator.ofInt(binding.rcvMessage.paddingTop, bottomHeight)
         msgAnimator.addUpdateListener {
@@ -240,156 +87,116 @@ class IMMessageFragment : Fragment(), EmojiPanelCallback {
         val animator = ObjectAnimator.ofFloat(
             binding.llAlwaysShow,
             "translationY",
-            (0 - bottomHeight).toFloat()
+            0 - bottomHeight.toFloat()
         )
-        animator.duration = 150
-        if (closeBottomPanel) {
-            val lp = binding.llBottomPanel.layoutParams
-            lp.height = bottomHeight
-            binding.llBottomPanel.layoutParams = lp
-            val bottomAnimator = ObjectAnimator.ofFloat(
-                binding.llBottomPanel,
-                "translationY",
-                (0 - bottomHeight).toFloat()
-            )
-            bottomAnimator.duration = 150
-            animators.play(msgAnimator).with(animator).with(bottomAnimator)
-        } else {
-            animators.play(msgAnimator).with(animator)
-        }
+        animator.duration = duration
+        val lp = binding.llBottomLayout.layoutParams
+        lp.height = bottomHeight
+        binding.llBottomLayout.layoutParams = lp
+        val bottomAnimator = ObjectAnimator.ofFloat(
+            binding.llBottomLayout,
+            "translationY",
+            0 - bottomHeight.toFloat()
+        )
+        bottomAnimator.duration = duration
+        animators.play(msgAnimator).with(animator).with(bottomAnimator)
         animators.start()
-    }
 
-    private fun initMessageRecyclerView(view: View) {
-        binding.rcvMessage.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
-        msgAdapter = MessageAdapter(session, this, binding.rcvMessage)
-        binding.rcvMessage.adapter = msgAdapter
-
-        binding.rcvMessage.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) { //当前状态为停止滑动
-                    if (!recyclerView.canScrollVertically(-1)) {
-                        loadMessages()
-                    }
-                    hasScrollToBottom = !recyclerView.canScrollVertically(1)
-                    LLog.v("hasScrollToBottom :$hasScrollToBottom")
-                }
-            }
-        })
-
-        val linearLayoutManager =
-            (binding.rcvMessage.layoutManager as LinearLayoutManager)
-        linearLayoutManager.stackFromEnd = true
-
-        binding.rcvMessage.setOnTouchListener { _, _ ->
-            if (bottomHeight > 0 || keyboardShowing) {
-                bottomHeight = 0
-                layoutRefresh(bottomHeight, false)
-                true
-            } else {
-                false
-            }
+        animator.doOnEnd {
+            binding.llInputLayout.onKeyboardChange(isKeyboardShow, bottomHeight, duration)
+            binding.llBottomLayout.onKeyboardChange(isKeyboardShow, bottomHeight, duration)
         }
     }
 
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
             it?.let {
-                LLog.v("IMEvent.MsgNew.value ${Gson().toJson(it)}")
-                if (it.sid == sid) {
-                    val pos = msgAdapter.insertNew(it)
-                    if (pos == 0) {
-                        scrollToLatestMsg()
-                    }
+                if (it.sid == session!!.id) {
+                    binding.rcvMessage.insertMessage(it)
                 }
             }
         })
         XEventBus.observe(this, IMEvent.MsgUpdate.value, Observer<Message> {
             it?.let {
-                if (it.sid == sid) {
-                    msgAdapter.update(it)
+                if (it.sid == session!!.id) {
+                    binding.rcvMessage.updateMessage(it)
                 }
             }
         })
         XEventBus.observe(this, IMEvent.MsgDelete.value, Observer<Message> {
             it?.let {
-                if (it.sid == sid) {
-                    msgAdapter.delete(it)
+                if (it.sid == session!!.id) {
+                    binding.rcvMessage.deleteMessage(it)
                 }
             }
         })
     }
 
-    private var cTime: Long = 0L  // 根据创建时间加载消息
-    private var hasMore: Boolean = true // 是否有更多消息
-    private var count = 20        // 每次加载消息的数量
-    private var isLoading = false // 是否正在加载中
-    private var hasScrollToBottom = false
-    private fun loadMessages() {
-        if (!hasMore || isLoading) return
-        if (msgAdapter.getMessageCount() == 0) {
-            cTime = IMCoreManager.signalModule.severTime
-        }
-        isLoading = true
-        val subscriber = object : BaseSubscriber<List<Message>>() {
-            override fun onNext(t: List<Message>) {
-                if (msgAdapter.getMessageCount() == 0) {
-                    msgAdapter.setData(t)
-                    scrollToLatestMsg()
-                } else {
-                    msgAdapter.addData(t)
-                }
-                if (t.isNotEmpty()) {
-                    cTime = t[t.size - 1].cTime
-                }
-                hasMore = t.size >= count
-                isLoading = false
-            }
-
-            override fun onError(t: Throwable?) {
-                super.onError(t)
-                isLoading = false
-            }
-        }
-        LLog.d("Load $sid $cTime $count")
-        IMCoreManager.getMessageModule().queryLocalMessages(sid, cTime, count)
-            .compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
-        composite.add(subscriber)
+    override fun previewMessage(msg: Message, position: Int, originView: View) {
     }
 
-    private fun scrollToLatestMsg(smooth: Boolean = false) {
-        if (smooth) {
-            binding.rcvMessage.smoothScrollToPosition(0)
+    override fun getSession(): Session {
+        return session!!
+    }
+
+    override fun resendMessage(msg: Message) {
+    }
+
+    override fun sendMessage(type: Int, body: Any) {
+    }
+
+    override fun sendInputContent() {
+    }
+
+    override fun addInputContent(text: String) {
+    }
+
+    override fun deleteInputContent(count: Int) {
+    }
+
+    override fun choosePhoto() {
+    }
+
+    override fun openCamera() {
+    }
+
+    override fun moveToLatestMessage() {
+    }
+
+    override fun showBottomPanel(position: Int) {
+        binding.llBottomLayout.showBottomPanel(position)
+    }
+
+    override fun closeBottomPanel() : Boolean {
+        return if (binding.llBottomLayout.getContentHeight() > 0) {
+            binding.llBottomLayout.closeBottomPanel()
+            true
         } else {
-            binding.rcvMessage.scrollToPosition(0)
+            false
         }
     }
 
-    override fun emojiOnItemClick(emoji: String) {
-        val startIndex: Int = binding.etMessage.selectionStart
-        val edit: Editable = binding.etMessage.editableText
-        if (startIndex < 0 || startIndex >= edit.length) {
-            edit.append(emoji)
-        } else {
-            edit.insert(startIndex, emoji)
-        }
-        Selection.setSelection(binding.etMessage.text, binding.etMessage.text?.length ?: 0)
+    override fun moveUpAlwaysShowView(isKeyboardShow: Boolean, bottomHeight: Int, duration: Long) {
+        moveLayout(isKeyboardShow, bottomHeight, duration)
     }
 
-    override fun deleteEmoji() {
-        var msgContent: String = binding.etMessage.text.toString()
-        if (msgContent.isEmpty()) {
-            return
-        }
-
-        if (msgContent.contains("[")) {
-            msgContent = msgContent.substring(0, msgContent.lastIndexOf("["))
-        }
-        binding.etMessage.setText(msgContent)
-        // 设置光标到末尾
-        Selection.setSelection(binding.etMessage.text, binding.etMessage.text?.length ?: 0)
+    override fun openKeyboard(): Boolean {
+        return binding.llInputLayout.openKeyboard()
     }
+
+    override fun isKeyboardShowing(): Boolean {
+        return keyboardShowing
+    }
+
+    override fun closeKeyboard(): Boolean {
+        return binding.llInputLayout.closeKeyboard()
+    }
+
+    override fun showMsgMultiChooseLayout() {
+
+    }
+
+    override fun dismissMsgMultiChooseLayout() {
+    }
+
 }

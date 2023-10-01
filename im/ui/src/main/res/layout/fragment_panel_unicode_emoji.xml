@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_emojis"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/iv_delete_emo"
+        android:layout_width="44dp"
+        android:layout_height="34dp"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/btn_emo_delete_selector" />
+
+</FrameLayout>

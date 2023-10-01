@@ -1,4 +1,4 @@
-package com.thk.im.android.core.processor
+package com.thk.im.android.ui.provider.internal.msg.proccessor
 
 import com.google.gson.Gson
 import com.thk.im.android.base.BaseSubscriber
@@ -17,6 +17,7 @@ import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.exception.DownloadException
 import com.thk.im.android.core.exception.UploadException
 import com.thk.im.android.core.fileloader.LoadListener
+import com.thk.im.android.core.processor.BaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message

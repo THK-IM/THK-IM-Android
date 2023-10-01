@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.provider.internal.viewholder.msg
+package com.thk.im.android.ui.provider.internal.msg.viewholder
 
 enum class MsgPosType(val value: Int) {
     Mid(0),

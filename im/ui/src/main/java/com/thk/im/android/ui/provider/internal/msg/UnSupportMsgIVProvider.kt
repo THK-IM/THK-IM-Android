@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.ui.provider.IMBaseMessageIVProvider
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
-import com.thk.im.android.ui.provider.internal.viewholder.msg.UnSupportMsgVH
+import com.thk.im.android.ui.provider.internal.msg.viewholder.UnSupportMsgVH
 
 class UnSupportMsgIVProvider : IMBaseMessageIVProvider() {
 

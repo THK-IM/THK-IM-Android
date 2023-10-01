@@ -1,4 +1,4 @@
-package com.thk.im.android.core.processor
+package com.thk.im.android.ui.provider.internal.msg.proccessor
 
 import com.google.gson.Gson
 import com.thk.im.android.base.BaseSubscriber
@@ -9,8 +9,6 @@ import com.thk.im.android.core.IMAudioMsgData
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
-import com.thk.im.android.core.IMImageMsgBody
-import com.thk.im.android.core.IMImageMsgData
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMMsgResourceType
@@ -18,6 +16,7 @@ import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.exception.DownloadException
 import com.thk.im.android.core.exception.UploadException
 import com.thk.im.android.core.fileloader.LoadListener
+import com.thk.im.android.core.processor.BaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.db.MsgSendStatus
 import com.thk.im.android.db.MsgType
@@ -206,6 +205,7 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                             LoadListener.Wait,
                             LoadListener.Ing -> {
                             }
+
                             LoadListener.Success -> {
                                 if (data == null) {
                                     data = IMAudioMsgData()

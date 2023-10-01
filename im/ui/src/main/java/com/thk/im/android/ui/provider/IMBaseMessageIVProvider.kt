@@ -8,7 +8,7 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
-import com.thk.im.android.ui.provider.internal.viewholder.msg.MsgPosType
+import com.thk.im.android.ui.provider.internal.msg.viewholder.MsgPosType
 
 abstract class IMBaseMessageIVProvider {
 

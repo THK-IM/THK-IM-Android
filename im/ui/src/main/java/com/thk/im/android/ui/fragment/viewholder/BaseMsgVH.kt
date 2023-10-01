@@ -22,7 +22,7 @@ import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.db.entity.User
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.provider.internal.viewholder.msg.MsgPosType
+import com.thk.im.android.ui.provider.internal.msg.viewholder.MsgPosType
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 

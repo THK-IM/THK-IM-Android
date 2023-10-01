@@ -18,19 +18,8 @@ public class MyApplication extends Application {
         super.onCreate();
         AppUtils.instance().init(this);
         ToastUtils.init(this);
-        IMUIManager.INSTANCE.init(this);
         new Thread() {
             public void run() {
-//                String bucket = "bucket";
-//                String endpoint = "https://oss-cn-ss.aliyuncs.com";
-//                OSSFileLoaderModule fileLoaderModule = new OSSFileLoaderModule(
-//                        MyApplication.this, bucket, endpoint, String.valueOf(uid), new OSSFederationCredentialProvider() {
-//
-//                    @Override
-//                    public OSSFederationToken getFederationToken() {
-//                        return new OSSFederationToken("", "", "", "");
-//                    }
-//                });
                 Long uid = 4L;
                 String host = "192.168.1.3:10000";
                 String endpoint = "http://" + host;
@@ -41,6 +30,8 @@ public class MyApplication extends Application {
                 IMCoreManager.INSTANCE.setImApi(new DefaultIMApi(endpoint, token));
                 IMCoreManager.INSTANCE.init(MyApplication.this, uid, true);
                 IMCoreManager.INSTANCE.setFileLoadModule(fileLoaderModule);
+                IMUIManager.INSTANCE.init(MyApplication.this);
+
                 IMCoreManager.INSTANCE.connect();
                 LiveManager.Companion.shared().init(MyApplication.this, String.valueOf(uid), true);
             }

@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.provider.internal.viewholder.session
+package com.thk.im.android.ui.provider.internal.session.viewholder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

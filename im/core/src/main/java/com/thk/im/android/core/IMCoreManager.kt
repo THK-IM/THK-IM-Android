@@ -18,11 +18,6 @@ import com.thk.im.android.core.module.internal.DefaultContactorModule
 import com.thk.im.android.core.module.internal.DefaultGroupModule
 import com.thk.im.android.core.module.internal.DefaultMessageModule
 import com.thk.im.android.core.module.internal.DefaultUserModule
-import com.thk.im.android.core.processor.AudioMsgProcessor
-import com.thk.im.android.core.processor.ImageMsgProcessor
-import com.thk.im.android.core.processor.TextMsgProcessor
-import com.thk.im.android.core.processor.UnSupportMsgProcessor
-import com.thk.im.android.core.processor.VideoMsgProcessor
 import com.thk.im.android.core.signal.SignalListener
 import com.thk.im.android.core.signal.SignalModule
 import com.thk.im.android.core.signal.SignalType
@@ -85,12 +80,6 @@ object IMCoreManager {
         registerModule(SignalType.Contactor.value, DefaultContactorModule())
         registerModule(SignalType.Group.value, DefaultGroupModule())
         registerModule(SignalType.Message.value, DefaultMessageModule())
-
-        getMessageModule().registerMsgProcessor(UnSupportMsgProcessor())
-        getMessageModule().registerMsgProcessor(TextMsgProcessor())
-        getMessageModule().registerMsgProcessor(ImageMsgProcessor())
-        getMessageModule().registerMsgProcessor(AudioMsgProcessor())
-        getMessageModule().registerMsgProcessor(VideoMsgProcessor())
     }
 
     fun connect() {

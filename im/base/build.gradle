@@ -6,12 +6,14 @@ plugins {
 }
 
 android {
-    namespace 'com.thk.im.android.common'
-    compileSdk 33
+    namespace "${rootProject.ext.android.applicationId}.base"
+    compileSdk rootProject.ext.android.compileSdkVersion
 
     defaultConfig {
-        minSdk 21
-        targetSdk 33
+        minSdk rootProject.ext.android.minSdkVersion
+        targetSdk rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -34,7 +36,7 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.test.ext:junit-ktx:1.1.5'
     testImplementation 'junit:junit:4.13.2'
 

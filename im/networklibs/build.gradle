@@ -4,11 +4,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    namespace "${rootProject.ext.android.applicationId}.networklibs"
+    compileSdk rootProject.ext.android.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 33
+        minSdk rootProject.ext.android.minSdkVersion
+        targetSdk rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 

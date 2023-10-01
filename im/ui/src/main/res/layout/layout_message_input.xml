@@ -97,7 +97,7 @@
         app:layout_constraintRight_toLeftOf="@id/ll_send"
         >
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <androidx.emoji2.widget.EmojiEditText
             android:id="@+id/et_message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

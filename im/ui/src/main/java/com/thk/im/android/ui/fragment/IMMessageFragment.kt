@@ -5,15 +5,19 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.animation.doOnEnd
+import androidx.emoji2.widget.EmojiEditText
+import androidx.emoji2.widget.EmojiTextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.popup.KeyboardPopupWindow
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.entity.Message
@@ -140,18 +144,23 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     }
 
     override fun resendMessage(msg: Message) {
+        IMCoreManager.getMessageModule().resend(msg)
     }
 
     override fun sendMessage(type: Int, body: Any) {
-    }
-
-    override fun sendInputContent() {
+        IMCoreManager.getMessageModule().sendMessage(body, session!!.id, type)
     }
 
     override fun addInputContent(text: String) {
+        binding.llInputLayout.addInputContent(text)
     }
 
-    override fun deleteInputContent(count: Int) {
+    override fun getEditText(): EmojiEditText {
+        return binding.llInputLayout.getEditText()
+    }
+
+    override fun deleteContent(count: Int) {
+         binding.llInputLayout.deleteContent(count)
     }
 
     override fun choosePhoto() {
@@ -161,6 +170,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     }
 
     override fun moveToLatestMessage() {
+        binding.rcvMessage.scrollToLatestMsg()
     }
 
     override fun showBottomPanel(position: Int) {

@@ -71,7 +71,12 @@ interface MessageModule : CommonModule {
         type: Int,
         atUser: String? = null,
         replyMsgId: Long? = null
-    ): Boolean
+    )
+
+    /**
+     * 重发
+     */
+    fun resend(msg: Message)
 
 
     /**

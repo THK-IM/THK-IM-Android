@@ -19,7 +19,7 @@ class IMUnicodeEmojiPanelProvider(private val position: Int) : IMBasePanelFragme
         return R.drawable.icon_chat_emoji
     }
 
-    override fun newFragment(sender: IMMsgSender): BasePanelFragment {
-        return IMUnicodeEmojiFragment(sender)
+    override fun newFragment(): BasePanelFragment {
+        return IMUnicodeEmojiFragment()
     }
 }

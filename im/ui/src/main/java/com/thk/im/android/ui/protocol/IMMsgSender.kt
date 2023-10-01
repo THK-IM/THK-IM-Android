@@ -1,5 +1,8 @@
 package com.thk.im.android.ui.protocol
 
+import android.text.Editable
+import androidx.emoji2.widget.EmojiEditText
+import androidx.emoji2.widget.EmojiTextView
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 
@@ -12,14 +15,12 @@ interface IMMsgSender {
     /// 发送消息
     fun sendMessage(type: Int, body: Any)
 
-    /// 发送输入框内容
-    fun sendInputContent()
-
     /// 输入框添加内容
     fun addInputContent(text: String)
 
-    /// 删除输入框内容
-    fun deleteInputContent(count: Int)
+    fun getEditText(): EmojiEditText
+
+    fun deleteContent(count: Int)
 
     /// 选择照片
     fun choosePhoto()

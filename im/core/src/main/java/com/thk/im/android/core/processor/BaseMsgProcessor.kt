@@ -112,15 +112,9 @@ abstract class BaseMsgProcessor {
         atUsers: String? = null,
         rMsgId: Long? = null,
         map: Map<String, Any> = mutableMapOf()
-    ): Boolean {
-        try {
-            val msg = buildSendMsg(body, sid, atUsers, rMsgId)
-            this.send(msg)
-        } catch (e: Exception) {
-            e.message?.let { LLog.e(it) }
-            return false
-        }
-        return true
+    ) {
+        val msg = buildSendMsg(body, sid, atUsers, rMsgId)
+        this.send(msg)
     }
 
     open fun resend(msg: Message) {

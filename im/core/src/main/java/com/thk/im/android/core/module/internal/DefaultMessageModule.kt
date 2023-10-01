@@ -1,8 +1,6 @@
 package com.thk.im.android.core.module.internal
 
 import android.content.Context.MODE_PRIVATE
-import android.os.Handler
-import android.os.Looper
 import com.google.gson.Gson
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
@@ -220,9 +218,14 @@ open class DefaultMessageModule : MessageModule {
         type: Int,
         atUser: String?,
         replyMsgId: Long?
-    ): Boolean {
+    ) {
         val processor = getMsgProcessor(type)
-        return processor.sendMessage(body, sessionId, atUser, replyMsgId)
+        processor.sendMessage(body, sessionId, atUser, replyMsgId)
+    }
+
+    override fun resend(msg: Message) {
+        val processor = getMsgProcessor(msg.type)
+        processor.resend(msg)
     }
 
     override fun sendMessageToServer(message: Message): Flowable<Message> {
@@ -345,27 +348,27 @@ open class DefaultMessageModule : MessageModule {
 
     override fun processSessionByMessage(msg: Message) {
 //        mainHandler.post {
-            val messageDao = IMCoreManager.getImDataBase().messageDao()
-            val sessionDao = IMCoreManager.getImDataBase().sessionDao()
-            val dispose = object : BaseSubscriber<Session>() {
-                override fun onNext(t: Session) {
-                    val processor = getMsgProcessor(msg.type)
-                    t.lastMsg = processor.getSessionDesc(msg)
-                    t.mTime = msg.cTime
-                    t.unRead = messageDao.getUnReadCount(t.id)
-                    sessionDao.insertOrUpdateSessions(t)
-                    XEventBus.post(IMEvent.SessionNew.value, t)
-                }
-
-                override fun onError(t: Throwable?) {
-                    super.onError(t)
-                    LLog.e("processSessionByMessage error $t")
-                }
+        val messageDao = IMCoreManager.getImDataBase().messageDao()
+        val sessionDao = IMCoreManager.getImDataBase().sessionDao()
+        val dispose = object : BaseSubscriber<Session>() {
+            override fun onNext(t: Session) {
+                val processor = getMsgProcessor(msg.type)
+                t.lastMsg = processor.getSessionDesc(msg)
+                t.mTime = msg.cTime
+                t.unRead = messageDao.getUnReadCount(t.id)
+                sessionDao.insertOrUpdateSessions(t)
+                XEventBus.post(IMEvent.SessionNew.value, t)
             }
-            getSession(msg.sid)
-                .compose(RxTransform.flowableToIo())
-                .subscribe(dispose)
-            disposes.add(dispose)
+
+            override fun onError(t: Throwable?) {
+                super.onError(t)
+                LLog.e("processSessionByMessage error $t")
+            }
+        }
+        getSession(msg.sid)
+            .compose(RxTransform.flowableToIo())
+            .subscribe(dispose)
+        disposes.add(dispose)
 //        }
     }
 

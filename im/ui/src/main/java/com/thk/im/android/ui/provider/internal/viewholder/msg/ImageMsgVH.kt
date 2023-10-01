@@ -27,7 +27,6 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     override fun onViewBind(message: Message, session: Session) {
-//        onViewDetached()
         super.onViewBind(message, session)
         XEventBus.unObserve(IMEvent.MsgLoadStatusUpdate.value, this)
         XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)

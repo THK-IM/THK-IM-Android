@@ -4,12 +4,14 @@ plugins {
 }
 
 android {
-    namespace 'com.thk.im.android.ui'
-    compileSdk 33
+    namespace "${rootProject.ext.android.applicationId}.ui"
+    compileSdk rootProject.ext.android.compileSdkVersion
 
     defaultConfig {
-        minSdk 21
-        targetSdk 33
+        minSdk rootProject.ext.android.minSdkVersion
+        targetSdk rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -54,4 +56,10 @@ dependencies {
 
     // 权限请求框架：https://github.com/getActivity/XXPermissions
     implementation 'com.github.getActivity:XXPermissions:16.0'
+
+    // unicode emoji表情
+    implementation("androidx.emoji2:emoji2:1.4.0")
+    implementation "androidx.emoji2:emoji2-bundled:1.4.0"
+    implementation("androidx.emoji2:emoji2-views:1.4.0")
+    implementation("androidx.emoji2:emoji2-views-helper:1.4.0")
 }

@@ -57,7 +57,7 @@ class IMBottomLayout : ConstraintLayout {
         }
         binding.vpMenu.adapter = adapter
 
-        binding.vpContent.adapter = PanelFragmentAdapter(fragment, msgSender)
+        binding.vpContent.adapter = PanelFragmentAdapter(fragment)
         binding.vpContent.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         binding.vpContent.offscreenPageLimit = 5
         binding.vpContent.registerOnPageChangeCallback(object : OnPageChangeCallback() {

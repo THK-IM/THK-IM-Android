@@ -1,6 +1,8 @@
 package com.thk.im.android.ui.manager
 
 import android.app.Application
+import androidx.emoji2.bundled.BundledEmojiCompatConfig
+import androidx.emoji2.text.EmojiCompat
 import com.thk.im.android.ui.provider.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.provider.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.IMBasePanelFragmentProvider
@@ -51,6 +53,7 @@ object IMUIManager {
     }
 
     fun init(app: Application) {
+        EmojiCompat.init(BundledEmojiCompatConfig(app))
         IMKeyboardUtils.init(app)
         val providers = arrayOf(
             TimeLineMsgIVProvider(),

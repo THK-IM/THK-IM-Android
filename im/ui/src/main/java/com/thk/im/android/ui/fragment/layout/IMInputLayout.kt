@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.emoji2.widget.EmojiEditText
 import androidx.fragment.app.Fragment
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.ui.R
@@ -36,7 +37,7 @@ class IMInputLayout : ConstraintLayout {
         binding = LayoutMessageInputBinding.bind(view)
         binding.etMessage.isFocusable = true
         binding.etMessage.isFocusableInTouchMode = true
-
+        binding.etMessage.requestFocus()
         binding.tvSendMsg.setOnClickListener {
             binding.etMessage.text?.let {
                 msgSender.sendMessage(MsgType.TEXT.value, it.toString())
@@ -139,9 +140,45 @@ class IMInputLayout : ConstraintLayout {
     }
 
     fun onKeyboardChange(isKeyShowing: Boolean, height: Int, duration: Long) {
-        if (isKeyShowing || height <=0 ) {
+        if (isKeyShowing || height <= 0) {
             binding.ivAddMore.isSelected = false
             binding.ivEmo.isSelected = false
+        }
+    }
+
+    fun addInputContent(text: String) {
+        val index: Int = binding.etMessage.selectionStart
+        if (binding.etMessage.text != null) {
+            binding.etMessage.text!!.insert(index, text)
+        } else {
+            val newText = binding.etMessage.text.toString() + text
+            binding.etMessage.setText(newText.toCharArray(), 0, newText.toCharArray().size)
+        }
+    }
+
+    fun getEditText(): EmojiEditText {
+        return binding.etMessage
+    }
+
+    fun deleteContent(count: Int) {
+        val index: Int = binding.etMessage.selectionStart
+        if (!binding.etMessage.text.isNullOrEmpty()) {
+            if (binding.etMessage.selectionEnd != index) {
+                binding.etMessage.text.delete(index, binding.etMessage.selectionEnd)
+                return
+            }
+            val chars = binding.etMessage.text.toString().toCharArray()
+            for (i in 0 ..< count) {
+                if (index >= 2) {
+                    if (Character.isSurrogatePair(chars[index - 2], chars[index - 1])) {
+                        binding.etMessage.text.delete(index - 2, index)
+                    } else {
+                        binding.etMessage.text.delete(index - 1, index)
+                    }
+                } else {
+                    binding.etMessage.text.delete(index - 1, index)
+                }
+            }
         }
     }
 

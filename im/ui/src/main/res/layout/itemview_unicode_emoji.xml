@@ -2,15 +2,15 @@
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="60dp"
     android:layout_height="60dp"
-    android:layout_gravity="center"
+    android:gravity="center"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <androidx.emoji2.widget.EmojiTextView
         android:id="@+id/tv_unicode_emoji"
-        android:layout_gravity="center"
-        android:textSize="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
         android:textAlignment="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:textSize="24sp" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -18,10 +18,10 @@ class TimeLineMsgVH(
         return R.layout.itemview_msg_timeline
     }
 
-    override fun onViewBind(msg: Message, ses: Session) {
-        super.onViewBind(msg, ses)
+    override fun onViewBind(message: Message, session: Session) {
+        super.onViewBind(message, session)
         val tvTime: TextView = itemView.findViewById(R.id.tv_time)
-        tvTime.text = DateUtil.getTimeline(msg.cTime)
+        tvTime.text = DateUtil.getTimeline(message.cTime)
     }
 
     override fun onViewDetached() {

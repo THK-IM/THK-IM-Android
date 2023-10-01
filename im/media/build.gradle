@@ -4,12 +4,14 @@ plugins {
 }
 
 android {
-    namespace 'com.thk.im.android.media'
-    compileSdk 33
+    namespace "${rootProject.ext.android.applicationId}.media"
+    compileSdk rootProject.ext.android.compileSdkVersion
 
     defaultConfig {
-        minSdk 21
-        targetSdk 33
+        minSdk rootProject.ext.android.minSdkVersion
+        targetSdk rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"

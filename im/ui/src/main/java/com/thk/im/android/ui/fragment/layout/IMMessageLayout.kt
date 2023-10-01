@@ -3,7 +3,10 @@ package com.thk.im.android.ui.fragment.layout
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.GestureDetector
+import android.view.GestureDetector.OnGestureListener
 import android.view.MotionEvent
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,6 +48,7 @@ class IMMessageLayout : RecyclerView {
         loadMessages()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initUI() {
         val linearLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
         linearLayoutManager.stackFromEnd = true
@@ -66,6 +70,52 @@ class IMMessageLayout : RecyclerView {
         })
 
         linearLayoutManager.stackFromEnd = true
+
+        val gestureDetector = GestureDetector(context, object : OnGestureListener {
+            override fun onDown(p0: MotionEvent): Boolean {
+                return false
+            }
+
+            override fun onShowPress(p0: MotionEvent) {
+            }
+
+            override fun onSingleTapUp(p0: MotionEvent): Boolean {
+                if (msgSender.isKeyboardShowing()) {
+                    msgSender.closeKeyboard()
+                    return true
+                } else {
+                    if (msgSender.closeBottomPanel()) {
+                        return true
+                    }
+                }
+                return false
+            }
+
+            override fun onScroll(
+                p0: MotionEvent?,
+                p1: MotionEvent,
+                p2: Float,
+                p3: Float
+            ): Boolean {
+                return false
+            }
+
+            override fun onLongPress(p0: MotionEvent) {
+            }
+
+            override fun onFling(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
+                return false
+            }
+
+        })
+
+        setOnTouchListener { _, p1 ->
+            if (p1 != null) {
+                gestureDetector.onTouchEvent(p1)
+            } else {
+                false
+            }
+        }
 
 //        binding.rcvMessage.setOnTouchListener { _, _ ->
 //            if (bottomHeight > 0 || keyboardShowing) {
@@ -111,7 +161,7 @@ class IMMessageLayout : RecyclerView {
         disposables.add(subscriber)
     }
 
-    private fun scrollToLatestMsg(smooth: Boolean = false) {
+    fun scrollToLatestMsg(smooth: Boolean = false) {
         if (smooth) {
             smoothScrollToPosition(0)
         } else {
@@ -144,18 +194,6 @@ class IMMessageLayout : RecyclerView {
 
     fun deleteMessage(message: Message) {
         msgAdapter.delete(message)
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(e: MotionEvent?): Boolean {
-        if (msgSender.isKeyboardShowing()) {
-            msgSender.closeKeyboard()
-            return true
-        }
-        if (msgSender.closeBottomPanel()) {
-            return true
-        }
-        return super.onTouchEvent(e)
     }
 
     override fun onDetachedFromWindow() {

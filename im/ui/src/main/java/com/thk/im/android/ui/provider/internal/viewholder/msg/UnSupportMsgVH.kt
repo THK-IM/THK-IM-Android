@@ -16,8 +16,8 @@ class UnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         return R.layout.itemview_msg_text
     }
 
-    override fun onViewBind(msg: Message, ses: Session) {
-        super.onViewBind(msg, ses)
+    override fun onViewBind(message: Message, session: Session) {
+        super.onViewBind(message, session)
         val tvMsgContent: TextView = contentContainer.findViewById(R.id.tv_msg_content)
         tvMsgContent.text = "不支持的消息类型，请尝试升级客户端"
         when (getType()) {

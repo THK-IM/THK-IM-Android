@@ -7,9 +7,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.thk.im.android.ui.databinding.FragmentPanelUnicodeEmojiBinding
 import com.thk.im.android.ui.fragment.panel.BasePanelFragment
-import com.thk.im.android.ui.protocol.IMMsgSender
 
-class IMUnicodeEmojiFragment(msgSender: IMMsgSender) : BasePanelFragment(msgSender) {
+class IMUnicodeEmojiFragment : BasePanelFragment() {
 
     private lateinit var binding: FragmentPanelUnicodeEmojiBinding
 
@@ -50,5 +49,13 @@ class IMUnicodeEmojiFragment(msgSender: IMMsgSender) : BasePanelFragment(msgSend
         val adapter = IMUnicodeEmojiAdapter()
         binding.rcvEmojis.adapter = adapter
         adapter.setEmoji(emojis)
+        adapter.onEmojiSelected = object : IMUnicodeEmojiAdapter.OnEmojiSelected {
+            override fun onSelected(emoji: String) {
+                getMsgSender()?.addInputContent(emoji)
+            }
+        }
+        binding.ivDeleteEmo.setOnClickListener {
+            getMsgSender()?.deleteContent(1)
+        }
     }
 }

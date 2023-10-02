@@ -3,16 +3,17 @@ package com.thk.im.android.ui.fragment.adapter
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
-import com.thk.im.android.base.LLog
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
-import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
+import com.thk.im.android.ui.manager.IMUIManager
+import com.thk.im.android.ui.protocol.IMMsgVHOperator
 import kotlin.math.abs
 
 class MessageAdapter(
     private val session: Session,
-    private val lifecycleOwner: LifecycleOwner
+    private val lifecycleOwner: LifecycleOwner,
+    private val msgVHOperator: IMMsgVHOperator
 ) :
     RecyclerView.Adapter<BaseMsgVH>() {
 
@@ -30,14 +31,13 @@ class MessageAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseMsgVH {
         val provider = IMUIManager.getMsgIVProviderByViewType(viewType)
-        val holder =  provider.viewHolder(lifecycleOwner, viewType, parent)
+        val holder = provider.viewHolder(lifecycleOwner, viewType, parent)
         holder.resetLayout()
         return holder
     }
 
     override fun onBindViewHolder(holder: BaseMsgVH, position: Int) {
-        val message = messageList[position]
-        holder.onViewBind(message, session)
+        holder.onViewBind(position, messageList, session, msgVHOperator)
     }
 
     override fun onViewRecycled(holder: BaseMsgVH) {
@@ -86,10 +86,6 @@ class MessageAdapter(
             }
             newMessages.add(messages[i])
         }
-//        if (newMessages[0].type != timeLineMsgType) {
-//            val message = newTimelineMessage(newMessages[0].cTime)
-//            newMessages.add(0, message)
-//        }
         return newMessages.reversed()
     }
 
@@ -130,10 +126,12 @@ class MessageAdapter(
                 val timelineMsg = addTimelineMessage(message)
                 if (timelineMsg != null) {
                     messageList.add(position, timelineMsg)
+                    messageList.add(position, message)
+                    notifyItemRangeInserted(position, 2)
+                } else {
+                    messageList.add(position, message)
                     notifyItemRangeInserted(position, 1)
                 }
-                messageList.add(position, message)
-                notifyItemRangeInserted(position, 1)
                 return position
             }
         }

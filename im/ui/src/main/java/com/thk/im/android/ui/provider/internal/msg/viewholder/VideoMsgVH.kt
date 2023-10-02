@@ -13,13 +13,14 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMMsgResourceType
-import com.thk.im.android.core.IMVideoMsgBody
-import com.thk.im.android.core.IMVideoMsgData
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
+import com.thk.im.android.ui.manager.IMVideoMsgBody
+import com.thk.im.android.ui.manager.IMVideoMsgData
+import com.thk.im.android.ui.protocol.IMMsgVHOperator
 import com.thk.im.android.ui.utils.DateUtil
 
 class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
@@ -30,8 +31,13 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         return R.layout.itemview_msg_video
     }
 
-    override fun onViewBind(message: Message, session: Session) {
-        super.onViewBind(message, session)
+    override fun onViewBind(
+        position: Int,
+        messages: List<Message>,
+        session: Session,
+        msgVHOperator: IMMsgVHOperator
+    ) {
+        super.onViewBind(position, messages, session, msgVHOperator)
         XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
 
         if (message.data.isNotEmpty() && message.data.isNotBlank()) {

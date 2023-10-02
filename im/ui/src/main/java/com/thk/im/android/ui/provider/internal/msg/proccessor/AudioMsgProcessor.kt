@@ -4,8 +4,6 @@ import com.google.gson.Gson
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
-import com.thk.im.android.core.IMAudioMsgBody
-import com.thk.im.android.core.IMAudioMsgData
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
@@ -21,6 +19,8 @@ import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.db.MsgSendStatus
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
+import com.thk.im.android.ui.manager.IMAudioMsgBody
+import com.thk.im.android.ui.manager.IMAudioMsgData
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.FileNotFoundException

@@ -7,6 +7,7 @@ import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
+import com.thk.im.android.ui.protocol.IMMsgVHOperator
 import com.thk.im.android.ui.utils.DateUtil
 
 class TimeLineMsgVH(
@@ -18,8 +19,13 @@ class TimeLineMsgVH(
         return R.layout.itemview_msg_timeline
     }
 
-    override fun onViewBind(message: Message, session: Session) {
-        super.onViewBind(message, session)
+    override fun onViewBind(
+        position: Int,
+        messages: List<Message>,
+        session: Session,
+        msgVHOperator: IMMsgVHOperator
+    ) {
+        super.onViewBind(position, messages, session, msgVHOperator)
         val tvTime: TextView = itemView.findViewById(R.id.tv_time)
         tvTime.text = DateUtil.getTimeline(message.cTime)
     }

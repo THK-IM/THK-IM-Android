@@ -8,8 +8,6 @@ import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
-import com.thk.im.android.core.IMImageMsgBody
-import com.thk.im.android.core.IMImageMsgData
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMMsgResourceType
@@ -21,6 +19,8 @@ import com.thk.im.android.core.processor.BaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
+import com.thk.im.android.ui.manager.IMImageMsgBody
+import com.thk.im.android.ui.manager.IMImageMsgData
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.FileNotFoundException

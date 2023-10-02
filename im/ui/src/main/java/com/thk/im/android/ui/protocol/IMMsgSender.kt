@@ -1,8 +1,6 @@
 package com.thk.im.android.ui.protocol
 
-import android.text.Editable
 import androidx.emoji2.widget.EmojiEditText
-import androidx.emoji2.widget.EmojiTextView
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 

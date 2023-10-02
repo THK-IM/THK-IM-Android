@@ -11,8 +11,6 @@ import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMMsgResourceType
-import com.thk.im.android.core.IMVideoMsgBody
-import com.thk.im.android.core.IMVideoMsgData
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.exception.DownloadException
 import com.thk.im.android.core.exception.UploadException
@@ -21,6 +19,8 @@ import com.thk.im.android.core.processor.BaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
+import com.thk.im.android.ui.manager.IMVideoMsgBody
+import com.thk.im.android.ui.manager.IMVideoMsgData
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.FileNotFoundException

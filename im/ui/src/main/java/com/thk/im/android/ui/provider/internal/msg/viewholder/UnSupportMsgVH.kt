@@ -8,6 +8,8 @@ import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
+import com.thk.im.android.ui.manager.IMMsgPosType
+import com.thk.im.android.ui.protocol.IMMsgVHOperator
 
 class UnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     BaseMsgVH(liftOwner, itemView, viewType) {
@@ -16,12 +18,17 @@ class UnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         return R.layout.itemview_msg_text
     }
 
-    override fun onViewBind(message: Message, session: Session) {
-        super.onViewBind(message, session)
+    override fun onViewBind(
+        position: Int,
+        messages: List<Message>,
+        session: Session,
+        msgVHOperator: IMMsgVHOperator
+    ) {
+        super.onViewBind(position, messages, session, msgVHOperator)
         val tvMsgContent: TextView = contentContainer.findViewById(R.id.tv_msg_content)
         tvMsgContent.text = "不支持的消息类型，请尝试升级客户端"
         when (getType()) {
-            MsgPosType.Left.value -> {
+            IMMsgPosType.Left.value -> {
                 tvMsgContent.setTextColor(
                     ContextCompat.getColor(
                         tvMsgContent.context,
@@ -31,7 +38,7 @@ class UnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                 tvMsgContent.setBackgroundResource(R.drawable.chat_bg_1)
             }
 
-            MsgPosType.Right.value -> {
+            IMMsgPosType.Right.value -> {
                 tvMsgContent.setTextColor(
                     ContextCompat.getColor(
                         tvMsgContent.context,

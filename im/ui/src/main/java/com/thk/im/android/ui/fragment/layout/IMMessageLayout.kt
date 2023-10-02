@@ -19,9 +19,10 @@ import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.fragment.adapter.MessageAdapter
 import com.thk.im.android.ui.protocol.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.IMMsgSender
+import com.thk.im.android.ui.protocol.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
 
-class IMMessageLayout : RecyclerView {
+class IMMessageLayout : RecyclerView, IMMsgVHOperator {
 
     private var cTime: Long = 0L  // 根据创建时间加载消息
     private var hasMore: Boolean = true // 是否有更多消息
@@ -54,7 +55,7 @@ class IMMessageLayout : RecyclerView {
         linearLayoutManager.stackFromEnd = true
         layoutManager = linearLayoutManager
         val session = msgSender.getSession()
-        msgAdapter = MessageAdapter(session, fragment)
+        msgAdapter = MessageAdapter(session, fragment, this)
         adapter = msgAdapter
 
         addOnScrollListener(object : OnScrollListener() {
@@ -199,6 +200,15 @@ class IMMessageLayout : RecyclerView {
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         disposables.clear()
+    }
+
+    override fun onMsgCellClick(message: Message, position: Int, view: View) {
+    }
+
+    override fun onMsgCellLongClick(message: Message, position: Int, view: View) {
+    }
+
+    override fun onMsgResendClick(message: Message) {
     }
 
 }

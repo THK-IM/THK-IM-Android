@@ -1,4 +1,4 @@
-package com.thk.im.android.core
+package com.thk.im.android.ui.manager
 
 import com.google.gson.annotations.SerializedName
 

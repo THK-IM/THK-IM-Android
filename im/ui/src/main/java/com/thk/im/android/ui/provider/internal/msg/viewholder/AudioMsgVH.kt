@@ -1,14 +1,11 @@
 package com.thk.im.android.ui.provider.internal.msg.viewholder
 
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import com.thk.im.android.base.ToastUtils
-import com.thk.im.android.core.IMAudioMsgBody
-import com.thk.im.android.core.IMAudioMsgData
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMLoadProgress
@@ -21,6 +18,10 @@ import com.thk.im.android.media.audio.AudioStatus
 import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
+import com.thk.im.android.ui.manager.IMAudioMsgBody
+import com.thk.im.android.ui.manager.IMAudioMsgData
+import com.thk.im.android.ui.manager.IMMsgPosType
+import com.thk.im.android.ui.protocol.IMMsgVHOperator
 import com.thk.im.android.ui.utils.DateUtil
 
 class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
@@ -30,9 +31,13 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         return R.layout.itemview_msg_audio
     }
 
-
-    override fun onViewBind(message: Message, session: Session) {
-        super.onViewBind(message, session)
+    override fun onViewBind(
+        position: Int,
+        messages: List<Message>,
+        session: Session,
+        msgVHOperator: IMMsgVHOperator
+    ) {
+        super.onViewBind(position, messages, session, msgVHOperator)
         XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
 
         if (message.data.isNotEmpty() && message.data.isNotBlank()) {
@@ -60,12 +65,12 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         val audioDurationView: TextView = contentContainer.findViewById(R.id.tv_audio_duration)
         audioDurationView.setOnClickListener {
             if (audioData.path != null)
-            OggOpusPlayer.startPlay(audioData.path!!, object : AudioCallback {
-                override fun notify(path: String, second: Int, db: Double, state: AudioStatus) {
-                    ToastUtils.show("play: $second, $db")
-                }
+                OggOpusPlayer.startPlay(audioData.path!!, object : AudioCallback {
+                    override fun notify(path: String, second: Int, db: Double, state: AudioStatus) {
+                        ToastUtils.show("play: $second, $db")
+                    }
 
-            })
+                })
         }
         val audioStatusView: View =
             contentContainer.findViewById(R.id.iv_audio_status)
@@ -75,7 +80,7 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         if (audioData.played) {
             audioStatusView.visibility = View.GONE
         } else {
-            if (getType() == MsgPosType.Right.value) {
+            if (getType() == IMMsgPosType.Right.value) {
                 audioStatusView.visibility = View.GONE
             } else {
                 audioStatusView.visibility = View.VISIBLE
@@ -91,7 +96,7 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         if (imageMsgBody.duration != null) {
             audioDurationView.text = DateUtil.getDuration(imageMsgBody.duration!!)
         }
-        if (getType() == MsgPosType.Right.value) {
+        if (getType() == IMMsgPosType.Right.value) {
             audioStatusView.visibility = View.GONE
         } else {
             audioStatusView.visibility = View.VISIBLE

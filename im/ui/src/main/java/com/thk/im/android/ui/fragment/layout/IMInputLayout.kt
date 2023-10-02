@@ -19,7 +19,6 @@ import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.ToastUtils
-import com.thk.im.android.core.IMAudioMsgData
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.db.MsgType
@@ -28,6 +27,7 @@ import com.thk.im.android.media.audio.AudioStatus
 import com.thk.im.android.media.audio.OggOpusRecorder
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
+import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.protocol.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.IMMsgSender
 import java.io.File
@@ -140,7 +140,6 @@ class IMInputLayout : ConstraintLayout {
         }
 
         binding.btRecordVoice.setOnTouchListener { _, p1 ->
-            LLog.v("recording ${p1.action}")
             when (p1.action) {
                 MotionEvent.ACTION_DOWN -> {
                     audioEventY = p1.y
@@ -149,9 +148,18 @@ class IMInputLayout : ConstraintLayout {
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    audioCancel = abs(p1.y - audioEventY) > 180
+                    val cancel = abs(p1.y - audioEventY) > 180
+                    if (audioCancel != cancel) {
+                        audioCancel = cancel
+                        if (audioCancel) {
+                            binding.btRecordVoice.text = "松开 取消"
+                        } else {
+                            binding.btRecordVoice.text = "松开 发送"
+                        }
+                    }
                 }
 
+                MotionEvent.ACTION_CANCEL,
                 MotionEvent.ACTION_UP -> {
                     stopAudioRecording()
                 }
@@ -233,20 +241,23 @@ class IMInputLayout : ConstraintLayout {
     }
 
     private fun checkAudioPermission() {
-        XXPermissions.with(context)
-            .permission(Permission.RECORD_AUDIO)
-            .request { _, all ->
-                if (all) {
-                    startRecordingAudio()
-                } else {
-                    // TODO
-                    ToastUtils.show("请开启录音权限")
+        val granted = XXPermissions.isGranted(context, Permission.RECORD_AUDIO)
+        if (!granted) {
+            XXPermissions.with(context)
+                .permission(Permission.RECORD_AUDIO)
+                .request { _, all ->
+                    if (!all) {
+                        // TODO
+                        ToastUtils.show("请开启录音权限")
+                    }
                 }
-            }
+        } else {
+            startRecordingAudio()
+        }
     }
 
     private fun startRecordingAudio() {
-
+        binding.btRecordVoice.text = "松开 发送"
         val path = IMCoreManager.storageModule.allocSessionFilePath(
             msgSender.getSession().id,
             "${System.currentTimeMillis() / 100}_audio.oga",
@@ -303,6 +314,7 @@ class IMInputLayout : ConstraintLayout {
     }
 
     private fun stopAudioRecording() {
+        binding.btRecordVoice.text = "按住 说话"
         OggOpusRecorder.stopRecording()
     }
 

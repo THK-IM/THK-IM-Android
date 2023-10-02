@@ -8,6 +8,8 @@ import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
+import com.thk.im.android.ui.manager.IMMsgPosType
+import com.thk.im.android.ui.protocol.IMMsgVHOperator
 
 class TextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     BaseMsgVH(liftOwner, itemView, viewType) {
@@ -17,12 +19,17 @@ class TextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         return R.layout.itemview_msg_text
     }
 
-    override fun onViewBind(message: Message, session: Session) {
-        super.onViewBind(message, session)
+    override fun onViewBind(
+        position: Int,
+        messages: List<Message>,
+        session: Session,
+        msgVHOperator: IMMsgVHOperator
+    ) {
+        super.onViewBind(position, messages, session, msgVHOperator)
         val tvMsgContent: TextView = contentContainer.findViewById(R.id.tv_msg_content)
         tvMsgContent.text = message.content
         when (getType()) {
-            MsgPosType.Left.value -> {
+            IMMsgPosType.Left.value -> {
                 tvMsgContent.setTextColor(
                     ContextCompat.getColor(
                         tvMsgContent.context,
@@ -32,7 +39,7 @@ class TextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                 tvMsgContent.setBackgroundResource(R.drawable.chat_bg_1)
             }
 
-            MsgPosType.Right.value -> {
+            IMMsgPosType.Right.value -> {
                 tvMsgContent.setTextColor(
                     ContextCompat.getColor(
                         tvMsgContent.context,
@@ -42,7 +49,7 @@ class TextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                 tvMsgContent.setBackgroundResource(R.drawable.chat_bg_3)
             }
 
-            MsgPosType.Mid.value -> {
+            IMMsgPosType.Mid.value -> {
                 tvMsgContent.setTextColor(
                     ContextCompat.getColor(
                         tvMsgContent.context,

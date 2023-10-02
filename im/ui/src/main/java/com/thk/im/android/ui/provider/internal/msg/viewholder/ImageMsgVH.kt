@@ -9,8 +9,6 @@ import com.thk.im.android.base.IMImageLoader
 import com.thk.im.android.base.extension.dp2px
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.IMImageMsgBody
-import com.thk.im.android.core.IMImageMsgData
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
@@ -18,6 +16,9 @@ import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
+import com.thk.im.android.ui.manager.IMImageMsgBody
+import com.thk.im.android.ui.manager.IMImageMsgData
+import com.thk.im.android.ui.protocol.IMMsgVHOperator
 
 class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     BaseMsgVH(liftOwner, itemView, viewType), Observer<IMLoadProgress> {
@@ -26,8 +27,13 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         return R.layout.itemview_msg_image
     }
 
-    override fun onViewBind(message: Message, session: Session) {
-        super.onViewBind(message, session)
+    override fun onViewBind(
+        position: Int,
+        messages: List<Message>,
+        session: Session,
+        msgVHOperator: IMMsgVHOperator
+    ) {
+        super.onViewBind(position, messages, session, msgVHOperator)
         XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
 
         if (message.data.isNotEmpty() && message.data.isNotBlank()) {

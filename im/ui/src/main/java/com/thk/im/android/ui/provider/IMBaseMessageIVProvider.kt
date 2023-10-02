@@ -8,7 +8,7 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
-import com.thk.im.android.ui.provider.internal.msg.viewholder.MsgPosType
+import com.thk.im.android.ui.manager.IMMsgPosType
 
 abstract class IMBaseMessageIVProvider {
 
@@ -30,15 +30,15 @@ abstract class IMBaseMessageIVProvider {
         val selfId = getSelfId()
         return when (entity.fUid) {
             0L -> {
-                3 * messageType() + MsgPosType.Mid.value     // 中间显示 （一般为后台系统发送, 如 某某加入/退出了群聊）
+                3 * messageType() + IMMsgPosType.Mid.value     // 中间显示 （一般为后台系统发送, 如 某某加入/退出了群聊）
             }
 
             selfId -> {
-                3 * messageType() + MsgPosType.Right.value   // 右侧视图显示 (自己发送)
+                3 * messageType() + IMMsgPosType.Right.value   // 右侧视图显示 (自己发送)
             }
 
             else -> {
-                3 * messageType() + MsgPosType.Left.value    // 左侧视图显示（一般为他人发送）
+                3 * messageType() + IMMsgPosType.Left.value    // 左侧视图显示（一般为他人发送）
             }
         }
     }

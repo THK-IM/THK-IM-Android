@@ -25,8 +25,6 @@ import com.thk.im.android.base.MediaUtils
 import com.thk.im.android.base.popup.KeyboardPopupWindow
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.IMImageMsgData
-import com.thk.im.android.core.IMVideoMsgData
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
@@ -34,6 +32,8 @@ import com.thk.im.android.db.entity.Session
 import com.thk.im.android.media.picker.AlbumStyleUtils
 import com.thk.im.android.media.picker.GlideEngine
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
+import com.thk.im.android.ui.manager.IMImageMsgData
+import com.thk.im.android.ui.manager.IMVideoMsgData
 import com.thk.im.android.ui.protocol.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.IMMsgSender
 import top.zibin.luban.CompressionPredicate

@@ -99,7 +99,12 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                 ?: return Flowable.error(IOException("extractVideoFrame error: ${videoData.path!!}"))
             val paths = storageModule.getPathsFromFullPath(videoData.path!!)
             val names = storageModule.getFileExt(paths.second)
-            val thumbName = "${names.first}_cover.jpg"
+            val ext = if (videoParams.first.hasAlpha()) {
+                "png"
+            } else {
+                "jpeg"
+            }
+            val thumbName = "${names.first}_cover.${ext}"
             val thumbnailPath = IMCoreManager.storageModule
                 .allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
             MediaUtils.compressSync(videoParams.first, 100 * 1024, thumbnailPath)

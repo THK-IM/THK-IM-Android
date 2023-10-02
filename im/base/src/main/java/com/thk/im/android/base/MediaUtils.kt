@@ -102,7 +102,11 @@ object MediaUtils {
         val length = source.byteCount
         if (length <= size) {
             val outputFileStream = FileOutputStream(desPath)
-            source.compress(Bitmap.CompressFormat.JPEG, 100, outputFileStream)
+            if (source.hasAlpha()) {
+                source.compress(Bitmap.CompressFormat.PNG, 100, outputFileStream)
+            } else {
+                source.compress(Bitmap.CompressFormat.JPEG, 100, outputFileStream)
+            }
             outputFileStream.flush()
             outputFileStream.close()
         }

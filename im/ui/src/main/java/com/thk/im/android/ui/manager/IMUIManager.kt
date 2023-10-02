@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.media.audio.OggOpusPlayer
+import com.thk.im.android.media.audio.OggOpusRecorder
 import com.thk.im.android.ui.provider.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.provider.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.IMBasePanelFragmentProvider
@@ -67,6 +69,8 @@ object IMUIManager {
         IMCoreManager.getMessageModule().registerMsgProcessor(AudioMsgProcessor())
         IMCoreManager.getMessageModule().registerMsgProcessor(VideoMsgProcessor())
 
+        OggOpusPlayer.initPlayer(app)
+        OggOpusRecorder.initRecorder(app)
         IMKeyboardUtils.init(app)
         val providers = arrayOf(
             TimeLineMsgIVProvider(),

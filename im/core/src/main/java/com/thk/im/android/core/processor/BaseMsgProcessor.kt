@@ -37,7 +37,7 @@ abstract class BaseMsgProcessor {
                 notify = true,
                 notifySession = true,
             )
-            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
+            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.getUid()) {
                 IMCoreManager.getMessageModule().ackMessageToCache(msg)
             }
         } else {
@@ -55,7 +55,7 @@ abstract class BaseMsgProcessor {
                     notifySession = true,
                 )
             }
-            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
+            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.getUid()) {
                 IMCoreManager.getMessageModule().ackMessageToCache(msg)
             }
         }

@@ -98,7 +98,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             } else {
                 it.visibility = View.GONE
             }
-            it.visibility = View.VISIBLE
         }
 
         if (message.fUid != 0L) {

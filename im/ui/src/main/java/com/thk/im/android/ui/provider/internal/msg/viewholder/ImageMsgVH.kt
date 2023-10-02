@@ -43,7 +43,7 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
             imageMsgBody?.let {
                 renderBody(it)
                 // 开始下载
-                if (it.thumbnailUrl.isNullOrEmpty()) {
+                if (!it.thumbnailUrl.isNullOrEmpty()) {
                     IMCoreManager.getMessageModule().getMsgProcessor(message.type)
                         .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
                 }

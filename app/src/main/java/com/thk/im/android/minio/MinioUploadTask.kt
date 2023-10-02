@@ -30,6 +30,7 @@ class MinioUploadTask(
     }
 
     override fun start() {
+        LLog.v("MinioUploadTask start")
         val params = fileLoaderModule.parserUploadKey(key)
         if (params == null) {
             notify(0, LoadListener.Failed)
@@ -64,7 +65,13 @@ class MinioUploadTask(
     }
 
     private fun startUpload(uploadParams: UploadParams) {
+        LLog.v("MinioUploadTask startUpload")
         if (!running.get()) {
+            notify(0, LoadListener.Failed)
+            return
+        }
+        val file = File(path)
+        if (file.length() <= 0) {
             notify(0, LoadListener.Failed)
             return
         }
@@ -74,7 +81,6 @@ class MinioUploadTask(
         for ((k, v) in uploadParams.params) {
             requestBodyBuilder.addFormDataPart(k, v)
         }
-        val file = File(path)
         val fileBody: RequestBody =
             FileProgressRequestBody(file, object : FileProgressRequestBody.ProgressListener {
                 override fun transferred(size: Long, progress: Int) {

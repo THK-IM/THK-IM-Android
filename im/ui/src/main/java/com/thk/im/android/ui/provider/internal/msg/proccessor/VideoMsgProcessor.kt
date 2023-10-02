@@ -28,9 +28,6 @@ import java.io.IOException
 
 open class VideoMsgProcessor : BaseMsgProcessor() {
 
-    private val format = "video"
-
-
     override fun messageType(): Int {
         return MsgType.VIDEO.value
     }
@@ -50,7 +47,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             return if (videoData.thumbnailPath == null) {
                 extractVideoFrame(IMCoreManager.storageModule, videoData, pair.second)
             } else {
-                return MediaUtils.compress(
+                MediaUtils.compress(
                     videoData.thumbnailPath!!,
                     100 * 1024,
                     videoData.thumbnailPath!!
@@ -104,7 +101,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             } else {
                 "jpeg"
             }
-            val thumbName = "${names.first}_cover.${ext}"
+            val thumbName = "${System.currentTimeMillis()/1000}_${names.first}_cover.${ext}"
             val thumbnailPath = IMCoreManager.storageModule
                 .allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
             MediaUtils.compressSync(videoParams.first, 100 * 1024, thumbnailPath)

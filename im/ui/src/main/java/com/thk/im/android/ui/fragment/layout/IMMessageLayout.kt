@@ -209,6 +209,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgResendClick(message: Message) {
+        IMCoreManager.getMessageModule().resend(message)
     }
 
 }

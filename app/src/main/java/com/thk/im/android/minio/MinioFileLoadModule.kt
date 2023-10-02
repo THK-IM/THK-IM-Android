@@ -37,6 +37,10 @@ class MinioFileLoadModule(
     private val uploadTaskMap =
         ConcurrentHashMap<String, Pair<MinioLoadTask, MutableList<WeakReference<LoadListener>>>>()
 
+    init {
+        okHttpClient.dispatcher.maxRequests = 32
+        okHttpClient.dispatcher.maxRequestsPerHost = 16
+    }
     fun notifyListeners(
         taskId: String, progress: Int, state: Int, url: String, path: String
     ) {

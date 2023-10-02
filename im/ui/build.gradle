@@ -38,28 +38,22 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation rootProject.ext.dependencies["appcompat"]
+    implementation rootProject.ext.dependencies["rxjava"]
+    implementation rootProject.ext.dependencies["rxandroid"]
+    implementation rootProject.ext.dependencies["permission"]
+    implementation rootProject.ext.dependencies["gson"]
+    implementation rootProject.ext.dependencies["emoji2"]
+    implementation rootProject.ext.dependencies["emoji2-bundled"]
+    implementation rootProject.ext.dependencies["emoji2-views"]
+    implementation rootProject.ext.dependencies["emoji2-views-helper"]
 
     implementation project(":im:base")
     implementation project(":im:core")
     implementation project(":im:db")
     api project(':im:media')
-
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.19'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-
-
-    implementation 'com.google.code.gson:gson:2.10.1'
-
-    // 权限请求框架：https://github.com/getActivity/XXPermissions
-    implementation 'com.github.getActivity:XXPermissions:16.0'
-
-    // unicode emoji表情
-    implementation("androidx.emoji2:emoji2:1.4.0")
-    implementation "androidx.emoji2:emoji2-bundled:1.4.0"
-    implementation("androidx.emoji2:emoji2-views:1.4.0")
-    implementation("androidx.emoji2:emoji2-views-helper:1.4.0")
 }

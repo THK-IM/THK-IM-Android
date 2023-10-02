@@ -1,9 +1,8 @@
-package com.thk.im.android.minio
+package com.thk.im.android.core.fileloader.internal
 
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
-import com.thk.im.android.base.LLog
 import com.thk.im.android.core.fileloader.FileLoadModule
 import com.thk.im.android.core.fileloader.LoadListener
 import okhttp3.ConnectionPool
@@ -12,7 +11,7 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
-class MinioFileLoadModule(
+class DefaultFileLoadModule(
     app: Application,
     val endpoint: String,
     val token: String,
@@ -33,14 +32,15 @@ class MinioFileLoadModule(
         .build()
 
     private val downloadTaskMap =
-        ConcurrentHashMap<String, Pair<MinioLoadTask, MutableList<WeakReference<LoadListener>>>>()
+        ConcurrentHashMap<String, Pair<LoadTask, MutableList<WeakReference<LoadListener>>>>()
     private val uploadTaskMap =
-        ConcurrentHashMap<String, Pair<MinioLoadTask, MutableList<WeakReference<LoadListener>>>>()
+        ConcurrentHashMap<String, Pair<LoadTask, MutableList<WeakReference<LoadListener>>>>()
 
     init {
         okHttpClient.dispatcher.maxRequests = 32
         okHttpClient.dispatcher.maxRequestsPerHost = 16
     }
+
     fun notifyListeners(
         taskId: String, progress: Int, state: Int, url: String, path: String
     ) {
@@ -113,7 +113,7 @@ class MinioFileLoadModule(
         val taskId = getTaskId(url, path, "download")
         val p = downloadTaskMap[taskId]
         if (p == null) {
-            val dTask = MinioDownloadTask(url, path, taskId, this)
+            val dTask = DownloadTask(url, path, taskId, this)
             val listeners = mutableListOf(WeakReference(listener))
             downloadTaskMap[taskId] = Pair(dTask, listeners)
             dTask.start()
@@ -127,7 +127,7 @@ class MinioFileLoadModule(
         val taskId = getTaskId(key, path, "upload")
         val p = uploadTaskMap[taskId]
         if (p == null) {
-            val uTask = MinioUploadTask(key, path, taskId, this)
+            val uTask = UploadTask(key, path, taskId, this)
             val listeners = mutableListOf(WeakReference(listener))
             uploadTaskMap[taskId] = Pair(uTask, listeners)
             uTask.start()

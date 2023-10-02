@@ -1,4 +1,4 @@
-package com.thk.im.android.minio
+package com.thk.im.android.core.fileloader.internal
 
 import com.thk.im.android.base.LLog
 import com.thk.im.android.core.fileloader.LoadListener
@@ -11,12 +11,12 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 
-class MinioDownloadTask(
+class DownloadTask(
     private val url: String,
     private val path: String,
     taskId: String,
-    private val fileLoaderModule: MinioFileLoadModule
-) : MinioLoadTask(taskId) {
+    private val fileLoaderModule: DefaultFileLoadModule
+) : LoadTask(taskId) {
 
     private val tag = "DownloadTask"
     private var running = AtomicBoolean(true)

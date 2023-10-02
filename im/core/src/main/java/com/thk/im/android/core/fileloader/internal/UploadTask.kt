@@ -1,4 +1,4 @@
-package com.thk.im.android.minio
+package com.thk.im.android.core.fileloader.internal
 
 import com.google.gson.Gson
 import com.thk.im.android.base.LLog
@@ -14,12 +14,12 @@ import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 
 
-class MinioUploadTask(
+class UploadTask(
     private val key: String,
     private val path: String,
     taskId: String,
-    private val fileLoaderModule: MinioFileLoadModule
-) : MinioLoadTask(taskId) {
+    private val fileLoaderModule: DefaultFileLoadModule
+) : LoadTask(taskId) {
 
     private var running = AtomicBoolean(true)
     private var call: Call? = null

@@ -1,4 +1,4 @@
-package com.thk.im.android.minio
+package com.thk.im.android.core.fileloader.internal
 
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType

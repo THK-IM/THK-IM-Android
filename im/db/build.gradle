@@ -47,11 +47,11 @@ dependencies {
     implementation 'androidx.test.ext:junit-ktx:1.1.5'
     testImplementation 'junit:junit:4.13.2'
 
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation('com.google.code.gson:gson:2.10.1')
-    debugImplementation 'com.guolindev.glance:glance:1.1.0'
-
-    implementation "androidx.room:room-runtime:2.5.0"
-    annotationProcessor "androidx.room:room-compiler:2.5.0"
-    kapt "androidx.room:room-compiler:2.5.0"
+    implementation rootProject.ext.dependencies["appcompat"]
+    implementation rootProject.ext.dependencies["gson"]
+    debugImplementation rootProject.ext.dependencies["sqlite-glance"]
+    implementation rootProject.ext.dependencies["rxjava"]
+    implementation rootProject.ext.dependencies["room"]
+    annotationProcessor rootProject.ext.dependencies["room-compiler-annotationProcessor"]
+    kapt rootProject.ext.dependencies["room-compiler-kapt"]
 }

@@ -37,12 +37,10 @@ dependencies {
     implementation 'androidx.test.ext:junit-ktx:1.1.5'
     testImplementation 'junit:junit:4.13.2'
 
-    // 选择相册
-    api 'io.github.lucksiege:pictureselector:v3.11.1'
-    api 'io.github.lucksiege:compress:v3.11.1'
-//    implementation 'io.github.lucksiege:ucrop:v3.11.1'
-    implementation 'com.github.bumptech.glide:glide:4.15.1'
+    api rootProject.ext.dependencies["pictureselector"]
+    api rootProject.ext.dependencies["pictureselector-compress"]
+    implementation rootProject.ext.dependencies["glide"]
+    implementation rootProject.ext.dependencies["opuslib"]
 
-    implementation 'top.oply.opuslib:opuslib:1.0.2'
     implementation project(":im:base")
 }

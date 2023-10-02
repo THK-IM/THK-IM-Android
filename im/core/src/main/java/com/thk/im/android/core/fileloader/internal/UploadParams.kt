@@ -1,4 +1,4 @@
-package com.thk.im.android.minio
+package com.thk.im.android.core.fileloader.internal
 
 import com.google.gson.annotations.SerializedName
 

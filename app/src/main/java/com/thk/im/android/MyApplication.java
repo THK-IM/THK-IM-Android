@@ -8,8 +8,8 @@ import com.thk.im.android.base.LLog;
 import com.thk.im.android.base.ToastUtils;
 import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.core.api.internal.DefaultIMApi;
+import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule;
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule;
-import com.thk.im.android.minio.MinioFileLoadModule;
 import com.thk.im.android.ui.manager.IMUIManager;
 
 public class MyApplication extends Application {
@@ -27,7 +27,7 @@ public class MyApplication extends Application {
                 String endpoint = "http://" + host;
                 String wsEndpoint = "ws://192.168.1.3:20000/ws";
                 String token = uid.toString();
-                MinioFileLoadModule fileLoaderModule = new MinioFileLoadModule(MyApplication.this, endpoint, token);
+                DefaultFileLoadModule fileLoaderModule = new DefaultFileLoadModule(MyApplication.this, endpoint, token);
                 IMCoreManager.INSTANCE.setSignalModule(new DefaultSignalModule(MyApplication.this, wsEndpoint, uid.toString()));
                 IMCoreManager.INSTANCE.setImApi(new DefaultIMApi(endpoint, token));
                 IMCoreManager.INSTANCE.init(MyApplication.this, uid, true);

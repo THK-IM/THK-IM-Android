@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.media.MediaMetadataRetriever
+import androidx.core.graphics.scale
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.ByteArrayOutputStream
@@ -26,53 +27,115 @@ object MediaUtils {
 
     fun compress(srcPath: String, size: Int, desPath: String): Flowable<String> {
         return Flowable.create({
-            val length = File(srcPath).length()
-            if (length <= size) {
-                val success = copyFile(srcPath, desPath)
-                if (success) {
-                    it.onNext(desPath)
-                    it.onComplete()
-                    return@create
-                } else {
-                    it.onError(IOException())
-                    return@create
-                }
+            try {
+                compressSync(srcPath, size, desPath)
+                it.onNext(desPath)
+                it.onComplete()
+            } catch (e: Exception) {
+                it.onError(e)
             }
-            val options = BitmapFactory.Options()
-            val rate = sqrt((length / size).toDouble()).toInt() * 2
-            var sample = 2
-            while (sample < rate) {
-                sample *= 2
-            }
-            options.inSampleSize = sample
-
-            val tagBitmap = BitmapFactory.decodeFile(srcPath, options)
-            val stream = ByteArrayOutputStream()
-
-            tagBitmap!!.compress(
-                if (tagBitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
-                if (tagBitmap.hasAlpha()) 100 else 60,
-                stream
-            )
-            tagBitmap.recycle()
-            val desFile = File(desPath)
-            if (desFile.exists()) {
-                desFile.delete()
-            }
-            val success = desFile.createNewFile()
-            if (!success) {
-                it.onError(FileNotFoundException())
-                return@create
-            }
-            val fos = FileOutputStream(desPath)
-            fos.write(stream.toByteArray())
-            fos.flush()
-            fos.close()
-            stream.close()
-            LLog.v("MediaUtils compress :${options.inSampleSize} from $length to ${desFile.length()}")
-            it.onNext(desPath)
-            it.onComplete()
         }, BackpressureStrategy.LATEST)
+    }
+
+    @Throws(Exception::class)
+    fun compressSync(srcPath: String, size: Int, desPath: String) {
+        val length = File(srcPath).length()
+        if (length <= size) {
+            val success = copyFile(srcPath, desPath)
+            if (success) {
+                return
+            } else {
+                throw IOException()
+            }
+        }
+        val options = BitmapFactory.Options()
+        val rate = sqrt((length / size).toDouble()).toInt() * 2
+        var sample = 2
+        while (sample < rate) {
+            sample *= 2
+        }
+        options.inSampleSize = sample
+
+        val tagBitmap = BitmapFactory.decodeFile(srcPath, options)
+        val stream = ByteArrayOutputStream()
+
+        tagBitmap!!.compress(
+            if (tagBitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
+            if (tagBitmap.hasAlpha()) 100 else 60,
+            stream
+        )
+        tagBitmap.recycle()
+        val desFile = File(desPath)
+        if (desFile.exists()) {
+            desFile.delete()
+        }
+        val success = desFile.createNewFile()
+        if (!success) {
+            stream.close()
+            throw IOException()
+        }
+        val fos = FileOutputStream(desPath)
+        fos.write(stream.toByteArray())
+        fos.flush()
+        fos.close()
+        stream.close()
+    }
+
+    @Throws(Exception::class)
+    fun compressSync(source: Bitmap, size: Int, desPath: String) {
+        val pair = getPathsFromFullPath(desPath)
+        val dirFile = File(pair.first)
+        if (!dirFile.exists()) {
+            if (!dirFile.mkdirs()) {
+                throw IOException("create dir $desPath failed")
+            }
+        }
+        val file = File(desPath)
+        if (file.exists()) {
+            if (!file.delete()) {
+                throw IOException("delete file ${file.absolutePath} failed")
+            }
+        }
+        if (!file.createNewFile()) {
+            throw IOException("create file ${file.absolutePath} failed")
+        }
+        val length = source.byteCount
+        if (length <= size) {
+            val outputFileStream = FileOutputStream(desPath)
+            source.compress(Bitmap.CompressFormat.JPEG, 100, outputFileStream)
+            outputFileStream.flush()
+            outputFileStream.close()
+        }
+        val rate = sqrt((length / size).toDouble()).toInt() * 2
+        var sample = 2
+        while (sample < rate) {
+            sample *= 2
+        }
+        val stream = ByteArrayOutputStream()
+        val bitmap = source.scale(
+            (source.width / sqrt(sample.toDouble())).toInt(),
+            (source.height / sqrt(sample.toDouble())).toInt()
+        )
+        bitmap.compress(
+            if (bitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
+            if (bitmap.hasAlpha()) 100 else 60,
+            stream
+        )
+        bitmap.recycle()
+        val desFile = File(desPath)
+        if (desFile.exists()) {
+            desFile.delete()
+        }
+        val success = desFile.createNewFile()
+        if (!success) {
+            stream.close()
+            throw IOException()
+        }
+        val fos = FileOutputStream(desPath)
+        fos.write(stream.toByteArray())
+        fos.flush()
+        fos.close()
+        stream.close()
     }
 
     private fun computeSize(width: Int, height: Int): Int {
@@ -215,16 +278,27 @@ object MediaUtils {
         return false
     }
 
+    @Throws(Exception::class)
     private fun copyFile(srcPath: String, desPath: String): Boolean {
         var input: InputStream? = null
         var output: OutputStream? = null
         var res = false
         try {
-            val desFile = File(desPath)
-            if (!desFile.exists()) {
-                if (!desFile.createNewFile()) {
-                    return false
+            val pair = getPathsFromFullPath(desPath)
+            val dirFile = File(pair.first)
+            if (!dirFile.exists()) {
+                if (!dirFile.mkdirs()) {
+                    throw IOException("create dir $desPath failed")
                 }
+            }
+            val file = File(desPath)
+            if (file.exists()) {
+                if (!file.delete()) {
+                    throw IOException("delete file ${file.absolutePath} failed")
+                }
+            }
+            if (!file.createNewFile()) {
+                throw IOException("create file ${file.absolutePath} failed")
             }
             input = FileInputStream(File(srcPath))
             output = FileOutputStream(File(desPath))
@@ -241,6 +315,16 @@ object MediaUtils {
             output?.close()
         }
         return res
+    }
+
+
+    private fun getPathsFromFullPath(fullPath: String): Pair<String, String> {
+        val i = fullPath.lastIndexOf("/")
+        return if (i <= 0 || i >= fullPath.length) {
+            Pair("", fullPath)
+        } else {
+            Pair(fullPath.substring(0, i), fullPath.substring(i + 1))
+        }
     }
 
 

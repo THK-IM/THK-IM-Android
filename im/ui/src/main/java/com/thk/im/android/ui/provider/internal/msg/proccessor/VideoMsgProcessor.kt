@@ -50,7 +50,13 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             return if (videoData.thumbnailPath == null) {
                 extractVideoFrame(IMCoreManager.storageModule, videoData, pair.second)
             } else {
-                Flowable.just(pair.second)
+                return MediaUtils.compress(
+                    videoData.thumbnailPath!!,
+                    100 * 1024,
+                    videoData.thumbnailPath!!
+                ).flatMap {
+                    Flowable.just(message)
+                }
             }
         } catch (e: Exception) {
             e.message?.let { LLog.e(it) }
@@ -88,7 +94,6 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
         videoData: IMVideoMsgData,
         entity: Message
     ): Flowable<Message> {
-
         try {
             val videoParams = MediaUtils.getVideoParams(videoData.path!!)
                 ?: return Flowable.error(IOException("extractVideoFrame error: ${videoData.path!!}"))
@@ -97,7 +102,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             val thumbName = "${names.first}_cover.jpg"
             val thumbnailPath = IMCoreManager.storageModule
                 .allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
-            storageModule.saveImageInto(thumbnailPath, videoParams.first)
+            MediaUtils.compressSync(videoParams.first, 100 * 1024, thumbnailPath)
             videoParams.first.recycle()
             val sizePair = MediaUtils.getBitmapAspect(thumbnailPath)
             videoData.thumbnailPath = thumbnailPath

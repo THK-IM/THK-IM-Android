@@ -5,26 +5,41 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.os.Build
 import android.os.Bundle
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.animation.doOnEnd
 import androidx.emoji2.widget.EmojiEditText
-import androidx.emoji2.widget.EmojiTextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.hjq.permissions.Permission
+import com.hjq.permissions.XXPermissions
+import com.luck.picture.lib.basic.PictureSelector
+import com.luck.picture.lib.config.SelectMimeType
+import com.luck.picture.lib.engine.CompressFileEngine
+import com.luck.picture.lib.entity.LocalMedia
+import com.luck.picture.lib.interfaces.OnResultCallbackListener
 import com.thk.im.android.base.LLog
+import com.thk.im.android.base.MediaUtils
 import com.thk.im.android.base.popup.KeyboardPopupWindow
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.IMImageMsgData
+import com.thk.im.android.core.IMVideoMsgData
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
+import com.thk.im.android.media.picker.AlbumStyleUtils
+import com.thk.im.android.media.picker.GlideEngine
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.protocol.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.IMMsgSender
+import top.zibin.luban.CompressionPredicate
+import top.zibin.luban.Luban
+import top.zibin.luban.OnNewCompressListener
+import java.io.File
 
 class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow
@@ -112,6 +127,116 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         }
     }
 
+    private fun selectImage() {
+        PictureSelector.create(context).openGallery(SelectMimeType.ofAll())
+            .setImageEngine(GlideEngine.createGlideEngine())
+            .setCompressEngine(CompressFileEngine { context, source, call ->
+                if (source != null && source.size > 0) {
+                    Luban.with(context).load(source).ignoreBy(300)
+                        .filter(object : CompressionPredicate {
+                            override fun apply(path: String?): Boolean {
+                                path?.let {
+                                    val isGif = MediaUtils.isGif(it)
+                                    return !isGif
+                                }
+                                return true
+                            }
+                        })
+                        .setCompressListener(object : OnNewCompressListener {
+                            override fun onStart() {
+                            }
+
+                            override fun onSuccess(source: String?, compressFile: File?) {
+                                call.onCallback(source, compressFile?.absolutePath)
+                            }
+
+                            override fun onError(source: String?, e: Throwable?) {
+                                LLog.e("compress error $e")
+                                call.onCallback(source, null)
+                            }
+
+                        }).launch()
+                }
+            })
+            .isOriginalControl(true)
+            .setSelectorUIStyle(AlbumStyleUtils.getStyle(context))
+            .isDisplayCamera(false)
+            .isGif(true)
+            .isPreviewImage(true)
+            .isWithSelectVideoImage(true)
+            .isPreviewZoomEffect(true)
+            .isPreviewFullScreenMode(false)
+            .isPreviewVideo(true)
+            .forResult(object :
+                OnResultCallbackListener<LocalMedia> {
+                override fun onResult(result: ArrayList<LocalMedia>) {
+                    onMediaResult(result)
+                }
+
+                override fun onCancel() {
+                }
+
+            })
+    }
+
+
+    private fun cameraMedia() {
+        PictureSelector.create(context)
+            .openCamera(SelectMimeType.ofAll())
+            .setCompressEngine(CompressFileEngine { context, source, call ->
+                if (source != null && source.size > 0) {
+                    Luban.with(context).load(source).ignoreBy(300)
+                        .setCompressListener(object : OnNewCompressListener {
+                            override fun onStart() {
+                            }
+
+                            override fun onSuccess(source: String?, compressFile: File?) {
+                                call.onCallback(source, compressFile?.absolutePath)
+                            }
+
+                            override fun onError(source: String?, e: Throwable?) {
+                                call.onCallback(source, null)
+                            }
+
+                        }).launch()
+                }
+            })
+            .forResult(object : OnResultCallbackListener<LocalMedia> {
+                override fun onResult(result: ArrayList<LocalMedia>) {
+                    onMediaResult(result)
+                }
+
+                override fun onCancel() {
+                }
+            })
+    }
+
+    private fun onMediaResult(result: ArrayList<LocalMedia>) {
+        try {
+            for (media in result) {
+                if (media.mimeType.startsWith("video", true)) {
+                    val imageMsgData = IMVideoMsgData()
+                    imageMsgData.path = media.realPath
+                    IMCoreManager.getMessageModule()
+                        .sendMessage(imageMsgData, session!!.id, MsgType.VIDEO.value)
+                } else {
+                    var path = media.compressPath
+                    if (path == null || media.isOriginal) {
+                        path = media.realPath
+                    }
+                    val imageMsgData = IMImageMsgData()
+                    imageMsgData.path = path
+                    IMCoreManager.getMessageModule()
+                        .sendMessage(imageMsgData, session!!.id, MsgType.IMAGE.value)
+                }
+
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
             it?.let {
@@ -160,13 +285,27 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     }
 
     override fun deleteContent(count: Int) {
-         binding.llInputLayout.deleteContent(count)
+        binding.llInputLayout.deleteContent(count)
     }
 
     override fun choosePhoto() {
+        XXPermissions.with(context)
+            .permission(Permission.READ_MEDIA_VIDEO, Permission.READ_MEDIA_IMAGES)
+            .request { _, all ->
+                if (all) {
+                    selectImage()
+                }
+            }
     }
 
     override fun openCamera() {
+        XXPermissions.with(context)
+            .permission(Permission.CAMERA)
+            .request { _, all ->
+                if (all) {
+                    cameraMedia()
+                }
+            }
     }
 
     override fun moveToLatestMessage() {
@@ -177,7 +316,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         binding.llBottomLayout.showBottomPanel(position)
     }
 
-    override fun closeBottomPanel() : Boolean {
+    override fun closeBottomPanel(): Boolean {
         return if (binding.llBottomLayout.getContentHeight() > 0) {
             binding.llBottomLayout.closeBottomPanel()
             true

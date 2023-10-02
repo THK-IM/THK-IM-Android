@@ -8,8 +8,6 @@ import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
-import com.thk.im.android.core.IMImageMsgBody
-import com.thk.im.android.core.IMImageMsgData
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMMsgResourceType
@@ -36,78 +34,6 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
     override fun messageType(): Int {
         return MsgType.VIDEO.value
     }
-
-//    override fun uploadFlowable(entity: Message): Flowable<Message>? {
-//        val body = Gson().fromJson(entity.content, VideoBody::class.java)
-//        val fileName = body.path?.substringAfterLast("/", "")
-//        if (!body.url.isNullOrEmpty()) {
-//            return Flowable.just(entity)
-//        } else if (body.path.isNullOrEmpty() || !File(body.path!!).exists() || fileName.isNullOrBlank()) {
-//            return Flowable.create({
-//                it.onError(FileNotFoundException(entity.content))
-//            }, BackpressureStrategy.LATEST)
-//        } else {
-//            val isAssigned = IMCoreManager.getStorageModule()
-//                .isAssignedPath(body.path!!, fileName, format, entity.sid)
-//            // 如果不是指定的文件地址,需要先拷贝到im的目录下
-//            if (!isAssigned) {
-//                val desPath =
-//                    IMCoreManager.getStorageModule()
-//                        .allocSessionFilePath(entity.sid, fileName, format)
-//                val res = IMCoreManager.getStorageModule().copyFile(body.path!!, desPath)
-//                if (!res) {
-//                    return Flowable.create({
-//                        it.onError(FileNotFoundException())
-//                    }, BackpressureStrategy.LATEST)
-//                }
-//                // path 放入本地数据库
-//                body.path = desPath
-//                entity.content = Gson().toJson(body)
-//                insertOrUpdateDb(entity)
-//            }
-//            val key =
-//                IMCoreManager.fileLoaderModule
-//                    .getUploadKey(entity.sid, entity.fUid, fileName, entity.id)
-//            return Flowable.create({
-//                IMCoreManager.fileLoaderModule
-//                    .upload(key, body.path!!, object : LoadListener {
-//                        override fun onProgress(
-//                            progress: Int,
-//                            state: Int,
-//                            url: String,
-//                            path: String
-//                        ) {
-//                            when (state) {
-//                                LoadListener.Success -> {
-//                                    // url 放入本地数据库
-//                                    body.url = url
-//                                    entity.content = Gson().toJson(body)
-//                                    insertOrUpdateDb(entity)
-//                                    it.onNext(entity)
-//                                }
-//
-//                                LoadListener.Failed -> {
-//                                    it.onError(UploadException())
-//                                }
-//
-//                                else -> {
-//                                    // 不用更新数据库，只用发送事件更新ui
-////                                    entity.data =
-////                                        Gson().toJson(ImageBody.ExtData(state, progress))
-//                                    XEventBus.post(IMEvent.MsgUpdate.value, entity)
-//                                }
-//                            }
-//                        }
-//
-//                        override fun notifyOnUiThread(): Boolean {
-//                            return false
-//                        }
-//
-//                    })
-//            }, BackpressureStrategy.LATEST)
-//
-//        }
-//    }
 
     override fun getSessionDesc(msg: Message): String {
         return "[视频]"
@@ -213,6 +139,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                         pair.second,
                         entity.id
                     )
+                    var over = false
                     IMCoreManager.fileLoadModule
                         .upload(key, videoData.thumbnailPath!!, object : LoadListener {
 
@@ -249,10 +176,12 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                         )
                                         it.onNext(entity)
                                         it.onComplete()
+                                        over = true
                                     }
 
                                     else -> {
                                         it.onError(UploadException())
+                                        over = true
                                     }
                                 }
                             }
@@ -261,6 +190,10 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
+                    // 防止线程被回收
+                    while (!over) {
+                        Thread.sleep(200)
+                    }
                 }, BackpressureStrategy.LATEST)
             }
         } catch (e: Exception) {
@@ -282,6 +215,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                 return Flowable.error(FileNotFoundException())
             } else {
                 val pair = IMCoreManager.storageModule.getPathsFromFullPath(videoData.path!!)
+                var over = false
                 return Flowable.create({
                     val key = IMCoreManager.fileLoadModule.getUploadKey(
                         entity.sid,
@@ -317,10 +251,12 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                         entity.content = Gson().toJson(videoBody)
                                         it.onNext(entity)
                                         it.onComplete()
+                                        over = true
                                     }
 
                                     else -> {
                                         it.onError(UploadException())
+                                        over = true
                                     }
                                 }
                             }
@@ -329,6 +265,10 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
+                    // 防止线程被回收
+                    while (!over) {
+                        Thread.sleep(200)
+                    }
                 }, BackpressureStrategy.LATEST)
             }
         } catch (e: Exception) {
@@ -383,6 +323,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                             LoadListener.Wait,
                             LoadListener.Ing -> {
                             }
+
                             LoadListener.Success -> {
                                 if (data == null) {
                                     data = IMVideoMsgData()

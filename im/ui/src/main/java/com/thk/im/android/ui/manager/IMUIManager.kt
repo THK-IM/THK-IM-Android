@@ -16,7 +16,7 @@ import com.thk.im.android.ui.provider.internal.msg.TextMsgIVProvider
 import com.thk.im.android.ui.provider.internal.msg.TimeLineMsgIVProvider
 import com.thk.im.android.ui.provider.internal.msg.UnSupportMsgIVProvider
 import com.thk.im.android.ui.provider.internal.msg.VideoMsgIVProvider
-import com.thk.im.android.ui.provider.internal.msg.VoiceMsgIVProvider
+import com.thk.im.android.ui.provider.internal.msg.AudioMsgIVProvider
 import com.thk.im.android.ui.provider.internal.msg.proccessor.AudioMsgProcessor
 import com.thk.im.android.ui.provider.internal.msg.proccessor.ImageMsgProcessor
 import com.thk.im.android.ui.provider.internal.msg.proccessor.TextMsgProcessor
@@ -73,7 +73,7 @@ object IMUIManager {
             UnSupportMsgIVProvider(),
             TextMsgIVProvider(),
             ImageMsgIVProvider(),
-            VoiceMsgIVProvider(),
+            AudioMsgIVProvider(),
             VideoMsgIVProvider()
         )
         registerMsgIVProvider(*providers)

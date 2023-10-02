@@ -25,9 +25,9 @@ data class MessageBean(
     @SerializedName("status")
     var status: Int? = null,
     @SerializedName("at_users")
-    var atUsers: String? = "",
+    var atUsers: String? = null,
     @SerializedName("r_msg_id")
-    var rMsgId: Long? = 0,
+    var rMsgId: Long? = null,
     @SerializedName("c_time")
     var cTime: Long = 0,
 ) : Parcelable {

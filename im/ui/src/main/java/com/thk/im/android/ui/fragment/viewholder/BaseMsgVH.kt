@@ -18,6 +18,7 @@ import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.db.MsgSendStatus
+import com.thk.im.android.db.SessionType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.db.entity.User
@@ -52,6 +53,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
      * ViewHolder 绑定数据触发设置界面ui
      */
     open fun onViewBind(message: Message, session: Session) {
+        onViewDetached()
         this.message = message
         this.session = session
 
@@ -91,11 +93,11 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
 
     open fun renderUserInfo() {
         tvNicknameView?.let {
-//            if (session.type != SessionType.Single.value) {
-//                it.visibility = View.VISIBLE
-//            } else {
-//                it.visibility = View.GONE
-//            }
+            if (session.type != SessionType.Single.value) {
+                it.visibility = View.VISIBLE
+            } else {
+                it.visibility = View.GONE
+            }
             it.visibility = View.VISIBLE
         }
 

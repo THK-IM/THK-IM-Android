@@ -70,7 +70,7 @@ class IMBottomLayout : ConstraintLayout {
 
         val gridLayoutManager = GridLayoutManager(context, 4)
         binding.rcvFunctions.layoutManager = gridLayoutManager
-        val functionsAdapter = IMFunctionAdapter()
+        val functionsAdapter = IMFunctionAdapter(this.msgSender)
         binding.rcvFunctions.adapter = functionsAdapter
     }
 

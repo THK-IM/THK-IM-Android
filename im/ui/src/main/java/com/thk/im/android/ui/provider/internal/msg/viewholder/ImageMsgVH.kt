@@ -28,27 +28,41 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
 
     override fun onViewBind(message: Message, session: Session) {
         super.onViewBind(message, session)
-        XEventBus.unObserve(IMEvent.MsgLoadStatusUpdate.value, this)
         XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
+
         if (message.data.isNotEmpty() && message.data.isNotBlank()) {
             val imageMsgData = Gson().fromJson(message.data, IMImageMsgData::class.java)
-            imageMsgData?.let { data ->
-                if (data.thumbnailPath != null && data.width != null && data.height != null) {
-                    setLayoutParams(data.width!!, data.height!!)
-                    renderImageData(data)
-                    return@onViewBind
+            imageMsgData?.let {
+                renderData(it)
+                return@onViewBind
+            }
+        }
+
+        if (message.content.isNotEmpty() && message.content.isNotBlank()) {
+            val imageMsgBody = Gson().fromJson(message.content, IMImageMsgBody::class.java)
+            imageMsgBody?.let {
+                renderBody(it)
+                // 开始下载
+                if (it.thumbnailUrl.isNullOrEmpty()) {
+                    IMCoreManager.getMessageModule().getMsgProcessor(message.type)
+                        .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
                 }
             }
         }
-        if (message.content.isNotEmpty() && message.content.isNotBlank()) {
-            val imageMsgBody = Gson().fromJson(message.content, IMImageMsgBody::class.java)
-            if (imageMsgBody.width != null && imageMsgBody.height != null) {
-                setLayoutParams(imageMsgBody.width!!, imageMsgBody.height!!)
-            }
-            if (!imageMsgBody.thumbnailUrl.isNullOrEmpty()) {
-                IMCoreManager.getMessageModule().getMsgProcessor(message.type)
-                    .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
-            }
+    }
+
+    private fun renderData(imageMsgData: IMImageMsgData) {
+        if (imageMsgData.width != null && imageMsgData.height != null) {
+            setLayoutParams(imageMsgData.width!!, imageMsgData.height!!)
+        }
+        if (imageMsgData.thumbnailPath != null) {
+            renderImage(imageMsgData.thumbnailPath!!)
+        }
+    }
+
+    private fun renderBody(imageMsgBody: IMImageMsgBody) {
+        if (imageMsgBody.width != null && imageMsgBody.height != null) {
+            setLayoutParams(imageMsgBody.width!!, imageMsgBody.height!!)
         }
     }
 
@@ -70,12 +84,10 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         imageView.visibility = View.INVISIBLE
     }
 
-    private fun renderImageData(imageMsgData: IMImageMsgData) {
-        imageMsgData.thumbnailPath?.let {
-            val imageView: ImageView = contentContainer.findViewById(R.id.iv_msg_content)
-            imageView.visibility = View.VISIBLE
-            IMImageLoader.displayImageByPath(imageView, it)
-        }
+    private fun renderImage(path: String) {
+        val imageView: ImageView = contentContainer.findViewById(R.id.iv_msg_content)
+        imageView.visibility = View.VISIBLE
+        IMImageLoader.displayImageByPath(imageView, path)
     }
 
     override fun onViewDetached() {

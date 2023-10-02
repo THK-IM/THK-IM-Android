@@ -64,5 +64,23 @@ public class DateUtil {
         return format.format(date);
     }
 
+    public static String getDuration(int duration) {
+        if (duration < 60) {
+            return addZero(duration) + "s";
+        } else if (duration < 3600) {
+            return addZero(duration / 60) + "m" + addZero(duration % 60) + "s";
+        } else {
+            return addZero(duration / 3600) + "m" + addZero((duration % 3600) / 60) + "m" + addZero(duration % 60) + "s";
+        }
+    }
+
+    private static String addZero(int number) {
+        if (number >= 10) {
+            return String.valueOf(number);
+        } else {
+            return "0" + number;
+        }
+    }
+
 
 }

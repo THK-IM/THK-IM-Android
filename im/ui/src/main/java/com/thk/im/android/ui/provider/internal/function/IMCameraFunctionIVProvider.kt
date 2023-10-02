@@ -18,6 +18,6 @@ class IMCameraFunctionIVProvider: IMBaseFunctionIVProvider() {
     }
 
     override fun click(sender: IMMsgSender) {
-
+        sender.openCamera()
     }
 }

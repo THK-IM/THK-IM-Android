@@ -18,6 +18,6 @@ class IMAlbumFunctionIVProvider : IMBaseFunctionIVProvider() {
     }
 
     override fun click(sender: IMMsgSender) {
-
+        sender.choosePhoto()
     }
 }

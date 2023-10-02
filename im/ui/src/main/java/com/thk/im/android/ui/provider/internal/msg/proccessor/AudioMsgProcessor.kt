@@ -27,8 +27,6 @@ import java.io.FileNotFoundException
 
 class AudioMsgProcessor : BaseMsgProcessor() {
 
-    private val format = "voice"
-
     override fun messageType(): Int {
         return MsgType.Audio.value
     }

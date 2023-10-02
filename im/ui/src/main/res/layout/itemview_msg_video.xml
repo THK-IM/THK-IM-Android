@@ -2,22 +2,20 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="10dp"
+    android:paddingVertical="5dp"
     android:paddingHorizontal="10dp"
     >
-
-    <ImageView
-        android:id="@+id/iv_msg_video_thumbnail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        />
-
     <RelativeLayout
-        android:id="@+id/rl_msg_video_prompt"
+        android:id="@+id/rl_msg_video_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         >
+        <ImageView
+            android:id="@+id/iv_msg_video_thumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            />
         <ImageView
             android:id="@+id/iv_video_play"
             android:layout_width="30dp"
@@ -30,13 +28,13 @@
             android:id="@+id/tv_video_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/dp10"
+            android:paddingHorizontal="6dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/dp10"
-            android:layout_marginBottom="@dimen/dp10"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@drawable/bg_tv_msg_tips"
-            android:textColor="@color/white"
+            android:textColor="@color/font_bg_main"
             android:textSize="11sp" />
     </RelativeLayout>
 </FrameLayout>

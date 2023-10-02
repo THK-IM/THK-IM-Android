@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.thk.android.im.live.LiveManager;
 import com.thk.im.android.base.AppUtils;
+import com.thk.im.android.base.LLog;
 import com.thk.im.android.base.ToastUtils;
 import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.core.api.internal.DefaultIMApi;
@@ -16,6 +17,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        LLog.v("onCreate MyApplication");
         AppUtils.instance().init(this);
         ToastUtils.init(this);
         new Thread() {

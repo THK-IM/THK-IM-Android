@@ -3,6 +3,7 @@ package com.thk.im.android.ui.fragment.adapter
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.thk.im.android.base.LLog
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.manager.IMUIManager
@@ -62,13 +63,15 @@ class MessageAdapter(
     }
 
     private fun addTimelineMessage(message: Message): Message? {
-        val msg = if (abs(message.cTime - lastMessageTime) > timeLineInterval) {
-            newTimelineMessage(message.cTime)
-        } else {
-            null
+        synchronized(this) {
+            val msg = if (abs(message.cTime - lastMessageTime) > timeLineInterval) {
+                newTimelineMessage(message.cTime)
+            } else {
+                null
+            }
+            lastMessageTime = message.cTime
+            return msg
         }
-        lastMessageTime = message.cTime
-        return msg
     }
 
     private fun addTimelineMessages(messages: List<Message>): List<Message> {
@@ -126,13 +129,11 @@ class MessageAdapter(
                 }
                 val timelineMsg = addTimelineMessage(message)
                 if (timelineMsg != null) {
-                    messageList.add(position, message)
-                    messageList.add(position + 1, timelineMsg)
-                    notifyItemRangeInserted(position, 2)
-                } else {
-                    messageList.add(position, message)
+                    messageList.add(position, timelineMsg)
                     notifyItemRangeInserted(position, 1)
                 }
+                messageList.add(position, message)
+                notifyItemRangeInserted(position, 1)
                 return position
             }
         }
@@ -149,22 +150,26 @@ class MessageAdapter(
     }
 
     private fun findPosition(message: Message): Int {
-        for ((pos, m) in messageList.withIndex()) {
-            if (message.id == m.id) {
-                return pos
+        synchronized(this) {
+            for ((pos, m) in messageList.withIndex()) {
+                if (message.id == m.id) {
+                    return pos
+                }
             }
+            return -1
         }
-        return -1
     }
 
 
     private fun findInsertPosition(message: Message): Int {
-        for ((pos, m) in messageList.withIndex()) {
-            if (message.cTime >= m.cTime) {
-                return pos
+        synchronized(this) {
+            for ((pos, m) in messageList.withIndex()) {
+                if (message.cTime >= m.cTime) {
+                    return pos
+                }
             }
+            return messageList.size
         }
-        return messageList.size
     }
 
     fun delete(message: Message) {

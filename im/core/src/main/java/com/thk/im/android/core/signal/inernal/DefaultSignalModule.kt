@@ -122,12 +122,16 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     override fun connect() {
+        NetworkManager.getInstance().registerObserver(this)
+        startConnect()
+    }
+
+    private fun startConnect() {
         synchronized(this) {
             if (status == SignalListener.StatusConnecting || status == SignalListener.StatusConnected) {
                 return
             }
             onStatusChange(SignalListener.StatusConnecting)
-            NetworkManager.getInstance().registerObserver(this)
             val request = Request.Builder()
                 .header("token", token)
                 .header("platform", "android")
@@ -180,7 +184,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             && NetworkUtils.isAvailable()
         ) {
             mHandler.postDelayed({
-                connect()
+                startConnect()
             }, reconnectInterval * reconnectTimes)
             if (reconnectTimes < 100) {
                 reconnectTimes++ // 最多100x100ms=10s重连

@@ -291,7 +291,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                 insertOrUpdateDb(t, notify = true, notifySession = false)
             }
         }
-        Flowable.create(
+        Flowable.create<Message>(
             {
                 var data = Gson().fromJson(entity.data, IMVideoMsgData::class.java)
                 val body = Gson().fromJson(entity.content, IMVideoMsgBody::class.java)

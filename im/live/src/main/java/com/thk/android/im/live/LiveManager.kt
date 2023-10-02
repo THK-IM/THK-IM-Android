@@ -2,8 +2,10 @@ package com.thk.android.im.live
 
 import android.app.Application
 import android.content.Context
+import android.content.pm.PackageManager
+import android.media.AudioDeviceInfo
 import android.media.AudioManager
-import com.thk.android.im.live.room.Room
+import android.os.Build
 import com.thk.android.im.live.api.ApiManager
 import com.thk.android.im.live.api.RoomApi
 import com.thk.android.im.live.bean.CreateRoomReqBean
@@ -12,7 +14,7 @@ import com.thk.android.im.live.room.Member
 import com.thk.android.im.live.room.Mode
 import com.thk.android.im.live.room.PCFactoryWrapper
 import com.thk.android.im.live.room.Role
-import com.thk.im.android.base.LLog
+import com.thk.android.im.live.room.Room
 import io.reactivex.Flowable
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
@@ -20,6 +22,7 @@ import org.webrtc.EglBase
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.audio.JavaAudioDeviceModule
 import org.webrtc.audio.JavaAudioDeviceModule.SamplesReadyCallback
+
 
 class LiveManager private constructor() {
 
@@ -49,7 +52,18 @@ class LiveManager private constructor() {
         )
         // 设置扬声器播放
         val audioManager = app.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager.isSpeakerphoneOn = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&  // Check FEATURE_AUDIO_OUTPUT to guard against false positives.
+            app.packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)
+        ) {
+            val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+            for (device in devices) {
+                if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                    audioManager.setCommunicationDevice(device)
+                }
+            }
+        } else {
+            audioManager.isSpeakerphoneOn = true
+        }
         audioManager.mode = AudioManager.MODE_NORMAL
     }
 

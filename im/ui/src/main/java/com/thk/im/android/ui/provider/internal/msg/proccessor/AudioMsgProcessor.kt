@@ -164,7 +164,7 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                 insertOrUpdateDb(t, notify = true, notifySession = false)
             }
         }
-        Flowable.create(
+        Flowable.create<Message>(
             {
                 var data = Gson().fromJson(entity.data, IMAudioMsgData::class.java)
                 val body = Gson().fromJson(entity.content, IMAudioMsgBody::class.java)

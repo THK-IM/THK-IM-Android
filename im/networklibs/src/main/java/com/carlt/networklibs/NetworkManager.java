@@ -1,7 +1,11 @@
 package com.carlt.networklibs;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkRequest;
+import android.os.Build;
 
 import com.carlt.networklibs.utils.Constants;
 
@@ -47,20 +51,16 @@ public class NetworkManager {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.ANDROID_NET_ACTION);
         application.registerReceiver(receiver, filter);
-        //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        //            NetworkCallbackImpl networkCallback = new NetworkCallbackImpl();
-        //            NetworkRequest.Builder builder = new NetworkRequest.Builder();
-        //            NetworkRequest request = builder.build();
-        //            ConnectivityManager connmagr = (ConnectivityManager) NetworkManager.getInstance()
-        //                    .getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
-        //            if (connmagr != null) {
-        //                connmagr.registerNetworkCallback(request, networkCallback);
-        //                //                connmagr.unregisterNetworkCallback(networkCallback);
-        //            }
-        //
-        //        } else {
-        //
-        //        }
+        NetworkCallbackImpl networkCallback = new NetworkCallbackImpl();
+        NetworkRequest.Builder builder = new NetworkRequest.Builder();
+        NetworkRequest request = builder.build();
+        ConnectivityManager connectivityManager = (ConnectivityManager) NetworkManager.getInstance()
+                .getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            connectivityManager.registerNetworkCallback(request, networkCallback);
+            //                connmagr.unregisterNetworkCallback(networkCallback);
+        }
+
     }
 
     public void registerObserver(Object register) {

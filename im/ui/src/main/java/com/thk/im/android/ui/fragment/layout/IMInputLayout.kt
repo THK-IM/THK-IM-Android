@@ -226,7 +226,7 @@ class IMInputLayout : ConstraintLayout {
                 return
             }
             val chars = binding.etMessage.text.toString().toCharArray()
-            for (i in 0 ..< count) {
+            for (i in 0 until count) {
                 if (index >= 2) {
                     if (Character.isSurrogatePair(chars[index - 2], chars[index - 1])) {
                         binding.etMessage.text.delete(index - 2, index)

@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.media.MediaMetadataRetriever
-import androidx.core.graphics.scale
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.ByteArrayOutputStream
@@ -116,9 +115,20 @@ object MediaUtils {
             sample *= 2
         }
         val stream = ByteArrayOutputStream()
-        val bitmap = source.scale(
-            (source.width / sqrt(sample.toDouble())).toInt(),
-            (source.height / sqrt(sample.toDouble())).toInt()
+        val m = Matrix()
+
+        val width: Int = source.width
+        val height: Int = source.height
+        val scale = sqrt(sample.toDouble()).toFloat()
+        m.setScale(scale, scale)
+        val bitmap = Bitmap.createBitmap(
+            source,
+            0,
+            0,
+            (width / scale).toInt(),
+            (height / scale).toInt(),
+            m,
+            true
         )
         bitmap.compress(
             if (bitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,

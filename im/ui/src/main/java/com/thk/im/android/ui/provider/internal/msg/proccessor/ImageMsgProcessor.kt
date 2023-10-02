@@ -285,7 +285,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                 insertOrUpdateDb(t, notify = true, notifySession = false)
             }
         }
-        Flowable.create(
+        Flowable.create<Message>(
             {
                 var data = Gson().fromJson(entity.data, IMImageMsgData::class.java)
                 val body = Gson().fromJson(entity.content, IMImageMsgBody::class.java)

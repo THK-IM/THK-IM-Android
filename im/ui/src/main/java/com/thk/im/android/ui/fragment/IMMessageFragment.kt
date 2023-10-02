@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.core.animation.doOnEnd
 import androidx.emoji2.widget.EmojiEditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -121,7 +120,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         animators.play(msgAnimator).with(animator).with(bottomAnimator)
         animators.start()
 
-        animator.doOnEnd {
+        animator.addUpdateListener {
             binding.llInputLayout.onKeyboardChange(isKeyboardShow, bottomHeight, duration)
             binding.llBottomLayout.onKeyboardChange(isKeyboardShow, bottomHeight, duration)
         }

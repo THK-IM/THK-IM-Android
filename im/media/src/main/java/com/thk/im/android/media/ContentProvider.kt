@@ -9,9 +9,9 @@ import com.luck.picture.lib.entity.LocalMedia
 import com.luck.picture.lib.interfaces.OnResultCallbackListener
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.MediaUtils
+import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.media.audio.OggOpusRecorder
-import com.thk.im.android.media.picker.AlbumStyleUtils
 import com.thk.im.android.media.picker.GlideEngine
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.protocol.AudioCallback
@@ -32,7 +32,7 @@ class ContentProvider(app: Application) : IMContentProvider {
 
     override fun openCamera(
         activity: Activity,
-        format: com.thk.im.android.core.IMFileFormat,
+        formats: List<IMFileFormat>,
         imContentResult: IMContentResult
     ) {
         PictureSelector.create(activity)
@@ -69,7 +69,7 @@ class ContentProvider(app: Application) : IMContentProvider {
 
     override fun pick(
         activity: Activity,
-        formats: List<com.thk.im.android.core.IMFileFormat>,
+        formats: List<IMFileFormat>,
         imContentResult: IMContentResult
     ) {
         PictureSelector.create(activity).openGallery(SelectMimeType.ofAll())
@@ -103,7 +103,7 @@ class ContentProvider(app: Application) : IMContentProvider {
                 }
             })
             .isOriginalControl(true)
-            .setSelectorUIStyle(AlbumStyleUtils.getStyle(activity))
+//            .setSelectorUIStyle())
             .isDisplayCamera(false)
             .isGif(true)
             .isPreviewImage(true)

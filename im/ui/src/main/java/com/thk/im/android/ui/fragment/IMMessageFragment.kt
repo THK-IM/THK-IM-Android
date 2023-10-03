@@ -141,7 +141,19 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
 
     private fun cameraMedia() {
+        activity?.let {
+            IMUIManager.contentProvider?.openCamera(it,
+                listOf(IMFileFormat.Image, IMFileFormat.Video),
+                object : IMContentResult {
+                    override fun onResult(result: List<IMFile>) {
+                        onMediaResult(result)
+                    }
 
+                    override fun onCancel() {
+                    }
+
+                })
+        }
     }
 
     private fun onMediaResult(result: List<IMFile>) {

@@ -6,7 +6,7 @@ import com.thk.im.android.ui.manager.IMFile
 
 interface IMContentProvider {
 
-    fun openCamera(activity: Activity, format: IMFileFormat, imContentResult: IMContentResult)
+    fun openCamera(activity: Activity, formats: List<IMFileFormat>, imContentResult: IMContentResult)
 
     fun pick(activity: Activity, formats: List<IMFileFormat>, imContentResult: IMContentResult)
 

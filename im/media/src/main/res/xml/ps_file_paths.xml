@@ -2,10 +2,10 @@
 <resources>
     <paths>
         <external-path
-            name="camera_photos"
-            path="" />
+            name="external"
+            path="/external" />
         <root-path
-            name="camera_photos"
-            path="" />
+            name="provider"
+            path="/provider" />
     </paths>
 </resources>

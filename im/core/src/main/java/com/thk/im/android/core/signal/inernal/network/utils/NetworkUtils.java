@@ -1,4 +1,4 @@
-package com.carlt.networklibs.utils;
+package com.thk.im.android.core.signal.inernal.network.utils;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -7,28 +7,20 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.carlt.networklibs.NetType;
-import com.carlt.networklibs.NetworkManager;
+import com.thk.im.android.core.signal.inernal.network.NetType;
+import com.thk.im.android.core.signal.inernal.network.NetworkManager;
 
-
-/**
- * Description:
- * Company    : carlt
- * Author     : zhanglei
- * Date       : 2019/2/26 16:09
- */
 public class NetworkUtils {
     /**
      * 网络是否可用
-     * @return
      */
-    @SuppressWarnings("MissingPermission")
     public static boolean isAvailable() {
-        ConnectivityManager connmagr = (ConnectivityManager) NetworkManager.getInstance().getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connmagr == null) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) NetworkManager.getInstance().getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) {
             return false;
         }
-        NetworkInfo[] allNetworkInfo = connmagr.getAllNetworkInfo();
+        NetworkInfo[] allNetworkInfo = connectivityManager.getAllNetworkInfo();
         if (allNetworkInfo != null) {
             for (NetworkInfo networkInfo : allNetworkInfo) {
                 if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
@@ -36,35 +28,32 @@ public class NetworkUtils {
                 }
             }
         }
-
-
         return false;
     }
 
     /**
      * 获取网络类型
-     * @return
      */
     public static NetType getNetType() {
-        ConnectivityManager connmagr = (ConnectivityManager) NetworkManager.getInstance().getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connmagr == null) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) NetworkManager.getInstance().getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) {
             return NetType.NONE;
         }
-        NetworkInfo activeNetworkInfo = connmagr.getActiveNetworkInfo();
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         if (activeNetworkInfo != null) {
             int type = activeNetworkInfo.getType();
-            if (type == ConnectivityManager.TYPE_MOBILE) {
-                String extraInfo = activeNetworkInfo.getExtraInfo();
-                if (extraInfo != null && !extraInfo.isEmpty()) {
-                    if (extraInfo.equalsIgnoreCase("cmnet")) {
-                        return NetType.CMNET;
-                    } else {
-                        return NetType.CMWAP;
-                    }
-                }
+            if (type == ConnectivityManager.TYPE_MOBILE  ||
+                    type == ConnectivityManager.TYPE_MOBILE_SUPL ||
+                    type == ConnectivityManager.TYPE_MOBILE_HIPRI ||
+                    type == ConnectivityManager.TYPE_MOBILE_MMS ||
+                    type == ConnectivityManager.TYPE_MOBILE_DUN
+            ) {
+                return NetType.Mobile;
             } else if (type == ConnectivityManager.TYPE_WIFI) {
                 return NetType.WIFI;
-
+            } else {
+                return NetType.Unknown;
             }
         }
         return NetType.NONE;

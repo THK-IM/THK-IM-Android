@@ -3,15 +3,15 @@ package com.thk.im.android.core.signal.inernal
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
-import com.carlt.networklibs.NetType
-import com.carlt.networklibs.NetworkManager
-import com.carlt.networklibs.annotation.NetWork
-import com.carlt.networklibs.utils.NetworkUtils
 import com.google.gson.Gson
 import com.thk.im.android.base.LLog
 import com.thk.im.android.core.signal.Signal
 import com.thk.im.android.core.signal.SignalListener
 import com.thk.im.android.core.signal.SignalModule
+import com.thk.im.android.core.signal.inernal.network.NetType
+import com.thk.im.android.core.signal.inernal.network.NetworkListener
+import com.thk.im.android.core.signal.inernal.network.NetworkManager
+import com.thk.im.android.core.signal.inernal.network.utils.NetworkUtils
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -20,7 +20,7 @@ import okhttp3.WebSocketListener
 import java.util.concurrent.TimeUnit
 
 
-class DefaultSignalModule(app: Application, wsUrl: String, token: String) : SignalModule {
+class DefaultSignalModule(app: Application, wsUrl: String, token: String) : SignalModule, NetworkListener {
     private val mHandler = Handler(Looper.getMainLooper())
     private val heatBeatInterval = 10 * 1000L
     private val reconnectInterval = 200L // 200ms
@@ -125,6 +125,13 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         NetworkManager.getInstance().registerObserver(this)
         startConnect()
     }
+    override fun disconnect(reason: String) {
+        NetworkManager.getInstance().unRegisterObserver(this)
+        webSocket?.close(0, reason)
+        webSocket = null
+        signalListener = null
+        mHandler.removeCallbacksAndMessages(null)
+    }
 
     private fun startConnect() {
         synchronized(this) {
@@ -166,14 +173,6 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         signalListener = listener
     }
 
-    override fun disconnect(reason: String) {
-        NetworkManager.getInstance().unRegisterObserver(this)
-        webSocket?.close(0, reason)
-        webSocket = null
-        signalListener = null
-        mHandler.removeCallbacksAndMessages(null)
-    }
-
     private fun onStatusChange(status: Int) {
         this.status = status
         signalListener?.onSignalStatusChange(status)
@@ -192,20 +191,6 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         }
     }
 
-    @NetWork(netType = NetType.AUTO)
-    fun network(netType: NetType?) {
-        when (netType) {
-            NetType.WIFI, NetType.CMNET, NetType.CMWAP, NetType.AUTO -> {
-                LLog.d("有网络")
-                reconnectTimes = 0
-                reconnect()
-            }
-
-            NetType.NONE -> LLog.d("无网络")
-            else -> {}
-        }
-    }
-
     private fun heatBeat() {
         if (status == SignalListener.StatusConnected) {
             try {
@@ -216,6 +201,19 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             mHandler.postDelayed({
                 heatBeat()
             }, heatBeatInterval)
+        }
+    }
+
+    override fun onNetworkChangeListener(type: NetType?) {
+        type?.let {
+            when (it) {
+                NetType.WIFI, NetType.Mobile, NetType.Unknown -> {
+                    LLog.d("有网络")
+                    reconnectTimes = 0
+                    reconnect()
+                }
+                NetType.NONE -> LLog.d("无网络")
+            }
         }
     }
 

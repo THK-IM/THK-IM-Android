@@ -57,5 +57,4 @@ dependencies {
 
     implementation project(":im:db")
     implementation project(":im:base")
-    implementation project(":im:networklibs")
 }

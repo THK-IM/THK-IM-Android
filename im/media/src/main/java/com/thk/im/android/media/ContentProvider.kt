@@ -21,7 +21,6 @@ import top.zibin.luban.CompressionPredicate
 import top.zibin.luban.Luban
 import top.zibin.luban.OnNewCompressListener
 import java.io.File
-import java.lang.ref.WeakReference
 
 class ContentProvider(app: Application) : IMContentProvider {
 
@@ -31,12 +30,9 @@ class ContentProvider(app: Application) : IMContentProvider {
     }
 
     override fun openCamera(
-        activity: Activity,
-        formats: List<IMFileFormat>,
-        imContentResult: IMContentResult
+        activity: Activity, formats: List<IMFileFormat>, imContentResult: IMContentResult
     ) {
-        PictureSelector.create(activity)
-            .openCamera(SelectMimeType.ofAll())
+        PictureSelector.create(activity).openCamera(SelectMimeType.ofAll())
             .setCompressEngine(CompressFileEngine { context, source, call ->
                 if (source != null && source.size > 0) {
                     Luban.with(context).load(source).ignoreBy(300)
@@ -54,8 +50,7 @@ class ContentProvider(app: Application) : IMContentProvider {
 
                         }).launch()
                 }
-            })
-            .forResult(object : OnResultCallbackListener<LocalMedia> {
+            }).forResult(object : OnResultCallbackListener<LocalMedia> {
                 override fun onResult(result: ArrayList<LocalMedia>) {
                     onMediaResult(result, imContentResult)
                 }
@@ -68,9 +63,7 @@ class ContentProvider(app: Application) : IMContentProvider {
     }
 
     override fun pick(
-        activity: Activity,
-        formats: List<IMFileFormat>,
-        imContentResult: IMContentResult
+        activity: Activity, formats: List<IMFileFormat>, imContentResult: IMContentResult
     ) {
         PictureSelector.create(activity).openGallery(SelectMimeType.ofAll())
             .setImageEngine(GlideEngine.createGlideEngine())
@@ -85,8 +78,7 @@ class ContentProvider(app: Application) : IMContentProvider {
                                 }
                                 return true
                             }
-                        })
-                        .setCompressListener(object : OnNewCompressListener {
+                        }).setCompressListener(object : OnNewCompressListener {
                             override fun onStart() {
                             }
 
@@ -101,18 +93,11 @@ class ContentProvider(app: Application) : IMContentProvider {
 
                         }).launch()
                 }
-            })
-            .isOriginalControl(true)
+            }).isOriginalControl(true)
 //            .setSelectorUIStyle())
-            .isDisplayCamera(false)
-            .isGif(true)
-            .isPreviewImage(true)
-            .isWithSelectVideoImage(true)
-            .isPreviewZoomEffect(true)
-            .isPreviewFullScreenMode(false)
-            .isPreviewVideo(true)
-            .forResult(object :
-                OnResultCallbackListener<LocalMedia> {
+            .isDisplayCamera(false).isGif(true).isPreviewImage(true).isWithSelectVideoImage(true)
+            .isPreviewZoomEffect(true).isPreviewFullScreenMode(false).isPreviewVideo(true)
+            .forResult(object : OnResultCallbackListener<LocalMedia> {
                 override fun onResult(result: ArrayList<LocalMedia>) {
                     onMediaResult(result, imContentResult)
                 }
@@ -124,9 +109,7 @@ class ContentProvider(app: Application) : IMContentProvider {
     }
 
     override fun startRecordAudio(
-        path: String,
-        duration: Int,
-        audioCallback: AudioCallback
+        path: String, duration: Int, audioCallback: AudioCallback
     ): Boolean {
         return OggOpusRecorder.startRecord(path, duration, audioCallback)
     }
@@ -152,8 +135,7 @@ class ContentProvider(app: Application) : IMContentProvider {
     }
 
     private fun onMediaResult(
-        result: List<LocalMedia>,
-        imContentResult: IMContentResult
+        result: List<LocalMedia>, imContentResult: IMContentResult
     ) {
         val files = mutableListOf<IMFile>()
         for (media in result) {

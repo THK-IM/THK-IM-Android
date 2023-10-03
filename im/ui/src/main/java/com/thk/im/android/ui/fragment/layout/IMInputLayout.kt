@@ -47,8 +47,11 @@ class IMInputLayout : ConstraintLayout {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int)
-            : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     init {
         val view = LayoutInflater.from(context).inflate(R.layout.layout_message_input, this, true)
@@ -159,8 +162,7 @@ class IMInputLayout : ConstraintLayout {
                     }
                 }
 
-                MotionEvent.ACTION_CANCEL,
-                MotionEvent.ACTION_UP -> {
+                MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                     stopAudioRecording()
                 }
             }
@@ -243,9 +245,7 @@ class IMInputLayout : ConstraintLayout {
     private fun checkAudioPermission() {
         val granted = XXPermissions.isGranted(context, Permission.RECORD_AUDIO)
         if (!granted) {
-            XXPermissions.with(context)
-                .permission(Permission.RECORD_AUDIO)
-                .request { _, all ->
+            XXPermissions.with(context).permission(Permission.RECORD_AUDIO).request { _, all ->
                     if (!all) {
                         // TODO
                         ToastUtils.show("请开启录音权限")

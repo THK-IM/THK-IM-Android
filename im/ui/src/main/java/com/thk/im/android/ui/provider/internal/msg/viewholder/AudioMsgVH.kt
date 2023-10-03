@@ -5,7 +5,6 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
-import com.thk.im.android.base.ToastUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMLoadProgress
@@ -13,9 +12,6 @@ import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
-import com.thk.im.android.media.audio.AudioCallback
-import com.thk.im.android.media.audio.AudioStatus
-import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMAudioMsgBody
@@ -40,7 +36,7 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         super.onViewBind(position, messages, session, msgVHOperator)
         XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
 
-        if (message.data.isNotEmpty() && message.data.isNotBlank()) {
+        if (!message.data.isNullOrEmpty()) {
             val audioMsgData = Gson().fromJson(message.data, IMAudioMsgData::class.java)
             audioMsgData?.let {
                 renderData(it)
@@ -48,7 +44,7 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
             }
         }
 
-        if (message.content.isNotEmpty() && message.content.isNotBlank()) {
+        if (!message.content.isNullOrEmpty()) {
             val audioMsgBody = Gson().fromJson(message.content, IMAudioMsgBody::class.java)
             audioMsgBody?.let {
                 renderBody(it)
@@ -63,15 +59,6 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
 
     private fun renderData(audioData: IMAudioMsgData) {
         val audioDurationView: TextView = contentContainer.findViewById(R.id.tv_audio_duration)
-        audioDurationView.setOnClickListener {
-            if (audioData.path != null)
-                OggOpusPlayer.startPlay(audioData.path!!, object : AudioCallback {
-                    override fun notify(path: String, second: Int, db: Double, state: AudioStatus) {
-                        ToastUtils.show("play: $second, $db")
-                    }
-
-                })
-        }
         val audioStatusView: View =
             contentContainer.findViewById(R.id.iv_audio_status)
         if (audioData.duration != null) {

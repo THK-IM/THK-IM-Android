@@ -46,7 +46,6 @@ ext {
             "emoji2-views"                     : "androidx.emoji2:emoji2-views:$version_emoji2",
             "emoji2-views-helper"              : "androidx.emoji2:emoji2-views-helper:$version_emoji2",
             "permission"                       : "com.github.getActivity:XXPermissions:16.0",
-            "annotation-jvm"                   : "androidx.annotation:annotation-jvm:1.7.0",
             "glide"                            : "com.github.bumptech.glide:glide:4.15.1",
             "pictureselector"                  : "io.github.lucksiege:pictureselector:v3.11.1",
             "pictureselector-compress"         : "io.github.lucksiege:compress:v3.11.1",

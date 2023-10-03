@@ -37,5 +37,5 @@ data class ReeditMsgBean(
     @SerializedName("msg_id")
     val msgIds: Long,
     @SerializedName("content")
-    val content: String,
+    val content: String?,
 )

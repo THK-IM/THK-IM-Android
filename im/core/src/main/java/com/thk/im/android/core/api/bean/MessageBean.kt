@@ -21,7 +21,7 @@ data class MessageBean(
     @SerializedName("type")
     var type: Int = 0,
     @SerializedName("body")
-    var body: String = "",
+    var body: String? = null,
     @SerializedName("status")
     var status: Int? = null,
     @SerializedName("at_users")

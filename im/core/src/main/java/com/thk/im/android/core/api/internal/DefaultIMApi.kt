@@ -122,7 +122,7 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         uId: Long,
         sessionId: Long,
         msgId: Long,
-        body: String
+        body: String?,
     ): Flowable<Void> {
         val bean = ReeditMsgBean(sessionId, uId, msgId, body)
         return messageApi.reeditMsg(bean)

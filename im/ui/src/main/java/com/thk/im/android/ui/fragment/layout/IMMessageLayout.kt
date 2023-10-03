@@ -203,6 +203,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgCellClick(message: Message, position: Int, view: View) {
+        msgPreviewer.previewMessage(message, position, view)
     }
 
     override fun onMsgCellLongClick(message: Message, position: Int, view: View) {

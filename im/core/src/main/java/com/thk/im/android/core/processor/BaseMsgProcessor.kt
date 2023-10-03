@@ -223,7 +223,11 @@ abstract class BaseMsgProcessor {
 
 
     open fun getSessionDesc(msg: Message): String {
-        return msg.content
+        return if (msg.content == null) {
+            ""
+        } else {
+            msg.content!!
+        }
     }
 
     /**

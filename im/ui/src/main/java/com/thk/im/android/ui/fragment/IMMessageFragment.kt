@@ -12,6 +12,7 @@ import android.view.WindowManager
 import androidx.emoji2.widget.EmojiEditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.google.gson.Gson
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.luck.picture.lib.basic.PictureSelector
@@ -21,6 +22,7 @@ import com.luck.picture.lib.entity.LocalMedia
 import com.luck.picture.lib.interfaces.OnResultCallbackListener
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.MediaUtils
+import com.thk.im.android.base.ToastUtils
 import com.thk.im.android.base.popup.KeyboardPopupWindow
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
@@ -28,9 +30,13 @@ import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
+import com.thk.im.android.media.audio.AudioCallback
+import com.thk.im.android.media.audio.AudioStatus
+import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.media.picker.AlbumStyleUtils
 import com.thk.im.android.media.picker.GlideEngine
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
+import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.android.ui.manager.IMVideoMsgData
 import com.thk.im.android.ui.protocol.IMMsgPreviewer
@@ -261,6 +267,24 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     }
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {
+        LLog.v("previewMessage ${msg.type} $position, $msg")
+        if (msg.type == MsgType.Audio.value) {
+            msg.data?.let {
+                val data = Gson().fromJson(it, IMAudioMsgData::class.java)
+                data.path?.let {path ->
+                    OggOpusPlayer.startPlay(path, object : AudioCallback {
+                        override fun notify(
+                            path: String,
+                            second: Int,
+                            db: Double,
+                            state: AudioStatus
+                        ) {
+                            ToastUtils.show("play: $second, $db")
+                        }
+                    })
+                }
+            }
+        }
     }
 
     override fun getSession(): Session {

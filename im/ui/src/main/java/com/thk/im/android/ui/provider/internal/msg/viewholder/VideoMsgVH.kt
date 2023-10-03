@@ -40,7 +40,7 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         super.onViewBind(position, messages, session, msgVHOperator)
         XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
 
-        if (message.data.isNotEmpty() && message.data.isNotBlank()) {
+        if (!message.data.isNullOrEmpty()) {
             val videoMsgData = Gson().fromJson(message.data, IMVideoMsgData::class.java)
             videoMsgData?.let {
                 renderData(it)
@@ -48,7 +48,7 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
             }
         }
 
-        if (message.content.isNotEmpty() && message.content.isNotBlank()) {
+        if (!message.content.isNullOrEmpty()) {
             val videoMsgBody = Gson().fromJson(message.content, IMVideoMsgBody::class.java)
             videoMsgBody?.let {
                 renderBody(it)

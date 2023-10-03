@@ -36,7 +36,7 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         super.onViewBind(position, messages, session, msgVHOperator)
         XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
 
-        if (message.data.isNotEmpty() && message.data.isNotBlank()) {
+        if (!message.data.isNullOrEmpty()) {
             val imageMsgData = Gson().fromJson(message.data, IMImageMsgData::class.java)
             imageMsgData?.let {
                 renderData(it)
@@ -44,7 +44,7 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
             }
         }
 
-        if (message.content.isNotEmpty() && message.content.isNotBlank()) {
+        if (!message.content.isNullOrEmpty()) {
             val imageMsgBody = Gson().fromJson(message.content, IMImageMsgBody::class.java)
             imageMsgBody?.let {
                 renderBody(it)

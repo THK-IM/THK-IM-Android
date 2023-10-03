@@ -22,12 +22,12 @@ import com.thk.im.android.base.ToastUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.db.MsgType
-import com.thk.im.android.media.audio.AudioCallback
-import com.thk.im.android.media.audio.AudioStatus
-import com.thk.im.android.media.audio.OggOpusRecorder
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
 import com.thk.im.android.ui.manager.IMAudioMsgData
+import com.thk.im.android.ui.manager.IMUIManager
+import com.thk.im.android.ui.protocol.AudioCallback
+import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.IMMsgSender
 import java.io.File
@@ -257,25 +257,28 @@ class IMInputLayout : ConstraintLayout {
     }
 
     private fun startRecordingAudio() {
-        binding.btRecordVoice.text = "松开 发送"
-        val path = IMCoreManager.storageModule.allocSessionFilePath(
-            msgSender.getSession().id,
-            "${System.currentTimeMillis() / 100}_audio.oga",
-            IMFileFormat.Audio.value
-        )
-        val file = File(path)
-        if (file.exists()) {
-            if (!file.delete()) {
+        val contentProvider = IMUIManager.contentProvider ?: return
+
+        if (!contentProvider.isRecordingAudio()) {
+            binding.btRecordVoice.text = "松开 发送"
+            val path = IMCoreManager.storageModule.allocSessionFilePath(
+                msgSender.getSession().id,
+                "${System.currentTimeMillis() / 100}_audio.oga",
+                IMFileFormat.Audio.value
+            )
+            val file = File(path)
+            if (file.exists()) {
+                if (!file.delete()) {
+                    return
+                }
+            }
+
+            if (!file.createNewFile()) {
                 return
             }
-        }
+            contentProvider.startRecordAudio(path, 60 * 1000, object : AudioCallback {
 
-        if (!file.createNewFile()) {
-            return
-        }
-        if (!OggOpusRecorder.isRecording()) {
-            OggOpusRecorder.startRecord(path, object : AudioCallback {
-                override fun notify(path: String, second: Int, db: Double, state: AudioStatus) {
+                override fun audioData(path: String, second: Int, db: Double, state: AudioStatus) {
                     LLog.v("notify $second, $db ${state.value}")
                     handler.post {
                         onAudioCallback(path, second, db, state)
@@ -315,7 +318,8 @@ class IMInputLayout : ConstraintLayout {
 
     private fun stopAudioRecording() {
         binding.btRecordVoice.text = "按住 说话"
-        OggOpusRecorder.stopRecording()
+        val contentProvider = IMUIManager.contentProvider ?: return
+        contentProvider.stopRecordAudio()
     }
 
 

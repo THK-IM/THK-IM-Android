@@ -8,6 +8,8 @@ import android.media.AudioTrack
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import com.thk.im.android.ui.protocol.AudioCallback
+import com.thk.im.android.ui.protocol.AudioStatus
 import top.oply.opuslib.OpusTool
 import java.io.File
 import java.nio.ByteBuffer
@@ -103,7 +105,7 @@ object OggOpusPlayer {
                     val ret = opusTool.openOpusFile(this.audioPath)
                     if (ret == 0) {
                         playing = false
-                        onStop(0.0, AudioStatus.Exited)
+                        onStop(AudioStatus.Exited)
                     } else {
                         playing = true
                     }
@@ -137,10 +139,10 @@ object OggOpusPlayer {
                     opusTool.closeOpusFile()
                     audioTrack.stop()
                     audioTrack.release()
-                    onStop(0.0, AudioStatus.Finished)
+                    onStop(AudioStatus.Finished)
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    onStop(0.0, AudioStatus.Exited)
+                    onStop(AudioStatus.Exited)
                 }
             }
         }
@@ -153,14 +155,14 @@ object OggOpusPlayer {
                 val end = System.currentTimeMillis()
                 val duration = (end - startAtTimestampMs) / 1000 + 1
                 handler.post {
-                    it.notify(path, duration.toInt(), db, status)
+                    it.audioData(path, duration.toInt(), db, status)
                 }
             }
         }
     }
 
-    private fun onStop(db: Double, status: AudioStatus = AudioStatus.Ing) {
-        callback(db, status)
+    private fun onStop(status: AudioStatus = AudioStatus.Finished) {
+        callback(0.0, status)
         audioCallback = null
         audioPath = null
     }

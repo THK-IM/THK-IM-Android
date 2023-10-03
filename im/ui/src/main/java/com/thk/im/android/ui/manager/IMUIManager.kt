@@ -4,27 +4,26 @@ import android.app.Application
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.media.audio.OggOpusPlayer
-import com.thk.im.android.media.audio.OggOpusRecorder
+import com.thk.im.android.ui.protocol.IMContentProvider
 import com.thk.im.android.ui.provider.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.provider.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.IMBasePanelFragmentProvider
 import com.thk.im.android.ui.provider.IMBaseSessionIVProvider
-import com.thk.im.android.ui.provider.internal.session.provider.SingleSessionIVProvider
 import com.thk.im.android.ui.provider.internal.function.IMAlbumFunctionIVProvider
 import com.thk.im.android.ui.provider.internal.function.IMCameraFunctionIVProvider
+import com.thk.im.android.ui.provider.internal.msg.AudioMsgIVProvider
 import com.thk.im.android.ui.provider.internal.msg.ImageMsgIVProvider
 import com.thk.im.android.ui.provider.internal.msg.TextMsgIVProvider
 import com.thk.im.android.ui.provider.internal.msg.TimeLineMsgIVProvider
 import com.thk.im.android.ui.provider.internal.msg.UnSupportMsgIVProvider
 import com.thk.im.android.ui.provider.internal.msg.VideoMsgIVProvider
-import com.thk.im.android.ui.provider.internal.msg.AudioMsgIVProvider
 import com.thk.im.android.ui.provider.internal.msg.proccessor.AudioMsgProcessor
 import com.thk.im.android.ui.provider.internal.msg.proccessor.ImageMsgProcessor
 import com.thk.im.android.ui.provider.internal.msg.proccessor.TextMsgProcessor
 import com.thk.im.android.ui.provider.internal.msg.proccessor.UnSupportMsgProcessor
 import com.thk.im.android.ui.provider.internal.msg.proccessor.VideoMsgProcessor
 import com.thk.im.android.ui.provider.internal.panel.IMUnicodeEmojiPanelProvider
+import com.thk.im.android.ui.provider.internal.session.provider.SingleSessionIVProvider
 import com.thk.im.android.ui.utils.IMKeyboardUtils
 
 object IMUIManager {
@@ -33,6 +32,7 @@ object IMUIManager {
     private val sessionIVProviders = HashMap<Int, IMBaseSessionIVProvider>()
     var panelFragmentProviders = HashMap<Int, IMBasePanelFragmentProvider>()
     var functionIVProviders = HashMap<Int, IMBaseFunctionIVProvider>()
+    var contentProvider: IMContentProvider? = null
 
     fun registerMsgIVProvider(vararg providers: IMBaseMessageIVProvider) {
         for (p in providers) {
@@ -69,8 +69,6 @@ object IMUIManager {
         IMCoreManager.getMessageModule().registerMsgProcessor(AudioMsgProcessor())
         IMCoreManager.getMessageModule().registerMsgProcessor(VideoMsgProcessor())
 
-        OggOpusPlayer.initPlayer(app)
-        OggOpusRecorder.initRecorder(app)
         IMKeyboardUtils.init(app)
         val providers = arrayOf(
             TimeLineMsgIVProvider(),

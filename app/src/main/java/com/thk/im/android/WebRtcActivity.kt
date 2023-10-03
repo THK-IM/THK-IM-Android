@@ -204,12 +204,12 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
     private fun initRoom() {
         XXPermissions.with(this).permission(Permission.CAMERA, Permission.RECORD_AUDIO)
             .request(object : OnPermissionCallback {
-                override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
+                override fun onGranted(permissions: MutableList<String>, allGranted: Boolean) {
                     initRoomViews()
                 }
 
-                override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
-                    super.onDenied(permissions, never)
+                override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
+                    super.onDenied(permissions, doNotAskAgain)
                     ToastUtils.show("permission denied")
                 }
             })

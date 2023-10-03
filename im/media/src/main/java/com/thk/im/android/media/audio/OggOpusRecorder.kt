@@ -9,6 +9,8 @@ import android.media.MediaRecorder
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.ActivityCompat
+import com.thk.im.android.ui.protocol.AudioCallback
+import com.thk.im.android.ui.protocol.AudioStatus
 import top.oply.opuslib.OpusTool
 import java.nio.ByteBuffer
 
@@ -36,8 +38,8 @@ object OggOpusRecorder {
 
     fun startRecord(
         path: String,
-        audioCallback: AudioCallback?,
-        maxDurationMs: Int = 60 * 1000
+        maxDurationMs: Int = 60 * 1000,
+        audioCallback: AudioCallback?
     ): Boolean {
         if (app == null) {
             return false
@@ -145,7 +147,7 @@ object OggOpusRecorder {
                 val end = System.currentTimeMillis()
                 val duration = (end - startAtTimestampMs) / 1000 + 1
                 handler.post {
-                    it.notify(path, duration.toInt(), db, status)
+                    it.audioData(path, duration.toInt(), db, status)
                 }
             }
         }

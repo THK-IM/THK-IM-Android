@@ -8,10 +8,10 @@ import com.hjq.permissions.XXPermissions
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.ToastUtils
 import com.thk.im.android.databinding.ActivityMediaTestBinding
-import com.thk.im.android.media.audio.AudioCallback
-import com.thk.im.android.media.audio.AudioStatus
 import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.media.audio.OggOpusRecorder
+import com.thk.im.android.ui.protocol.AudioCallback
+import com.thk.im.android.ui.protocol.AudioStatus
 import java.io.File
 
 class MediaTestActivity : AppCompatActivity() {
@@ -36,15 +36,21 @@ class MediaTestActivity : AppCompatActivity() {
                     file.delete()
                 }
                 file.createNewFile()
-                val success = OggOpusRecorder.startRecord(tmpAudioPath, object : AudioCallback {
-                    override fun notify(path: String, second: Int, db: Double, state: AudioStatus) {
-                        LLog.d("recorder notify $path, $second, $db, $state")
-                        if (state == AudioStatus.Finished || state == AudioStatus.Exited) {
-                            binding.btnRecord.text = "start record"
+                val success =
+                    OggOpusRecorder.startRecord(tmpAudioPath, 60 * 1000, object : AudioCallback {
+                        override fun audioData(
+                            path: String,
+                            second: Int,
+                            db: Double,
+                            state: AudioStatus
+                        ) {
+                            LLog.d("recorder notify $path, $second, $db, $state")
+                            if (state == AudioStatus.Finished || state == AudioStatus.Exited) {
+                                binding.btnRecord.text = "start record"
+                            }
                         }
-                    }
 
-                })
+                    })
                 if (success) {
                     binding.btnRecord.text = "stop record"
                 }
@@ -59,7 +65,8 @@ class MediaTestActivity : AppCompatActivity() {
                 val file = File(tmpAudioPath)
                 if (file.exists()) {
                     val success = OggOpusPlayer.startPlay(tmpAudioPath, object : AudioCallback {
-                        override fun notify(
+
+                        override fun audioData(
                             path: String,
                             second: Int,
                             db: Double,
@@ -109,15 +116,14 @@ class MediaTestActivity : AppCompatActivity() {
     private fun checkPermission() {
         XXPermissions.with(this).permission(Permission.RECORD_AUDIO)
             .request(object : OnPermissionCallback {
-                override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
+                override fun onGranted(permissions: MutableList<String>, allGranted: Boolean) {}
 
-                }
-
-                override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
-                    super.onDenied(permissions, never)
+                override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
+                    super.onDenied(permissions, doNotAskAgain)
                     ToastUtils.show("permission denied")
                     finish()
                 }
+
             })
     }
 }

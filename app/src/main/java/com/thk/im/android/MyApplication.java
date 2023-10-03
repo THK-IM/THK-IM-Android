@@ -10,6 +10,7 @@ import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.core.api.internal.DefaultIMApi;
 import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule;
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule;
+import com.thk.im.android.media.ContentProvider;
 import com.thk.im.android.ui.manager.IMUIManager;
 
 public class MyApplication extends Application {
@@ -33,6 +34,7 @@ public class MyApplication extends Application {
                 IMCoreManager.INSTANCE.init(MyApplication.this, uid, true);
                 IMCoreManager.INSTANCE.setFileLoadModule(fileLoaderModule);
                 IMUIManager.INSTANCE.init(MyApplication.this);
+                IMUIManager.INSTANCE.setContentProvider(new ContentProvider(MyApplication.this));
 
                 IMCoreManager.INSTANCE.connect();
                 LiveManager.Companion.shared().init(MyApplication.this, String.valueOf(uid), true);

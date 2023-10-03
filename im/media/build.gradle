@@ -38,10 +38,12 @@ dependencies {
     implementation 'androidx.test.ext:junit-ktx:1.1.5'
     testImplementation 'junit:junit:4.13.2'
 
-    api rootProject.ext.dependencies["pictureselector"]
-    api rootProject.ext.dependencies["pictureselector-compress"]
+    implementation rootProject.ext.dependencies["pictureselector"]
+    implementation rootProject.ext.dependencies["pictureselector-compress"]
     implementation rootProject.ext.dependencies["glide"]
     implementation rootProject.ext.dependencies["opuslib"]
 
     implementation project(":im:base")
+    implementation project(":im:ui")
+    implementation project(":im:core")
 }

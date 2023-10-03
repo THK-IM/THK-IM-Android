@@ -60,6 +60,7 @@ dependencies {
     implementation project(":im:core")
     implementation project(":im:db")
     implementation project(":im:ui")
+    implementation project(":im:media")
     implementation project(":im:base")
     implementation project(":im:live")
     implementation 'com.google.android.material:material:1.8.0'

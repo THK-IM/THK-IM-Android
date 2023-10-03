@@ -42,6 +42,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
+    implementation rootProject.ext.dependencies["glide"]
     implementation rootProject.ext.dependencies["appcompat"]
     implementation rootProject.ext.dependencies["rxjava"]
     implementation rootProject.ext.dependencies["rxandroid"]
@@ -51,9 +52,12 @@ dependencies {
     implementation rootProject.ext.dependencies["emoji2-bundled"]
     implementation rootProject.ext.dependencies["emoji2-views"]
     implementation rootProject.ext.dependencies["emoji2-views-helper"]
+    implementation rootProject.ext.dependencies["recyclerview"]
+    implementation rootProject.ext.dependencies["viewpager2"]
+    implementation rootProject.ext.dependencies["constraintlayout"]
 
     implementation project(":im:base")
     implementation project(":im:core")
     implementation project(":im:db")
-    api project(':im:media')
+//    implementation project(':im:media')
 }

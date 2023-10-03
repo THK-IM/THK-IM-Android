@@ -15,36 +15,27 @@ import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import com.luck.picture.lib.basic.PictureSelector
-import com.luck.picture.lib.config.SelectMimeType
-import com.luck.picture.lib.engine.CompressFileEngine
-import com.luck.picture.lib.entity.LocalMedia
-import com.luck.picture.lib.interfaces.OnResultCallbackListener
 import com.thk.im.android.base.LLog
-import com.thk.im.android.base.MediaUtils
 import com.thk.im.android.base.ToastUtils
 import com.thk.im.android.base.popup.KeyboardPopupWindow
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
-import com.thk.im.android.media.audio.AudioCallback
-import com.thk.im.android.media.audio.AudioStatus
-import com.thk.im.android.media.audio.OggOpusPlayer
-import com.thk.im.android.media.picker.AlbumStyleUtils
-import com.thk.im.android.media.picker.GlideEngine
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.manager.IMAudioMsgData
+import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.IMImageMsgData
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.manager.IMVideoMsgData
+import com.thk.im.android.ui.protocol.AudioCallback
+import com.thk.im.android.ui.protocol.AudioStatus
+import com.thk.im.android.ui.protocol.IMContentResult
 import com.thk.im.android.ui.protocol.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.IMMsgSender
-import top.zibin.luban.CompressionPredicate
-import top.zibin.luban.Luban
-import top.zibin.luban.OnNewCompressListener
-import java.io.File
 
 class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow
@@ -133,108 +124,40 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     }
 
     private fun selectImage() {
-        PictureSelector.create(context).openGallery(SelectMimeType.ofAll())
-            .setImageEngine(GlideEngine.createGlideEngine())
-            .setCompressEngine(CompressFileEngine { context, source, call ->
-                if (source != null && source.size > 0) {
-                    Luban.with(context).load(source).ignoreBy(300)
-                        .filter(object : CompressionPredicate {
-                            override fun apply(path: String?): Boolean {
-                                path?.let {
-                                    val isGif = MediaUtils.isGif(it)
-                                    return !isGif
-                                }
-                                return true
-                            }
-                        })
-                        .setCompressListener(object : OnNewCompressListener {
-                            override fun onStart() {
-                            }
+        activity?.let {
+            IMUIManager.contentProvider?.pick(it,
+                listOf(IMFileFormat.Image, IMFileFormat.Video),
+                object : IMContentResult {
+                    override fun onResult(result: List<IMFile>) {
+                        onMediaResult(result)
+                    }
 
-                            override fun onSuccess(source: String?, compressFile: File?) {
-                                call.onCallback(source, compressFile?.absolutePath)
-                            }
+                    override fun onCancel() {
+                    }
 
-                            override fun onError(source: String?, e: Throwable?) {
-                                LLog.e("compress error $e")
-                                call.onCallback(source, null)
-                            }
-
-                        }).launch()
-                }
-            })
-            .isOriginalControl(true)
-            .setSelectorUIStyle(AlbumStyleUtils.getStyle(context))
-            .isDisplayCamera(false)
-            .isGif(true)
-            .isPreviewImage(true)
-            .isWithSelectVideoImage(true)
-            .isPreviewZoomEffect(true)
-            .isPreviewFullScreenMode(false)
-            .isPreviewVideo(true)
-            .forResult(object :
-                OnResultCallbackListener<LocalMedia> {
-                override fun onResult(result: ArrayList<LocalMedia>) {
-                    onMediaResult(result)
-                }
-
-                override fun onCancel() {
-                }
-
-            })
+                })
+        }
     }
 
 
     private fun cameraMedia() {
-        PictureSelector.create(context)
-            .openCamera(SelectMimeType.ofAll())
-            .setCompressEngine(CompressFileEngine { context, source, call ->
-                if (source != null && source.size > 0) {
-                    Luban.with(context).load(source).ignoreBy(300)
-                        .setCompressListener(object : OnNewCompressListener {
-                            override fun onStart() {
-                            }
 
-                            override fun onSuccess(source: String?, compressFile: File?) {
-                                call.onCallback(source, compressFile?.absolutePath)
-                            }
-
-                            override fun onError(source: String?, e: Throwable?) {
-                                call.onCallback(source, null)
-                            }
-
-                        }).launch()
-                }
-            })
-            .forResult(object : OnResultCallbackListener<LocalMedia> {
-                override fun onResult(result: ArrayList<LocalMedia>) {
-                    onMediaResult(result)
-                }
-
-                override fun onCancel() {
-                }
-            })
     }
 
-    private fun onMediaResult(result: ArrayList<LocalMedia>) {
+    private fun onMediaResult(result: List<IMFile>) {
         try {
             for (media in result) {
                 if (media.mimeType.startsWith("video", true)) {
                     val imageMsgData = IMVideoMsgData()
-                    imageMsgData.path = media.realPath
+                    imageMsgData.path = media.path
                     IMCoreManager.getMessageModule()
                         .sendMessage(imageMsgData, session!!.id, MsgType.VIDEO.value)
-                } else {
-                    var path = media.compressPath
-                    if (path == null || media.isOriginal) {
-                        path = media.realPath
-                    }
+                } else if (media.mimeType.startsWith("image", true)) {
                     val imageMsgData = IMImageMsgData()
-                    imageMsgData.path = path
+                    imageMsgData.path = media.path
                     IMCoreManager.getMessageModule()
                         .sendMessage(imageMsgData, session!!.id, MsgType.IMAGE.value)
                 }
-
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -271,9 +194,9 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         if (msg.type == MsgType.Audio.value) {
             msg.data?.let {
                 val data = Gson().fromJson(it, IMAudioMsgData::class.java)
-                data.path?.let {path ->
-                    OggOpusPlayer.startPlay(path, object : AudioCallback {
-                        override fun notify(
+                data.path?.let { path ->
+                    IMUIManager.contentProvider?.startPlayAudio(path, object : AudioCallback {
+                        override fun audioData(
                             path: String,
                             second: Int,
                             db: Double,
@@ -312,23 +235,27 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     }
 
     override fun choosePhoto() {
-        XXPermissions.with(context)
-            .permission(Permission.READ_MEDIA_VIDEO, Permission.READ_MEDIA_IMAGES)
-            .request { _, all ->
-                if (all) {
-                    selectImage()
+        context?.let {
+            XXPermissions.with(it)
+                .permission(Permission.READ_MEDIA_VIDEO, Permission.READ_MEDIA_IMAGES)
+                .request { _, all ->
+                    if (all) {
+                        selectImage()
+                    }
                 }
-            }
+        }
     }
 
     override fun openCamera() {
-        XXPermissions.with(context)
-            .permission(Permission.CAMERA)
-            .request { _, all ->
-                if (all) {
-                    cameraMedia()
+        context?.let {
+            XXPermissions.with(it)
+                .permission(Permission.CAMERA)
+                .request { _, all ->
+                    if (all) {
+                        cameraMedia()
+                    }
                 }
-            }
+        }
     }
 
     override fun moveToLatestMessage() {

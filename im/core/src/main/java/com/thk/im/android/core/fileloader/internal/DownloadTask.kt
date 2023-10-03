@@ -50,7 +50,6 @@ class DownloadTask(
                     return
                 }
                 notify(0, LoadListener.Ing)
-                val inputStream = response.body!!.byteStream()
                 val file = File(loadingPath)
                 // 如果文件存在 删除然后创建新文件
                 if (file.exists()) {
@@ -66,6 +65,7 @@ class DownloadTask(
                     return
                 }
                 val fos = FileOutputStream(file)
+                val inputStream = response.body!!.byteStream()
                 // 储存下载文件的目录
                 try {
                     val buf = ByteArray(256 * 1024)

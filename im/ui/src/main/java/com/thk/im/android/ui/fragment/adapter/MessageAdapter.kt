@@ -45,6 +45,16 @@ class MessageAdapter(
         holder.onViewDetached()
     }
 
+    override fun onViewAttachedToWindow(holder: BaseMsgVH) {
+        super.onViewAttachedToWindow(holder)
+        holder.onViewAttached()
+    }
+
+    override fun onViewDetachedFromWindow(holder: BaseMsgVH) {
+        super.onViewDetachedFromWindow(holder)
+        holder.onViewDetached()
+    }
+
     override fun onFailedToRecycleView(holder: BaseMsgVH): Boolean {
         holder.onViewDetached()
         return super.onFailedToRecycleView(holder)

@@ -2,6 +2,9 @@ package com.thk.im.android.media
 
 import android.app.Activity
 import android.app.Application
+import android.content.Intent
+import android.graphics.Rect
+import android.view.View
 import com.luck.picture.lib.basic.PictureSelector
 import com.luck.picture.lib.config.SelectMimeType
 import com.luck.picture.lib.engine.CompressFileEngine
@@ -13,7 +16,9 @@ import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.media.audio.OggOpusRecorder
 import com.thk.im.android.media.picker.GlideEngine
+import com.thk.im.android.media.preview.MediaPreviewActivity
 import com.thk.im.android.ui.manager.IMFile
+import com.thk.im.android.ui.manager.MediaItem
 import com.thk.im.android.ui.protocol.AudioCallback
 import com.thk.im.android.ui.protocol.IMContentProvider
 import com.thk.im.android.ui.protocol.IMContentResult
@@ -27,6 +32,22 @@ class ContentProvider(app: Application) : IMContentProvider {
     init {
         OggOpusPlayer.initPlayer(app)
         OggOpusRecorder.initRecorder(app)
+    }
+
+    override fun preview(activity: Activity, items: ArrayList<MediaItem>, view: View) {
+        val intent = Intent(activity, MediaPreviewActivity::class.java)
+        val locations = IntArray(2)
+        view.getLocationOnScreen(locations)
+        intent.putParcelableArrayListExtra("media_items", items)
+        val rect = Rect(
+            locations[0],
+            locations[1],
+            locations[0] + view.measuredWidth,
+            locations[1] + view.measuredHeight,
+        )
+        intent.putExtra("origin_rect", rect)
+        activity.startActivity(intent)
+        activity.overridePendingTransition(0, 0)
     }
 
     override fun openCamera(

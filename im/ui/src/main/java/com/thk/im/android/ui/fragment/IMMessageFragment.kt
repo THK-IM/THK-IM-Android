@@ -31,6 +31,8 @@ import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.manager.IMVideoMsgData
+import com.thk.im.android.ui.manager.ImageMediaItem
+import com.thk.im.android.ui.manager.MediaItem
 import com.thk.im.android.ui.protocol.AudioCallback
 import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.IMContentResult
@@ -217,6 +219,27 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                             ToastUtils.show("play: $second, $db")
                         }
                     })
+                }
+            }
+        } else if (msg.type == MsgType.IMAGE.value || msg.type == MsgType.VIDEO.value) {
+            if (msg.type == MsgType.IMAGE.value) {
+                val media = ImageMediaItem(0, 0, null, null, null, null)
+                msg.data?.let {
+                    val data = Gson().fromJson(it, IMImageMsgData::class.java)
+                    if (data != null) {
+                        media.thumbnailPath = data.thumbnailPath
+                    }
+                }
+                val items = arrayListOf<MediaItem>()
+                items.add(media)
+                items.add(media)
+                items.add(media)
+                items.add(media)
+                items.add(media)
+                IMUIManager.contentProvider?.let { cp ->
+                    activity?.let { a ->
+                        cp.preview(a, items, originView)
+                    }
                 }
             }
         }

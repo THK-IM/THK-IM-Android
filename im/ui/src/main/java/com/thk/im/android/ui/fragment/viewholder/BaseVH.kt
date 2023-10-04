@@ -30,16 +30,6 @@ abstract class BaseVH(private val liftOwner: LifecycleOwner, itemView: View) :
 
     init {
         liftOwner.lifecycle.addObserver(this.lifecycleObserver)
-        itemView.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(p0: View) {
-                onViewAttached()
-            }
-
-            override fun onViewDetachedFromWindow(p0: View) {
-                onViewDetached()
-            }
-
-        })
     }
 
     open fun onViewAttached() {

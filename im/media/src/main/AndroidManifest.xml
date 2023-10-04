@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application>
+        <activity
+            android:name=".preview.MediaPreviewActivity"
+            android:theme="@style/AppThemeMediaPreview" />
         <provider
             android:name="com.thk.im.android.media.picker.FileProvider"
             android:authorities="${applicationId}.IMFileProvider"
@@ -15,10 +18,11 @@
         </provider>
     </application>
 
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 </manifest>

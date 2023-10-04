@@ -3,6 +3,7 @@ package com.thk.im.android.base;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -70,6 +71,39 @@ public class AppUtils {
         DisplayMetrics outMetrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(outMetrics);
         return outMetrics.heightPixels;
+    }
+
+    /**
+     * Value of px to value of dp.
+     *
+     * @param pxValue The value of px.
+     * @return value of dp
+     */
+    public float px2dp(final float pxValue) {
+        final float scale = Resources.getSystem().getDisplayMetrics().density;
+        return (pxValue / scale + 0.5f);
+    }
+
+    /**
+     * Value of sp to value of px.
+     *
+     * @param spValue The value of sp.
+     * @return value of px
+     */
+    public Float sp2px(final float spValue) {
+        final float fontScale = Resources.getSystem().getDisplayMetrics().scaledDensity;
+        return (spValue * fontScale + 0.5f);
+    }
+
+    /**
+     * Value of px to value of sp.
+     *
+     * @param pxValue The value of px.
+     * @return value of sp
+     */
+    public Float px2sp(final float pxValue) {
+        final float fontScale = Resources.getSystem().getDisplayMetrics().scaledDensity;
+        return (pxValue / fontScale + 0.5f);
     }
 
 

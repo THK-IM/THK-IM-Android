@@ -20,6 +20,7 @@ import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.databinding.ActivityMainBinding;
 import com.thk.im.android.db.SessionType;
 import com.thk.im.android.db.entity.Session;
+import com.thk.im.android.media.preview.MediaPreviewActivity;
 
 import java.util.Objects;
 import java.util.Random;
@@ -45,9 +46,13 @@ public class MainActivity extends AppCompatActivity {
         binding.buttonFirst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Random random = new Random();
-                long uid = Math.abs(random.nextInt(100000));
-                createSingleSession(uid);
+//                Random random = new Random();
+//                long uid = Math.abs(random.nextInt(100000));
+//                createSingleSession(uid);
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, MediaPreviewActivity.class);
+                startActivity(intent);
+                overridePendingTransition(0, 0);
             }
         });
 

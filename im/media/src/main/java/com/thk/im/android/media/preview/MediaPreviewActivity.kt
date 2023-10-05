@@ -11,8 +11,12 @@ import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.thk.im.android.base.AppUtils
 import com.thk.im.android.base.LLog
@@ -29,6 +33,34 @@ class MediaPreviewActivity : AppCompatActivity() {
     private var dragStartX = 0
     private var dragStartY = 0
     private val animationDuration = 300L
+    private val currentPreviewView: View?
+        get() {
+            val recyclerView = binding.vpMediaPreview.getChildAt(0) as RecyclerView
+            return recyclerView.layoutManager!!.findViewByPosition(binding.vpMediaPreview.currentItem)
+        }
+
+    private fun canChildScroll(view: View?): Boolean {
+        if (view == null) {
+            return false
+        }
+        var can =
+            view.canScrollHorizontally(1) || view.canScrollHorizontally(-1) || view.canScrollVertically(
+                -1
+            ) || view.canScrollVertically(1)
+        if (can) {
+            return true
+        } else {
+            if (view is ViewGroup) {
+                for (i in 0 until view.childCount) {
+                    can = canChildScroll(view.getChildAt(i))
+                    if (can) {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,55 +86,77 @@ class MediaPreviewActivity : AppCompatActivity() {
     private fun initView() {
         binding.vpMediaPreview.adapter = adapter
         binding.vpMediaPreview.offscreenPageLimit = 2
-        binding.vpMediaPreview.registerOnPageChangeCallback(object : OnPageChangeCallback() {
-        })
+        binding.vpMediaPreview.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        binding.vpMediaPreview.registerOnPageChangeCallback(object : OnPageChangeCallback() {})
     }
 
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        LLog.v("dispatchTouchEvent: ${event.pointerCount}, ${event.action}")
+    private var intercepted = false
+    private fun intercept(event: MotionEvent): Boolean {
+        LLog.v("touchEvent: ${event.pointerCount}, ${event.action}")
+        if (event.pointerCount > 1) {
+            if (binding.clContent.background.alpha != 255) {
+                reset()
+            }
+            intercepted = false
+            return false
+        }
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
+                intercepted = true
                 dragStartX = event.rawX.toInt()
                 dragStartY = event.rawY.toInt()
             }
 
             MotionEvent.ACTION_MOVE -> {
-                if (event.pointerCount > 1 && binding.clContent.background.alpha != 255) {
-                    return super.dispatchTouchEvent(event)
-                }
-                val transitionX = event.rawX - dragStartX
-                val transitionY = event.rawY - dragStartY
-                if (abs(transitionX) < abs(transitionY) || binding.clContent.alpha != 1f) {
-                    val alpha = 1 - abs(transitionY) / AppUtils.instance().screenHeight
-                    val scale = maxOf(minOf(1f, alpha), 0.7f)
-                    binding.vpMediaPreview.translationX = transitionX / binding.clContent.scaleX
-                    binding.vpMediaPreview.translationY = transitionY / binding.clContent.scaleX
-                    binding.vpMediaPreview.scaleX = scale
-                    binding.vpMediaPreview.scaleY = scale
-                    binding.clContent.background.alpha = (alpha * 255).toInt()
-                }
-                if (binding.clContent.background.alpha != 255) {
-                    return false
+                if (intercepted) {
+                    val transitionX = event.rawX - dragStartX
+                    val transitionY = event.rawY - dragStartY
+                    if (abs(transitionX) < abs(transitionY) || binding.clContent.alpha != 1f) {
+                        val alpha = 1 - abs(transitionY) / AppUtils.instance().screenHeight
+                        val scale = maxOf(minOf(1f, alpha), 0.7f)
+                        binding.vpMediaPreview.translationX = transitionX / binding.clContent.scaleX
+                        binding.vpMediaPreview.translationY = transitionY / binding.clContent.scaleX
+                        binding.vpMediaPreview.scaleX = scale
+                        binding.vpMediaPreview.scaleY = scale
+                        binding.clContent.background.alpha = (alpha * 255).toInt()
+                        return true
+                    }
                 }
             }
 
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
-                if (binding.clContent.background.alpha != 255) {
-                    if (binding.clContent.background.alpha < 180) {
-                        binding.clContent.background.alpha = 0
-                        exit()
-                    } else {
-                        binding.vpMediaPreview.translationX = 0f
-                        binding.vpMediaPreview.translationY = 0f
-                        binding.vpMediaPreview.scaleX = 1f
-                        binding.vpMediaPreview.scaleY = 1f
-                        binding.clContent.background.alpha = 255
+                if (intercepted) {
+                    if (binding.clContent.background.alpha != 255) {
+                        if (binding.clContent.background.alpha < 180) {
+                            binding.clContent.background.alpha = 0
+                            this@MediaPreviewActivity.exit()
+                        } else {
+                            reset()
+                        }
+                        return true
                     }
-                    return false
                 }
             }
         }
-        return super.dispatchTouchEvent(event)
+        return false
+    }
+
+    private fun reset() {
+        binding.vpMediaPreview.translationX = 0f
+        binding.vpMediaPreview.translationY = 0f
+        binding.vpMediaPreview.scaleX = 1f
+        binding.vpMediaPreview.scaleY = 1f
+        binding.clContent.background.alpha = 255
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (canChildScroll(currentPreviewView)) {
+            return super.dispatchTouchEvent(ev)
+        }
+        if (intercept(ev)) {
+            return true
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun startEnterAnimation() {
@@ -120,9 +174,7 @@ class MediaPreviewActivity : AppCompatActivity() {
             "translationY", startLocation[1], location[1]
         )
         val animator = ObjectAnimator.ofPropertyValuesHolder(
-            binding.vpMediaPreview,
-            translationX,
-            translationY
+            binding.vpMediaPreview, translationX, translationY
         )
         animator.interpolator = LinearInterpolator()
 
@@ -136,8 +188,9 @@ class MediaPreviewActivity : AppCompatActivity() {
             ObjectAnimator.ofPropertyValuesHolder(binding.vpMediaPreview, scaleX, scaleY)
         scaleAnimation.interpolator = LinearInterpolator()
 
-        val colorAnim =
-            ObjectAnimator.ofInt(binding.clContent, "backgroundColor", Color.TRANSPARENT, Color.BLACK)
+        val colorAnim = ObjectAnimator.ofInt(
+            binding.clContent, "backgroundColor", Color.TRANSPARENT, Color.BLACK
+        )
         colorAnim.setEvaluator(ArgbEvaluator())
         colorAnim.duration = animationDuration
 
@@ -168,9 +221,7 @@ class MediaPreviewActivity : AppCompatActivity() {
             binding.vpMediaPreview.translationY, startLocation[1],
         )
         val animator = ObjectAnimator.ofPropertyValuesHolder(
-            binding.vpMediaPreview,
-            translationX,
-            translationY
+            binding.vpMediaPreview, translationX, translationY
         )
         animator.interpolator = LinearInterpolator()
 

@@ -24,9 +24,9 @@ public class MyApplication extends Application {
         new Thread() {
             public void run() {
                 Long uid = 4L;
-                String host = "192.168.1.3:10000";
+                String host = "192.168.1.5:10000";
                 String endpoint = "http://" + host;
-                String wsEndpoint = "ws://192.168.1.3:20000/ws";
+                String wsEndpoint = "ws://192.168.1.5:20000/ws";
                 String token = uid.toString();
                 DefaultFileLoadModule fileLoaderModule = new DefaultFileLoadModule(MyApplication.this, endpoint, token);
                 IMCoreManager.INSTANCE.setSignalModule(new DefaultSignalModule(MyApplication.this, wsEndpoint, uid.toString()));

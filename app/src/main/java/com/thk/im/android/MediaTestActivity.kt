@@ -1,5 +1,6 @@
 package com.thk.im.android
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.hjq.permissions.OnPermissionCallback
@@ -83,36 +84,13 @@ class MediaTestActivity : AppCompatActivity() {
                     }
                 }
             }
-//            if (OpusPlayer.getInstance().isPlaying) {
-//                OpusPlayer.getInstance().stop()
-//                binding.btnPlay.text = "start play"
-//            } else {
-//                val file = File(tmpAudioPath)
-//                if (file.exists()) {
-//                    OpusPlayer.getInstance().play(tmpAudioPath)
-//                    binding.btnPlay.text = "stop play"
-//                }
-//            }
+        }
+
+        binding.videoPlay.setOnClickListener {
+            val intent = Intent(this@MediaTestActivity, VideoActivity::class.java)
+            startActivity(intent)
         }
     }
-
-    private fun startRecord() {
-        val file = File(tmpAudioPath)
-        if (file.exists()) {
-            if (file.isFile) {
-                LLog.d("File size: ${file.length()}")
-            }
-            file.delete()
-        }
-    }
-
-    private fun stopRecord() {
-    }
-
-    private fun onStopped() {
-        binding.btnRecord.text = "start record"
-    }
-
     private fun checkPermission() {
         XXPermissions.with(this).permission(Permission.RECORD_AUDIO)
             .request(object : OnPermissionCallback {

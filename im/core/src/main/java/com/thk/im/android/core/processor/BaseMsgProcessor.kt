@@ -167,7 +167,7 @@ abstract class BaseMsgProcessor {
                 // 消息内容上传
                 it.sendStatus = MsgSendStatus.Uploading.value
                 insertOrUpdateDb(
-                    msg,
+                    it,
                     notify = true,
                     notifySession = false,
                 )

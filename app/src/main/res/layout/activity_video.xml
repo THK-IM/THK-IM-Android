@@ -8,6 +8,7 @@
         android:id="@+id/pv_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

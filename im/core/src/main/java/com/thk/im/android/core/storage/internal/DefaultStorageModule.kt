@@ -54,11 +54,16 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
     }
 
     override fun getPathsFromFullPath(fullPath: String): Pair<String, String> {
-        val i = fullPath.lastIndexOf("/")
-        return if (i <= 0 || i >= fullPath.length) {
-            Pair("", fullPath)
+        var absolutePath = fullPath
+        if (absolutePath.startsWith("http")) {
+            absolutePath = absolutePath.replaceAfter("?", "", absolutePath)
+            absolutePath = absolutePath.replace("?", "")
+        }
+        val i = absolutePath.lastIndexOf("/")
+        return if (i <= 0 || i >= absolutePath.length) {
+            Pair("", absolutePath)
         } else {
-            Pair(fullPath.substring(0, i), fullPath.substring(i + 1))
+            Pair(absolutePath.substring(0, i), absolutePath.substring(i + 1))
         }
     }
 

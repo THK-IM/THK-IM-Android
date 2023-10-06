@@ -22,6 +22,8 @@ import com.thk.im.android.base.AppUtils
 import com.thk.im.android.base.LLog
 import com.thk.im.android.media.databinding.ActivityMediaPreviewBinding
 import com.thk.im.android.media.preview.adapter.MediaPreviewAdapter
+import com.thk.im.android.media.preview.view.VideoPlayerView
+import com.thk.im.android.media.preview.view.ZoomableImageView
 import com.thk.im.android.ui.manager.MediaItem
 import kotlin.math.abs
 
@@ -43,23 +45,23 @@ class MediaPreviewActivity : AppCompatActivity() {
         if (view == null) {
             return false
         }
-        var can =
-            view.canScrollHorizontally(1) || view.canScrollHorizontally(-1) || view.canScrollVertically(
-                -1
-            ) || view.canScrollVertically(1)
-        if (can) {
-            return true
-        } else {
-            if (view is ViewGroup) {
-                for (i in 0 until view.childCount) {
-                    can = canChildScroll(view.getChildAt(i))
-                    if (can) {
-                        return true
-                    }
+        if (view is VideoPlayerView || view is ZoomableImageView) {
+            val can =
+                view.canScrollHorizontally(1) || view.canScrollHorizontally(-1) || view.canScrollVertically(
+                    -1
+                ) || view.canScrollVertically(1)
+            if (can) {
+                return true
+            }
+        } else if (view is ViewGroup) {
+            for (i in 0 until view.childCount) {
+                val can = canChildScroll(view.getChildAt(i))
+                if (can) {
+                    return true
                 }
             }
-            return false
         }
+        return false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -150,7 +152,9 @@ class MediaPreviewActivity : AppCompatActivity() {
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        LLog.v("dispatchTouchEvent start")
         if (canChildScroll(currentPreviewView)) {
+            LLog.v("dispatchTouchEvent canChildScroll true")
             return super.dispatchTouchEvent(ev)
         }
         if (intercept(ev)) {

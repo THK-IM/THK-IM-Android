@@ -11,6 +11,7 @@ import com.thk.im.android.core.api.internal.DefaultIMApi;
 import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule;
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule;
 import com.thk.im.android.media.ContentProvider;
+import com.thk.im.android.media.preview.VideoCache;
 import com.thk.im.android.ui.manager.IMUIManager;
 
 public class MyApplication extends Application {
@@ -28,13 +29,14 @@ public class MyApplication extends Application {
                 String endpoint = "http://" + host;
                 String wsEndpoint = "ws://192.168.1.5:20000/ws";
                 String token = uid.toString();
+
                 DefaultFileLoadModule fileLoaderModule = new DefaultFileLoadModule(MyApplication.this, endpoint, token);
                 IMCoreManager.INSTANCE.setSignalModule(new DefaultSignalModule(MyApplication.this, wsEndpoint, uid.toString()));
                 IMCoreManager.INSTANCE.setImApi(new DefaultIMApi(endpoint, token));
                 IMCoreManager.INSTANCE.init(MyApplication.this, uid, true);
                 IMCoreManager.INSTANCE.setFileLoadModule(fileLoaderModule);
                 IMUIManager.INSTANCE.init(MyApplication.this);
-                IMUIManager.INSTANCE.setContentProvider(new ContentProvider(MyApplication.this));
+                IMUIManager.INSTANCE.setContentProvider(new ContentProvider(MyApplication.this, token));
 
                 IMCoreManager.INSTANCE.connect();
                 LiveManager.Companion.shared().init(MyApplication.this, String.valueOf(uid), true);

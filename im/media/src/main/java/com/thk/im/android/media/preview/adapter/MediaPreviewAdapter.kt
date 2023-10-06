@@ -37,7 +37,7 @@ class MediaPreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: Lis
             ImageMediaVH(lifecycleOwner, view)
         } else {
             val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.itemview_media_image, parent, false)
+                .inflate(R.layout.itemview_media_video, parent, false)
             VideoMediaVH(lifecycleOwner, view)
         }
     }

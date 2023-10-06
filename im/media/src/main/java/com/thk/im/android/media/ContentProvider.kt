@@ -17,6 +17,7 @@ import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.media.audio.OggOpusRecorder
 import com.thk.im.android.media.picker.GlideEngine
 import com.thk.im.android.media.preview.MediaPreviewActivity
+import com.thk.im.android.media.preview.VideoCache
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.MediaItem
 import com.thk.im.android.ui.protocol.AudioCallback
@@ -27,9 +28,10 @@ import top.zibin.luban.Luban
 import top.zibin.luban.OnNewCompressListener
 import java.io.File
 
-class ContentProvider(app: Application) : IMContentProvider {
+class ContentProvider(app: Application, token: String) : IMContentProvider {
 
     init {
+        VideoCache.init(app, token)
         OggOpusPlayer.initPlayer(app)
         OggOpusRecorder.initRecorder(app)
     }

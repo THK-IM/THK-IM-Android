@@ -46,13 +46,9 @@ public class MainActivity extends AppCompatActivity {
         binding.buttonFirst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Random random = new Random();
-//                long uid = Math.abs(random.nextInt(100000));
-//                createSingleSession(uid);
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this, MediaPreviewActivity.class);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
+                Random random = new Random();
+                long uid = Math.abs(random.nextInt(100000));
+                createSingleSession(uid);
             }
         });
 

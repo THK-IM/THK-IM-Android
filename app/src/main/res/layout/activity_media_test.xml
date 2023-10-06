@@ -25,4 +25,15 @@
         android:background="@color/purple_500"
         android:textColor="@color/white"
         />
+
+    <Button
+        android:id="@+id/video_play"
+        android:text="video play"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textAlignment="center"
+        android:layout_margin="15dp"
+        android:background="@color/purple_500"
+        android:textColor="@color/white"
+        />
 </LinearLayout>

@@ -12,14 +12,12 @@ import com.thk.im.android.ui.manager.MediaItem
 class ImageMediaVH(liftOwner: LifecycleOwner, itemView: View) :
     MediaVH(liftOwner, itemView) {
 
-    private val testView = itemView.findViewById<TextView>(R.id.tv_page)
     private val iVMedia = itemView.findViewById<AppCompatImageView>(R.id.iv_media)
 
 
     override fun bindMedia(mediaItem: MediaItem) {
         super.bindMedia(mediaItem)
         val imageItem = mediaItem as ImageMediaItem
-        testView.text = "${imageItem.width}"
 
         if (imageItem.thumbnailPath != null) {
             IMImageLoader.displayImageByPath(iVMedia, imageItem.thumbnailPath!!)

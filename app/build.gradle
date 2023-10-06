@@ -55,6 +55,10 @@ dependencies {
     implementation rootProject.ext.dependencies["okhttp"]
     implementation rootProject.ext.dependencies["retrofit"]
     implementation rootProject.ext.dependencies["permission"]
+    implementation rootProject.ext.dependencies["media3-exoplayer"]
+    implementation rootProject.ext.dependencies["media3-exoplayer-ui"]
+    implementation rootProject.ext.dependencies["videocache"]
+
 
     implementation project(":im:core")
     implementation project(":im:db")

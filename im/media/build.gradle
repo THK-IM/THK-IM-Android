@@ -45,6 +45,9 @@ dependencies {
     implementation rootProject.ext.dependencies["pictureselector-compress"]
     implementation rootProject.ext.dependencies["glide"]
     implementation rootProject.ext.dependencies["opuslib"]
+    implementation rootProject.ext.dependencies["media3-exoplayer"]
+    implementation rootProject.ext.dependencies["media3-exoplayer-ui"]
+    implementation rootProject.ext.dependencies["videocache"]
 
     implementation project(":im:base")
     implementation project(":im:ui")

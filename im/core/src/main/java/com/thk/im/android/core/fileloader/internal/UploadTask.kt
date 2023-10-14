@@ -30,7 +30,7 @@ class UploadTask(
     }
 
     override fun start() {
-        LLog.v("MinioUploadTask start")
+        LLog.v("MinioUploadTask start $path")
         val params = fileLoaderModule.parserUploadKey(key)
         if (params == null) {
             notify(0, LoadListener.Failed)

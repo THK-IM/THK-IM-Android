@@ -247,7 +247,9 @@ abstract class BaseMsgProcessor {
     /**
      * 消息内容下载
      */
-    open fun downloadMsgContent(entity: Message, resourceType: String) {}
+    open fun downloadMsgContent(entity: Message, resourceType: String): Boolean {
+        return true
+    }
 
 
     /**

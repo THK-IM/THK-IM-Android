@@ -1,9 +1,7 @@
 package com.thk.im.android.ui.provider.internal.msg.proccessor
 
 import com.google.gson.Gson
-import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
-import com.thk.im.android.base.RxTransform
 import com.thk.im.android.base.compress.CompressUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
@@ -12,7 +10,6 @@ import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.exception.DownloadException
 import com.thk.im.android.core.exception.UploadException
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.BaseMsgProcessor
@@ -279,93 +276,72 @@ class ImageMsgProcessor : BaseMsgProcessor() {
         }
     }
 
-    override fun downloadMsgContent(entity: Message, resourceType: String) {
-        val subscriber = object : BaseSubscriber<Message>() {
-            override fun onNext(t: Message) {
-                super.onComplete()
-                insertOrUpdateDb(t, notify = true, notifySession = false)
-            }
+    override fun downloadMsgContent(entity: Message, resourceType: String): Boolean {
+        var data = Gson().fromJson(entity.data, IMImageMsgData::class.java)
+        val body = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
+
+        val downloadUrl = if (resourceType == IMMsgResourceType.Thumbnail.value) {
+            body.thumbnailUrl
+        } else {
+            body.url
         }
-        Flowable.create<Message>(
-            {
-                var data = Gson().fromJson(entity.data, IMImageMsgData::class.java)
-                val body = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
 
-                val downloadUrl = if (resourceType == IMMsgResourceType.Thumbnail.value) {
-                    body.thumbnailUrl
-                } else {
-                    body.url
-                }
+        val fileName = body.name
+        if (downloadUrl == null || fileName == null) {
+            return false
+        }
 
-                val fileName = body.name
-                if (downloadUrl == null || fileName == null) {
-                    it.onError(DownloadException())
-                    return@create
-                }
+        val localPath = IMCoreManager.storageModule.allocSessionFilePath(
+            entity.sid,
+            fileName,
+            IMFileFormat.Image.value
+        )
 
-                val localPath = IMCoreManager.storageModule.allocSessionFilePath(
-                    entity.sid,
-                    fileName,
-                    IMFileFormat.Image.value
+        val listener = object : LoadListener {
+            override fun onProgress(
+                progress: Int,
+                state: Int,
+                url: String,
+                path: String
+            ) {
+                XEventBus.post(
+                    IMEvent.MsgLoadStatusUpdate.value,
+                    IMLoadProgress(IMLoadType.Download.value, url, state, progress)
                 )
-                var over = false
-                val listener = object : LoadListener {
-                    override fun onProgress(
-                        progress: Int,
-                        state: Int,
-                        url: String,
-                        path: String
-                    ) {
-                        XEventBus.post(
-                            IMEvent.MsgLoadStatusUpdate.value,
-                            IMLoadProgress(IMLoadType.Download.value, url, state, progress)
-                        )
-                        when (state) {
-                            LoadListener.Init,
-                            LoadListener.Wait,
-                            LoadListener.Ing -> {
-                            }
+                when (state) {
+                    LoadListener.Init,
+                    LoadListener.Wait,
+                    LoadListener.Ing -> {
+                    }
 
-                            LoadListener.Success -> {
-                                if (data == null) {
-                                    data = IMImageMsgData()
-                                }
-                                data.height = body.height
-                                data.width = body.width
-                                if (resourceType == IMMsgResourceType.Thumbnail.value) {
-                                    data.thumbnailPath = path
-                                } else {
-                                    data.path = path
-                                }
-                                entity.data = Gson().toJson(data)
-                                it.onNext(entity)
-                                it.onComplete()
-                                over = true
-                            }
-
-                            else -> {
-                                over = true
-                                it.onError(DownloadException())
-                            }
+                    LoadListener.Success -> {
+                        if (data == null) {
+                            data = IMImageMsgData()
                         }
+                        data.height = body.height
+                        data.width = body.width
+                        if (resourceType == IMMsgResourceType.Thumbnail.value) {
+                            data.thumbnailPath = path
+                        } else {
+                            data.path = path
+                        }
+                        entity.data = Gson().toJson(data)
+                        insertOrUpdateDb(entity, notify = true, notifySession = false)
                     }
-
-                    override fun notifyOnUiThread(): Boolean {
-                        return false
-                    }
-
                 }
-                IMCoreManager.fileLoadModule.download(
-                    downloadUrl,
-                    localPath,
-                    listener
-                )
-                // 防止线程被回收
-                while (!over) {
-                    Thread.sleep(200)
-                }
-            }, BackpressureStrategy.LATEST
-        ).compose(RxTransform.flowableToIo()).subscribe(subscriber)
+            }
+
+            override fun notifyOnUiThread(): Boolean {
+                return false
+            }
+
+        }
+        IMCoreManager.fileLoadModule.download(
+            downloadUrl,
+            localPath,
+            listener
+        )
+        return true
     }
 
 }

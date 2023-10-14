@@ -28,6 +28,7 @@ class DownloadTask(
     }
 
     override fun start() {
+        LLog.v("MinioDownloadTask start $url")
         notify(0, LoadListener.Init)
         val request = Request.Builder().addHeader("token", fileLoaderModule.token)
             //访问路径

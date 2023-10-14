@@ -58,9 +58,9 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     private fun renderData(audioData: IMAudioMsgData) {
-        val audioDurationView: TextView = contentContainer.findViewById(R.id.tv_audio_duration)
+        val audioDurationView: TextView = itemView.findViewById(R.id.tv_audio_duration)
         val audioStatusView: View =
-            contentContainer.findViewById(R.id.iv_audio_status)
+            itemView.findViewById(R.id.iv_audio_status)
         if (audioData.duration != null) {
             audioDurationView.text = DateUtil.getDuration(audioData.duration!!)
         }
@@ -76,10 +76,10 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     private fun renderBody(imageMsgBody: IMAudioMsgBody) {
-        val audioDurationView: TextView = contentContainer.findViewById(R.id.tv_audio_duration)
+        val audioDurationView: TextView = itemView.findViewById(R.id.tv_audio_duration)
         audioDurationView.setOnClickListener(null)
         val audioStatusView: View =
-            contentContainer.findViewById(R.id.iv_audio_status)
+            itemView.findViewById(R.id.iv_audio_status)
         if (imageMsgBody.duration != null) {
             audioDurationView.text = DateUtil.getDuration(imageMsgBody.duration!!)
         }

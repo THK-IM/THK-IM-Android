@@ -25,7 +25,7 @@ class UnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-        val tvMsgContent: TextView = contentContainer.findViewById(R.id.tv_msg_content)
+        val tvMsgContent: TextView = itemView.findViewById(R.id.tv_msg_content)
         tvMsgContent.text = "不支持的消息类型，请尝试升级客户端"
         when (getType()) {
             IMMsgPosType.Left.value -> {

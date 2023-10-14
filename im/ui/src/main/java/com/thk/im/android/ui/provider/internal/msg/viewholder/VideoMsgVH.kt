@@ -83,7 +83,7 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     private fun setLayoutParams(width: Int, height: Int) {
-        val contentView: RelativeLayout = contentContainer.findViewById(R.id.rl_msg_video_content)
+        val contentView: RelativeLayout = itemView.findViewById(R.id.rl_msg_video_content)
         val lp = contentView.layoutParams
         if (width > height) {
             val calWidth = maxOf(80.dp2px(), minOf(200.dp2px(), width))
@@ -97,21 +97,21 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
             lp.height = calHeight
         }
         contentView.layoutParams = lp
-        val imageView: ImageView = contentContainer.findViewById(R.id.iv_msg_video_thumbnail)
-        val durationView: TextView = contentContainer.findViewById(R.id.tv_video_duration)
+        val imageView: ImageView = itemView.findViewById(R.id.iv_msg_video_thumbnail)
+        val durationView: TextView = itemView.findViewById(R.id.tv_video_duration)
         imageView.visibility = View.INVISIBLE
         durationView.visibility = View.INVISIBLE
     }
 
 
     private fun renderDuration(duration: Int) {
-        val durationView: TextView = contentContainer.findViewById(R.id.tv_video_duration)
+        val durationView: TextView = itemView.findViewById(R.id.tv_video_duration)
         durationView.visibility = View.VISIBLE
         durationView.text = DateUtil.getDuration(duration)
     }
 
     private fun renderThumbnailImage(path: String) {
-        val imageView: ImageView = contentContainer.findViewById(R.id.iv_msg_video_thumbnail)
+        val imageView: ImageView = itemView.findViewById(R.id.iv_msg_video_thumbnail)
         imageView.visibility = View.VISIBLE
         IMImageLoader.displayImageByPath(imageView, path)
     }

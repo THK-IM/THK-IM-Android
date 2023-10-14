@@ -32,6 +32,7 @@ class VideoActivity : AppCompatActivity(), CacheListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        binding.pvVideo.releasePlay()
         VideoCache.getProxy().unregisterCacheListener(
             this, videoUrl
         )

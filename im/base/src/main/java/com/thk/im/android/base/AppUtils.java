@@ -25,8 +25,6 @@ public class AppUtils {
 
     /**
      * 获取当前本地apk的版本
-     *
-     * @return
      */
     public int getVersionCode() {
         int versionCode = 0;
@@ -42,8 +40,6 @@ public class AppUtils {
 
     /**
      * 获取版本号名称
-     *
-     * @return
      */
     public String getVerName() {
         String verName = "";

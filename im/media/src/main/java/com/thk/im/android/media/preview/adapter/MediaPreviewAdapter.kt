@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.thk.im.android.base.LLog
 import com.thk.im.android.media.R
 import com.thk.im.android.media.preview.viewholder.ImageMediaVH
 import com.thk.im.android.media.preview.viewholder.MediaVH
@@ -52,7 +53,7 @@ class MediaPreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: Lis
 
     override fun onViewRecycled(holder: MediaVH) {
         super.onViewRecycled(holder)
-        holder.onViewDetached()
+        holder.onViewRecycled()
     }
 
     override fun onViewAttachedToWindow(holder: MediaVH) {
@@ -65,8 +66,38 @@ class MediaPreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: Lis
         holder.onViewDetached()
     }
 
-    override fun onFailedToRecycleView(holder: MediaVH): Boolean {
-        holder.onViewDetached()
-        return super.onFailedToRecycleView(holder)
+    fun onPageSelected(position: Int, recyclerView: RecyclerView) {
+        for (i in 0 until medias.size) {
+            val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
+            viewHolder?.let {
+                if (position == i) {
+                    (viewHolder as MediaVH).startPreview()
+                } else {
+                    (viewHolder as MediaVH).stopPreview()
+                }
+            }
+        }
+    }
+
+    fun hideChildren(currentItem: Int, recyclerView: RecyclerView) {
+        for (i in 0 until medias.size) {
+            val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
+            viewHolder?.let {
+                if (currentItem != i) {
+                    (viewHolder as MediaVH).hide()
+                }
+            }
+        }
+    }
+
+    fun showChildren(currentItem: Int, recyclerView: RecyclerView) {
+        for (i in 0 until medias.size) {
+            val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
+            viewHolder?.let {
+                if (currentItem != i) {
+                    (viewHolder as MediaVH).show()
+                }
+            }
+        }
     }
 }

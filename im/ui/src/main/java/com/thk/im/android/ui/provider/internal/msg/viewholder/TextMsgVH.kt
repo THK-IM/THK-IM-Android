@@ -26,7 +26,7 @@ class TextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-        val tvMsgContent: TextView = contentContainer.findViewById(R.id.tv_msg_content)
+        val tvMsgContent: TextView = itemView.findViewById(R.id.tv_msg_content)
         tvMsgContent.text = message.content
         when (getType()) {
             IMMsgPosType.Left.value -> {

@@ -73,7 +73,7 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     private fun setLayoutParams(width: Int, height: Int) {
-        val imageView: ImageView = contentContainer.findViewById(R.id.iv_msg_content)
+        val imageView: ImageView = itemView.findViewById(R.id.iv_msg_content)
         val lp = imageView.layoutParams
         if (width > height) {
             val calWidth = maxOf(80.dp2px(), minOf(200.dp2px(), width))
@@ -91,7 +91,7 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     private fun renderImage(path: String) {
-        val imageView: ImageView = contentContainer.findViewById(R.id.iv_msg_content)
+        val imageView: ImageView = itemView.findViewById(R.id.iv_msg_content)
         imageView.visibility = View.VISIBLE
         IMImageLoader.displayImageByPath(imageView, path)
     }

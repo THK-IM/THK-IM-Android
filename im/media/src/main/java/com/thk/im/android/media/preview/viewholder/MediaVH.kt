@@ -8,7 +8,24 @@ import com.thk.im.android.ui.manager.MediaItem
 open class MediaVH(liftOwner: LifecycleOwner, itemView: View) :
     BaseVH(liftOwner, itemView) {
 
+    protected var mediaItem: MediaItem? = null
     open fun bindMedia(mediaItem: MediaItem) {
+        this.mediaItem = mediaItem
+    }
+
+    open fun startPreview() {
+
+    }
+
+    open fun stopPreview() {
+
+    }
+
+    open fun hide() {
+    }
+
+    open fun show() {
+
     }
 
 }

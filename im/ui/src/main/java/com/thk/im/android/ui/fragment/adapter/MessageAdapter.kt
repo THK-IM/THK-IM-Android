@@ -32,7 +32,7 @@ class MessageAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseMsgVH {
         val provider = IMUIManager.getMsgIVProviderByViewType(viewType)
         val holder = provider.viewHolder(lifecycleOwner, viewType, parent)
-        holder.resetLayout()
+        holder.onCreate()
         return holder
     }
 
@@ -42,23 +42,18 @@ class MessageAdapter(
 
     override fun onViewRecycled(holder: BaseMsgVH) {
         super.onViewRecycled(holder)
-        holder.onViewDetached()
+        holder.onViewRecycled()
     }
 
-//    override fun onViewAttachedToWindow(holder: BaseMsgVH) {
-//        super.onViewAttachedToWindow(holder)
-//        holder.onViewAttached()
-//    }
-//
-//    override fun onViewDetachedFromWindow(holder: BaseMsgVH) {
-//        super.onViewDetachedFromWindow(holder)
-//        holder.onViewDetached()
-//    }
+    override fun onViewAttachedToWindow(holder: BaseMsgVH) {
+        super.onViewAttachedToWindow(holder)
+        holder.onViewAttached()
+    }
 
-//    override fun onFailedToRecycleView(holder: BaseMsgVH): Boolean {
-//        holder.onViewDetached()
-//        return super.onFailedToRecycleView(holder)
-//    }
+    override fun onViewDetachedFromWindow(holder: BaseMsgVH) {
+        super.onViewDetachedFromWindow(holder)
+        holder.onViewDetached()
+    }
 
     override fun getItemCount(): Int {
         return messageList.size

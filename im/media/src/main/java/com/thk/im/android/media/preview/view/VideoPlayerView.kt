@@ -7,6 +7,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import com.thk.im.android.base.LLog
 import com.thk.im.android.media.preview.VideoCache
 
 class VideoPlayerView : PlayerView {
@@ -30,40 +31,48 @@ class VideoPlayerView : PlayerView {
             url
         }
         val mediaItem = MediaItem.fromUri(proxyUrl)
-        player = ExoPlayer.Builder(context.applicationContext).build()
-        player!!.addListener(object : Player.Listener {
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                super.onPlaybackStateChanged(playbackState)
-                when (playbackState) {
-                    Player.STATE_READY -> {
-                        player!!.play()
-                    }
+        if (player == null) {
+            player = ExoPlayer.Builder(context.applicationContext).build()
+            player?.addListener(object : Player.Listener {
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    super.onPlaybackStateChanged(playbackState)
+                    when (playbackState) {
+                        Player.STATE_READY -> {
+                        }
 
-                    Player.STATE_ENDED -> {
-                    }
+                        Player.STATE_ENDED -> {
+                        }
 
-                    Player.STATE_IDLE -> {}
-                    Player.STATE_BUFFERING -> {}
+                        Player.STATE_IDLE -> {}
+                        Player.STATE_BUFFERING -> {}
+                    }
+                }
+            })
+            player?.setMediaItem(mediaItem)
+            player?.prepare()
+            player?.playWhenReady = true
+        } else {
+            player?.currentMediaItem?.localConfiguration?.uri?.path?.let {
+                LLog.v("resume play $it $proxyUrl")
+                if (it == proxyUrl.removePrefix("file://")) {
+                    LLog.v("resume play")
+                    player?.play()
+                } else {
+                    player?.setMediaItem(mediaItem)
+                    player?.prepare()
+                    player?.playWhenReady = true
                 }
             }
-        })
-        player!!.setMediaItem(mediaItem)
-        player!!.prepare()
-        player!!.playWhenReady = true
+        }
     }
 
-    fun stopPlay() {
-        player!!.release()
+    fun releasePlay() {
+        player?.release()
+        player = null
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        player!!.pause()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        player!!.pause()
+    fun pause() {
+        player?.pause()
     }
 
     override fun canScrollHorizontally(direction: Int): Boolean {

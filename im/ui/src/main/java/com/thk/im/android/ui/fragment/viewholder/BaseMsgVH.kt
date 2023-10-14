@@ -2,17 +2,14 @@ package com.thk.im.android.ui.fragment.viewholder
 
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.lifecycle.LifecycleOwner
-import com.thk.im.android.base.AppUtils
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.IMImageLoader
-import com.thk.im.android.base.extension.dp2px
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
@@ -23,7 +20,6 @@ import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.db.entity.User
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
@@ -33,9 +29,8 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
 
     open lateinit var message: Message
     open lateinit var session: Session
-    var msgVHOperator: IMMsgVHOperator? = null
-    var pos: Int = 0
-    lateinit var contentContainer: View
+    private var msgVHOperator: IMMsgVHOperator? = null
+    private var pos: Int = 0
 
     open val disposable = CompositeDisposable()
     open val ivAvatarView: ImageView? = itemView.findViewById(R.id.iv_avatar)
@@ -62,35 +57,19 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         this.message = messages[position]
         this.session = session
         this.msgVHOperator = msgVHOperator
+        onViewAttached()
+    }
+
+    override fun onViewAttached() {
+        super.onViewAttached()
         renderUserInfo()
         renderMsgStatus()
     }
 
-    fun resetLayout() {
-        // 包裹视图layout
-        val flContainer: LinearLayout?
-        if (viewType % 3 == IMMsgPosType.Mid.value) {
-            flContainer = itemView.findViewById(R.id.fl_container_mid)
-            val lp = flContainer.layoutParams
-            lp.width = AppUtils.instance().screenWidth
-            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            flContainer.layoutParams = lp
-        } else if (viewType % 3 == IMMsgPosType.Left.value) {
-            flContainer = itemView.findViewById(R.id.fl_container_left)
-            val lp = flContainer.layoutParams
-            lp.width = 300.dp2px()
-            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            flContainer.layoutParams = lp
-        } else {
-            flContainer = itemView.findViewById(R.id.fl_container_right)
-            val lp = flContainer.layoutParams
-            lp.width = 300.dp2px()
-            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            flContainer.layoutParams = lp
-        }
+    fun onCreate() {
         // 内容视图layout
         val flContent: LinearLayout = itemView.findViewById(R.id.fl_content)
-        contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
+        val contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
         flContent.addView(contentContainer)
         contentContainer.setOnClickListener(this)
         contentContainer.setOnLongClickListener(this)
@@ -155,7 +134,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     override fun onViewDetached() {
         super.onViewDetached()
         disposable.clear()
-        msgVHOperator = null
         avatarTaskId?.let {
             IMCoreManager.fileLoadModule.cancelDownloadListener(it)
         }
@@ -193,5 +171,10 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             return true
         }
         return false
+    }
+
+    override fun onViewRecycled() {
+        super.onViewRecycled()
+        msgVHOperator = null
     }
 }

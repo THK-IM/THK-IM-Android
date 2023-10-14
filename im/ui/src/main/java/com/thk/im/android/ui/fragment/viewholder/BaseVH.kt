@@ -1,11 +1,9 @@
 package com.thk.im.android.ui.fragment.viewholder
 
 import android.view.View
-import android.view.View.OnAttachStateChangeListener
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
-import com.thk.im.android.base.LLog
 
 abstract class BaseVH(private val liftOwner: LifecycleOwner, itemView: View) :
     RecyclerView.ViewHolder(itemView) {
@@ -32,15 +30,15 @@ abstract class BaseVH(private val liftOwner: LifecycleOwner, itemView: View) :
         liftOwner.lifecycle.addObserver(this.lifecycleObserver)
     }
 
-    open fun onViewAttached() {
-
-    }
+    /**
+     * ViewHolder上屏触发，此处可以初始化一些和界面渲染无关的资源
+     */
+    open fun onViewAttached() {}
 
     /**
-     * ViewHolder离开屏幕触发，此处可以释放一些和界面渲染无关的资源
+     * ViewHolder离屏触发，此处可以释放一些和界面渲染无关的资源
      */
-    open fun onViewDetached() {
-    }
+    open fun onViewDetached() {}
 
     /**
      * recyclerView adapter的lifeOwner resume时触发
@@ -52,10 +50,14 @@ abstract class BaseVH(private val liftOwner: LifecycleOwner, itemView: View) :
      */
     open fun onLifeOwnerPause() {}
 
+    open fun onViewRecycled() {
+        onViewDetached()
+    }
+
     /**
      * recyclerView adapter的lifeOwner销毁时触发, 此处应该彻底断开ViewHolder被其他对象的引用
      */
     open fun onLifeOwnerDestroy() {
-        onViewDetached()
+        onViewRecycled()
     }
 }

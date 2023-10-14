@@ -13,7 +13,7 @@ class KeyboardPopupWindow(view: View, val function: (keyboardHeight: Int) -> Uni
     PopupWindow(view.context),
     ViewTreeObserver.OnGlobalLayoutListener, View.OnAttachStateChangeListener {
 
-    var keyboardHeight = 0
+    private var keyboardHeight = 0
 
     //当前PopupWindow最大的显示高度
     private var maxHeight = 0
@@ -27,7 +27,7 @@ class KeyboardPopupWindow(view: View, val function: (keyboardHeight: Int) -> Uni
         setBackgroundDrawable(ColorDrawable(0))
         //设置键盘弹出模式
         softInputMode =
-            WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
+            WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
         inputMethodMode = INPUT_METHOD_NEEDED
         //设置监听
         contentView.addOnAttachStateChangeListener(this)

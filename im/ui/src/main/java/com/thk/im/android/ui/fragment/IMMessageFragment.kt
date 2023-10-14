@@ -207,72 +207,76 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {
         LLog.v("previewMessage ${msg.type} $position, $msg")
-        if (msg.type == MsgType.Audio.value) {
-            msg.data?.let {
-                val data = Gson().fromJson(it, IMAudioMsgData::class.java)
-                data.path?.let { path ->
-                    IMUIManager.contentProvider?.startPlayAudio(path, object : AudioCallback {
-                        override fun audioData(
-                            path: String,
-                            second: Int,
-                            db: Double,
-                            state: AudioStatus
-                        ) {
-                            ToastUtils.show("play: $second, $db")
+        when (msg.type) {
+            MsgType.Audio.value -> {
+                msg.data?.let {
+                    val data = Gson().fromJson(it, IMAudioMsgData::class.java)
+                    data.path?.let { path ->
+                        IMUIManager.contentProvider?.startPlayAudio(path, object : AudioCallback {
+                            override fun audioData(
+                                path: String,
+                                second: Int,
+                                db: Double,
+                                state: AudioStatus
+                            ) {
+                                ToastUtils.show("play: $second, $db")
+                            }
+                        })
+                    }
+                }
+            }
+            MsgType.IMAGE.value -> {
+                val media = ImageMediaItem(0, 0, null, null, null, null)
+                msg.data?.let {
+                    val data = Gson().fromJson(it, IMImageMsgData::class.java)
+                    if (data != null) {
+                        media.thumbnailPath = data.thumbnailPath
+                    }
+                }
+                val items = arrayListOf<MediaItem>()
+                items.add(media)
+                items.add(media)
+                items.add(media)
+                items.add(media)
+                items.add(media)
+                IMUIManager.contentProvider?.let { cp ->
+                    activity?.let { a ->
+                        cp.preview(a, items, originView)
+                    }
+                }
+            }
+            MsgType.VIDEO.value -> {
+                val media = VideoMediaItem(0, 0, 0, null, null, null, null)
+                msg.data?.let {
+                    val data = Gson().fromJson(it, IMVideoMsgData::class.java)
+                    if (data != null) {
+                        media.coverPath = data.thumbnailPath
+                        media.sourcePath = data.path
+                        data.duration?.let { d ->
+                            media.duration = d
                         }
-                    })
-                }
-            }
-        } else if (msg.type == MsgType.IMAGE.value) {
-            val media = ImageMediaItem(0, 0, null, null, null, null)
-            msg.data?.let {
-                val data = Gson().fromJson(it, IMImageMsgData::class.java)
-                if (data != null) {
-                    media.thumbnailPath = data.thumbnailPath
-                }
-            }
-            val items = arrayListOf<MediaItem>()
-            items.add(media)
-            items.add(media)
-            items.add(media)
-            items.add(media)
-            items.add(media)
-            IMUIManager.contentProvider?.let { cp ->
-                activity?.let { a ->
-                    cp.preview(a, items, originView)
-                }
-            }
-        } else if (msg.type == MsgType.VIDEO.value) {
-            val media = VideoMediaItem(0, 0, 0, null, null, null, null)
-            msg.data?.let {
-                val data = Gson().fromJson(it, IMVideoMsgData::class.java)
-                if (data != null) {
-                    media.coverPath = data.thumbnailPath
-                    media.sourcePath = data.path
-                    data.duration?.let { d ->
-                        media.duration = d
                     }
                 }
-            }
-            msg.content?.let {
-                val body = Gson().fromJson(it, IMVideoMsgBody::class.java)
-                if (body != null) {
-                    media.coverUrl = body.thumbnailUrl
-                    media.sourceUrl = body.url
-                    body.duration?.let { d ->
-                        media.duration = d
+                msg.content?.let {
+                    val body = Gson().fromJson(it, IMVideoMsgBody::class.java)
+                    if (body != null) {
+                        media.coverUrl = body.thumbnailUrl
+                        media.sourceUrl = body.url
+                        body.duration?.let { d ->
+                            media.duration = d
+                        }
                     }
                 }
-            }
-            val items = arrayListOf<MediaItem>()
-            items.add(media)
-            items.add(media)
-            items.add(media)
-            items.add(media)
-            items.add(media)
-            IMUIManager.contentProvider?.let { cp ->
-                activity?.let { a ->
-                    cp.preview(a, items, originView)
+                val items = arrayListOf<MediaItem>()
+                items.add(media)
+                items.add(media)
+                items.add(media)
+                items.add(media)
+                items.add(media)
+                IMUIManager.contentProvider?.let { cp ->
+                    activity?.let { a ->
+                        cp.preview(a, items, originView)
+                    }
                 }
             }
         }

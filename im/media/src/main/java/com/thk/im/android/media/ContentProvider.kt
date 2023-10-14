@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import android.graphics.Rect
+import android.os.Build
 import android.view.View
 import com.luck.picture.lib.basic.PictureSelector
 import com.luck.picture.lib.config.SelectMimeType
@@ -49,7 +50,11 @@ class ContentProvider(app: Application, token: String) : IMContentProvider {
         )
         intent.putExtra("origin_rect", rect)
         activity.startActivity(intent)
-        activity.overridePendingTransition(0, 0)
+        if (Build.VERSION.SDK_INT >= 34) {
+            activity.overrideActivityTransition(Activity.OVERRIDE_TRANSITION_OPEN, 0, 0)
+        } else {
+            activity.overridePendingTransition(0, 0)
+        }
     }
 
     override fun openCamera(

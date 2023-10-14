@@ -182,25 +182,20 @@ class ZoomableImageView : AppCompatImageView {
         }
     }
 
-//    private fun reset() {
-//        //重置位置到fit
-//        mOuterMatrix.reset()
-//        //清空mask
-//        mMask = null
-//        //停止所有手势
-//        mPinchMode = PINCH_MODE_FREE
-//        mLastMovePoint[0f] = 0f
-//        mScaleCenter[0f] = 0f
-//        mScaleBase = 0f
-//        //停止所有动画
-//        if (mMaskAnimator != null) {
-//            mMaskAnimator!!.cancel()
-//            mMaskAnimator = null
-//        }
-//        cancelAllAnimator()
-//        //重绘
-//        invalidate()
-//    }
+    fun reset() {
+        //重置位置到fit
+        mOuterMatrix.reset()
+        //清空mask
+        mMask = null
+        //停止所有手势
+        currentMode = modeFree
+        mLastMovePoint[0f] = 0f
+        mScaleCenter[0f] = 0f
+        mScaleBase = 0f
+        cancelAllAnimator()
+        //重绘
+        invalidate()
+    }
 
 
     private fun getMaxScale(): Float {

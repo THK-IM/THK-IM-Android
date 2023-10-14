@@ -1,10 +1,16 @@
-package com.thk.im.android.base
+package com.thk.im.android.base.compress
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Matrix
-import android.media.ExifInterface
 import android.media.MediaMetadataRetriever
+import androidx.exifinterface.media.ExifInterface
+import com.bumptech.glide.Glide
+import com.bumptech.glide.gifdecoder.GifHeaderParser
+import com.bumptech.glide.gifdecoder.StandardGifDecoder
+import com.bumptech.glide.load.resource.gif.GifBitmapProvider
+import com.thk.im.android.base.AppUtils
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.ByteArrayOutputStream
@@ -15,6 +21,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.ByteBuffer
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -22,7 +29,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 
-object MediaUtils {
+object CompressUtils {
 
     fun compress(srcPath: String, size: Int, desPath: String): Flowable<String> {
         return Flowable.create({
@@ -47,37 +54,78 @@ object MediaUtils {
                 throw IOException()
             }
         }
-        val options = BitmapFactory.Options()
         val rate = sqrt((length / size).toDouble()).toInt() * 2
         var sample = 2
         while (sample < rate) {
             sample *= 2
         }
-        options.inSampleSize = sample
+        val isGif = isGif(srcPath)
+        if (isGif) {
+            val srcFile = File(srcPath)
+            val fis = FileInputStream(srcFile)
+            val bb = ByteBuffer.allocate(100 * 1024)
+            val gifParser = GifHeaderParser()
+            fis.channel.read(bb)
+            gifParser.setData(bb)
+            val header = gifParser.parseHeader()
+            val encoder = AnimatedGifEncoder()
+            val desFile = File(desPath)
+            if (desFile.exists()) {
+                desFile.delete()
+            }
+            var success = desFile.createNewFile()
+            if (!success) {
+                throw IOException()
+            }
+            val fos = FileOutputStream(desPath)
+            val decoder =
+                StandardGifDecoder(GifBitmapProvider(Glide.get(AppUtils.instance().app).bitmapPool))
+            decoder.setData(header, bb, sample)
+            encoder.setSize(addOne(header.width / sample), addOne(header.height / sample))
+            encoder.setTransparent(Color.TRANSPARENT)
+            encoder.setRepeat(0)
+            success = encoder.start(fos)
+            if (!success) {
+                throw IOException()
+            }
+            for (i in 0 until decoder.frameCount) {
+                decoder.advance()
+                encoder.addFrame(decoder.nextFrame)
+                encoder.setDelay(decoder.getDelay(i))
+            }
+            success = encoder.finish()
+            fos.close()
+            if (!success) {
+                throw IOException()
+            }
+        } else {
+            val options = BitmapFactory.Options()
+            options.inSampleSize = sample
 
-        val tagBitmap = BitmapFactory.decodeFile(srcPath, options)
-        val stream = ByteArrayOutputStream()
+            val tagBitmap = BitmapFactory.decodeFile(srcPath, options)
+            val stream = ByteArrayOutputStream()
 
-        tagBitmap!!.compress(
-            if (tagBitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
-            if (tagBitmap.hasAlpha()) 100 else 60,
-            stream
-        )
-        tagBitmap.recycle()
-        val desFile = File(desPath)
-        if (desFile.exists()) {
-            desFile.delete()
-        }
-        val success = desFile.createNewFile()
-        if (!success) {
+            tagBitmap!!.compress(
+                if (tagBitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
+                if (tagBitmap.hasAlpha()) 100 else 60,
+                stream
+            )
+            tagBitmap.recycle()
+            val desFile = File(desPath)
+            if (desFile.exists()) {
+                desFile.delete()
+            }
+            val success = desFile.createNewFile()
+            if (!success) {
+                stream.close()
+                throw IOException()
+            }
+            val fos = FileOutputStream(desPath)
+            fos.write(stream.toByteArray())
+            fos.flush()
+            fos.close()
             stream.close()
-            throw IOException()
         }
-        val fos = FileOutputStream(desPath)
-        fos.write(stream.toByteArray())
-        fos.flush()
-        fos.close()
-        stream.close()
     }
 
     @Throws(Exception::class)
@@ -122,13 +170,7 @@ object MediaUtils {
         val scale = sqrt(sample.toDouble()).toFloat()
         m.setScale(scale, scale)
         val bitmap = Bitmap.createBitmap(
-            source,
-            0,
-            0,
-            (width / scale).toInt(),
-            (height / scale).toInt(),
-            m,
-            true
+            source, 0, 0, addOne((width / scale).toInt()), addOne((height / scale).toInt()), m, true
         )
         bitmap.compress(
             if (bitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
@@ -338,6 +380,14 @@ object MediaUtils {
             Pair("", fullPath)
         } else {
             Pair(fullPath.substring(0, i), fullPath.substring(i + 1))
+        }
+    }
+
+    private fun addOne(value: Int): Int {
+        return if (value % 2 > 0) {
+            value + 1
+        } else {
+            value
         }
     }
 

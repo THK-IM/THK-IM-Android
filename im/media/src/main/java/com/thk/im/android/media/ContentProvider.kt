@@ -12,7 +12,7 @@ import com.luck.picture.lib.engine.CompressFileEngine
 import com.luck.picture.lib.entity.LocalMedia
 import com.luck.picture.lib.interfaces.OnResultCallbackListener
 import com.thk.im.android.base.LLog
-import com.thk.im.android.base.MediaUtils
+import com.thk.im.android.base.compress.CompressUtils
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.media.audio.OggOpusRecorder
@@ -101,7 +101,7 @@ class ContentProvider(app: Application, token: String) : IMContentProvider {
                         .filter(object : CompressionPredicate {
                             override fun apply(path: String?): Boolean {
                                 path?.let {
-                                    val isGif = MediaUtils.isGif(it)
+                                    val isGif = CompressUtils.isGif(it)
                                     return !isGif
                                 }
                                 return true

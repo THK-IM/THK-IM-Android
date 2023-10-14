@@ -3,8 +3,8 @@ package com.thk.im.android.ui.provider.internal.msg.proccessor
 import com.google.gson.Gson
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
-import com.thk.im.android.base.MediaUtils
 import com.thk.im.android.base.RxTransform
+import com.thk.im.android.base.compress.CompressUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
@@ -47,9 +47,9 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             return if (videoData.thumbnailPath == null) {
                 extractVideoFrame(IMCoreManager.storageModule, videoData, pair.second)
             } else {
-                MediaUtils.compress(
+                CompressUtils.compress(
                     videoData.thumbnailPath!!,
-                    100 * 1024,
+                    50 * 1024,
                     videoData.thumbnailPath!!
                 ).flatMap {
                     Flowable.just(message)
@@ -92,7 +92,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
         entity: Message
     ): Flowable<Message> {
         try {
-            val videoParams = MediaUtils.getVideoParams(videoData.path!!)
+            val videoParams = CompressUtils.getVideoParams(videoData.path!!)
                 ?: return Flowable.error(IOException("extractVideoFrame error: ${videoData.path!!}"))
             val paths = storageModule.getPathsFromFullPath(videoData.path!!)
             val names = storageModule.getFileExt(paths.second)
@@ -101,12 +101,12 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             } else {
                 "jpeg"
             }
-            val thumbName = "${System.currentTimeMillis()/1000}_${names.first}_cover.${ext}"
+            val thumbName = "${System.currentTimeMillis() / 1000}_${names.first}_cover.${ext}"
             val thumbnailPath = IMCoreManager.storageModule
                 .allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
-            MediaUtils.compressSync(videoParams.first, 100 * 1024, thumbnailPath)
+            CompressUtils.compressSync(videoParams.first, 100 * 1024, thumbnailPath)
             videoParams.first.recycle()
-            val sizePair = MediaUtils.getBitmapAspect(thumbnailPath)
+            val sizePair = CompressUtils.getBitmapAspect(thumbnailPath)
             videoData.thumbnailPath = thumbnailPath
             videoData.duration = videoParams.second
             videoData.width = sizePair.first

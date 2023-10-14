@@ -5,6 +5,7 @@ import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.thk.im.android.base.compress.CompressUtils
 import java.io.File
 
 object IMImageLoader {
@@ -15,7 +16,7 @@ object IMImageLoader {
         if (file.exists()) {
             val corner = dp2px(cornerDp).toFloat()
             val roundedCorners = GranularRoundedCorners(corner, corner, corner, corner)
-            val isGif = MediaUtils.isGif(path)
+            val isGif = CompressUtils.isGif(path)
             if (isGif) {
                 Glide.with(imageView.context.applicationContext).asGif().load(File(path))
                     .apply(RequestOptions().transform(roundedCorners)).into(imageView)

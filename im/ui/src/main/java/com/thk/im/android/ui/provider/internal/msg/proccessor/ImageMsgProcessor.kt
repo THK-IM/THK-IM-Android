@@ -3,8 +3,8 @@ package com.thk.im.android.ui.provider.internal.msg.proccessor
 import com.google.gson.Gson
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
-import com.thk.im.android.base.MediaUtils
 import com.thk.im.android.base.RxTransform
+import com.thk.im.android.base.compress.CompressUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
@@ -89,12 +89,12 @@ class ImageMsgProcessor : BaseMsgProcessor() {
         val thumbName = "${names.first}_thumb.${names.second}"
         val thumbPath =
             storageModule.allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
-        return MediaUtils.compress(
+        return CompressUtils.compress(
             imageData.path!!,
-            100 * 1024,
+            50 * 1024,
             thumbPath
         ).flatMap {
-            val size = MediaUtils.getBitmapAspect(imageData.path!!)
+            val size = CompressUtils.getBitmapAspect(imageData.path!!)
             imageData.thumbnailPath = thumbPath
             imageData.width = size.first
             imageData.height = size.second
@@ -160,7 +160,8 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                         imageBody.width = imageData.width
                                         imageBody.height = imageData.height
                                         entity.content = Gson().toJson(imageBody)
-                                        insertOrUpdateDb(entity,
+                                        insertOrUpdateDb(
+                                            entity,
                                             notify = false,
                                             notifySession = false,
                                         )
@@ -324,6 +325,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                             LoadListener.Wait,
                             LoadListener.Ing -> {
                             }
+
                             LoadListener.Success -> {
                                 if (data == null) {
                                     data = IMImageMsgData()

@@ -19,6 +19,10 @@ public class AppUtils {
         return sAppUtils;
     }
 
+    public Application getApp() {
+        return mApp;
+    }
+
     public void init(Application app) {
         this.mApp = app;
     }

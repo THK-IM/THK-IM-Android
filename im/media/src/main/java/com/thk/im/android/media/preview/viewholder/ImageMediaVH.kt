@@ -16,6 +16,10 @@ class ImageMediaVH(liftOwner: LifecycleOwner, itemView: View) :
     override fun bindMedia(mediaItem: MediaItem) {
         super.bindMedia(mediaItem)
         val imageItem = mediaItem as ImageMediaItem
+        if (imageItem.sourcePath != null) {
+            IMImageLoader.displayImageByPath(iVMedia, imageItem.sourcePath!!)
+            return
+        }
         if (imageItem.thumbnailPath != null) {
             IMImageLoader.displayImageByPath(iVMedia, imageItem.thumbnailPath!!)
         }

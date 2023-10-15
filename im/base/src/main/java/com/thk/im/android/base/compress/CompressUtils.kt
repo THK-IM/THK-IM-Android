@@ -63,7 +63,7 @@ object CompressUtils {
         if (isGif) {
             val srcFile = File(srcPath)
             val fis = FileInputStream(srcFile)
-            val bb = ByteBuffer.allocate(100 * 1024)
+            val bb = ByteBuffer.allocate(length.toInt())
             val gifParser = GifHeaderParser()
             fis.channel.read(bb)
             gifParser.setData(bb)

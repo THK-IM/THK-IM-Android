@@ -225,12 +225,20 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                     }
                 }
             }
+
             MsgType.IMAGE.value -> {
                 val media = ImageMediaItem(0, 0, null, null, null, null)
                 msg.data?.let {
                     val data = Gson().fromJson(it, IMImageMsgData::class.java)
                     if (data != null) {
                         media.thumbnailPath = data.thumbnailPath
+                        media.sourcePath = data.path
+                        data.width?.let { width ->
+                            media.width = width
+                        }
+                        data.height?.let { height ->
+                            media.height = height
+                        }
                     }
                 }
                 val items = arrayListOf<MediaItem>()
@@ -245,6 +253,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                     }
                 }
             }
+
             MsgType.VIDEO.value -> {
                 val media = VideoMediaItem(0, 0, 0, null, null, null, null)
                 msg.data?.let {

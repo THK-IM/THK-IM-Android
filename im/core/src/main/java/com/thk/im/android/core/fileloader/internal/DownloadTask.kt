@@ -105,7 +105,6 @@ class DownloadTask(
     override fun cancel() {
         call?.let {
             if (!it.isCanceled()) {
-                notify(0, LoadListener.Failed)
                 it.cancel()
             }
         }

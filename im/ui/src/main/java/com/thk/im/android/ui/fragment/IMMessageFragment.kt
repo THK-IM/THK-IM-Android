@@ -28,6 +28,7 @@ import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMFile
+import com.thk.im.android.ui.manager.IMImageMsgBody
 import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.manager.IMVideoMsgBody
@@ -46,6 +47,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     private var keyboardShowing = false
     private var session: Session? = null
     private lateinit var binding: FragmentMessageBinding
+    private var preview: View? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -226,67 +228,122 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                 }
             }
 
+            MsgType.IMAGE.value,
+            MsgType.VIDEO.value -> {
+                previewImageAndVideo(msg, position, originView)
+            }
+        }
+    }
+
+    private fun previewImageAndVideo(msg: Message, position: Int, originView: View) {
+        val messages = binding.rcvMessage.getMessages()
+        val medias = ArrayList<MediaItem>()
+        var count = 0
+        val rightMedias = mutableListOf<MediaItem>()
+        for (i in position until messages.size) {
+            if (msg.type == MsgType.IMAGE.value || msg.type == MsgType.VIDEO.value) {
+                val media = convertMessageToMediaItem(messages[i])
+                media?.let {
+                    rightMedias.add(media)
+                    count++
+                }
+            }
+            if (count == 5) {
+                break
+            }
+        }
+
+        medias.addAll(rightMedias.reversed())
+        val previewPos = medias.size - 1
+        count = 0
+        for (i in 0 until position) {
+            if (msg.type == MsgType.IMAGE.value || msg.type == MsgType.VIDEO.value) {
+                val media = convertMessageToMediaItem(messages[position - 1 - i])
+                media?.let {
+                    medias.add(media)
+                    count++
+                }
+            }
+            if (count == 5) {
+                break
+            }
+        }
+        preview = originView
+        activity?.let { IMUIManager.contentProvider?.preview(it, medias, originView, previewPos) }
+    }
+
+    private fun convertMessageToMediaItem(message: Message): MediaItem? {
+        return when (message.type) {
             MsgType.IMAGE.value -> {
-                val media = ImageMediaItem(0, 0, null, null, null, null)
-                msg.data?.let {
-                    val data = Gson().fromJson(it, IMImageMsgData::class.java)
+                val item = ImageMediaItem(0, 0, null, null, null, null)
+                if (message.data != null) {
+                    val data = Gson().fromJson(message.data, IMImageMsgData::class.java)
                     if (data != null) {
-                        media.thumbnailPath = data.thumbnailPath
-                        media.sourcePath = data.path
+                        item.thumbnailPath = data.thumbnailPath
+                        item.sourcePath = data.path
                         data.width?.let { width ->
-                            media.width = width
+                            item.width = width
                         }
                         data.height?.let { height ->
-                            media.height = height
+                            item.height = height
                         }
                     }
                 }
-                val items = arrayListOf<MediaItem>()
-                items.add(media)
-                items.add(media)
-                items.add(media)
-                items.add(media)
-                items.add(media)
-                IMUIManager.contentProvider?.let { cp ->
-                    activity?.let { a ->
-                        cp.preview(a, items, originView)
+                if (message.content != null) {
+                    val content = Gson().fromJson(message.content, IMImageMsgBody::class.java)
+                    if (content != null) {
+                        item.thumbnailUrl = content.thumbnailUrl
+                        item.sourceUrl = content.url
+                        content.width?.let { width ->
+                            item.width = width
+                        }
+                        content.height?.let { height ->
+                            item.height = height
+                        }
                     }
                 }
+                item
             }
 
             MsgType.VIDEO.value -> {
-                val media = VideoMediaItem(0, 0, 0, null, null, null, null)
-                msg.data?.let {
-                    val data = Gson().fromJson(it, IMVideoMsgData::class.java)
+                val item = VideoMediaItem(0, 0, 0, null, null, null, null)
+                if (message.data != null) {
+                    val data = Gson().fromJson(message.data, IMVideoMsgData::class.java)
                     if (data != null) {
-                        media.coverPath = data.thumbnailPath
-                        media.sourcePath = data.path
-                        data.duration?.let { d ->
-                            media.duration = d
+                        item.coverPath = data.thumbnailPath
+                        item.sourcePath = data.path
+                        data.duration?.let { duration ->
+                            item.duration = duration
+                        }
+                        data.width?.let { width ->
+                            item.width = width
+                        }
+                        data.height?.let { height ->
+                            item.height = height
                         }
                     }
                 }
-                msg.content?.let {
-                    val body = Gson().fromJson(it, IMVideoMsgBody::class.java)
-                    if (body != null) {
-                        media.coverUrl = body.thumbnailUrl
-                        media.sourceUrl = body.url
-                        body.duration?.let { d ->
-                            media.duration = d
+                if (message.content != null) {
+                    val content = Gson().fromJson(message.content, IMVideoMsgBody::class.java)
+                    if (content != null) {
+                        item.coverUrl = content.thumbnailUrl
+                        item.sourceUrl = content.url
+                        content.duration?.let { duration ->
+                            item.duration = duration
+                        }
+                        content.width?.let { width ->
+                            item.width = width
+                        }
+                        content.height?.let { height ->
+                            item.height = height
                         }
                     }
                 }
-                val items = arrayListOf<MediaItem>()
-                items.add(media)
-                items.add(media)
-                items.add(media)
-                items.add(media)
-                items.add(media)
-                IMUIManager.contentProvider?.let { cp ->
-                    activity?.let { a ->
-                        cp.preview(a, items, originView)
-                    }
-                }
+                item
+            }
+
+            else -> {
+                null
             }
         }
     }

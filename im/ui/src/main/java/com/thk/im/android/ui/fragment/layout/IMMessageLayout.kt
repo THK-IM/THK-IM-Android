@@ -8,14 +8,12 @@ import android.view.GestureDetector.OnGestureListener
 import android.view.MotionEvent
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.fragment.adapter.MessageAdapter
 import com.thk.im.android.ui.protocol.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.IMMsgSender
@@ -211,6 +209,10 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
 
     override fun onMsgResendClick(message: Message) {
         IMCoreManager.getMessageModule().resend(message)
+    }
+
+    fun getMessages(): List<Message> {
+        return (adapter as MessageAdapter).getMessages()
     }
 
 }

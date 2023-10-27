@@ -127,7 +127,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         msgVHOperator?.onMsgResendClick(message)
     }
 
-    fun getType(): Int {
+    fun getPositionType(): Int {
         return viewType % 3
     }
 

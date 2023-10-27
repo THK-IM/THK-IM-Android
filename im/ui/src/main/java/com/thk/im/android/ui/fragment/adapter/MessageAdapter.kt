@@ -203,4 +203,8 @@ class MessageAdapter(
         return count
     }
 
+    fun getMessages(): List<Message> {
+        return messageList
+    }
+
 }

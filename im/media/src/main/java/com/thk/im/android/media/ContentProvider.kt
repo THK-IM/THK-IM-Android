@@ -37,7 +37,12 @@ class ContentProvider(app: Application, token: String) : IMContentProvider {
         OggOpusRecorder.initRecorder(app)
     }
 
-    override fun preview(activity: Activity, items: ArrayList<MediaItem>, view: View) {
+    override fun preview(
+        activity: Activity,
+        items: ArrayList<MediaItem>,
+        view: View,
+        position: Int
+    ) {
         val intent = Intent(activity, MediaPreviewActivity::class.java)
         val locations = IntArray(2)
         view.getLocationOnScreen(locations)
@@ -49,6 +54,7 @@ class ContentProvider(app: Application, token: String) : IMContentProvider {
             locations[1] + view.measuredHeight,
         )
         intent.putExtra("origin_rect", rect)
+        intent.putExtra("position", position)
         activity.startActivity(intent)
         if (Build.VERSION.SDK_INT >= 34) {
             activity.overrideActivityTransition(Activity.OVERRIDE_TRANSITION_OPEN, 0, 0)

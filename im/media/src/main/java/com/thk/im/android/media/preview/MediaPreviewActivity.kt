@@ -33,6 +33,7 @@ class MediaPreviewActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMediaPreviewBinding
     private lateinit var adapter: MediaPreviewAdapter
     private var originRect = Rect(0, 0, 0, 0)
+    private var position = 0
     private var dragStartX = 0
     private var dragStartY = 0
     private val animationDuration = 300L
@@ -67,6 +68,7 @@ class MediaPreviewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        position = intent.getIntExtra("position", 0)
         originRect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("origin_rect", Rect::class.java)!!
         } else {
@@ -98,6 +100,7 @@ class MediaPreviewActivity : AppCompatActivity() {
                 adapter.onPageSelected(position, recyclerView)
             }
         })
+        binding.vpMediaPreview.setCurrentItem(position, false)
     }
 
     private var intercepted = false
@@ -225,53 +228,57 @@ class MediaPreviewActivity : AppCompatActivity() {
     }
 
     private fun startExitAnimation() {
-        val scaleStart = originRect.width().toFloat() / AppUtils.instance().screenWidth
-        val startLocation = floatArrayOf(
-            (originRect.left).toFloat() + (originRect.width() / 2) - AppUtils.instance().screenWidth / 2,
-            (originRect.top).toFloat() + (originRect.height() / 2) - AppUtils.instance().screenHeight / 2,
-        )
-        val translationX: PropertyValuesHolder = PropertyValuesHolder.ofFloat(
-            "translationX",
-            binding.vpMediaPreview.translationX, startLocation[0],
-        )
-        val translationY: PropertyValuesHolder = PropertyValuesHolder.ofFloat(
-            "translationY",
-            binding.vpMediaPreview.translationY, startLocation[1],
-        )
-        val animator = ObjectAnimator.ofPropertyValuesHolder(
-            binding.vpMediaPreview, translationX, translationY
-        )
-        animator.interpolator = LinearInterpolator()
-        val scaleX: PropertyValuesHolder = PropertyValuesHolder.ofFloat(
-            "scaleX", binding.vpMediaPreview.scaleX, scaleStart
-        )
-        val scaleY: PropertyValuesHolder = PropertyValuesHolder.ofFloat(
-            "scaleY", binding.vpMediaPreview.scaleY, scaleStart
-        )
-        val scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(
-            binding.vpMediaPreview, scaleX, scaleY
-        )
-        scaleAnimation.interpolator = LinearInterpolator()
+        if (binding.vpMediaPreview.currentItem != position) {
+            finish()
+        } else {
+            val scaleStart = originRect.width().toFloat() / AppUtils.instance().screenWidth
+            val startLocation = floatArrayOf(
+                (originRect.left).toFloat() + (originRect.width() / 2) - AppUtils.instance().screenWidth / 2,
+                (originRect.top).toFloat() + (originRect.height() / 2) - AppUtils.instance().screenHeight / 2,
+            )
+            val translationX: PropertyValuesHolder = PropertyValuesHolder.ofFloat(
+                "translationX",
+                binding.vpMediaPreview.translationX, startLocation[0],
+            )
+            val translationY: PropertyValuesHolder = PropertyValuesHolder.ofFloat(
+                "translationY",
+                binding.vpMediaPreview.translationY, startLocation[1],
+            )
+            val animator = ObjectAnimator.ofPropertyValuesHolder(
+                binding.vpMediaPreview, translationX, translationY
+            )
+            animator.interpolator = LinearInterpolator()
+            val scaleX: PropertyValuesHolder = PropertyValuesHolder.ofFloat(
+                "scaleX", binding.vpMediaPreview.scaleX, scaleStart
+            )
+            val scaleY: PropertyValuesHolder = PropertyValuesHolder.ofFloat(
+                "scaleY", binding.vpMediaPreview.scaleY, scaleStart
+            )
+            val scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(
+                binding.vpMediaPreview, scaleX, scaleY
+            )
+            scaleAnimation.interpolator = LinearInterpolator()
 
-        val animatorSet = AnimatorSet()
-        animatorSet.playTogether(animator, scaleAnimation)
-        animatorSet.duration = animationDuration
-        animatorSet.start()
-        animatorSet.addListener(object : AnimatorListener {
-            override fun onAnimationStart(animation: Animator) {
-            }
+            val animatorSet = AnimatorSet()
+            animatorSet.playTogether(animator, scaleAnimation)
+            animatorSet.duration = animationDuration
+            animatorSet.start()
+            animatorSet.addListener(object : AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {
+                }
 
-            override fun onAnimationEnd(animation: Animator) {
-                finish()
-            }
+                override fun onAnimationEnd(animation: Animator) {
+                    finish()
+                }
 
-            override fun onAnimationCancel(animation: Animator) {
-            }
+                override fun onAnimationCancel(animation: Animator) {
+                }
 
-            override fun onAnimationRepeat(animation: Animator) {
-            }
+                override fun onAnimationRepeat(animation: Animator) {
+                }
 
-        })
+            })
+        }
     }
 
     override fun onBackPressed() {

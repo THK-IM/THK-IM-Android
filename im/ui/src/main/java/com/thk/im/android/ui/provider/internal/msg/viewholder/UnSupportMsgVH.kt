@@ -27,7 +27,7 @@ class UnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         super.onViewBind(position, messages, session, msgVHOperator)
         val tvMsgContent: TextView = itemView.findViewById(R.id.tv_msg_content)
         tvMsgContent.text = "不支持的消息类型，请尝试升级客户端"
-        when (getType()) {
+        when (getPositionType()) {
             IMMsgPosType.Left.value -> {
                 tvMsgContent.setTextColor(
                     ContextCompat.getColor(

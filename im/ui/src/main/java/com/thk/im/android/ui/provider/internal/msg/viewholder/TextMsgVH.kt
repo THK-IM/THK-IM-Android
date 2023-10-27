@@ -28,7 +28,7 @@ class TextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         super.onViewBind(position, messages, session, msgVHOperator)
         val tvMsgContent: TextView = itemView.findViewById(R.id.tv_msg_content)
         tvMsgContent.text = message.content
-        when (getType()) {
+        when (getPositionType()) {
             IMMsgPosType.Left.value -> {
                 tvMsgContent.setTextColor(
                     ContextCompat.getColor(

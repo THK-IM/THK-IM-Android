@@ -9,6 +9,6 @@
         <item name="android:activityCloseEnterAnimation">@null</item>
         <item name="android:activityCloseExitAnimation">@null</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>//5.x以后设置全透明
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 </resources>

@@ -67,7 +67,7 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         if (audioData.played) {
             audioStatusView.visibility = View.GONE
         } else {
-            if (getType() == IMMsgPosType.Right.value) {
+            if (getPositionType() == IMMsgPosType.Right.value) {
                 audioStatusView.visibility = View.GONE
             } else {
                 audioStatusView.visibility = View.VISIBLE
@@ -83,7 +83,7 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         if (imageMsgBody.duration != null) {
             audioDurationView.text = DateUtil.getDuration(imageMsgBody.duration!!)
         }
-        if (getType() == IMMsgPosType.Right.value) {
+        if (getPositionType() == IMMsgPosType.Right.value) {
             audioStatusView.visibility = View.GONE
         } else {
             audioStatusView.visibility = View.VISIBLE

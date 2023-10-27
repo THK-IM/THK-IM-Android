@@ -7,7 +7,7 @@ import com.thk.im.android.ui.manager.MediaItem
 
 interface IMContentProvider {
 
-    fun preview(activity: Activity, items: ArrayList<MediaItem>, view: View)
+    fun preview(activity: Activity, items: ArrayList<MediaItem>, view: View, position: Int)
 
     fun openCamera(
         activity: Activity,

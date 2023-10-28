@@ -3,15 +3,11 @@ package com.thk.im.android.ui.provider.internal.msg.viewholder
 import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import com.thk.im.android.base.IMImageLoader
 import com.thk.im.android.base.extension.dp2px
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMMsgResourceType
-import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
@@ -21,7 +17,7 @@ import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
-    BaseMsgVH(liftOwner, itemView, viewType), Observer<IMLoadProgress> {
+    BaseMsgVH(liftOwner, itemView, viewType) {
 
     override fun getContentId(): Int {
         return R.layout.itemview_msg_image
@@ -34,41 +30,42 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-        XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
-
+        var imagePath = ""
+        var width = 0
+        var height = 0
         if (!message.data.isNullOrEmpty()) {
             val imageMsgData = Gson().fromJson(message.data, IMImageMsgData::class.java)
             imageMsgData?.let {
-                renderData(it)
-                return@onViewBind
+                if (it.thumbnailPath != null) {
+                    imagePath = it.thumbnailPath!!
+                }
+                if (it.width != null) {
+                    width = it.width!!
+                }
+                if (it.height != null) {
+                    height = it.height!!
+                }
             }
         }
 
         if (!message.content.isNullOrEmpty()) {
             val imageMsgBody = Gson().fromJson(message.content, IMImageMsgBody::class.java)
             imageMsgBody?.let {
-                renderBody(it)
-                // 开始下载
-                if (!it.thumbnailUrl.isNullOrEmpty()) {
-                    IMCoreManager.getMessageModule().getMsgProcessor(message.type)
-                        .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
+                if (it.width != null) {
+                    width = it.width!!
+                }
+                if (it.height != null) {
+                    height = it.height!!
                 }
             }
         }
-    }
 
-    private fun renderData(imageMsgData: IMImageMsgData) {
-        if (imageMsgData.width != null && imageMsgData.height != null) {
-            setLayoutParams(imageMsgData.width!!, imageMsgData.height!!)
-        }
-        if (imageMsgData.thumbnailPath != null) {
-            renderImage(imageMsgData.thumbnailPath!!)
-        }
-    }
-
-    private fun renderBody(imageMsgBody: IMImageMsgBody) {
-        if (imageMsgBody.width != null && imageMsgBody.height != null) {
-            setLayoutParams(imageMsgBody.width!!, imageMsgBody.height!!)
+        setLayoutParams(width, height)
+        if (imagePath != "") {
+            renderImage(imagePath)
+        } else {
+            IMCoreManager.getMessageModule().getMsgProcessor(message.type)
+                .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
         }
     }
 
@@ -98,13 +95,6 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
 
     override fun onViewDetached() {
         super.onViewDetached()
-        XEventBus.unObserve(IMEvent.MsgLoadStatusUpdate.value, this)
-    }
-
-    override fun onChanged(t: IMLoadProgress?) {
-//        t?.let {
-//            LLog.v("IMLoadProgress ${it.type} ${it.state} ${it.progress} ${it.key}")
-//        }
     }
 
 }

@@ -5,15 +5,12 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import com.thk.im.android.base.IMImageLoader
+import com.thk.im.android.base.LLog
 import com.thk.im.android.base.extension.dp2px
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMMsgResourceType
-import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
@@ -24,7 +21,7 @@ import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import com.thk.im.android.ui.utils.DateUtil
 
 class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
-    BaseMsgVH(liftOwner, itemView, viewType), Observer<IMLoadProgress> {
+    BaseMsgVH(liftOwner, itemView, viewType) {
 
 
     override fun getContentId(): Int {
@@ -38,47 +35,51 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-        XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
 
+        var imagePath = ""
+        var width = 0
+        var height = 0
+        var duration = 0
         if (!message.data.isNullOrEmpty()) {
             val videoMsgData = Gson().fromJson(message.data, IMVideoMsgData::class.java)
             videoMsgData?.let {
-                renderData(it)
-                return@onViewBind
+                if (it.thumbnailPath != null) {
+                    imagePath = it.thumbnailPath!!
+                }
+                if (it.width != null) {
+                    width = it.width!!
+                }
+                if (it.height != null) {
+                    height = it.height!!
+                }
+                if (it.duration != null) {
+                    duration = it.duration!!
+                }
             }
         }
 
         if (!message.content.isNullOrEmpty()) {
             val videoMsgBody = Gson().fromJson(message.content, IMVideoMsgBody::class.java)
             videoMsgBody?.let {
-                renderBody(it)
-                // 开始下载
-                if (!it.thumbnailUrl.isNullOrEmpty()) {
-                    IMCoreManager.getMessageModule().getMsgProcessor(message.type)
-                        .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
+                if (it.width != null) {
+                    width = it.width!!
+                }
+                if (it.height != null) {
+                    height = it.height!!
+                }
+                if (it.duration != null) {
+                    duration = it.duration!!
                 }
             }
         }
-    }
 
-    private fun renderData(videoMsgData: IMVideoMsgData) {
-        if (videoMsgData.width != null && videoMsgData.height != null) {
-            setLayoutParams(videoMsgData.width!!, videoMsgData.height!!)
-        }
-        if (videoMsgData.thumbnailPath != null) {
-            renderThumbnailImage(videoMsgData.thumbnailPath!!)
-        }
-        if (videoMsgData.duration != null) {
-            renderDuration(videoMsgData.duration!!)
-        }
-    }
-
-    private fun renderBody(videoMsgBody: IMVideoMsgBody) {
-        if (videoMsgBody.width != null && videoMsgBody.height != null) {
-            setLayoutParams(videoMsgBody.width!!, videoMsgBody.height!!)
-        }
-        if (videoMsgBody.duration != null) {
-            renderDuration(videoMsgBody.duration!!)
+        setLayoutParams(width, height)
+        renderDuration(duration)
+        if (imagePath != "") {
+            renderThumbnailImage(imagePath)
+        } else {
+            IMCoreManager.getMessageModule().getMsgProcessor(message.type)
+                .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
         }
     }
 
@@ -105,6 +106,7 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
 
 
     private fun renderDuration(duration: Int) {
+        LLog.d("renderDuration ${duration}")
         val durationView: TextView = itemView.findViewById(R.id.tv_video_duration)
         durationView.visibility = View.VISIBLE
         durationView.text = DateUtil.getDuration(duration)
@@ -118,12 +120,5 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
 
     override fun onViewDetached() {
         super.onViewDetached()
-        XEventBus.unObserve(IMEvent.MsgLoadStatusUpdate.value, this)
-    }
-
-    override fun onChanged(t: IMLoadProgress?) {
-//        t?.let {
-//            LLog.v("IMLoadProgress ${it.type} ${it.state} ${it.progress} ${it.key}")
-//        }
     }
 }

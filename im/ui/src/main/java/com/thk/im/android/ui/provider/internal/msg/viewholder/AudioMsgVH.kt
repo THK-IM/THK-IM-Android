@@ -3,13 +3,9 @@ package com.thk.im.android.ui.provider.internal.msg.viewholder
 import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMMsgResourceType
-import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
@@ -21,7 +17,7 @@ import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import com.thk.im.android.ui.utils.DateUtil
 
 class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
-    BaseMsgVH(liftOwner, itemView, viewType), Observer<IMLoadProgress> {
+    BaseMsgVH(liftOwner, itemView, viewType) {
 
     override fun getContentId(): Int {
         return R.layout.itemview_msg_audio
@@ -34,37 +30,44 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-        XEventBus.observe(IMEvent.MsgLoadStatusUpdate.value, this)
-
+        var duration = 0
+        var path = ""
+        var played = false
         if (!message.data.isNullOrEmpty()) {
             val audioMsgData = Gson().fromJson(message.data, IMAudioMsgData::class.java)
             audioMsgData?.let {
-                renderData(it)
-                return@onViewBind
+                if (it.duration != null) {
+                    duration = it.duration!!
+                }
+                if (it.path != null) {
+                    path = it.path!!
+                }
+                played = it.played
             }
         }
 
         if (!message.content.isNullOrEmpty()) {
             val audioMsgBody = Gson().fromJson(message.content, IMAudioMsgBody::class.java)
             audioMsgBody?.let {
-                renderBody(it)
-                // 开始下载
-                if (!it.url.isNullOrEmpty()) {
-                    IMCoreManager.getMessageModule().getMsgProcessor(message.type)
-                        .downloadMsgContent(message, IMMsgResourceType.Source.value)
+                if (it.duration != null) {
+                    duration = it.duration!!
                 }
             }
         }
+
+        render(duration, played)
+        if (path == "") {
+            IMCoreManager.getMessageModule().getMsgProcessor(message.type)
+                .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
+        }
     }
 
-    private fun renderData(audioData: IMAudioMsgData) {
+    private fun render(duration: Int, played: Boolean) {
         val audioDurationView: TextView = itemView.findViewById(R.id.tv_audio_duration)
         val audioStatusView: View =
             itemView.findViewById(R.id.iv_audio_status)
-        if (audioData.duration != null) {
-            audioDurationView.text = DateUtil.getDuration(audioData.duration!!)
-        }
-        if (audioData.played) {
+        audioDurationView.text = DateUtil.getDuration(duration)
+        if (played) {
             audioStatusView.visibility = View.GONE
         } else {
             if (getPositionType() == IMMsgPosType.Right.value) {
@@ -73,33 +76,6 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                 audioStatusView.visibility = View.VISIBLE
             }
         }
-    }
-
-    private fun renderBody(imageMsgBody: IMAudioMsgBody) {
-        val audioDurationView: TextView = itemView.findViewById(R.id.tv_audio_duration)
-        audioDurationView.setOnClickListener(null)
-        val audioStatusView: View =
-            itemView.findViewById(R.id.iv_audio_status)
-        if (imageMsgBody.duration != null) {
-            audioDurationView.text = DateUtil.getDuration(imageMsgBody.duration!!)
-        }
-        if (getPositionType() == IMMsgPosType.Right.value) {
-            audioStatusView.visibility = View.GONE
-        } else {
-            audioStatusView.visibility = View.VISIBLE
-        }
-
-    }
-
-    override fun onViewDetached() {
-        super.onViewDetached()
-        XEventBus.unObserve(IMEvent.MsgLoadStatusUpdate.value, this)
-    }
-
-    override fun onChanged(t: IMLoadProgress?) {
-//        t?.let {
-//            LLog.v("IMLoadProgress ${it.type} ${it.state} ${it.progress} ${it.key}")
-//        }
     }
 
 }

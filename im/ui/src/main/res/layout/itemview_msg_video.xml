@@ -28,13 +28,14 @@
             android:id="@+id/tv_video_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="6dp"
+            android:paddingHorizontal="8dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="6dp"
+            android:textAlignment="center"
             android:background="@drawable/bg_tv_msg_tips"
             android:textColor="@color/font_bg_main"
-            android:textSize="11sp" />
+            android:textSize="@dimen/dp10" />
     </RelativeLayout>
 </FrameLayout>

@@ -155,7 +155,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                             ) {
                                 XEventBus.post(
                                     IMEvent.MsgLoadStatusUpdate.value,
-                                    IMLoadProgress(IMLoadType.Upload.value, key, state, progress)
+                                    IMLoadProgress(IMLoadType.Upload.value, url, path, state, progress)
                                 )
                                 when (state) {
                                     LoadListener.Init,
@@ -238,7 +238,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                             ) {
                                 XEventBus.post(
                                     IMEvent.MsgLoadStatusUpdate.value,
-                                    IMLoadProgress(IMLoadType.Upload.value, key, state, progress)
+                                    IMLoadProgress(IMLoadType.Upload.value, url, path, state, progress)
                                 )
                                 when (state) {
                                     LoadListener.Init,
@@ -311,7 +311,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             ) {
                 XEventBus.post(
                     IMEvent.MsgLoadStatusUpdate.value,
-                    IMLoadProgress(IMLoadType.Download.value, url, state, progress)
+                    IMLoadProgress(IMLoadType.Download.value, url, path, state, progress)
                 )
                 when (state) {
                     LoadListener.Init,

@@ -1,6 +1,7 @@
 package com.thk.im.preview
 
 import android.content.Context
+import com.danikula.videocache.CacheListener
 import com.danikula.videocache.HttpProxyCacheServer
 import com.thk.im.android.core.IMCoreManager
 import java.io.File
@@ -34,4 +35,13 @@ object VideoCache {
     fun getProxy(): HttpProxyCacheServer {
         return proxy!!
     }
+
+    fun registerCacheListener(listener: CacheListener, url: String) {
+        proxy?.registerCacheListener(listener, url)
+    }
+
+    fun unregister(listener: CacheListener) {
+        proxy?.unregisterCacheListener(listener)
+    }
+
 }

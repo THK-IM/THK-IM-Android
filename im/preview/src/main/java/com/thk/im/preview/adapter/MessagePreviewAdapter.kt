@@ -65,7 +65,7 @@ class MessagePreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: L
             val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
             viewHolder?.let {
                 if (position == i) {
-//                    (viewHolder as PreviewVH).startPreview()
+                    (viewHolder as PreviewVH).startPreview()
                 } else {
                     (viewHolder as PreviewVH).stopPreview()
                 }
@@ -91,6 +91,16 @@ class MessagePreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: L
                 if (currentItem != i) {
                     (viewHolder as PreviewVH).show()
                 }
+            }
+        }
+    }
+
+    fun updateMessage(message: Message) {
+        for (i in 0 until messages.size) {
+            if (messages[i].id == message.id) {
+                messages[i] = message
+                notifyItemChanged(i)
+                break
             }
         }
     }

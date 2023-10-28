@@ -29,8 +29,10 @@ enum class IMFileFormat(val value: String) {
 data class IMLoadProgress(
     @SerializedName("type")
     var type: String,
-    @SerializedName("key")
-    var key: String,
+    @SerializedName("url")
+    var url: String,
+    @SerializedName("path")
+    var path: String,
     @SerializedName("state")
     var state: Int,
     @SerializedName("progress")

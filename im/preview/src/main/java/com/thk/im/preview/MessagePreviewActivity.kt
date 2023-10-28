@@ -16,10 +16,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.thk.im.android.base.AppUtils
+import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.preview.databinding.ActivityMediaPreviewBinding
 import com.thk.im.preview.adapter.MessagePreviewAdapter
@@ -87,6 +90,7 @@ class MessagePreviewActivity : AppCompatActivity() {
             adapter = MessagePreviewAdapter(this, it)
         }
         initView()
+        initEventBus()
     }
 
     private fun initView() {
@@ -107,6 +111,21 @@ class MessagePreviewActivity : AppCompatActivity() {
             }
         })
         binding.vpMediaPreview.setCurrentItem(position, false)
+    }
+
+    private fun initEventBus() {
+        XEventBus.observe(this, IMEvent.MsgUpdate.value, Observer<Message> {
+            it?.let {
+                val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
+                adapter.updateMessage(it)
+            }
+        })
+        XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
+            it?.let {
+                val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
+                adapter.updateMessage(it)
+            }
+        })
     }
 
     private fun intercept(event: MotionEvent) {

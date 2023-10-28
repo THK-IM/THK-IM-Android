@@ -4,18 +4,26 @@ import android.view.View
 import android.widget.RelativeLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.lifecycle.LifecycleOwner
+import com.danikula.videocache.CacheListener
 import com.google.gson.Gson
+import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.IMImageLoader
 import com.thk.im.android.base.LLog
+import com.thk.im.android.base.RxTransform
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.preview.R
 import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
+import com.thk.im.preview.VideoCache
 import com.thk.im.preview.view.VideoPlayerView
+import io.reactivex.Flowable
+import java.io.File
 
 
 class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
-    PreviewVH(liftOwner, itemView) {
+    PreviewVH(liftOwner, itemView), CacheListener {
     private val pvVideo = itemView.findViewById<VideoPlayerView>(R.id.pv_video)
     private val lyCover = itemView.findViewById<RelativeLayout>(R.id.ly_cover)
     private val ivCover = itemView.findViewById<AppCompatImageView>(R.id.iv_cover)
@@ -23,20 +31,7 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
 
     override fun bindMessage(message: Message) {
         super.bindMessage(message)
-        if (message.data != null) {
-            val data = Gson().fromJson(message.data, IMVideoMsgData::class.java)
-            if (data?.thumbnailPath != null) {
-                IMImageLoader.displayImageByPath(ivCover, data.thumbnailPath!!)
-            } else {
-                downloadCover()
-            }
-        }
-        pvVideo.visibility = View.GONE
-        lyCover.visibility = View.VISIBLE
-        ivPlay.setOnClickListener {
-            startPreview()
-            lyCover.visibility = View.GONE
-        }
+        startPreview()
     }
 
     private fun downloadCover() {
@@ -56,7 +51,26 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
 
     override fun startPreview() {
         super.startPreview()
-        pvVideo.visibility = View.VISIBLE
+        message?.let {
+            if (it.data != null) {
+                val data = Gson().fromJson(it.data, IMVideoMsgData::class.java)
+                if (data?.thumbnailPath != null) {
+                    IMImageLoader.displayImageByPath(ivCover, data.thumbnailPath!!)
+                } else {
+                    downloadCover()
+                }
+            }
+            pvVideo.visibility = View.GONE
+            lyCover.visibility = View.VISIBLE
+            ivPlay.setOnClickListener {
+                loadVideo()
+                lyCover.visibility = View.GONE
+            }
+            pvVideo.visibility = View.VISIBLE
+        }
+    }
+
+    private fun loadVideo() {
         message?.let {
             var played = false
             if (it.data != null) {
@@ -71,6 +85,7 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                 if (it.content != null) {
                     val body = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
                     if (body?.url != null) {
+                        VideoCache.registerCacheListener(this, body.url!!)
                         pvVideo.initPlay(body.url!!)
                         pvVideo.play()
                     }
@@ -81,6 +96,7 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
 
     override fun stopPreview() {
         super.stopPreview()
+        VideoCache.unregister(this)
         pvVideo.releasePlay()
         lyCover.visibility = View.VISIBLE
         pvVideo.visibility = View.GONE
@@ -98,6 +114,37 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
 
     override fun onViewRecycled() {
         super.onViewRecycled()
-        pvVideo.releasePlay()
+        stopPreview()
     }
+
+    override fun onCacheAvailable(cacheFile: File?, url: String?, percentsAvailable: Int) {
+        LLog.v("onCacheAvailable $percentsAvailable")
+        if (percentsAvailable < 100) {
+            return
+        }
+        if (cacheFile == null || !cacheFile.exists()) {
+            return
+        }
+        message?.let {
+            if (it.content != null) {
+                val body = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
+                if (body?.url != null && body.url == url) {
+                    body.name?.let { name ->
+                        val path = IMCoreManager.storageModule.allocSessionFilePath(
+                            it.sid,
+                            name,
+                            IMFileFormat.Video.value
+                        )
+                        IMCoreManager.storageModule.copyFile(cacheFile.path, path)
+                        val newContent = Gson().toJson(body)
+                        it.content = newContent
+                        updateDb(it)
+                    }
+                }
+            }
+
+        }
+    }
+
+
 }

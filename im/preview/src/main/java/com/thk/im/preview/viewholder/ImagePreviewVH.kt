@@ -24,14 +24,13 @@ class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
             } else {
                 if (data.thumbnailPath != null) {
                     IMImageLoader.displayImageByPath(iVMedia, data.thumbnailPath!!)
-                } else {
-                    startDownload()
                 }
+                downloadImages(data.thumbnailPath == null)
             }
         }
     }
 
-    private fun startDownload() {
+    private fun downloadImages(thumbnail: Boolean) {
         message?.let {
             if (it.content != null) {
                 val content = Gson().fromJson(it.content, IMImageMsgBody::class.java)

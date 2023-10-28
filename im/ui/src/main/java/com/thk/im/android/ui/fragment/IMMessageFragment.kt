@@ -235,7 +235,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         var count = 0
         val rightMessages = mutableListOf<Message>()
         for (i in position until messages.size) {
-            if (msg.type == MsgType.IMAGE.value || msg.type == MsgType.VIDEO.value) {
+            if (messages[i].type == MsgType.IMAGE.value || messages[i].type == MsgType.VIDEO.value) {
                 rightMessages.add(messages[i])
                 count++
             }
@@ -248,8 +248,8 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         val previewPos = mediaMessages.size - 1
         count = 0
         for (i in 0 until position) {
-            if (msg.type == MsgType.IMAGE.value || msg.type == MsgType.VIDEO.value) {
-                mediaMessages.add(messages[i])
+            if (messages[position - 1 - i].type == MsgType.IMAGE.value || messages[position - 1 - i].type == MsgType.VIDEO.value) {
+                mediaMessages.add(messages[position - 1 - i])
                 count++
             }
             if (count == 5) {

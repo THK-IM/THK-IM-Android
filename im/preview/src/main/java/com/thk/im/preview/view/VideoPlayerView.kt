@@ -16,15 +16,16 @@ class VideoPlayerView : PlayerView {
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
     init {
+        setShowShuffleButton(false)
         setShowNextButton(false)
         setShowRewindButton(false)
         setShowPreviousButton(false)
         setShowFastForwardButton(false)
-        controllerAutoShow = true
+        controllerAutoShow = false
         controllerHideOnTouch = false
     }
 
-    fun startPlay(url: String) {
+    fun initPlay(url: String) {
         val proxyUrl: String = if (url.startsWith("http")) {
             VideoCache.getProxy().getProxyUrl(url)
         } else {
@@ -50,7 +51,6 @@ class VideoPlayerView : PlayerView {
             })
             player?.setMediaItem(mediaItem)
             player?.prepare()
-            player?.playWhenReady = true
         } else {
             player?.currentMediaItem?.localConfiguration?.uri?.path?.let {
                 LLog.v("resume play $it $proxyUrl")
@@ -60,10 +60,13 @@ class VideoPlayerView : PlayerView {
                 } else {
                     player?.setMediaItem(mediaItem)
                     player?.prepare()
-                    player?.playWhenReady = true
                 }
             }
         }
+    }
+
+    fun play() {
+        player?.playWhenReady = true
     }
 
     fun releasePlay() {
@@ -73,6 +76,7 @@ class VideoPlayerView : PlayerView {
 
     fun pause() {
         player?.pause()
+        player?.playWhenReady = false
     }
 
     override fun canScrollHorizontally(direction: Int): Boolean {

@@ -6,7 +6,6 @@ import androidx.media3.common.util.UnstableApi
 import com.danikula.videocache.CacheListener
 import com.thk.im.android.base.LLog
 import com.thk.im.android.databinding.ActivityVideoBinding
-import com.thk.im.preview.VideoCache
 import java.io.File
 
 @UnstableApi
@@ -24,7 +23,7 @@ class VideoActivity : AppCompatActivity(), CacheListener {
     }
 
     private fun initVideoView() {
-        binding.pvVideo.startPlay(videoUrl)
+        binding.pvVideo.initPlay(videoUrl)
     }
 
     override fun onDestroy() {

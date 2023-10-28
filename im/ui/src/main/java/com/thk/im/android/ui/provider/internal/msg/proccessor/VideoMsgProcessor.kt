@@ -303,9 +303,13 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             body.url
         }
 
-        val fileName = body.name
+        var fileName = body.name
         if (downloadUrl == null || fileName == null) {
             return true
+        }
+
+        if (resourceType == IMMsgResourceType.Thumbnail.value) {
+            fileName = "cover_${fileName}"
         }
 
         val localPath = IMCoreManager.storageModule.allocSessionFilePath(

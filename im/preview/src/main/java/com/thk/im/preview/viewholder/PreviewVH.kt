@@ -32,23 +32,4 @@ open class PreviewVH(liftOwner: LifecycleOwner, itemView: View) :
 
     }
 
-    protected open fun updateDb(message: Message) {
-        Flowable.just(message).compose(RxTransform.flowableToIo())
-            .subscribe(object : BaseSubscriber<Message>() {
-                override fun onNext(t: Message?) {
-                    t?.let {
-                        IMCoreManager.getMessageModule()
-                            .getMsgProcessor(t.type)
-                            .insertOrUpdateDb(
-                                t,
-                                notify = true,
-                                notifySession = false
-                            )
-                    }
-
-                }
-
-            })
-    }
-
 }

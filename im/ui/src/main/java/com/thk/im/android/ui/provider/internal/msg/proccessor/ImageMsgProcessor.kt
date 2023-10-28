@@ -286,9 +286,13 @@ class ImageMsgProcessor : BaseMsgProcessor() {
             body.url
         }
 
-        val fileName = body.name
+        var fileName = body.name
         if (downloadUrl == null || fileName == null) {
             return false
+        }
+
+        if (resourceType == IMMsgResourceType.Thumbnail.value) {
+            fileName = "thumb_${fileName}"
         }
 
         val localPath = IMCoreManager.storageModule.allocSessionFilePath(

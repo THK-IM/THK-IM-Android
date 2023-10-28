@@ -119,32 +119,58 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
     }
 
     override fun onCacheAvailable(cacheFile: File?, url: String?, percentsAvailable: Int) {
-        LLog.v("onCacheAvailable $percentsAvailable")
+        LLog.d("onCacheAvailable $percentsAvailable")
         if (percentsAvailable < 100) {
             return
         }
-        if (cacheFile == null || !cacheFile.exists()) {
+        if (cacheFile == null || url == null || !cacheFile.exists() || !cacheFile.canRead()) {
+            return
+        }
+        if (cacheFile.path.endsWith(".download")) {
             return
         }
         message?.let {
-            if (it.content != null) {
-                val body = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
-                if (body?.url != null && body.url == url) {
-                    body.name?.let { name ->
-                        val path = IMCoreManager.storageModule.allocSessionFilePath(
-                            it.sid,
-                            name,
-                            IMFileFormat.Video.value
-                        )
-                        IMCoreManager.storageModule.copyFile(cacheFile.path, path)
-                        val newContent = Gson().toJson(body)
-                        it.content = newContent
-                        updateDb(it)
+            updateDb(it, cacheFile, url)
+        }
+    }
+
+    private fun updateDb(message: Message, cacheFile: File, url: String) {
+        Flowable.just(message).compose(RxTransform.flowableToIo())
+            .subscribe(object : BaseSubscriber<Message>() {
+                override fun onNext(t: Message?) {
+                    t?.let {
+                        if (it.content != null) {
+                            val body = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
+                            if (body?.url != null && body.url == url) {
+                                body.name?.let { name ->
+                                    val path = IMCoreManager.storageModule.allocSessionFilePath(
+                                        it.sid,
+                                        name,
+                                        IMFileFormat.Video.value
+                                    )
+                                    IMCoreManager.storageModule.copyFile(cacheFile.path, path)
+
+                                    if (it.data != null) {
+                                        val data =
+                                            Gson().fromJson(it.data, IMVideoMsgData::class.java)
+                                        data.path = path
+                                        it.data = Gson().toJson(data)
+                                        IMCoreManager.getMessageModule()
+                                            .getMsgProcessor(t.type)
+                                            .insertOrUpdateDb(
+                                                t,
+                                                notify = true,
+                                                notifySession = false
+                                            )
+                                    }
+
+
+                                }
+                            }
+                        }
                     }
                 }
-            }
-
-        }
+            })
     }
 
 

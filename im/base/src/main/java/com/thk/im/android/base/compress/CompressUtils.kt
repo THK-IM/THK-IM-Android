@@ -168,9 +168,9 @@ object CompressUtils {
         val width: Int = source.width
         val height: Int = source.height
         val scale = sqrt(sample.toDouble()).toFloat()
-        m.setScale(scale, scale)
+        m.setScale(1 / scale, 1 / scale)
         val bitmap = Bitmap.createBitmap(
-            source, 0, 0, addOne((width / scale).toInt()), addOne((height / scale).toInt()), m, true
+            source, 0, 0, width, height, m, true
         )
         bitmap.compress(
             if (bitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,

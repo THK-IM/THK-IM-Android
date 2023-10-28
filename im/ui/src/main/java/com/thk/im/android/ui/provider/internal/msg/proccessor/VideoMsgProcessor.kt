@@ -101,7 +101,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             val thumbName = "${System.currentTimeMillis() / 1000}_${names.first}_cover.${ext}"
             val thumbnailPath = IMCoreManager.storageModule
                 .allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
-            CompressUtils.compressSync(videoParams.first, 100 * 1024, thumbnailPath)
+            CompressUtils.compressSync(videoParams.first, 4 * 1024 * 1024, thumbnailPath)
             videoParams.first.recycle()
             val sizePair = CompressUtils.getBitmapAspect(thumbnailPath)
             videoData.thumbnailPath = thumbnailPath
@@ -155,7 +155,13 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                             ) {
                                 XEventBus.post(
                                     IMEvent.MsgLoadStatusUpdate.value,
-                                    IMLoadProgress(IMLoadType.Upload.value, url, path, state, progress)
+                                    IMLoadProgress(
+                                        IMLoadType.Upload.value,
+                                        url,
+                                        path,
+                                        state,
+                                        progress
+                                    )
                                 )
                                 when (state) {
                                     LoadListener.Init,
@@ -238,7 +244,13 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                             ) {
                                 XEventBus.post(
                                     IMEvent.MsgLoadStatusUpdate.value,
-                                    IMLoadProgress(IMLoadType.Upload.value, url, path, state, progress)
+                                    IMLoadProgress(
+                                        IMLoadType.Upload.value,
+                                        url,
+                                        path,
+                                        state,
+                                        progress
+                                    )
                                 )
                                 when (state) {
                                     LoadListener.Init,

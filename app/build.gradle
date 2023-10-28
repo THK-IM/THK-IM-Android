@@ -63,7 +63,7 @@ dependencies {
     implementation project(":im:core")
     implementation project(":im:db")
     implementation project(":im:ui")
-    implementation project(":im:media")
+    implementation project(':im:provider')
     implementation project(":im:base")
     implementation project(":im:live")
     implementation project(":im:preview")

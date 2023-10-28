@@ -3,7 +3,7 @@ package com.thk.im.android.ui.protocol
 import android.app.Activity
 import com.thk.im.android.core.IMFileFormat
 
-interface IMMediaProvider {
+interface IMProvider {
 
     fun openCamera(
         activity: Activity,

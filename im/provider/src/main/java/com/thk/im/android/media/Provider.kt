@@ -16,13 +16,13 @@ import com.thk.im.android.media.picker.GlideEngine
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.protocol.AudioCallback
 import com.thk.im.android.ui.protocol.IMContentResult
-import com.thk.im.android.ui.protocol.IMMediaProvider
+import com.thk.im.android.ui.protocol.IMProvider
 import top.zibin.luban.CompressionPredicate
 import top.zibin.luban.Luban
 import top.zibin.luban.OnNewCompressListener
 import java.io.File
 
-class MediaProvider(app: Application, token: String) : IMMediaProvider {
+class Provider(app: Application, token: String) : IMProvider {
 
     init {
         OggOpusPlayer.initPlayer(app)

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace "${rootProject.ext.android.applicationId}.media"
+    namespace "${rootProject.ext.android.applicationId}.provider"
     compileSdk rootProject.ext.android.compileSdkVersion
 
     defaultConfig {

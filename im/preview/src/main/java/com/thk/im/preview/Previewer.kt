@@ -7,9 +7,9 @@ import android.graphics.Rect
 import android.os.Build
 import android.view.View
 import com.thk.im.android.ui.manager.MediaItem
-import com.thk.im.android.ui.protocol.IMMediaPreviewer
+import com.thk.im.android.ui.protocol.IMPreviewer
 
-class MediaPreviewer(app: Application, token: String) : IMMediaPreviewer {
+class Previewer(app: Application, token: String) : IMPreviewer {
 
     init {
         VideoCache.init(app, token)

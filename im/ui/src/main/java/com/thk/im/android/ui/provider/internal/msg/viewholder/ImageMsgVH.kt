@@ -18,7 +18,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMImageMsgBody
 import com.thk.im.android.ui.manager.IMImageMsgData
-import com.thk.im.android.ui.protocol.IMMsgVHOperator
+import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     BaseMsgVH(liftOwner, itemView, viewType), Observer<IMLoadProgress> {

@@ -7,7 +7,7 @@ import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMUIManager
-import com.thk.im.android.ui.protocol.IMMsgVHOperator
+import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import kotlin.math.abs
 
 class MessageAdapter(

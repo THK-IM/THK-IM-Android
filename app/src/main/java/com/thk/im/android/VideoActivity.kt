@@ -2,14 +2,11 @@ package com.thk.im.android
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
 import com.danikula.videocache.CacheListener
 import com.thk.im.android.base.LLog
 import com.thk.im.android.databinding.ActivityVideoBinding
-import com.thk.im.android.media.preview.VideoCache
+import com.thk.im.preview.VideoCache
 import java.io.File
 
 @UnstableApi
@@ -23,7 +20,7 @@ class VideoActivity : AppCompatActivity(), CacheListener {
         binding = ActivityVideoBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initVideoView()
-        VideoCache.getProxy().registerCacheListener(this, videoUrl)
+        com.thk.im.preview.VideoCache.getProxy().registerCacheListener(this, videoUrl)
     }
 
     private fun initVideoView() {
@@ -33,7 +30,7 @@ class VideoActivity : AppCompatActivity(), CacheListener {
     override fun onDestroy() {
         super.onDestroy()
         binding.pvVideo.releasePlay()
-        VideoCache.getProxy().unregisterCacheListener(
+        com.thk.im.preview.VideoCache.getProxy().unregisterCacheListener(
             this, videoUrl
         )
     }

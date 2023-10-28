@@ -28,8 +28,8 @@ import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.AudioCallback
 import com.thk.im.android.ui.protocol.AudioStatus
-import com.thk.im.android.ui.protocol.IMMsgPreviewer
-import com.thk.im.android.ui.protocol.IMMsgSender
+import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
+import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import java.io.File
 import kotlin.math.abs
 
@@ -257,7 +257,7 @@ class IMInputLayout : ConstraintLayout {
     }
 
     private fun startRecordingAudio() {
-        val contentProvider = IMUIManager.contentProvider ?: return
+        val contentProvider = IMUIManager.mediaProvider ?: return
 
         if (!contentProvider.isRecordingAudio()) {
             binding.btRecordVoice.text = "松开 发送"
@@ -318,7 +318,7 @@ class IMInputLayout : ConstraintLayout {
 
     private fun stopAudioRecording() {
         binding.btRecordVoice.text = "按住 说话"
-        val contentProvider = IMUIManager.contentProvider ?: return
+        val contentProvider = IMUIManager.mediaProvider ?: return
         contentProvider.stopRecordAudio()
     }
 

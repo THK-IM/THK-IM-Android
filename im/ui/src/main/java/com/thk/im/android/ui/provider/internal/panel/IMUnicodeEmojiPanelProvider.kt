@@ -2,7 +2,6 @@ package com.thk.im.android.ui.provider.internal.panel
 
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.panel.BasePanelFragment
-import com.thk.im.android.ui.protocol.IMMsgSender
 import com.thk.im.android.ui.provider.IMBasePanelFragmentProvider
 
 class IMUnicodeEmojiPanelProvider(private val position: Int) : IMBasePanelFragmentProvider() {

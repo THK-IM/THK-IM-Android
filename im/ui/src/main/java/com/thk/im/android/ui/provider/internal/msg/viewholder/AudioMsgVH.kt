@@ -17,7 +17,7 @@ import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMAudioMsgBody
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMMsgPosType
-import com.thk.im.android.ui.protocol.IMMsgVHOperator
+import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import com.thk.im.android.ui.utils.DateUtil
 
 class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :

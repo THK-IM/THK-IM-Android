@@ -4,7 +4,8 @@ import android.app.Application
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.ui.protocol.IMContentProvider
+import com.thk.im.android.ui.protocol.IMMediaPreviewer
+import com.thk.im.android.ui.protocol.IMMediaProvider
 import com.thk.im.android.ui.provider.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.provider.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.IMBasePanelFragmentProvider
@@ -32,7 +33,8 @@ object IMUIManager {
     private val sessionIVProviders = HashMap<Int, IMBaseSessionIVProvider>()
     var panelFragmentProviders = HashMap<Int, IMBasePanelFragmentProvider>()
     var functionIVProviders = HashMap<Int, IMBaseFunctionIVProvider>()
-    var contentProvider: IMContentProvider? = null
+    var mediaProvider: IMMediaProvider? = null
+    var mediaPreviewer: IMMediaPreviewer? = null
 
     fun registerMsgIVProvider(vararg providers: IMBaseMessageIVProvider) {
         for (p in providers) {

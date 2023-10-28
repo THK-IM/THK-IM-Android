@@ -1,7 +1,7 @@
 package com.thk.im.android.ui.fragment.panel
 
 import androidx.fragment.app.Fragment
-import com.thk.im.android.ui.protocol.IMMsgSender
+import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
 abstract class BasePanelFragment : Fragment() {
 

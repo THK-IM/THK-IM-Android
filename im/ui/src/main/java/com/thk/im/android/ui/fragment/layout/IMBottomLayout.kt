@@ -15,8 +15,8 @@ import com.thk.im.android.ui.databinding.LayoutMessageBottomBinding
 import com.thk.im.android.ui.fragment.adapter.PanelFragmentAdapter
 import com.thk.im.android.ui.fragment.adapter.PanelMenuAdapter
 import com.thk.im.android.ui.fragment.panel.IMFunctionAdapter
-import com.thk.im.android.ui.protocol.IMMsgPreviewer
-import com.thk.im.android.ui.protocol.IMMsgSender
+import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
+import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
 class IMBottomLayout : ConstraintLayout {
 

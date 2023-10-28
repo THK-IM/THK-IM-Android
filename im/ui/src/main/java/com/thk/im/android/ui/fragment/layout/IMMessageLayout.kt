@@ -15,9 +15,9 @@ import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.ui.fragment.adapter.MessageAdapter
-import com.thk.im.android.ui.protocol.IMMsgPreviewer
-import com.thk.im.android.ui.protocol.IMMsgSender
-import com.thk.im.android.ui.protocol.IMMsgVHOperator
+import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
+import com.thk.im.android.ui.protocol.internal.IMMsgSender
+import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
 
 class IMMessageLayout : RecyclerView, IMMsgVHOperator {

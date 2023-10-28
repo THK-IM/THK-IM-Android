@@ -20,7 +20,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
-import com.thk.im.android.ui.protocol.IMMsgVHOperator
+import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import com.thk.im.android.ui.utils.DateUtil
 
 class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :

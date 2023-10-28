@@ -1,6 +1,6 @@
 package com.thk.im.android.ui.provider
 
-import com.thk.im.android.ui.protocol.IMMsgSender
+import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
 abstract class IMBaseFunctionIVProvider {
 

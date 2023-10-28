@@ -1,7 +1,7 @@
 package com.thk.im.android.ui.provider.internal.function
 
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.protocol.IMMsgSender
+import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.provider.IMBaseFunctionIVProvider
 
 class IMAlbumFunctionIVProvider : IMBaseFunctionIVProvider() {

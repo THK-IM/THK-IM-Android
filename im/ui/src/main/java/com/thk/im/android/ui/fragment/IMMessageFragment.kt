@@ -39,15 +39,14 @@ import com.thk.im.android.ui.manager.VideoMediaItem
 import com.thk.im.android.ui.protocol.AudioCallback
 import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.IMContentResult
-import com.thk.im.android.ui.protocol.IMMsgPreviewer
-import com.thk.im.android.ui.protocol.IMMsgSender
+import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
+import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
 class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow
     private var keyboardShowing = false
     private var session: Session? = null
     private lateinit var binding: FragmentMessageBinding
-    private var preview: View? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -131,7 +130,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     private fun selectImage() {
         activity?.let {
-            IMUIManager.contentProvider?.pick(it,
+            IMUIManager.mediaProvider?.pick(it,
                 listOf(IMFileFormat.Image, IMFileFormat.Video),
                 object : IMContentResult {
                     override fun onResult(result: List<IMFile>) {
@@ -148,7 +147,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     private fun cameraMedia() {
         activity?.let {
-            IMUIManager.contentProvider?.openCamera(it,
+            IMUIManager.mediaProvider?.openCamera(it,
                 listOf(IMFileFormat.Image, IMFileFormat.Video),
                 object : IMContentResult {
                     override fun onResult(result: List<IMFile>) {
@@ -214,7 +213,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                 msg.data?.let {
                     val data = Gson().fromJson(it, IMAudioMsgData::class.java)
                     data.path?.let { path ->
-                        IMUIManager.contentProvider?.startPlayAudio(path, object : AudioCallback {
+                        IMUIManager.mediaProvider?.startPlayAudio(path, object : AudioCallback {
                             override fun audioData(
                                 path: String,
                                 second: Int,
@@ -268,8 +267,14 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                 break
             }
         }
-        preview = originView
-        activity?.let { IMUIManager.contentProvider?.preview(it, medias, originView, previewPos) }
+        activity?.let {
+            IMUIManager.mediaPreviewer?.previewMessage(
+                it,
+                medias,
+                originView,
+                previewPos
+            )
+        }
     }
 
     private fun convertMessageToMediaItem(message: Message): MediaItem? {

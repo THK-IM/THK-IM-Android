@@ -1,14 +1,11 @@
 package com.thk.im.android;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -18,9 +15,7 @@ import com.thk.im.android.base.BaseSubscriber;
 import com.thk.im.android.base.RxTransform;
 import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.databinding.ActivityMainBinding;
-import com.thk.im.android.db.SessionType;
 import com.thk.im.android.db.entity.Session;
-import com.thk.im.android.media.preview.MediaPreviewActivity;
 
 import java.util.Objects;
 import java.util.Random;

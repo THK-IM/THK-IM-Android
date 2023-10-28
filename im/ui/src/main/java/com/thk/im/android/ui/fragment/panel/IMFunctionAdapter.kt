@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMUIManager
-import com.thk.im.android.ui.protocol.IMMsgSender
+import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
 class IMFunctionAdapter(private val msgSender: IMMsgSender) : RecyclerView.Adapter<IMFunctionsVH>() {
 

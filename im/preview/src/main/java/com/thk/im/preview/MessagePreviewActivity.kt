@@ -125,14 +125,18 @@ class MessagePreviewActivity : AppCompatActivity() {
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.MsgUpdate.value, Observer<Message> {
             it?.let {
-                val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
-                adapter.updateMessage(it)
+                if (it.type == MsgType.IMAGE.value) {
+                    val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
+                    adapter.updateMessage(it)
+                }
             }
         })
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
             it?.let {
-                val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
-                adapter.updateMessage(it)
+                if (it.type == MsgType.IMAGE.value) {
+                    val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
+                    adapter.updateMessage(it)
+                }
             }
         })
     }

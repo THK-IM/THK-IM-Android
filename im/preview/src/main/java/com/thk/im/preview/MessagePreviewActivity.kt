@@ -21,19 +21,27 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.thk.im.android.base.AppUtils
+import com.thk.im.android.base.BaseSubscriber
+import com.thk.im.android.base.LLog
+import com.thk.im.android.base.RxTransform
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.preview.databinding.ActivityMediaPreviewBinding
 import com.thk.im.preview.adapter.MessagePreviewAdapter
 import com.thk.im.preview.view.VideoPlayerView
 import com.thk.im.preview.view.ZoomableImageView
+import io.reactivex.Flowable
+import io.reactivex.disposables.CompositeDisposable
 import kotlin.math.abs
 
 class MessagePreviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMediaPreviewBinding
     private lateinit var adapter: MessagePreviewAdapter
+    private val disposeables = CompositeDisposable()
     private var originRect = Rect(0, 0, 0, 0)
     private var previewerScrolling = false
     private var position = 0
@@ -108,6 +116,7 @@ class MessagePreviewActivity : AppCompatActivity() {
                 super.onPageSelected(position)
                 val recyclerView = binding.vpMediaPreview.getChildAt(0) as RecyclerView
                 adapter.onPageSelected(position, recyclerView)
+                onPreviewPageSelected(position)
             }
         })
         binding.vpMediaPreview.setCurrentItem(position, false)
@@ -290,6 +299,60 @@ class MessagePreviewActivity : AppCompatActivity() {
         }
     }
 
+    private fun onPreviewPageSelected(position: Int) {
+        val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
+        if (position != 0 && position != adapter.itemCount - 1) {
+            return
+        }
+        val message = adapter.getMessage(position)
+        message?.let {
+            if (position == 0) {
+                loadMessages(it, true)
+            } else if (position == adapter.itemCount - 1) {
+                loadMessages(it, false)
+            }
+        }
+    }
+
+    private fun loadMessages(message: Message, older: Boolean) {
+        val subscriber = object : BaseSubscriber<List<Message>>() {
+            override fun onNext(t: List<Message>?) {
+                t?.let {
+                    val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
+                    adapter.addOlderMessage(t, older)
+                }
+            }
+        }
+        Flowable.just(message)
+            .map {
+                val messages = when (older) {
+                    true -> {
+                        IMCoreManager.getImDataBase().messageDao().findOlderMessage(
+                            it.sid,
+                            it.msgId,
+                            arrayOf(MsgType.IMAGE.value, MsgType.VIDEO.value),
+                            it.cTime,
+                            10
+                        ).reversed()
+                    }
+
+                    else -> {
+                        IMCoreManager.getImDataBase().messageDao().findNewerMessage(
+                            it.sid,
+                            it.msgId,
+                            arrayOf(MsgType.IMAGE.value, MsgType.VIDEO.value),
+                            it.cTime,
+                            10
+                        )
+                    }
+                }
+                return@map messages
+            }
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposeables.add(subscriber)
+    }
+
     override fun onBackPressed() {
         exit()
     }
@@ -301,5 +364,10 @@ class MessagePreviewActivity : AppCompatActivity() {
         } else {
             overridePendingTransition(0, 0)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposeables.clear()
     }
 }

@@ -104,4 +104,21 @@ class MessagePreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: L
             }
         }
     }
+
+    fun getMessage(position: Int): Message? {
+        return if (position < messages.size) {
+            messages[position]
+        } else {
+            null
+        }
+    }
+
+    fun addOlderMessage(messages: List<Message>, older: Boolean) {
+        var pos = 0
+        if (!older) {
+            pos = this.messages.size
+        }
+        this.messages.addAll(pos, messages)
+        notifyItemRangeInserted(pos, messages.size)
+    }
 }

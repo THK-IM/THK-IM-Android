@@ -31,6 +31,7 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
 
     override fun bindMessage(message: Message) {
         super.bindMessage(message)
+        pvVideo.visibility = View.GONE
         startPreview()
     }
 
@@ -66,11 +67,11 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                 loadVideo()
                 lyCover.visibility = View.GONE
             }
-            pvVideo.visibility = View.VISIBLE
         }
     }
 
     private fun loadVideo() {
+        pvVideo.visibility = View.VISIBLE
         message?.let {
             var played = false
             if (it.data != null) {

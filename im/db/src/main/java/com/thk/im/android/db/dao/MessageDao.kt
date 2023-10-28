@@ -26,8 +26,8 @@ interface MessageDao {
     @Query("delete from message where sid= :sid and c_time >= :startTime and c_time <= :endTime")
     fun deleteMessageByCTimeInclude(sid: Long, startTime: Long, endTime: Long)
 
-    @Query("select * from message where sid = :sid and type > 0 and c_time < :cTime order by c_time desc limit :size")
-    fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, size: Int): List<Message>
+    @Query("select * from message where sid = :sid and type > 0 and c_time < :cTime order by c_time desc limit :count")
+    fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
 
     @Query("update message set send_status = :status where send_status < :successStatus")
     fun resetSendingMsg(
@@ -40,6 +40,12 @@ interface MessageDao {
 
     @Query("select * from message where id = :id")
     fun findMessage(id: Long): Message?
+
+    @Query("select * from message where sid = :sId and msg_id != :msgId and type in (:types) and c_time <= :cTime order by c_time desc limit :count")
+    fun findOlderMessage(sId: Long, msgId: Long, types: Array<Int>, cTime: Long, count: Int): List<Message>
+
+    @Query("select * from message where sid = :sId and msg_id != :msgId and type in (:types) and c_time >= :cTime order by c_time asc limit :count")
+    fun findNewerMessage(sId: Long, msgId: Long, types: Array<Int>, cTime: Long, count: Int): List<Message>
 
     @Query("select count(id) from message")
     fun getMessageCount(): Long

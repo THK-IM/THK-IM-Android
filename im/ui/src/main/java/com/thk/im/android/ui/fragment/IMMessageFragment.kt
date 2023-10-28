@@ -28,14 +28,9 @@ import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMFile
-import com.thk.im.android.ui.manager.IMImageMsgBody
 import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.android.ui.manager.IMUIManager
-import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
-import com.thk.im.android.ui.manager.ImageMediaItem
-import com.thk.im.android.ui.manager.MediaItem
-import com.thk.im.android.ui.manager.VideoMediaItem
 import com.thk.im.android.ui.protocol.AudioCallback
 import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.IMContentResult
@@ -236,32 +231,26 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     private fun previewImageAndVideo(msg: Message, position: Int, originView: View) {
         val messages = binding.rcvMessage.getMessages()
-        val medias = ArrayList<MediaItem>()
+        val mediaMessages = ArrayList<Message>()
         var count = 0
-        val rightMedias = mutableListOf<MediaItem>()
+        val rightMessages = mutableListOf<Message>()
         for (i in position until messages.size) {
             if (msg.type == MsgType.IMAGE.value || msg.type == MsgType.VIDEO.value) {
-                val media = convertMessageToMediaItem(messages[i])
-                media?.let {
-                    rightMedias.add(media)
-                    count++
-                }
+                rightMessages.add(messages[i])
+                count++
             }
             if (count == 5) {
                 break
             }
         }
 
-        medias.addAll(rightMedias.reversed())
-        val previewPos = medias.size - 1
+        mediaMessages.addAll(rightMessages.reversed())
+        val previewPos = mediaMessages.size - 1
         count = 0
         for (i in 0 until position) {
             if (msg.type == MsgType.IMAGE.value || msg.type == MsgType.VIDEO.value) {
-                val media = convertMessageToMediaItem(messages[position - 1 - i])
-                media?.let {
-                    medias.add(media)
-                    count++
-                }
+                mediaMessages.add(messages[i])
+                count++
             }
             if (count == 5) {
                 break
@@ -270,86 +259,10 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         activity?.let {
             IMUIManager.mediaPreviewer?.previewMessage(
                 it,
-                medias,
+                mediaMessages,
                 originView,
                 previewPos
             )
-        }
-    }
-
-    private fun convertMessageToMediaItem(message: Message): MediaItem? {
-        return when (message.type) {
-            MsgType.IMAGE.value -> {
-                val item = ImageMediaItem(0, 0, null, null, null, null)
-                if (message.data != null) {
-                    val data = Gson().fromJson(message.data, IMImageMsgData::class.java)
-                    if (data != null) {
-                        item.thumbnailPath = data.thumbnailPath
-                        item.sourcePath = data.path
-                        data.width?.let { width ->
-                            item.width = width
-                        }
-                        data.height?.let { height ->
-                            item.height = height
-                        }
-                    }
-                }
-                if (message.content != null) {
-                    val content = Gson().fromJson(message.content, IMImageMsgBody::class.java)
-                    if (content != null) {
-                        item.thumbnailUrl = content.thumbnailUrl
-                        item.sourceUrl = content.url
-                        content.width?.let { width ->
-                            item.width = width
-                        }
-                        content.height?.let { height ->
-                            item.height = height
-                        }
-                    }
-                }
-                item
-            }
-
-            MsgType.VIDEO.value -> {
-                val item = VideoMediaItem(0, 0, 0, null, null, null, null)
-                if (message.data != null) {
-                    val data = Gson().fromJson(message.data, IMVideoMsgData::class.java)
-                    if (data != null) {
-                        item.coverPath = data.thumbnailPath
-                        item.sourcePath = data.path
-                        data.duration?.let { duration ->
-                            item.duration = duration
-                        }
-                        data.width?.let { width ->
-                            item.width = width
-                        }
-                        data.height?.let { height ->
-                            item.height = height
-                        }
-                    }
-                }
-                if (message.content != null) {
-                    val content = Gson().fromJson(message.content, IMVideoMsgBody::class.java)
-                    if (content != null) {
-                        item.coverUrl = content.thumbnailUrl
-                        item.sourceUrl = content.url
-                        content.duration?.let { duration ->
-                            item.duration = duration
-                        }
-                        content.width?.let { width ->
-                            item.width = width
-                        }
-                        content.height?.let { height ->
-                            item.height = height
-                        }
-                    }
-                }
-                item
-            }
-
-            else -> {
-                null
-            }
         }
     }
 

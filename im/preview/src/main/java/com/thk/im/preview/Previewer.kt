@@ -6,7 +6,7 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Build
 import android.view.View
-import com.thk.im.android.ui.manager.MediaItem
+import com.thk.im.android.db.entity.Message
 import com.thk.im.android.ui.protocol.IMPreviewer
 
 class Previewer(app: Application, token: String) : IMPreviewer {
@@ -14,16 +14,17 @@ class Previewer(app: Application, token: String) : IMPreviewer {
     init {
         VideoCache.init(app, token)
     }
+
     override fun previewMessage(
         activity: Activity,
-        items: ArrayList<MediaItem>,
+        items: ArrayList<Message>,
         view: View,
         position: Int
     ) {
-        val intent = Intent(activity, MediaPreviewActivity::class.java)
+        val intent = Intent(activity, MessagePreviewActivity::class.java)
         val locations = IntArray(2)
         view.getLocationOnScreen(locations)
-        intent.putParcelableArrayListExtra("media_items", items)
+        intent.putParcelableArrayListExtra("messages", items)
         val rect = Rect(
             locations[0],
             locations[1],

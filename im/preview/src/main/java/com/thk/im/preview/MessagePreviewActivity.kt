@@ -20,18 +20,17 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.thk.im.android.base.AppUtils
-import com.thk.im.android.base.LLog
+import com.thk.im.android.db.entity.Message
 import com.thk.im.android.preview.databinding.ActivityMediaPreviewBinding
-import com.thk.im.android.ui.manager.MediaItem
-import com.thk.im.preview.adapter.MediaPreviewAdapter
+import com.thk.im.preview.adapter.MessagePreviewAdapter
 import com.thk.im.preview.view.VideoPlayerView
 import com.thk.im.preview.view.ZoomableImageView
 import kotlin.math.abs
 
-class MediaPreviewActivity : AppCompatActivity() {
+class MessagePreviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMediaPreviewBinding
-    private lateinit var adapter: MediaPreviewAdapter
+    private lateinit var adapter: MessagePreviewAdapter
     private var originRect = Rect(0, 0, 0, 0)
     private var previewerScrolling = false
     private var position = 0
@@ -78,14 +77,14 @@ class MediaPreviewActivity : AppCompatActivity() {
         }
         binding = ActivityMediaPreviewBinding.inflate(layoutInflater)
         val items = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableArrayListExtra("media_items", MediaItem::class.java)
+            intent.getParcelableArrayListExtra("messages", Message::class.java)
         } else {
-            intent.getParcelableArrayListExtra("media_items")
+            intent.getParcelableArrayListExtra("messages")
         }
         setContentView(binding.root)
         startEnterAnimation()
         items?.let {
-            adapter = MediaPreviewAdapter(this, it)
+            adapter = MessagePreviewAdapter(this, it)
         }
         initView()
     }
@@ -99,7 +98,6 @@ class MediaPreviewActivity : AppCompatActivity() {
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
                 previewerScrolling = state != ViewPager2.SCROLL_STATE_IDLE
-                LLog.v("previewerScrolling: ${previewerScrolling}")
             }
 
             override fun onPageSelected(position: Int) {
@@ -130,7 +128,7 @@ class MediaPreviewActivity : AppCompatActivity() {
                 if (binding.clContent.background.alpha != 255) {
                     if (binding.clContent.background.alpha < 180) {
                         binding.clContent.background.alpha = 0
-                        this@MediaPreviewActivity.exit()
+                        this@MessagePreviewActivity.exit()
                     } else {
                         reset()
                     }

@@ -4,97 +4,92 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.thk.im.android.db.MsgType
+import com.thk.im.android.db.entity.Message
 import com.thk.im.android.preview.R
-import com.thk.im.android.ui.manager.ImageMediaItem
-import com.thk.im.android.ui.manager.MediaItem
-import com.thk.im.preview.viewholder.ImageMediaVH
-import com.thk.im.preview.viewholder.MediaVH
-import com.thk.im.preview.viewholder.VideoMediaVH
+import com.thk.im.preview.viewholder.ImagePreviewVH
+import com.thk.im.preview.viewholder.PreviewVH
+import com.thk.im.preview.viewholder.VideoPreviewVH
 
-class MediaPreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: List<MediaItem>) :
-    RecyclerView.Adapter<MediaVH>() {
+class MessagePreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: List<Message>) :
+    RecyclerView.Adapter<PreviewVH>() {
 
 
-    private val medias = mutableListOf<MediaItem>()
+    private val messages = mutableListOf<Message>()
 
     init {
-        medias.addAll(items)
+        messages.addAll(items)
     }
 
     override fun getItemViewType(position: Int): Int {
-        val media = medias[position]
-        return if (media is ImageMediaItem) {
-            1
-        } else {
-            2
-        }
+        return messages[position].type
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaVH {
-        return if (viewType == 1) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreviewVH {
+        return if (viewType == MsgType.IMAGE.value) {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.itemview_media_image, parent, false)
-            ImageMediaVH(lifecycleOwner, view)
+            ImagePreviewVH(lifecycleOwner, view)
         } else {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.itemview_media_video, parent, false)
-            VideoMediaVH(lifecycleOwner, view)
+            VideoPreviewVH(lifecycleOwner, view)
         }
     }
 
     override fun getItemCount(): Int {
-        return medias.size
+        return messages.size
     }
 
-    override fun onBindViewHolder(holder: MediaVH, position: Int) {
-        holder.bindMedia(medias[position])
+    override fun onBindViewHolder(holder: PreviewVH, position: Int) {
+        holder.bindMessage(messages[position])
     }
 
-    override fun onViewRecycled(holder: MediaVH) {
+    override fun onViewRecycled(holder: PreviewVH) {
         super.onViewRecycled(holder)
         holder.onViewRecycled()
     }
 
-    override fun onViewAttachedToWindow(holder: MediaVH) {
+    override fun onViewAttachedToWindow(holder: PreviewVH) {
         super.onViewAttachedToWindow(holder)
         holder.onViewAttached()
     }
 
-    override fun onViewDetachedFromWindow(holder: MediaVH) {
+    override fun onViewDetachedFromWindow(holder: PreviewVH) {
         super.onViewDetachedFromWindow(holder)
         holder.onViewDetached()
     }
 
     fun onPageSelected(position: Int, recyclerView: RecyclerView) {
-        for (i in 0 until medias.size) {
+        for (i in 0 until messages.size) {
             val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
             viewHolder?.let {
                 if (position == i) {
-                    (viewHolder as MediaVH).startPreview()
+                    (viewHolder as PreviewVH).startPreview()
                 } else {
-                    (viewHolder as MediaVH).stopPreview()
+                    (viewHolder as PreviewVH).stopPreview()
                 }
             }
         }
     }
 
     fun hideChildren(currentItem: Int, recyclerView: RecyclerView) {
-        for (i in 0 until medias.size) {
+        for (i in 0 until messages.size) {
             val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
             viewHolder?.let {
                 if (currentItem != i) {
-                    (viewHolder as MediaVH).hide()
+                    (viewHolder as PreviewVH).hide()
                 }
             }
         }
     }
 
     fun showChildren(currentItem: Int, recyclerView: RecyclerView) {
-        for (i in 0 until medias.size) {
+        for (i in 0 until messages.size) {
             val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
             viewHolder?.let {
                 if (currentItem != i) {
-                    (viewHolder as MediaVH).show()
+                    (viewHolder as PreviewVH).show()
                 }
             }
         }

@@ -294,7 +294,7 @@ object CompressUtils {
                 ?: return null
             val duration =
                 retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toString()
-                    .toInt() / 1000 + 1 // 时长(秒)
+                    .toInt() / 1000 // 时长(秒)
             return Pair(b, duration)
         } catch (e: IllegalArgumentException) {
             e.printStackTrace()

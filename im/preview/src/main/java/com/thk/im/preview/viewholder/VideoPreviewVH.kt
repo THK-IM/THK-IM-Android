@@ -86,9 +86,16 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                 if (it.content != null) {
                     val body = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
                     if (body?.url != null) {
-                        VideoCache.registerCacheListener(this, body.url!!)
-                        pvVideo.initPlay(body.url!!)
-                        pvVideo.play()
+                        val cachePath = VideoCache.getCachePath(body.url!!)
+                        if (cachePath == null) {
+                            VideoCache.registerCacheListener(this, body.url!!)
+                            pvVideo.initPlay(body.url!!)
+                            pvVideo.play()
+                        } else {
+                            updateDb(it, File(cachePath), body.url!!)
+                            pvVideo.initPlay(cachePath)
+                            pvVideo.play()
+                        }
                     }
                 }
             }
@@ -163,8 +170,6 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                                                 notifySession = false
                                             )
                                     }
-
-
                                 }
                             }
                         }

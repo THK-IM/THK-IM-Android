@@ -88,7 +88,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
             storageModule.allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
         return CompressUtils.compress(
             imageData.path!!,
-            50 * 1024,
+            100 * 1024,
             thumbPath
         ).flatMap {
             val size = CompressUtils.getBitmapAspect(imageData.path!!)

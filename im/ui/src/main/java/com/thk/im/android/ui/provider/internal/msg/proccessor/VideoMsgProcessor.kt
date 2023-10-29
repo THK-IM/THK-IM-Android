@@ -46,7 +46,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             } else {
                 CompressUtils.compress(
                     videoData.thumbnailPath!!,
-                    50 * 1024,
+                    100 * 1024,
                     videoData.thumbnailPath!!
                 ).flatMap {
                     Flowable.just(message)

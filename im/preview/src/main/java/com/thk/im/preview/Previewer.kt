@@ -15,11 +15,11 @@ class Previewer(app: Application, token: String) : IMPreviewer {
         VideoCache.init(app, token)
     }
 
-    override fun previewMessage(
+    override fun previewMediaMessage(
         activity: Activity,
         items: ArrayList<Message>,
         view: View,
-        position: Int
+        defaultId: Long
     ) {
         val intent = Intent(activity, MessagePreviewActivity::class.java)
         val locations = IntArray(2)
@@ -32,7 +32,7 @@ class Previewer(app: Application, token: String) : IMPreviewer {
             locations[1] + view.measuredHeight,
         )
         intent.putExtra("origin_rect", rect)
-        intent.putExtra("position", position)
+        intent.putExtra("defaultId", defaultId)
         activity.startActivity(intent)
         if (Build.VERSION.SDK_INT >= 34) {
             activity.overrideActivityTransition(Activity.OVERRIDE_TRANSITION_OPEN, 0, 0)

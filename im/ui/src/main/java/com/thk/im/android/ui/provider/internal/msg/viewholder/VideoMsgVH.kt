@@ -72,8 +72,9 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                 }
             }
         }
-
-        setLayoutParams(width, height)
+        if (width != 0 && height != 0) {
+            setLayoutParams(width, height)
+        }
         renderDuration(duration)
         if (imagePath != "") {
             renderThumbnailImage(imagePath)

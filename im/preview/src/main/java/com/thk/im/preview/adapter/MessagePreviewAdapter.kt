@@ -121,4 +121,8 @@ class MessagePreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: L
         this.messages.addAll(pos, messages)
         notifyItemRangeInserted(pos, messages.size)
     }
+
+    fun getMessages(): List<Message> {
+        return this.messages
+    }
 }

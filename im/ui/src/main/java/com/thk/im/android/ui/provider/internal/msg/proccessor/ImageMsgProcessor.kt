@@ -277,6 +277,9 @@ class ImageMsgProcessor : BaseMsgProcessor() {
     }
 
     override fun downloadMsgContent(entity: Message, resourceType: String): Boolean {
+        if (entity.content.isNullOrEmpty()) {
+            return false
+        }
         var data = Gson().fromJson(entity.data, IMImageMsgData::class.java)
         val body = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
 

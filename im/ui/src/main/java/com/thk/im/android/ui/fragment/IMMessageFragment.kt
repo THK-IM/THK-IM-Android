@@ -257,11 +257,11 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
             }
         }
         activity?.let {
-            IMUIManager.mediaPreviewer?.previewMessage(
+            IMUIManager.mediaPreviewer?.previewMediaMessage(
                 it,
                 mediaMessages,
                 originView,
-                previewPos
+                msg.id
             )
         }
     }

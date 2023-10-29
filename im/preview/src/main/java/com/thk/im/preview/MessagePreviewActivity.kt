@@ -22,7 +22,6 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.thk.im.android.base.AppUtils
 import com.thk.im.android.base.BaseSubscriber
-import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
@@ -41,10 +40,10 @@ class MessagePreviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMediaPreviewBinding
     private lateinit var adapter: MessagePreviewAdapter
-    private val disposeables = CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
     private var originRect = Rect(0, 0, 0, 0)
     private var previewerScrolling = false
-    private var position = 0
+    private var defaultId = 0L
     private var dragStartX = 0
     private var dragStartY = 0
     private val animationDuration = 300L
@@ -80,7 +79,7 @@ class MessagePreviewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        position = intent.getIntExtra("position", 0)
+        defaultId = intent.getLongExtra("defaultId", 0)
         originRect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("origin_rect", Rect::class.java)!!
         } else {
@@ -119,7 +118,19 @@ class MessagePreviewActivity : AppCompatActivity() {
                 onPreviewPageSelected(position)
             }
         })
-        binding.vpMediaPreview.setCurrentItem(position, false)
+
+        binding.vpMediaPreview.setCurrentItem(findPosition(defaultId), false)
+
+    }
+
+    private fun findPosition(id: Long): Int {
+        val messages = adapter.getMessages()
+        for (i in messages.indices) {
+            if (messages[i].id == id) {
+                return i
+            }
+        }
+        return 0
     }
 
     private fun initEventBus() {
@@ -250,7 +261,8 @@ class MessagePreviewActivity : AppCompatActivity() {
     }
 
     private fun startExitAnimation() {
-        if (binding.vpMediaPreview.currentItem != position) {
+        val defaultPosition = findPosition(defaultId)
+        if (binding.vpMediaPreview.currentItem != defaultPosition) {
             finish()
         } else {
             val scaleStart = originRect.width().toFloat() / AppUtils.instance().screenWidth
@@ -354,7 +366,7 @@ class MessagePreviewActivity : AppCompatActivity() {
             }
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
-        disposeables.add(subscriber)
+        compositeDisposable.add(subscriber)
     }
 
     override fun onBackPressed() {
@@ -372,6 +384,6 @@ class MessagePreviewActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        disposeables.clear()
+        compositeDisposable.clear()
     }
 }

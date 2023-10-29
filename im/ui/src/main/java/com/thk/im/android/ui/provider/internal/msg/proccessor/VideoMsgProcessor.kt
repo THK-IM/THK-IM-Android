@@ -294,6 +294,9 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
     }
 
     override fun downloadMsgContent(entity: Message, resourceType: String): Boolean {
+        if (entity.content.isNullOrEmpty()) {
+            return false
+        }
         var data = Gson().fromJson(entity.data, IMVideoMsgData::class.java)
         val body = Gson().fromJson(entity.content, IMVideoMsgBody::class.java)
 

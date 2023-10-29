@@ -39,10 +39,10 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                 if (it.thumbnailPath != null) {
                     imagePath = it.thumbnailPath!!
                 }
-                if (it.width != null) {
+                if (it.width != null && it.width!! > 0) {
                     width = it.width!!
                 }
-                if (it.height != null) {
+                if (it.height != null&& it.height!! > 0) {
                     height = it.height!!
                 }
             }
@@ -51,16 +51,18 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         if (!message.content.isNullOrEmpty()) {
             val imageMsgBody = Gson().fromJson(message.content, IMImageMsgBody::class.java)
             imageMsgBody?.let {
-                if (it.width != null) {
+                if (it.width != null && it.width!! > 0) {
                     width = it.width!!
                 }
-                if (it.height != null) {
+                if (it.height != null&& it.height!! > 0) {
                     height = it.height!!
                 }
             }
         }
 
-        setLayoutParams(width, height)
+        if (width != 0 && height != 0) {
+            setLayoutParams(width, height)
+        }
         if (imagePath != "") {
             renderImage(imagePath)
         } else {

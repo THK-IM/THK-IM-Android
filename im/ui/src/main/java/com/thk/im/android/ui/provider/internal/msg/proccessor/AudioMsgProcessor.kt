@@ -155,7 +155,9 @@ class AudioMsgProcessor : BaseMsgProcessor() {
     }
 
     override fun downloadMsgContent(entity: Message, resourceType: String): Boolean {
-
+        if (entity.content.isNullOrEmpty()) {
+            return false
+        }
         var data = Gson().fromJson(entity.data, IMAudioMsgData::class.java)
         val body = Gson().fromJson(entity.content, IMAudioMsgBody::class.java)
 

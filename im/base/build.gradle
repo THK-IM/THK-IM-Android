@@ -40,6 +40,8 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 
     implementation rootProject.ext.dependencies["glide"]
+    implementation rootProject.ext.dependencies["glide-gifencoder-integration"]
     implementation rootProject.ext.dependencies["rxjava"]
     implementation rootProject.ext.dependencies["rxandroid"]
+    implementation rootProject.ext.dependencies["android-gif-drawable"]
 }

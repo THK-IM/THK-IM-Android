@@ -1,18 +1,13 @@
-package com.thk.im.android.base.compress
+package com.thk.im.android.base
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.graphics.Matrix
 import android.media.MediaMetadataRetriever
-import androidx.exifinterface.media.ExifInterface
-import com.bumptech.glide.Glide
-import com.bumptech.glide.gifdecoder.GifHeaderParser
-import com.bumptech.glide.gifdecoder.StandardGifDecoder
-import com.bumptech.glide.load.resource.gif.GifBitmapProvider
-import com.thk.im.android.base.AppUtils
+import com.bumptech.glide.gifencoder.AnimatedGifEncoder
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import pl.droidsonroids.gif.GifDrawable
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -21,11 +16,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.nio.ByteBuffer
-import kotlin.math.ceil
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 
@@ -54,51 +44,37 @@ object CompressUtils {
                 throw IOException()
             }
         }
-        val rate = sqrt((length / size).toDouble()).toInt() * 2
-        var sample = 2
-        while (sample < rate) {
-            sample *= 2
-        }
         val isGif = isGif(srcPath)
         if (isGif) {
-            val srcFile = File(srcPath)
-            val fis = FileInputStream(srcFile)
-            val bb = ByteBuffer.allocate(length.toInt())
-            val gifParser = GifHeaderParser()
-            fis.channel.read(bb)
-            gifParser.setData(bb)
-            val header = gifParser.parseHeader()
-            val encoder = AnimatedGifEncoder()
             val desFile = File(desPath)
             if (desFile.exists()) {
                 desFile.delete()
             }
-            var success = desFile.createNewFile()
+            val success = desFile.createNewFile()
             if (!success) {
                 throw IOException()
             }
-            val fos = FileOutputStream(desPath)
-            val decoder =
-                StandardGifDecoder(GifBitmapProvider(Glide.get(AppUtils.instance().app).bitmapPool))
-            decoder.setData(header, bb, sample)
-            encoder.setSize(addOne(header.width / sample), addOne(header.height / sample))
-            encoder.setTransparent(Color.TRANSPARENT)
-            encoder.setRepeat(0)
-            success = encoder.start(fos)
-            if (!success) {
-                throw IOException()
+            val gifDrawable = GifDrawable(srcPath)
+            val rate = sqrt((length / size).toDouble()).toInt() * 2
+            var sample = 2
+            var mod = 1
+            while (sample * mod < rate) {
+                if (gifDrawable.minimumWidth / sample > 100) {
+                    sample *= 2
+                } else {
+                    mod *= 2
+                }
             }
-            for (i in 0 until decoder.frameCount) {
-                decoder.advance()
-                encoder.addFrame(decoder.nextFrame)
-                encoder.setDelay(decoder.getDelay(i))
-            }
-            success = encoder.finish()
-            fos.close()
-            if (!success) {
-                throw IOException()
-            }
+            compressFrameGif(
+                gifDrawable, mod, sample, desPath
+            )
+            gifDrawable.recycle()
         } else {
+            val rate = sqrt((length / size).toDouble()).toInt() * 2
+            var sample = 2
+            while (sample < rate) {
+                sample *= 2
+            }
             val options = BitmapFactory.Options()
             options.inSampleSize = sample
 
@@ -163,11 +139,11 @@ object CompressUtils {
             sample *= 2
         }
         val stream = ByteArrayOutputStream()
-        val m = Matrix()
 
         val width: Int = source.width
         val height: Int = source.height
         val scale = sqrt(sample.toDouble()).toFloat()
+        val m = Matrix()
         m.setScale(1 / scale, 1 / scale)
         val bitmap = Bitmap.createBitmap(
             source, 0, 0, width, height, m, true
@@ -194,28 +170,6 @@ object CompressUtils {
         stream.close()
     }
 
-    private fun computeSize(width: Int, height: Int): Int {
-        val srcWidth = if (width % 2 == 1) width + 1 else width
-        val srcHeight = if (height % 2 == 1) height + 1 else height
-        val longSide: Int = max(srcWidth, srcHeight)
-        val shortSide: Int = min(srcWidth, srcHeight)
-        val scale = shortSide.toFloat() / longSide
-        return if (scale <= 1 && scale > 0.5625) {
-            if (longSide < 600) {
-                1
-            } else if (longSide < 1200) {
-                2
-            } else if (longSide in 1200..2400) {
-                4
-            } else {
-                longSide / 600
-            }
-        } else if (scale <= 0.5625 && scale > 0.5) {
-            if (longSide / 600 == 0) 1 else longSide / 600
-        } else {
-            ceil(longSide / (600.0 / scale)).toInt()
-        }
-    }
 
     /**
      * 获取bitmap的长宽
@@ -225,61 +179,6 @@ object CompressUtils {
         options.inJustDecodeBounds = true
         BitmapFactory.decodeFile(path, options)
         return Pair(options.outWidth, options.outHeight)
-    }
-
-    fun readPictureDegree(path: String): Int {
-        var degree = 0
-        try {
-            val exifInterface = ExifInterface(path)
-            val orientation = exifInterface.getAttributeInt(
-                ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL
-            )
-            when (orientation) {
-                ExifInterface.ORIENTATION_ROTATE_90 -> degree = 90
-                ExifInterface.ORIENTATION_ROTATE_180 -> degree = 180
-                ExifInterface.ORIENTATION_ROTATE_270 -> degree = 270
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return degree
-    }
-
-    fun calculateInSampleSize(
-        options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int
-    ): Int {
-        // 源图片的高度和宽度
-        val height = options.outHeight
-        val width = options.outWidth
-        var inSampleSize = 2
-        if (height > reqHeight || width > reqWidth) {
-            // 计算出实际宽高和目标宽高的比率
-            val heightRatio = (height.toFloat() / reqHeight.toFloat()).roundToInt()
-            val widthRatio = (width.toFloat() / reqWidth.toFloat()).roundToInt()
-            // 选择宽和高中最小的比率作为inSampleSize的值，这样可以保证最终图片的宽和高
-            // 一定都会大于等于目标的宽和高。
-            inSampleSize = if (heightRatio < widthRatio) heightRatio else widthRatio
-        }
-        return inSampleSize
-    }
-
-    /*
-     * 旋转图片
-     * @param angle
-     * @param bitmap
-     * @return Bitmap
-     */
-    fun rotatingImageView(angle: Int, bitmap: Bitmap?): Bitmap? {
-        if (null == bitmap) {
-            return null
-        }
-        // 旋转图片 动作
-        val matrix = Matrix()
-        matrix.postRotate(angle.toFloat())
-        // 创建新的图片
-        return Bitmap.createBitmap(
-            bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
-        )
     }
 
 
@@ -383,13 +282,44 @@ object CompressUtils {
         }
     }
 
-    private fun addOne(value: Int): Int {
-        return if (value % 2 > 0) {
-            value + 1
-        } else {
-            value
+    @Throws(Exception::class)
+    private fun compressFrameGif(
+        gifDrawable: GifDrawable, mod: Int, sample: Int, savePath: String
+    ) {
+        var bos: ByteArrayOutputStream? = null
+        var outStream: FileOutputStream? = null
+        try {
+            val gifFrames = gifDrawable.numberOfFrames
+            val gifDuration = gifDrawable.duration
+            bos = ByteArrayOutputStream()
+            val encoder = AnimatedGifEncoder()
+            encoder.setRepeat(0)
+            encoder.start(bos)
+            for (i in 0 until gifFrames) {
+                if (i % mod == 0) {
+                    val source = gifDrawable.seekToFrameAndGet(i)
+                    val scale = sample.toFloat()
+                    val m = Matrix()
+                    m.setScale(1 / scale, 1 / scale)
+                    val bitmap = Bitmap.createBitmap(
+                        source, 0, 0, source.width, source.height, m, true
+                    )
+                    encoder.addFrame(bitmap)
+                    encoder.setDelay(gifDuration / (gifFrames / mod))
+                }
+            }
+            encoder.finish()
+            outStream = FileOutputStream(savePath)
+            outStream.write(bos.toByteArray())
+        } catch (e: Exception) {
+            throw e
+        } finally {
+            try {
+                bos?.close()
+                outStream?.close()
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
         }
     }
-
-
 }

@@ -2,7 +2,7 @@ package com.thk.im.android.ui.provider.internal.msg.proccessor
 
 import com.google.gson.Gson
 import com.thk.im.android.base.LLog
-import com.thk.im.android.base.compress.CompressUtils
+import com.thk.im.android.base.CompressUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat

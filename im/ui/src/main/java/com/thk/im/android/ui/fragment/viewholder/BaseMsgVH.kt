@@ -10,6 +10,7 @@ import androidx.annotation.LayoutRes
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.IMImageLoader
+import com.thk.im.android.base.LLog
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
@@ -20,6 +21,7 @@ import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.db.entity.User
 import com.thk.im.android.ui.R
+import com.thk.im.android.ui.fragment.adapter.ViewHolderSelect
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
@@ -31,12 +33,14 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     open lateinit var session: Session
     private var msgVHOperator: IMMsgVHOperator? = null
     private var pos: Int = 0
+    private var viewHolderSelect: ViewHolderSelect? = null
 
-    open val disposable = CompositeDisposable()
+    private var disposable = CompositeDisposable()
     open val ivAvatarView: ImageView? = itemView.findViewById(R.id.iv_avatar)
     open val tvNicknameView: TextView? = itemView.findViewById(R.id.tv_nickname)
     open val ivMsgFailedView: ImageView? = itemView.findViewById(R.id.iv_msg_fail)
     open val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
+    open val selectView: ImageView = itemView.findViewById(R.id.iv_msg_select)
 
     private var avatarTaskId: String? = null
 
@@ -50,14 +54,37 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         position: Int,
         messages: List<Message>,
         session: Session,
-        msgVHOperator: IMMsgVHOperator
+        msgVHOperator: IMMsgVHOperator,
+        viewHolderSelect: ViewHolderSelect
     ) {
         onViewDetached()
         this.pos = position
         this.message = messages[position]
         this.session = session
         this.msgVHOperator = msgVHOperator
+        this.viewHolderSelect = viewHolderSelect
         onViewAttached()
+        updateSelectMode()
+    }
+
+    fun updateSelectMode() {
+        if (!supportSelect()) {
+            selectView.visibility = View.GONE
+            return
+        }
+        viewHolderSelect?.let {
+            LLog.v("updateSelectMode ${it.isSelectMode()}")
+            if (it.isSelectMode()) {
+                selectView.visibility = View.VISIBLE
+                selectView.isSelected = it.isItemSelected(this.message.msgId)
+            } else {
+                selectView.visibility = View.GONE
+            }
+        }
+    }
+
+    open fun supportSelect(): Boolean {
+        return true
     }
 
     override fun onViewAttached() {
@@ -121,6 +148,13 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         ivMsgFailedView?.setOnClickListener {
             resend()
         }
+
+        selectView.setOnClickListener {
+            viewHolderSelect?.let {
+                selectView.isSelected = !selectView.isSelected
+                it.onSelected(message.msgId, selectView.isSelected)
+            }
+        }
     }
 
     open fun resend() {
@@ -176,5 +210,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     override fun onViewRecycled() {
         super.onViewRecycled()
         msgVHOperator = null
+        viewHolderSelect = null
     }
+
 }

@@ -24,6 +24,7 @@ import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
+import com.thk.im.android.ui.fragment.adapter.MessageAdapter
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.AudioCallback
@@ -320,6 +321,16 @@ class IMInputLayout : ConstraintLayout {
         binding.btRecordVoice.text = "按住 说话"
         val contentProvider = IMUIManager.mediaProvider ?: return
         contentProvider.stopRecordAudio()
+    }
+
+    fun setSelectMode(selected: Boolean) {
+        if (selected) {
+            binding.llMessageInput.visibility = View.GONE
+            binding.llMessageOperator.visibility = View.VISIBLE
+        } else {
+            binding.llMessageInput.visibility = View.VISIBLE
+            binding.llMessageOperator.visibility = View.GONE
+        }
     }
 
 

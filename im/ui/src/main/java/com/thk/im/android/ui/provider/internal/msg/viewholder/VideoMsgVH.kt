@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
 import com.thk.im.android.base.IMImageLoader
@@ -14,6 +15,7 @@ import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
+import com.thk.im.android.ui.fragment.adapter.ViewHolderSelect
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
@@ -32,9 +34,10 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         position: Int,
         messages: List<Message>,
         session: Session,
-        msgVHOperator: IMMsgVHOperator
+        msgVHOperator: IMMsgVHOperator,
+        viewHolderSelect: ViewHolderSelect
     ) {
-        super.onViewBind(position, messages, session, msgVHOperator)
+        super.onViewBind(position, messages, session, msgVHOperator, viewHolderSelect)
 
         var imagePath = ""
         var width = 0
@@ -85,8 +88,8 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     private fun setLayoutParams(width: Int, height: Int) {
-        val contentView: RelativeLayout = itemView.findViewById(R.id.rl_msg_video_content)
-        val lp = contentView.layoutParams
+        val container: CardView = itemView.findViewById(R.id.card_msg_container)
+        val lp = container.layoutParams
         if (width > height) {
             val calWidth = maxOf(80.dp2px(), minOf(200.dp2px(), width))
             val calHeight = maxOf(calWidth * height / width, 60.dp2px())
@@ -98,7 +101,7 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
             lp.width = calWidth
             lp.height = calHeight
         }
-        contentView.layoutParams = lp
+        container.layoutParams = lp
         val imageView: ImageView = itemView.findViewById(R.id.iv_msg_video_thumbnail)
         val durationView: TextView = itemView.findViewById(R.id.tv_video_duration)
         imageView.visibility = View.INVISIBLE

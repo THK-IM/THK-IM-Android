@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.emoji2.widget.EmojiEditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -68,12 +69,24 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         } else {
             arguments?.getParcelable("session")!!
         }
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
         binding.rcvMessage.init(this, this, this)
         binding.llInputLayout.init(this, this, this)
         binding.llBottomLayout.init(this, this, this)
         initKeyboardWindow()
         initEventBus()
+        activity?.let {
+            it.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+            it.onBackPressedDispatcher.addCallback(it, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (binding.rcvMessage.isSelectMode()) {
+                        binding.llInputLayout.setSelectMode(false)
+                        binding.rcvMessage.setSelectMode(false, null)
+                    } else {
+                        it.finish()
+                    }
+                }
+            })
+        }
     }
 
     private fun initKeyboardWindow() {
@@ -229,6 +242,11 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         }
     }
 
+    override fun setSelectMode(selected: Boolean, firstSelectId: Long?) {
+        binding.llInputLayout.setSelectMode(selected)
+        binding.rcvMessage.setSelectMode(selected, firstSelectId)
+    }
+
     private fun previewImageAndVideo(msg: Message, position: Int, originView: View) {
         val messages = binding.rcvMessage.getMessages()
         val mediaMessages = ArrayList<Message>()
@@ -345,13 +363,6 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     override fun closeKeyboard(): Boolean {
         return binding.llInputLayout.closeKeyboard()
-    }
-
-    override fun showMsgMultiChooseLayout() {
-
-    }
-
-    override fun dismissMsgMultiChooseLayout() {
     }
 
 }

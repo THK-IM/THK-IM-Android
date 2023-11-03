@@ -116,15 +116,6 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
             }
         }
 
-//        binding.rcvMessage.setOnTouchListener { _, _ ->
-//            if (bottomHeight > 0 || keyboardShowing) {
-//                bottomHeight = 0
-//                layoutRefresh(bottomHeight, false)
-//                true
-//            } else {
-//                false
-//            }
-//        }
     }
 
     private fun loadMessages() {
@@ -168,18 +159,6 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         }
     }
 
-//    private fun getMessageContentHeight(): Int {
-//        var totalHeight = 0
-//        for (i in 0 until msgAdapter.itemCount) {
-//            val itemView: View? = layoutManager?.findViewByPosition(i)
-//            itemView?.let { iv ->
-//                iv.measure(MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-//                totalHeight += iv.measuredHeight
-//            }
-//        }
-//        return totalHeight
-//    }
-
     fun insertMessage(message: Message) {
         val pos = msgAdapter.insertNew(message)
         if (pos == 0) {
@@ -205,6 +184,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgCellLongClick(message: Message, position: Int, view: View) {
+        msgPreviewer.setSelectMode(true, message.msgId)
     }
 
     override fun onMsgResendClick(message: Message) {
@@ -213,6 +193,14 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
 
     fun getMessages(): List<Message> {
         return (adapter as MessageAdapter).getMessages()
+    }
+
+    fun setSelectMode(selected: Boolean, firstSelectId: Long?) {
+        (adapter as MessageAdapter).setSelectMode(selected, firstSelectId,this)
+    }
+
+    fun isSelectMode() :Boolean {
+        return (adapter as MessageAdapter).isSelectMode()
     }
 
 }

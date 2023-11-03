@@ -47,10 +47,4 @@ interface IMMsgSender {
     /// 关闭键盘
     fun closeKeyboard(): Boolean
 
-    /// 显示消息多选视图
-    fun showMsgMultiChooseLayout()
-
-    /// 关闭消息多选视图
-    fun dismissMsgMultiChooseLayout()
-
 }

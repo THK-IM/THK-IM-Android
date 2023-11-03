@@ -2,6 +2,7 @@ package com.thk.im.android.ui.provider.internal.msg.viewholder
 
 import android.view.View
 import android.widget.ImageView
+import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
 import com.thk.im.android.base.IMImageLoader
@@ -11,6 +12,7 @@ import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
+import com.thk.im.android.ui.fragment.adapter.ViewHolderSelect
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMImageMsgBody
 import com.thk.im.android.ui.manager.IMImageMsgData
@@ -27,9 +29,10 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         position: Int,
         messages: List<Message>,
         session: Session,
-        msgVHOperator: IMMsgVHOperator
+        msgVHOperator: IMMsgVHOperator,
+        viewHolderSelect: ViewHolderSelect
     ) {
-        super.onViewBind(position, messages, session, msgVHOperator)
+        super.onViewBind(position, messages, session, msgVHOperator, viewHolderSelect)
         var imagePath = ""
         var width = 0
         var height = 0
@@ -72,8 +75,9 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     }
 
     private fun setLayoutParams(width: Int, height: Int) {
+        val container: CardView = itemView.findViewById(R.id.card_msg_container)
         val imageView: ImageView = itemView.findViewById(R.id.iv_msg_content)
-        val lp = imageView.layoutParams
+        val lp = container.layoutParams
         if (width > height) {
             val calWidth = maxOf(80.dp2px(), minOf(200.dp2px(), width))
             val calHeight = maxOf(calWidth * height / width, 60.dp2px())
@@ -85,7 +89,7 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
             lp.width = calWidth
             lp.height = calHeight
         }
-        imageView.layoutParams = lp
+        container.layoutParams = lp
         imageView.visibility = View.INVISIBLE
     }
 

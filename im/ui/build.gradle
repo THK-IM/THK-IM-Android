@@ -56,6 +56,7 @@ dependencies {
     implementation rootProject.ext.dependencies["recyclerview"]
     implementation rootProject.ext.dependencies["viewpager2"]
     implementation rootProject.ext.dependencies["constraintlayout"]
+    implementation rootProject.ext.dependencies["cardview"]
 
     implementation project(":im:base")
     implementation project(":im:core")

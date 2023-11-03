@@ -3,6 +3,7 @@ package com.thk.im.android.ui.fragment.adapter
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.thk.im.android.base.LLog
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
@@ -15,13 +16,15 @@ class MessageAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val msgVHOperator: IMMsgVHOperator
 ) :
-    RecyclerView.Adapter<BaseMsgVH>() {
+    RecyclerView.Adapter<BaseMsgVH>(), ViewHolderSelect {
 
     private var lastMessageTime: Long = 0L
     private val timeLineMsgType = 9999
     private val timeLineInterval = 5 * 60 * 1000
 
     private val messageList = mutableListOf<Message>()
+    private var selectIds = mutableSetOf<Long>()
+    private var isSelectMode = false
 
     override fun getItemViewType(position: Int): Int {
         val message = messageList[position]
@@ -37,7 +40,7 @@ class MessageAdapter(
     }
 
     override fun onBindViewHolder(holder: BaseMsgVH, position: Int) {
-        holder.onViewBind(position, messageList, session, msgVHOperator)
+        holder.onViewBind(position, messageList, session, msgVHOperator, this)
     }
 
     override fun onViewRecycled(holder: BaseMsgVH) {
@@ -205,6 +208,43 @@ class MessageAdapter(
 
     fun getMessages(): List<Message> {
         return messageList
+    }
+
+    fun setSelectMode(open: Boolean, firstSelectId: Long?, recyclerView: RecyclerView) {
+        if (this.isSelectMode != open) {
+            this.isSelectMode = open
+            firstSelectId?.let {
+                selectIds.add(it)
+            }
+            for (i in 0 until messageList.size) {
+                val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
+                viewHolder?.let {
+                    (it as BaseMsgVH).updateSelectMode()
+                }
+            }
+        } else {
+            selectIds = mutableSetOf()
+        }
+    }
+
+    fun getSelectIds(): MutableSet<Long> {
+        return selectIds
+    }
+
+    override fun isSelectMode(): Boolean {
+        return isSelectMode
+    }
+
+    override fun isItemSelected(id: Long): Boolean {
+        return selectIds.contains(id)
+    }
+
+    override fun onSelected(id: Long, selected: Boolean) {
+        if (selected) {
+            selectIds.add(id)
+        } else {
+            selectIds.remove(id)
+        }
     }
 
 }

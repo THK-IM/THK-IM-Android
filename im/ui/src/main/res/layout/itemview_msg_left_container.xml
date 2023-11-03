@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="10dp"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingHorizontal="10dp">
+
+    <ImageView
+        android:id="@+id/iv_msg_select"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:visibility="gone"
+        android:src="@drawable/icon_msg_select" />
 
     <ImageView
         android:id="@+id/iv_avatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_toRightOf="@id/iv_msg_select"
         android:scaleType="centerCrop"
         android:src="@drawable/icon_chat_user" />
 
     <LinearLayout
-        android:id="@+id/fl_container_left"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="60dp"
+        android:layout_toRightOf="@id/iv_avatar"
         android:minHeight="60dp"
         android:orientation="vertical">
 
@@ -31,9 +42,9 @@
 
         <LinearLayout
             android:id="@+id/fl_content"
-            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
 
         <TextView
             android:id="@+id/tv_msg_tips"
@@ -55,4 +66,4 @@
     </LinearLayout>
 
 
-</LinearLayout>
+</RelativeLayout>

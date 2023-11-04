@@ -64,7 +64,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         this.msgVHOperator = msgVHOperator
         this.viewHolderSelect = viewHolderSelect
         onViewAttached()
-        updateSelectMode()
     }
 
     fun updateSelectMode() {
@@ -76,7 +75,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             LLog.v("updateSelectMode ${it.isSelectMode()}")
             if (it.isSelectMode()) {
                 selectView.visibility = View.VISIBLE
-                selectView.isSelected = it.isItemSelected(this.message.msgId)
+                selectView.isSelected = it.isItemSelected(message)
             } else {
                 selectView.visibility = View.GONE
             }
@@ -91,6 +90,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         super.onViewAttached()
         renderUserInfo()
         renderMsgStatus()
+        updateSelectMode()
     }
 
     fun onCreate() {
@@ -152,7 +152,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         selectView.setOnClickListener {
             viewHolderSelect?.let {
                 selectView.isSelected = !selectView.isSelected
-                it.onSelected(message.msgId, selectView.isSelected)
+                it.onSelected(message, selectView.isSelected)
             }
         }
     }

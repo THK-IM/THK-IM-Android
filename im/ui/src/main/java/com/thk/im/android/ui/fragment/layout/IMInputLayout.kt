@@ -24,7 +24,6 @@ import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
-import com.thk.im.android.ui.fragment.adapter.MessageAdapter
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.AudioCallback
@@ -169,6 +168,19 @@ class IMInputLayout : ConstraintLayout {
             }
             true
         }
+
+        binding.ivMsgOprCancel.setOnClickListener {
+            msgSender.setSelectMode(false, null)
+        }
+
+        binding.ivMsgOprDelete.setOnClickListener {
+            msgSender.deleteSelectedMessages()
+            msgSender.setSelectMode(false, null)
+        }
+
+        binding.ivMsgOprForward.setOnClickListener {
+            msgSender.setSelectMode(false, null)
+        }
     }
 
     fun init(fragment: Fragment, sender: IMMsgSender, previewer: IMMsgPreviewer) {
@@ -194,10 +206,6 @@ class IMInputLayout : ConstraintLayout {
         binding.etMessage.requestFocus()
         imm.hideSoftInputFromWindow(windowToken, 0)
         return true
-    }
-
-    fun getLayoutHeight(): Int {
-        return height
     }
 
     fun onKeyboardChange(isKeyShowing: Boolean, height: Int, duration: Long) {
@@ -247,11 +255,11 @@ class IMInputLayout : ConstraintLayout {
         val granted = XXPermissions.isGranted(context, Permission.RECORD_AUDIO)
         if (!granted) {
             XXPermissions.with(context).permission(Permission.RECORD_AUDIO).request { _, all ->
-                    if (!all) {
-                        // TODO
-                        ToastUtils.show("请开启录音权限")
-                    }
+                if (!all) {
+                    // TODO
+                    ToastUtils.show("请开启录音权限")
                 }
+            }
         } else {
             startRecordingAudio()
         }

@@ -16,7 +16,9 @@ import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
+import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
+import com.thk.im.android.base.RxTransform
 import com.thk.im.android.base.ToastUtils
 import com.thk.im.android.base.popup.KeyboardPopupWindow
 import com.thk.im.android.core.IMCoreManager
@@ -212,6 +214,15 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                 }
             }
         })
+        XEventBus.observe(this, IMEvent.BatchMsgDelete.value, Observer<List<Message>> { messages ->
+            val deleteMessages = mutableListOf<Message>()
+            messages.forEach {
+                if (it.sid == session!!.id) {
+                    deleteMessages.add(it)
+                }
+            }
+            binding.rcvMessage.deleteMessages(deleteMessages)
+        })
     }
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {
@@ -242,9 +253,26 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         }
     }
 
-    override fun setSelectMode(selected: Boolean, firstSelectId: Long?) {
+    override fun setSelectMode(selected: Boolean, message: Message?) {
         binding.llInputLayout.setSelectMode(selected)
-        binding.rcvMessage.setSelectMode(selected, firstSelectId)
+        binding.rcvMessage.setSelectMode(selected, message)
+    }
+
+    override fun deleteSelectedMessages() {
+        val messages = binding.rcvMessage.getSelectMessages()
+        session?.let {
+            IMCoreManager.getMessageModule()
+                .deleteMessages(it.id, messages.toList(), true)
+                .compose(RxTransform.flowableToMain())
+                .subscribe(object : BaseSubscriber<Void>() {
+                    override fun onNext(t: Void?) {
+
+                    }
+                    override fun onError(t: Throwable?) {
+                        super.onError(t)
+                    }
+                })
+        }
     }
 
     private fun previewImageAndVideo(msg: Message, position: Int, originView: View) {

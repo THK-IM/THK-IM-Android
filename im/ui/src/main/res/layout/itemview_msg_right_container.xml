@@ -24,7 +24,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="60dp"
+        android:layout_marginLeft="40dp"
         android:layout_toLeftOf="@+id/iv_avatar"
         android:layout_toRightOf="@+id/iv_msg_select"
         android:gravity="end"

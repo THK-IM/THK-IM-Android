@@ -3,9 +3,9 @@ package com.thk.im.android.core.api.bean
 import com.google.gson.annotations.SerializedName
 
 data class DeleteMsgBean(
-    @SerializedName("session_id")
+    @SerializedName("s_id")
     val sid: Long,
-    @SerializedName("uid")
+    @SerializedName("u_id")
     val uid: Long,
     @SerializedName("msg_ids")
     val msgIds: Set<Long>,

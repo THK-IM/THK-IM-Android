@@ -23,7 +23,7 @@ class MessageAdapter(
     private val timeLineInterval = 5 * 60 * 1000
 
     private val messageList = mutableListOf<Message>()
-    private var selectIds = mutableSetOf<Long>()
+    private var selectedMessages = hashSetOf<Message>()
     private var isSelectMode = false
 
     override fun getItemViewType(position: Int): Int {
@@ -179,20 +179,28 @@ class MessageAdapter(
     }
 
     fun delete(message: Message) {
+        LLog.d("delete id: ${message.id}")
         synchronized(this) {
             val pos = findPosition(message)
+            LLog.d("delete pos: $pos")
             if (pos >= 0) {
                 messageList.removeAt(pos)
                 notifyItemRemoved(pos)
             }
-            val timeLinePost = pos + 1
             // 附加在该消息上的时间线消息也一并删除
-            if (timeLinePost < messageList.size - 1) {
-                if (messageList[timeLinePost].type == timeLineMsgType) {
-                    messageList.removeAt(timeLinePost)
-                    notifyItemRemoved(timeLinePost)
+            if (pos < messageList.size - 1 && pos > 0) {
+                if (messageList[pos].type == timeLineMsgType) {
+                    LLog.d("delete timeLineMsgType $pos")
+                    messageList.removeAt(pos)
+                    notifyItemRemoved(pos)
                 }
             }
+        }
+    }
+
+    fun batchDelete(deleteMessages: List<Message>) {
+        deleteMessages.forEach {
+            delete(it)
         }
     }
 
@@ -210,11 +218,15 @@ class MessageAdapter(
         return messageList
     }
 
-    fun setSelectMode(open: Boolean, firstSelectId: Long?, recyclerView: RecyclerView) {
+    fun setSelectMode(open: Boolean, firstSelected: Message?, recyclerView: RecyclerView) {
         if (this.isSelectMode != open) {
             this.isSelectMode = open
-            firstSelectId?.let {
-                selectIds.add(it)
+            if (this.isSelectMode) {
+                firstSelected?.let {
+                    selectedMessages.add(it)
+                }
+            } else {
+                selectedMessages.clear()
             }
             for (i in 0 until messageList.size) {
                 val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
@@ -222,28 +234,26 @@ class MessageAdapter(
                     (it as BaseMsgVH).updateSelectMode()
                 }
             }
-        } else {
-            selectIds = mutableSetOf()
         }
     }
 
-    fun getSelectIds(): MutableSet<Long> {
-        return selectIds
+    fun getSelectIds(): MutableSet<Message> {
+        return selectedMessages
     }
 
     override fun isSelectMode(): Boolean {
         return isSelectMode
     }
 
-    override fun isItemSelected(id: Long): Boolean {
-        return selectIds.contains(id)
+    override fun isItemSelected(message: Message): Boolean {
+        return selectedMessages.contains(message)
     }
 
-    override fun onSelected(id: Long, selected: Boolean) {
+    override fun onSelected(message: Message, selected: Boolean) {
         if (selected) {
-            selectIds.add(id)
+            selectedMessages.add(message)
         } else {
-            selectIds.remove(id)
+            selectedMessages.remove(message)
         }
     }
 

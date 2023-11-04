@@ -47,4 +47,10 @@ interface IMMsgSender {
     /// 关闭键盘
     fun closeKeyboard(): Boolean
 
+    /// 打开多选消息视图
+    fun setSelectMode(selected: Boolean, message: Message?)
+
+    /// 删除多选视图选中的消息
+    fun deleteSelectedMessages()
+
 }

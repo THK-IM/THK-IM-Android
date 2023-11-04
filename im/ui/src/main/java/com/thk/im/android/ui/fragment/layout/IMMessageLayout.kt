@@ -174,6 +174,10 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         msgAdapter.delete(message)
     }
 
+    fun deleteMessages(deleteMessages: MutableList<Message>) {
+        msgAdapter.batchDelete(deleteMessages)
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         disposables.clear()
@@ -184,7 +188,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgCellLongClick(message: Message, position: Int, view: View) {
-        msgPreviewer.setSelectMode(true, message.msgId)
+        msgSender.setSelectMode(true, message)
     }
 
     override fun onMsgResendClick(message: Message) {
@@ -195,12 +199,16 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         return (adapter as MessageAdapter).getMessages()
     }
 
-    fun setSelectMode(selected: Boolean, firstSelectId: Long?) {
-        (adapter as MessageAdapter).setSelectMode(selected, firstSelectId,this)
+    fun setSelectMode(selected: Boolean, message: Message?) {
+        (adapter as MessageAdapter).setSelectMode(selected, message, this)
     }
 
-    fun isSelectMode() :Boolean {
+    fun isSelectMode(): Boolean {
         return (adapter as MessageAdapter).isSelectMode()
+    }
+
+    fun getSelectMessages(): Set<Message> {
+        return (adapter as MessageAdapter).getSelectIds()
     }
 
 }

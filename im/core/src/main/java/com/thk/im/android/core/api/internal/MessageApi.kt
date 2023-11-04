@@ -11,6 +11,7 @@ import io.reactivex.Flowable
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -68,9 +69,9 @@ interface MessageApi {
     ): Flowable<ListBean<MessageBean>>
 
     /**
-     * 发送消息ack
+     * 删除消息
      */
-    @DELETE("/message")
+    @HTTP(method = "DELETE", path = "/message", hasBody = true)
     fun deleteMessages(
         @Body body: DeleteMsgBean
     ): Flowable<Void>

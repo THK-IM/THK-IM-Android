@@ -325,6 +325,7 @@ open class DefaultMessageModule : MessageModule {
     private fun deleteLocalMessages(messages: List<Message>): Flowable<Void> {
         return Flowable.create({
             IMCoreManager.getImDataBase().messageDao().deleteMessages(messages)
+            XEventBus.post(IMEvent.BatchMsgDelete.value, messages)
             it.onComplete()
         }, BackpressureStrategy.LATEST)
     }
@@ -337,7 +338,9 @@ open class DefaultMessageModule : MessageModule {
         return if (deleteServer) {
             val msgIds = mutableSetOf<Long>()
             messages.forEach {
-                msgIds.add(it.msgId)
+                if (it.msgId > 0) {
+                    msgIds.add(it.msgId)
+                }
             }
             this.deleteSeverMessages(sessionId, msgIds)
                 .concatWith(deleteLocalMessages(messages))

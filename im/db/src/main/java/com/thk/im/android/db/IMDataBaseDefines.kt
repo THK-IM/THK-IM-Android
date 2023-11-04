@@ -54,16 +54,16 @@ enum class MsgOperateStatus(var value: Int) {
  * 消息类型
  */
 enum class MsgType(var value: Int) {
-    UnSupport(0),  // 未知
-    TEXT(1),     // 文本
-    EMOJI(2),    // 表情图片
-    Audio(3),    // 语音
-    IMAGE(4),    // 图片
-    RICH(5),     // 富文本
-    VIDEO(6),    // 视频
-    FILE(7),     // 文件
-    LOCATION(8), // 定位
-    CALL(9),     // 通话
+    Reedit(-4), // 重编辑消息
+    Revoke(-3), // 撤回消息消息
+    READ(-2), // 读消息消息
+    ACK(-1), // 收消息消息
+    UnSupport(0),  // 未知消息
+    TEXT(1),     // 文本消息
+    EMOJI(2),    // 表情图片消息
+    Audio(3),    // 语音消息
+    IMAGE(4),    // 图片消息
+    VIDEO(6),    // 视频消息
 }
 
 /**

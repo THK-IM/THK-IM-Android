@@ -38,7 +38,6 @@ open class DefaultMessageModule : MessageModule {
     private val disposes = CompositeDisposable()
     private val idLock = ReentrantLock()
     private val ackLock = ReentrantReadWriteLock()
-    private val eventLock = ReentrantLock()
 
     override fun registerMsgProcessor(processor: BaseMsgProcessor) {
         processorMap[processor.messageType()] = processor
@@ -232,11 +231,6 @@ open class DefaultMessageModule : MessageModule {
         return IMCoreManager.imApi.sendMessageToServer(message)
     }
 
-    override fun readMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
-        val uId = IMCoreManager.getUid()
-        return IMCoreManager.imApi.readMessages(uId, sessionId, msgIds)
-    }
-
     override fun revokeMessage(message: Message): Flowable<Void> {
         val uId = IMCoreManager.getUid()
         return IMCoreManager.imApi.revokeMessage(uId, message.sid, message.msgId)
@@ -259,9 +253,10 @@ open class DefaultMessageModule : MessageModule {
                     needAckMap[message.sid]?.add(message.msgId)
                 }
             }
-            ackLock.writeLock().unlock()
         } catch (e: Exception) {
             LLog.e("ackMessageToCache $e")
+        } finally {
+            ackLock.writeLock().unlock()
         }
     }
 
@@ -285,12 +280,11 @@ open class DefaultMessageModule : MessageModule {
 
             override fun onComplete() {
                 super.onComplete()
+                IMCoreManager.getImDataBase().messageDao().clientReadMessages(sessionId, msgIds, MsgOperateStatus.Ack.value)
                 ackMessagesSuccess(sessionId, msgIds)
             }
 
-            override fun onNext(t: Void?) {
-                ackMessagesSuccess(sessionId, msgIds)
-            }
+            override fun onNext(t: Void?) {}
 
             override fun onError(t: Throwable?) {
                 super.onError(t)
@@ -311,9 +305,10 @@ open class DefaultMessageModule : MessageModule {
                     this.ackServerMessage(it.key, it.value)
                 }
             }
-            ackLock.readLock().unlock()
         } catch (e: Exception) {
             LLog.e("ackMessageToCache $e")
+        } finally {
+            ackLock.readLock().unlock()
         }
     }
 
@@ -350,13 +345,14 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun processSessionByMessage(msg: Message) {
-//        mainHandler.post {
         val messageDao = IMCoreManager.getImDataBase().messageDao()
         val sessionDao = IMCoreManager.getImDataBase().sessionDao()
         val dispose = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {
                 val processor = getMsgProcessor(msg.type)
-                t.lastMsg = processor.getSessionDesc(msg)
+                processor.getSessionDesc(msg)?.let {
+                    t.lastMsg = it
+                }
                 t.mTime = msg.cTime
                 t.unRead = messageDao.getUnReadCount(t.id)
                 sessionDao.insertOrUpdateSessions(t)
@@ -372,7 +368,6 @@ open class DefaultMessageModule : MessageModule {
             .compose(RxTransform.flowableToIo())
             .subscribe(dispose)
         disposes.add(dispose)
-//        }
     }
 
     override fun onSignalReceived(subType: Int, body: String) {

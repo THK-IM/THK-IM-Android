@@ -3,9 +3,9 @@ package com.thk.im.android;
 import android.app.Application;
 
 import com.thk.android.im.live.LiveManager;
-import com.thk.im.android.base.AppUtils;
+import com.thk.im.android.base.utils.AppUtils;
 import com.thk.im.android.base.LLog;
-import com.thk.im.android.base.ToastUtils;
+import com.thk.im.android.base.utils.ToastUtils;
 import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.core.api.internal.DefaultIMApi;
 import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule;

@@ -3,64 +3,86 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
-    android:layout_marginLeft="16dp"
-    android:layout_marginTop="5dp"
-    android:layout_marginRight="16dp"
-    android:layout_marginBottom="5dp"
-    android:background="@drawable/shape_white_bg_radius_8dp">
+    android:layout_height="72dp"
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="8dp">
 
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/iv_avatar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="12dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/avatar_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:cardMaxElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="42dp"
+            android:layout_height="42dp" />
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_unread_count"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginTop="-6dp"
+        android:layout_marginRight="-6dp"
+        android:background="@drawable/bg_tv_unread_count"
+        android:paddingTop="2dp"
+        android:textAlignment="center"
+        android:textColor="#ffffff"
+        android:textSize="8sp"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="@id/avatar_container"
+        app:layout_constraintTop_toTopOf="@id/avatar_container" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_nickname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="3dp"
-        android:textColor="#0A0E10"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintLeft_toRightOf="@+id/iv_avatar"
-        app:layout_constraintTop_toTopOf="@+id/iv_avatar"
-        tools:text="小麦琪吖" />
-
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_last_message"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
-        android:layout_marginRight="16dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="#999999"
-        android:textSize="12sp"
-        app:layout_constraintLeft_toLeftOf="@+id/tv_nickname"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_nickname"
-        tools:text="我们今天去游乐场吧～我们今天去游乐场吧我们今天去游乐场吧我们今天去游乐场吧" />
-
+        android:textColor="#0A0E10"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toRightOf="@+id/avatar_container"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_last_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:layout_marginEnd="12dp"
-        tools:text="13:14"
+        android:layout_marginTop="8dp"
         android:textColor="#999999"
         android:textSize="11sp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="13:14" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_session_status"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_last_time" />
+
+    <androidx.emoji2.widget.EmojiTextView
+        android:id="@+id/tv_last_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="#999999"
+        android:textSize="12sp"
+        app:layout_constraintLeft_toLeftOf="@+id/tv_nickname"
+        app:layout_constraintRight_toRightOf="@id/iv_session_status"
+        app:layout_constraintTop_toBottomOf="@+id/tv_nickname" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

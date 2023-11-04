@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.thk.im.android.base.LLog
-import com.thk.im.android.base.ToastUtils
+import com.thk.im.android.base.utils.ToastUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.db.MsgType

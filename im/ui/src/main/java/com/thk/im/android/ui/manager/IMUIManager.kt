@@ -3,6 +3,7 @@ package com.thk.im.android.ui.manager
 import android.app.Application
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
+import com.thk.im.android.base.utils.IMKeyboardUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.ui.protocol.IMPreviewer
 import com.thk.im.android.ui.protocol.IMProvider
@@ -25,7 +26,6 @@ import com.thk.im.android.ui.provider.internal.msg.proccessor.UnSupportMsgProces
 import com.thk.im.android.ui.provider.internal.msg.proccessor.VideoMsgProcessor
 import com.thk.im.android.ui.provider.internal.panel.IMUnicodeEmojiPanelProvider
 import com.thk.im.android.ui.provider.internal.session.provider.SingleSessionIVProvider
-import com.thk.im.android.ui.utils.IMKeyboardUtils
 
 object IMUIManager {
 

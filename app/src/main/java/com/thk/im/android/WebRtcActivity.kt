@@ -26,10 +26,10 @@ import com.thk.im.android.adapter.MessageAdapter
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
-import com.thk.im.android.base.ToastUtils
+import com.thk.im.android.base.utils.ToastUtils
 import com.thk.im.android.base.popup.KeyboardPopupWindow
+import com.thk.im.android.base.utils.IMKeyboardUtils
 import com.thk.im.android.databinding.ActivityWebrtcBinding
-import com.thk.im.android.ui.utils.IMKeyboardUtils
 import com.thk.im.android.view.ParticipantView
 import io.reactivex.disposables.CompositeDisposable
 import java.nio.ByteBuffer

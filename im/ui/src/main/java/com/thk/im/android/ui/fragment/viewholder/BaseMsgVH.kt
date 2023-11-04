@@ -15,6 +15,7 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.LoadListener
+import com.thk.im.android.db.MsgOperateStatus
 import com.thk.im.android.db.MsgSendStatus
 import com.thk.im.android.db.SessionType
 import com.thk.im.android.db.entity.Message
@@ -87,6 +88,18 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         renderUserInfo()
         renderMsgStatus()
         updateSelectMode()
+        if (message.msgId <= 0) {
+            return
+        }
+        if (message.oprStatus.and(MsgOperateStatus.ClientRead.value) > 0
+            && message.oprStatus.and(MsgOperateStatus.ServerRead.value) > 0
+        ) {
+            return
+        }
+        LLog.v("readMessage ${message.id} ${message.oprStatus}")
+        msgVHOperator?.readMessage(message)
+        message.oprStatus = message.oprStatus.or(MsgOperateStatus.ClientRead.value)
+            .or(MsgOperateStatus.ServerRead.value)
     }
 
     fun onCreate() {

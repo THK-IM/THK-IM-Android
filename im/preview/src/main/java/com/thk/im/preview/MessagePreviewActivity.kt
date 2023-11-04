@@ -20,7 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.thk.im.android.base.AppUtils
+import com.thk.im.android.base.utils.AppUtils
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager

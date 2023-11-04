@@ -8,8 +8,12 @@ import com.thk.im.android.ui.provider.internal.msg.viewholder.TimeLineMsgVH
 
 class TimeLineMsgIVProvider : IMBaseMessageIVProvider() {
 
+    companion object {
+        const val timeLineMsgType = 9999
+    }
+
     override fun messageType(): Int {
-        return 9999
+        return timeLineMsgType
     }
 
     override fun createViewHolder(

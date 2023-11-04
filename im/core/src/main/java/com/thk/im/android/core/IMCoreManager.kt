@@ -2,8 +2,8 @@ package com.thk.im.android.core
 
 import android.app.Application
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.thk.im.android.base.AppUtils
-import com.thk.im.android.base.ToastUtils
+import com.thk.im.android.base.utils.AppUtils
+import com.thk.im.android.base.utils.ToastUtils
 import com.thk.im.android.core.api.IMApi
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadModule
@@ -18,6 +18,9 @@ import com.thk.im.android.core.module.internal.DefaultContactorModule
 import com.thk.im.android.core.module.internal.DefaultGroupModule
 import com.thk.im.android.core.module.internal.DefaultMessageModule
 import com.thk.im.android.core.module.internal.DefaultUserModule
+import com.thk.im.android.core.processor.ReadMessageProcessor
+import com.thk.im.android.core.processor.ReeditMessageProcessor
+import com.thk.im.android.core.processor.RevokeMessageProcessor
 import com.thk.im.android.core.signal.SignalListener
 import com.thk.im.android.core.signal.SignalModule
 import com.thk.im.android.core.signal.SignalType
@@ -80,6 +83,10 @@ object IMCoreManager {
         registerModule(SignalType.Contactor.value, DefaultContactorModule())
         registerModule(SignalType.Group.value, DefaultGroupModule())
         registerModule(SignalType.Message.value, DefaultMessageModule())
+
+        getMessageModule().registerMsgProcessor(ReadMessageProcessor())
+        getMessageModule().registerMsgProcessor(ReeditMessageProcessor())
+        getMessageModule().registerMsgProcessor(RevokeMessageProcessor())
     }
 
     fun connect() {

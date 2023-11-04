@@ -6,7 +6,7 @@ import com.google.gson.Gson
 import com.thk.android.im.live.LiveManager
 import com.thk.android.im.live.utils.MediaConstraintsHelper
 import com.thk.im.android.base.LLog
-import com.thk.im.android.base.Utils
+import com.thk.im.android.base.utils.StringUtils
 import io.reactivex.disposables.CompositeDisposable
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
@@ -280,7 +280,7 @@ abstract class BaseParticipant(
         p0?.let {
             if (it.binary) {
                 it.data?.let { data ->
-                    LLog.d("onMessage: " + Utils.byteArray2HexString(data.array()))
+                    LLog.d("onMessage: " + StringUtils.byteArray2HexString(data.array()))
                     this.onNewBufferMessage(it.data)
                 }
             } else {

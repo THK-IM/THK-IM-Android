@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.activity.OnBackPressedCallback
 import androidx.emoji2.widget.EmojiEditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -19,12 +18,13 @@ import com.hjq.permissions.XXPermissions
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
-import com.thk.im.android.base.ToastUtils
 import com.thk.im.android.base.popup.KeyboardPopupWindow
+import com.thk.im.android.base.utils.ToastUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.db.MsgOperateStatus
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
@@ -256,10 +256,18 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                     override fun onNext(t: Void?) {
 
                     }
+
                     override fun onError(t: Throwable?) {
                         super.onError(t)
                     }
                 })
+        }
+    }
+
+    override fun readMessage(message: Message) {
+        // 对于不是自己发的消息才能发送已读消息
+        if (message.fUid != IMCoreManager.getUid() && message.msgId > 0) {
+            IMCoreManager.getMessageModule().sendMessage("", message.sid, MsgType.READ.value, null, message.msgId)
         }
     }
 

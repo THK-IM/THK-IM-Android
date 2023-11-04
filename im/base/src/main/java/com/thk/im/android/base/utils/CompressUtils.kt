@@ -1,4 +1,4 @@
-package com.thk.im.android.base
+package com.thk.im.android.base.utils
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

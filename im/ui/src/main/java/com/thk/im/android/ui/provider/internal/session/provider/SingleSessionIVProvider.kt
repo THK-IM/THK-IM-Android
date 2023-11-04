@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.db.SessionType
 import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
 import com.thk.im.android.ui.provider.IMBaseSessionIVProvider
-import com.thk.im.android.ui.provider.internal.session.viewholder.IMSessionVH
+import com.thk.im.android.ui.provider.internal.session.viewholder.SingleSessionVH
 
 class SingleSessionIVProvider : IMBaseSessionIVProvider() {
     override fun sessionType(): Int {
@@ -17,6 +17,6 @@ class SingleSessionIVProvider : IMBaseSessionIVProvider() {
         viewType: Int,
         parent: ViewGroup
     ): BaseSessionVH {
-        return IMSessionVH(lifecycleOwner, parent)
+        return SingleSessionVH(lifecycleOwner, parent)
     }
 }

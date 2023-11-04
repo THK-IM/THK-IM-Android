@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.utils;
+package com.thk.im.android.base.utils;
 
 import android.app.Activity;
 import android.app.Application;

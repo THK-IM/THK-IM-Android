@@ -1,27 +1,29 @@
 package com.thk.im.android.ui.provider.internal.session.viewholder
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.emoji2.widget.EmojiTextView
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.IMImageLoader
+import com.thk.im.android.base.utils.DateUtils
+import com.thk.im.android.base.utils.StringUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.LoadListener
-import com.thk.im.android.db.entity.Group
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
-import com.thk.im.android.ui.utils.DateUtil
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 
-class IMSessionVH(
+class SingleSessionVH(
     lifecycleOwner: LifecycleOwner,
     parent: ViewGroup,
     resId: Int = R.layout.itemview_session
@@ -30,19 +32,22 @@ class IMSessionVH(
 ) {
     val nickView: AppCompatTextView = itemView.findViewById(R.id.tv_nickname)
     val avatarView: AppCompatImageView = itemView.findViewById(R.id.iv_avatar)
-    private val lastMsgView: AppCompatTextView = itemView.findViewById(R.id.tv_last_message)
+    private val lastMsgView: EmojiTextView = itemView.findViewById(R.id.tv_last_message)
     private val lastTimeView: AppCompatTextView = itemView.findViewById(R.id.tv_last_time)
+    private val unReadCountView: AppCompatTextView = itemView.findViewById(R.id.tv_unread_count)
     private val disposable = CompositeDisposable()
 
     override fun onViewBind(session: Session) {
         super.onViewBind(session)
         lastMsgView.text = session.lastMsg
-        lastTimeView.text = DateUtil.getTimeline(session.mTime)
-        if (session.type == 1) {
-            showUserInfo(session)
+        lastTimeView.text = DateUtils.getTimeline(session.mTime)
+        if (session.unRead == 0) {
+            unReadCountView.visibility = View.GONE
         } else {
-            showGroupInfo(session)
+            unReadCountView.visibility = View.VISIBLE
+            unReadCountView.text = StringUtils.getMessageCount(session.unRead)
         }
+        showUserInfo(session)
     }
 
     override fun onViewDetached() {
@@ -68,18 +73,6 @@ class IMSessionVH(
         disposable.add(subscriber)
     }
 
-    private fun showGroupInfo(session: Session) {
-        val subscriber = object : BaseSubscriber<Group>() {
-            override fun onNext(t: Group) {
-                nickView.text = t.name
-                t.avatar?.let {
-                    displayAvatar(avatarView, t.id, it)
-                }
-            }
-        }
-        getGroupModule().getGroupInfo(session.entityId).subscribe(subscriber)
-        disposable.add(subscriber)
-    }
 
     fun displayAvatar(imageView: ImageView, id: Long, url: String) {
         val path = IMCoreManager.storageModule.allocAvatarPath(id, url)

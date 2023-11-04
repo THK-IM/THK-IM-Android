@@ -9,6 +9,7 @@ import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
+import com.thk.im.android.ui.provider.internal.msg.TimeLineMsgIVProvider
 import kotlin.math.abs
 
 class MessageAdapter(
@@ -19,7 +20,6 @@ class MessageAdapter(
     RecyclerView.Adapter<BaseMsgVH>() {
 
     private var lastMessageTime: Long = 0L
-    private val timeLineMsgType = 9999
     private val timeLineInterval = 5 * 60 * 1000
 
     private val messageList = mutableListOf<Message>()
@@ -65,7 +65,7 @@ class MessageAdapter(
 
     private fun newTimelineMessage(cTime: Long): Message {
         return Message(
-            0L, 0L, 0L, 0L, timeLineMsgType, cTime.toString(),
+            0L, 0L, 0L, 0L, TimeLineMsgIVProvider.timeLineMsgType, cTime.toString(),
             0, 0, cTime, 0L, "", null, null
         )
     }
@@ -118,6 +118,9 @@ class MessageAdapter(
     }
 
     fun insertNew(message: Message): Int {
+        if (message.type < 0) {
+            return -1
+        }
         synchronized(this) {
             val pos = findPosition(message)
             if (pos >= 0 && pos < messageList.size) {
@@ -146,6 +149,9 @@ class MessageAdapter(
     }
 
     fun update(message: Message) {
+        if (message.type < 0) {
+            return
+        }
         synchronized(this) {
             val pos = findPosition(message)
             if (pos >= 0 && pos < messageList.size) {
@@ -179,18 +185,15 @@ class MessageAdapter(
     }
 
     fun delete(message: Message) {
-        LLog.d("delete id: ${message.id}")
         synchronized(this) {
             val pos = findPosition(message)
-            LLog.d("delete pos: $pos")
             if (pos >= 0) {
                 messageList.removeAt(pos)
                 notifyItemRemoved(pos)
             }
             // 附加在该消息上的时间线消息也一并删除
             if (pos < messageList.size - 1 && pos > 0) {
-                if (messageList[pos].type == timeLineMsgType) {
-                    LLog.d("delete timeLineMsgType $pos")
+                if (messageList[pos].type == TimeLineMsgIVProvider.timeLineMsgType) {
                     messageList.removeAt(pos)
                     notifyItemRemoved(pos)
                 }

@@ -1,8 +1,8 @@
-package com.thk.im.android.base
+package com.thk.im.android.base.utils
 
 import java.lang.StringBuilder
 
-object Utils {
+object StringUtils {
 
     fun byteArray2HexString(array: ByteArray): String {
         val hexStringBuilder = StringBuilder()
@@ -11,5 +11,15 @@ object Utils {
             hexStringBuilder.append(st)
         }
         return hexStringBuilder.toString()
+    }
+
+    fun getMessageCount(count: Int) : String {
+        return if (count <= 0) {
+            ""
+        } else if (count < 100) {
+            "$count"
+        } else {
+            "99+"
+        }
     }
 }

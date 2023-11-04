@@ -42,10 +42,22 @@ interface MessageDao {
     fun findMessage(id: Long): Message?
 
     @Query("select * from message where sid = :sId and msg_id != :msgId and type in (:types) and c_time <= :cTime order by c_time desc limit :count")
-    fun findOlderMessage(sId: Long, msgId: Long, types: Array<Int>, cTime: Long, count: Int): List<Message>
+    fun findOlderMessage(
+        sId: Long,
+        msgId: Long,
+        types: Array<Int>,
+        cTime: Long,
+        count: Int
+    ): List<Message>
 
     @Query("select * from message where sid = :sId and msg_id != :msgId and type in (:types) and c_time >= :cTime order by c_time asc limit :count")
-    fun findNewerMessage(sId: Long, msgId: Long, types: Array<Int>, cTime: Long, count: Int): List<Message>
+    fun findNewerMessage(
+        sId: Long,
+        msgId: Long,
+        types: Array<Int>,
+        cTime: Long,
+        count: Int
+    ): List<Message>
 
     @Query("select count(id) from message")
     fun getMessageCount(): Long
@@ -78,4 +90,18 @@ interface MessageDao {
      */
     @Query("update message set send_status = :sendStatus where send_status < :sendStatus")
     fun resetSendingMessagesStatus(sendStatus: Int)
+
+    @Query("update message set opr_status = opr_status | :oprStatus where sid = :sid and msg_id in (:msgIds)")
+    fun clientReadMessages(
+        sid: Long,
+        msgIds: Set<Long>,
+        oprStatus: Int = MsgOperateStatus.ClientRead.value or MsgOperateStatus.Ack.value
+    )
+
+    @Query("update message set opr_status = opr_status | :oprStatus where sid = :sid and msg_id in (:msgIds)")
+    fun serverReadMessages(
+        sid: Long,
+        msgIds: Set<Long>,
+        oprStatus: Int = MsgOperateStatus.ServerRead.value or MsgOperateStatus.Ack.value
+    )
 }

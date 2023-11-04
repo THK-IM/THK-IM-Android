@@ -85,11 +85,6 @@ interface MessageModule : CommonModule {
     fun sendMessageToServer(message: Message): Flowable<Message>
 
     /**
-     * 标记消息已读
-     */
-    fun readMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Void>
-
-    /**
      * 撤回消息
      */
     fun revokeMessage(message: Message): Flowable<Void>

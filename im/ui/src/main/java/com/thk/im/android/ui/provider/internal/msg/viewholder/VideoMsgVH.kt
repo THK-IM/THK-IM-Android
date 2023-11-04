@@ -7,8 +7,8 @@ import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
 import com.thk.im.android.base.IMImageLoader
-import com.thk.im.android.base.LLog
 import com.thk.im.android.base.extension.dp2px
+import com.thk.im.android.base.utils.DateUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.db.entity.Message
@@ -18,7 +18,6 @@ import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
-import com.thk.im.android.ui.utils.DateUtil
 
 class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     BaseMsgVH(liftOwner, itemView, viewType) {
@@ -107,10 +106,9 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
 
 
     private fun renderDuration(duration: Int) {
-        LLog.d("renderDuration ${duration}")
         val durationView: TextView = itemView.findViewById(R.id.tv_video_duration)
         durationView.visibility = View.VISIBLE
-        durationView.text = DateUtil.getDuration(duration)
+        durationView.text = DateUtils.getDuration(duration)
     }
 
     private fun renderThumbnailImage(path: String) {

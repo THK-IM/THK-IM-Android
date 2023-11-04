@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.utils;
+package com.thk.im.android.base.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -11,7 +11,7 @@ import java.util.Date;
  *
  * @yingmu
  */
-public class DateUtil {
+public class DateUtils {
 
 
     /**

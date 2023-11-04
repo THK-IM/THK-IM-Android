@@ -53,4 +53,7 @@ interface IMMsgSender {
     /// 删除多选视图选中的消息
     fun deleteSelectedMessages()
 
+    /// 已读消息
+    fun readMessage(message: Message)
+
 }

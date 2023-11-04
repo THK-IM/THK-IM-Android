@@ -10,4 +10,5 @@ interface IMMsgVHOperator {
     fun isSelectMode(): Boolean
     fun isItemSelected(message: Message): Boolean
     fun onSelected(message: Message, selected: Boolean)
+    fun readMessage(message: Message)
 }

@@ -213,6 +213,10 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         return (adapter as MessageAdapter).onSelected(message, selected)
     }
 
+    override fun readMessage(message: Message) {
+        msgSender.readMessage(message)
+    }
+
     fun getSelectMessages(): Set<Message> {
         return (adapter as MessageAdapter).getSelectIds()
     }

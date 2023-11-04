@@ -3,12 +3,12 @@ package com.thk.im.android.ui.provider.internal.msg.viewholder
 import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
+import com.thk.im.android.base.utils.DateUtils
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
-import com.thk.im.android.ui.utils.DateUtil
 
 class TimeLineMsgVH(
     lifecycleOwner: LifecycleOwner, itemView: View, viewType: Int
@@ -27,7 +27,7 @@ class TimeLineMsgVH(
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
         val tvTime: TextView = itemView.findViewById(R.id.tv_time)
-        tvTime.text = DateUtil.getTimeline(message.cTime)
+        tvTime.text = DateUtils.getTimeline(message.cTime)
     }
 
     override fun onViewDetached() {

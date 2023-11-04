@@ -6,7 +6,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.adapter.ViewHolderSelect
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import com.thk.im.android.ui.utils.DateUtil
@@ -24,10 +23,9 @@ class TimeLineMsgVH(
         position: Int,
         messages: List<Message>,
         session: Session,
-        msgVHOperator: IMMsgVHOperator,
-        viewHolderSelect: ViewHolderSelect
+        msgVHOperator: IMMsgVHOperator
     ) {
-        super.onViewBind(position, messages, session, msgVHOperator, viewHolderSelect)
+        super.onViewBind(position, messages, session, msgVHOperator)
         val tvTime: TextView = itemView.findViewById(R.id.tv_time)
         tvTime.text = DateUtil.getTimeline(message.cTime)
     }

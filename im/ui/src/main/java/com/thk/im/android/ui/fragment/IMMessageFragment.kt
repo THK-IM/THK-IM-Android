@@ -66,6 +66,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
         session = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable("session", Session::class.java) as Session
         } else {
@@ -76,19 +77,6 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         binding.llBottomLayout.init(this, this, this)
         initKeyboardWindow()
         initEventBus()
-        activity?.let {
-            it.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
-            it.onBackPressedDispatcher.addCallback(it, object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    if (binding.rcvMessage.isSelectMode()) {
-                        binding.llInputLayout.setSelectMode(false)
-                        binding.rcvMessage.setSelectMode(false, null)
-                    } else {
-                        it.finish()
-                    }
-                }
-            })
-        }
     }
 
     private fun initKeyboardWindow() {

@@ -68,8 +68,6 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
             }
         })
 
-        linearLayoutManager.stackFromEnd = true
-
         val gestureDetector = GestureDetector(context, object : OnGestureListener {
             override fun onDown(p0: MotionEvent): Boolean {
                 return false
@@ -203,8 +201,16 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         (adapter as MessageAdapter).setSelectMode(selected, message, this)
     }
 
-    fun isSelectMode(): Boolean {
+    override fun isSelectMode(): Boolean {
         return (adapter as MessageAdapter).isSelectMode()
+    }
+
+    override fun isItemSelected(message: Message): Boolean {
+        return (adapter as MessageAdapter).isItemSelected(message)
+    }
+
+    override fun onSelected(message: Message, selected: Boolean) {
+        return (adapter as MessageAdapter).onSelected(message, selected)
     }
 
     fun getSelectMessages(): Set<Message> {

@@ -7,7 +7,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.adapter.ViewHolderSelect
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
@@ -23,10 +22,9 @@ class UnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         position: Int,
         messages: List<Message>,
         session: Session,
-        msgVHOperator: IMMsgVHOperator,
-        viewHolderSelect: ViewHolderSelect
+        msgVHOperator: IMMsgVHOperator
     ) {
-        super.onViewBind(position, messages, session, msgVHOperator, viewHolderSelect)
+        super.onViewBind(position, messages, session, msgVHOperator)
         val tvMsgContent: TextView = itemView.findViewById(R.id.tv_msg_content)
         tvMsgContent.text = "不支持的消息类型，请尝试升级客户端"
         when (getPositionType()) {

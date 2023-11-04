@@ -2,7 +2,6 @@ package com.thk.im.android.ui.provider.internal.msg.viewholder
 
 import android.view.View
 import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
@@ -15,7 +14,6 @@ import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.adapter.ViewHolderSelect
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
@@ -34,10 +32,9 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         position: Int,
         messages: List<Message>,
         session: Session,
-        msgVHOperator: IMMsgVHOperator,
-        viewHolderSelect: ViewHolderSelect
+        msgVHOperator: IMMsgVHOperator
     ) {
-        super.onViewBind(position, messages, session, msgVHOperator, viewHolderSelect)
+        super.onViewBind(position, messages, session, msgVHOperator)
 
         var imagePath = ""
         var width = 0

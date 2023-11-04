@@ -16,7 +16,7 @@ class MessageAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val msgVHOperator: IMMsgVHOperator
 ) :
-    RecyclerView.Adapter<BaseMsgVH>(), ViewHolderSelect {
+    RecyclerView.Adapter<BaseMsgVH>() {
 
     private var lastMessageTime: Long = 0L
     private val timeLineMsgType = 9999
@@ -40,7 +40,7 @@ class MessageAdapter(
     }
 
     override fun onBindViewHolder(holder: BaseMsgVH, position: Int) {
-        holder.onViewBind(position, messageList, session, msgVHOperator, this)
+        holder.onViewBind(position, messageList, session, msgVHOperator)
     }
 
     override fun onViewRecycled(holder: BaseMsgVH) {
@@ -241,15 +241,15 @@ class MessageAdapter(
         return selectedMessages
     }
 
-    override fun isSelectMode(): Boolean {
+    fun isSelectMode(): Boolean {
         return isSelectMode
     }
 
-    override fun isItemSelected(message: Message): Boolean {
+    fun isItemSelected(message: Message): Boolean {
         return selectedMessages.contains(message)
     }
 
-    override fun onSelected(message: Message, selected: Boolean) {
+    fun onSelected(message: Message, selected: Boolean) {
         if (selected) {
             selectedMessages.add(message)
         } else {

@@ -21,7 +21,6 @@ import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.db.entity.User
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.adapter.ViewHolderSelect
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
@@ -33,7 +32,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     open lateinit var session: Session
     private var msgVHOperator: IMMsgVHOperator? = null
     private var pos: Int = 0
-    private var viewHolderSelect: ViewHolderSelect? = null
 
     private var disposable = CompositeDisposable()
     open val ivAvatarView: ImageView? = itemView.findViewById(R.id.iv_avatar)
@@ -54,15 +52,13 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         position: Int,
         messages: List<Message>,
         session: Session,
-        msgVHOperator: IMMsgVHOperator,
-        viewHolderSelect: ViewHolderSelect
+        msgVHOperator: IMMsgVHOperator
     ) {
         onViewDetached()
         this.pos = position
         this.message = messages[position]
         this.session = session
         this.msgVHOperator = msgVHOperator
-        this.viewHolderSelect = viewHolderSelect
         onViewAttached()
     }
 
@@ -71,7 +67,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             selectView.visibility = View.GONE
             return
         }
-        viewHolderSelect?.let {
+        msgVHOperator?.let {
             LLog.v("updateSelectMode ${it.isSelectMode()}")
             if (it.isSelectMode()) {
                 selectView.visibility = View.VISIBLE
@@ -150,7 +146,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         }
 
         selectView.setOnClickListener {
-            viewHolderSelect?.let {
+            msgVHOperator?.let {
                 selectView.isSelected = !selectView.isSelected
                 it.onSelected(message, selectView.isSelected)
             }
@@ -210,7 +206,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     override fun onViewRecycled() {
         super.onViewRecycled()
         msgVHOperator = null
-        viewHolderSelect = null
     }
 
 }

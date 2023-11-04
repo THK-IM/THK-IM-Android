@@ -12,7 +12,6 @@ import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.adapter.ViewHolderSelect
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMImageMsgBody
 import com.thk.im.android.ui.manager.IMImageMsgData
@@ -29,10 +28,9 @@ class ImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         position: Int,
         messages: List<Message>,
         session: Session,
-        msgVHOperator: IMMsgVHOperator,
-        viewHolderSelect: ViewHolderSelect
+        msgVHOperator: IMMsgVHOperator
     ) {
-        super.onViewBind(position, messages, session, msgVHOperator, viewHolderSelect)
+        super.onViewBind(position, messages, session, msgVHOperator)
         var imagePath = ""
         var width = 0
         var height = 0

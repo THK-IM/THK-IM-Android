@@ -57,19 +57,6 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
     private fun initSessionRecyclerView(rootView: View) {
         sessionRecyclerView = rootView.findViewById(R.id.rcv_session)
         sessionAdapter = SessionAdapter(this, this)
-        sessionAdapter.onItemClickListener = object : SessionAdapter.OnItemClickListener {
-            override fun onItemClick(adapter: SessionAdapter, position: Int, session: Session) {
-                sessionClick?.onSessionClick(session)
-            }
-
-            override fun onItemLongClick(
-                adapter: SessionAdapter,
-                position: Int,
-                session: Session
-            ): Boolean {
-                return true
-            }
-        }
         sessionRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)

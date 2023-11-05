@@ -9,16 +9,11 @@ import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 
-class SessionAdapter(private val lifecycleOwner: LifecycleOwner,
-    private val sessionOperator: IMSessionVHOperator) :
+class SessionAdapter(
+    private val lifecycleOwner: LifecycleOwner,
+    private val sessionOperator: IMSessionVHOperator
+) :
     RecyclerView.Adapter<BaseSessionVH>() {
-
-    interface OnItemClickListener {
-        fun onItemClick(adapter: SessionAdapter, position: Int, session: Session)
-        fun onItemLongClick(adapter: SessionAdapter, position: Int, session: Session): Boolean
-    }
-
-    var onItemClickListener: OnItemClickListener? = null
 
     private val sessionList = mutableListOf<Session>()
 
@@ -36,16 +31,6 @@ class SessionAdapter(private val lifecycleOwner: LifecycleOwner,
     override fun onBindViewHolder(holder: BaseSessionVH, position: Int) {
         val session = sessionList[position]
         holder.onViewBind(session, sessionOperator)
-        holder.itemView.setOnClickListener {
-            onItemClickListener?.onItemClick(this, position, session)
-        }
-        holder.itemView.setOnLongClickListener {
-            if (onItemClickListener == null) {
-                false
-            } else {
-                onItemClickListener!!.onItemLongClick(this, position, session)
-            }
-        }
     }
 
     override fun onViewRecycled(holder: BaseSessionVH) {

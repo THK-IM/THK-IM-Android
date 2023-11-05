@@ -67,28 +67,12 @@ class SessionAdapter(
         // 当前位置
         val pos = findPosition(session)
         if (pos >= 0 && pos < sessionList.size) {
-            // 应该摆放的位置
-            val position = findInsertPosition(session)
-            if (position < pos) {
-                // 应该摆放的位置靠上
-                for (i in pos downTo position) {
-                    if (i == position) {
-                        sessionList[i] = session
-                    } else {
-                        sessionList[i] = sessionList[i - 1]
-                    }
-                }
-                notifyItemRangeChanged(position, pos - position + 1)
-            } else {
-                // 应该摆放的位置靠下，还是放在原位
-                sessionList[pos] = session
-                notifyItemChanged(pos)
-            }
-        } else {
-            val position = findInsertPosition(session)
-            sessionList.add(position, session)
-            notifyItemInserted(position)
+            sessionList.removeAt(pos)
+            notifyItemRemoved(pos)
         }
+        val position = findInsertPosition(session)
+        sessionList.add(position, session)
+        notifyItemInserted(position)
     }
 
     private fun findPosition(session: Session): Int {

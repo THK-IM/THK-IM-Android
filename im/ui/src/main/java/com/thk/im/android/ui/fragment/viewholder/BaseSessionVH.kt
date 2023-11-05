@@ -54,22 +54,22 @@ abstract class BaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
             topView.text = "置顶"
         }
         deleteView.setOnClickListener {
-            this.sessionVHOperator?.deleteSession(session)
+            this.sessionVHOperator?.deleteSession(this.session)
         }
         muteView.setOnClickListener {
-            session.status = session.status.xor(SessionStatus.Silence.value)
-            this.sessionVHOperator?.updateSession(session)
+            this.session.status = this.session.status.xor(SessionStatus.Silence.value)
+            this.sessionVHOperator?.updateSession(this.session)
         }
         topView.setOnClickListener {
-            if (session.topTime > 0) {
-                session.topTime = 0
+            if (this.session.topTime > 0) {
+                this.session.topTime = 0
             } else {
-                session.topTime = IMCoreManager.signalModule.severTime
+                this.session.topTime = IMCoreManager.signalModule.severTime
             }
-            this.sessionVHOperator?.updateSession(session)
+            this.sessionVHOperator?.updateSession(this.session)
         }
         container.setOnClickListener {
-            this.sessionVHOperator?.openSession(session)
+            this.sessionVHOperator?.openSession(this.session)
         }
     }
 

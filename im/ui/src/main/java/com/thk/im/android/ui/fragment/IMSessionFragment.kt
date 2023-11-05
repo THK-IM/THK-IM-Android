@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.base.BaseSubscriber
+import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
@@ -16,10 +17,11 @@ import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.adapter.SessionAdapter
+import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 import io.reactivex.disposables.CompositeDisposable
 
 
-class IMSessionFragment : Fragment() {
+class IMSessionFragment : Fragment(), IMSessionVHOperator {
 
     interface OnSessionClick {
         fun onSessionClick(session: Session)
@@ -27,7 +29,7 @@ class IMSessionFragment : Fragment() {
 
     private lateinit var sessionRecyclerView: RecyclerView
     private lateinit var sessionAdapter: SessionAdapter
-    private val composite = CompositeDisposable()
+    private val disposables = CompositeDisposable()
     private var hasMore = true
     private val count = 5
 
@@ -54,7 +56,7 @@ class IMSessionFragment : Fragment() {
 
     private fun initSessionRecyclerView(rootView: View) {
         sessionRecyclerView = rootView.findViewById(R.id.rcv_session)
-        sessionAdapter = SessionAdapter(this)
+        sessionAdapter = SessionAdapter(this, this)
         sessionAdapter.onItemClickListener = object : SessionAdapter.OnItemClickListener {
             override fun onItemClick(adapter: SessionAdapter, position: Int, session: Session) {
                 sessionClick?.onSessionClick(session)
@@ -103,7 +105,7 @@ class IMSessionFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        composite.clear()
+        disposables.clear()
     }
 
     private var isLoading = false
@@ -130,6 +132,46 @@ class IMSessionFragment : Fragment() {
         IMCoreManager.getMessageModule().queryLocalSessions(10, current)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
-        composite.add(subscriber)
+        disposables.add(subscriber)
+    }
+
+    override fun updateSession(session: Session) {
+        val subscriber = object : BaseSubscriber<Void>() {
+            override fun onNext(t: Void?) {
+            }
+
+            override fun onError(t: Throwable?) {
+                t?.message?.let {
+                    LLog.e(it)
+                }
+            }
+        }
+        IMCoreManager.getMessageModule()
+            .updateSession(session, true)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposables.add(subscriber)
+    }
+
+    override fun deleteSession(session: Session) {
+        val subscriber = object : BaseSubscriber<Void>() {
+            override fun onNext(t: Void?) {
+            }
+
+            override fun onError(t: Throwable?) {
+                t?.message?.let {
+                    LLog.e(it)
+                }
+            }
+        }
+        IMCoreManager.getMessageModule()
+            .deleteSession(session, true)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposables.add(subscriber)
+    }
+
+    override fun openSession(session: Session) {
+        sessionClick?.onSessionClick(session)
     }
 }

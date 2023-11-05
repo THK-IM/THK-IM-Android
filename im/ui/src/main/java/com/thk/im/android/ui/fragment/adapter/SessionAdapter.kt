@@ -7,8 +7,10 @@ import com.thk.im.android.base.LLog
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
 import com.thk.im.android.ui.manager.IMUIManager
+import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 
-class SessionAdapter(private val lifecycleOwner: LifecycleOwner) :
+class SessionAdapter(private val lifecycleOwner: LifecycleOwner,
+    private val sessionOperator: IMSessionVHOperator) :
     RecyclerView.Adapter<BaseSessionVH>() {
 
     interface OnItemClickListener {
@@ -33,7 +35,7 @@ class SessionAdapter(private val lifecycleOwner: LifecycleOwner) :
 
     override fun onBindViewHolder(holder: BaseSessionVH, position: Int) {
         val session = sessionList[position]
-        holder.onViewBind(session)
+        holder.onViewBind(session, sessionOperator)
         holder.itemView.setOnClickListener {
             onItemClickListener?.onItemClick(this, position, session)
         }

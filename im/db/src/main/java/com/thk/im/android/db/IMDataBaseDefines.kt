@@ -1,6 +1,14 @@
 package com.thk.im.android.db
 
 /**
+ * session状态
+ */
+enum class SessionStatus(val value: Int) {
+    Reject(1),
+    Silence(2),
+}
+
+/**
  * 会话类型
  */
 enum class SessionType(val value: Int) {

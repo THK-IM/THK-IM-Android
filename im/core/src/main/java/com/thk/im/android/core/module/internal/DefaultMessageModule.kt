@@ -92,7 +92,8 @@ open class DefaultMessageModule : MessageModule {
                     // 更新每个session的最后一条消息
                     for (sessionMessage in sessionMessages) {
                         XEventBus.post(IMEvent.BatchMsgNew.value, sessionMessage.value)
-                        val lastMsg = IMCoreManager.getImDataBase().messageDao().findLastMessageBySessionId(sessionMessage.key)
+                        val lastMsg = IMCoreManager.getImDataBase().messageDao()
+                            .findLastMessageBySessionId(sessionMessage.key)
                         lastMsg?.let {
                             processSessionByMessage(it)
                         }
@@ -192,10 +193,22 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun deleteSession(
-        sessionList: Array<Session>,
+        session: Session,
         deleteServer: Boolean
-    ): Flowable<Boolean> {
-        return Flowable.just(false)
+    ): Flowable<Void> {
+        return if (deleteServer) {
+            deleteSeverSession(session).concatWith(deleteLocalSession(session))
+        } else {
+            deleteLocalSession(session)
+        }
+    }
+
+    override fun updateSession(session: Session, updateServer: Boolean): Flowable<Void> {
+        return if (updateServer) {
+            updateSeverSession(session).concatWith(updateLocalSession(session))
+        } else {
+            updateLocalSession(session)
+        }
     }
 
     override fun onNewMessage(msg: Message) {
@@ -284,31 +297,6 @@ open class DefaultMessageModule : MessageModule {
         }
     }
 
-    private fun ackServerMessage(sessionId: Long, msgIds: Set<Long>) {
-        val uId = IMCoreManager.getUid()
-        val disposable = object : BaseSubscriber<Void>() {
-
-            override fun onComplete() {
-                super.onComplete()
-                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
-                    sessionId, msgIds, MsgOperateStatus.Ack.value
-                )
-                ackMessagesSuccess(sessionId, msgIds)
-            }
-
-            override fun onNext(t: Void?) {}
-
-            override fun onError(t: Throwable?) {
-                super.onError(t)
-                t?.message?.let { LLog.e(it) }
-            }
-        }
-        IMCoreManager.imApi.ackMessages(uId, sessionId, msgIds)
-            .compose(RxTransform.flowableToIo())
-            .subscribe(disposable)
-        this.disposes.add(disposable)
-    }
-
     override fun ackMessagesToServer() {
         try {
             ackLock.readLock().tryLock(1, TimeUnit.SECONDS)
@@ -322,19 +310,6 @@ open class DefaultMessageModule : MessageModule {
         } finally {
             ackLock.readLock().unlock()
         }
-    }
-
-    private fun deleteSeverMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
-        val uId = IMCoreManager.getUid()
-        return IMCoreManager.imApi.deleteMessages(uId, sessionId, msgIds)
-    }
-
-    private fun deleteLocalMessages(messages: List<Message>): Flowable<Void> {
-        return Flowable.create({
-            IMCoreManager.getImDataBase().messageDao().deleteMessages(messages)
-            XEventBus.post(IMEvent.BatchMsgDelete.value, messages)
-            it.onComplete()
-        }, BackpressureStrategy.LATEST)
     }
 
     override fun deleteMessages(
@@ -408,5 +383,83 @@ open class DefaultMessageModule : MessageModule {
         val app = IMCoreManager.getApplication()
         val sp = app.getSharedPreferences(spName, MODE_PRIVATE)
         return sp.getLong(lastSyncMsgTime, 0)
+    }
+
+    private fun updateSeverSession(session: Session): Flowable<Void> {
+        return IMCoreManager.imApi.updateSession(IMCoreManager.getUid(), session)
+    }
+
+    private fun updateLocalSession(session: Session): Flowable<Void> {
+        return Flowable.create({
+            try {
+                IMCoreManager.getImDataBase().sessionDao().updateSession(session)
+            } catch (e: Exception) {
+                it.onError(e)
+            }
+            XEventBus.post(IMEvent.SessionUpdate.value, session)
+            it.onComplete()
+        }, BackpressureStrategy.LATEST)
+    }
+
+
+    private fun deleteSeverSession(session: Session): Flowable<Void> {
+        return IMCoreManager.imApi.deleteSession(IMCoreManager.getUid(), session)
+    }
+
+    private fun deleteLocalSession(session: Session): Flowable<Void> {
+        return Flowable.create({
+            try {
+                IMCoreManager.getImDataBase().sessionDao().deleteSessions(session)
+            } catch (e: Exception) {
+                it.onError(e)
+            }
+            XEventBus.post(IMEvent.SessionDelete.value, session)
+            it.onComplete()
+        }, BackpressureStrategy.LATEST)
+    }
+
+
+    private fun deleteSeverMessages(sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
+        val uId = IMCoreManager.getUid()
+        return IMCoreManager.imApi.deleteMessages(uId, sessionId, msgIds)
+    }
+
+    private fun deleteLocalMessages(messages: List<Message>): Flowable<Void> {
+        return Flowable.create({
+            try {
+                IMCoreManager.getImDataBase().messageDao().deleteMessages(messages)
+            } catch (e: Exception) {
+                it.onError(e)
+            }
+            XEventBus.post(IMEvent.BatchMsgDelete.value, messages)
+            it.onComplete()
+        }, BackpressureStrategy.LATEST)
+    }
+
+
+
+    private fun ackServerMessage(sessionId: Long, msgIds: Set<Long>) {
+        val uId = IMCoreManager.getUid()
+        val disposable = object : BaseSubscriber<Void>() {
+
+            override fun onComplete() {
+                super.onComplete()
+                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
+                    sessionId, msgIds, MsgOperateStatus.Ack.value
+                )
+                ackMessagesSuccess(sessionId, msgIds)
+            }
+
+            override fun onNext(t: Void?) {}
+
+            override fun onError(t: Throwable?) {
+                super.onError(t)
+                t?.message?.let { LLog.e(it) }
+            }
+        }
+        IMCoreManager.imApi.ackMessages(uId, sessionId, msgIds)
+            .compose(RxTransform.flowableToIo())
+            .subscribe(disposable)
+        this.disposes.add(disposable)
     }
 }

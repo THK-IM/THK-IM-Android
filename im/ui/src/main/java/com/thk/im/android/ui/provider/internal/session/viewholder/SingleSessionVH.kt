@@ -20,6 +20,7 @@ import com.thk.im.android.db.entity.Session
 import com.thk.im.android.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
+import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 
@@ -30,15 +31,10 @@ class SingleSessionVH(
 ) : BaseSessionVH(
     lifecycleOwner, LayoutInflater.from(parent.context).inflate(resId, parent, false)
 ) {
-    val nickView: AppCompatTextView = itemView.findViewById(R.id.tv_nickname)
-    val avatarView: AppCompatImageView = itemView.findViewById(R.id.iv_avatar)
-    private val lastMsgView: EmojiTextView = itemView.findViewById(R.id.tv_last_message)
-    private val lastTimeView: AppCompatTextView = itemView.findViewById(R.id.tv_last_time)
-    private val unReadCountView: AppCompatTextView = itemView.findViewById(R.id.tv_unread_count)
     private val disposable = CompositeDisposable()
 
-    override fun onViewBind(session: Session) {
-        super.onViewBind(session)
+    override fun onViewBind(session: Session, sessionVHOperator: IMSessionVHOperator) {
+        super.onViewBind(session, sessionVHOperator)
         lastMsgView.text = session.lastMsg
         lastTimeView.text = DateUtils.getTimeline(session.mTime)
         if (session.unRead == 0) {

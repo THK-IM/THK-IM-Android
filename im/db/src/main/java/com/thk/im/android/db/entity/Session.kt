@@ -19,7 +19,7 @@ data class Session(
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "remark") var remark: String,
     @ColumnInfo(name = "mute") var mute: Int,
-    @ColumnInfo(name = "status") var status: Int,
+    @ColumnInfo(name = "status") var status: Int, // 1 静音 2 拒收
     @ColumnInfo(name = "role") var role: Int,
     @ColumnInfo(name = "top") var topTime: Long,
     @ColumnInfo(name = "c_time") val cTime: Long,

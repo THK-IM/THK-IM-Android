@@ -8,6 +8,7 @@ import com.thk.im.android.core.api.bean.MessageBean
 import com.thk.im.android.core.api.bean.ReadMsgBean
 import com.thk.im.android.core.api.bean.ReeditMsgBean
 import com.thk.im.android.core.api.bean.RevokeMsgBean
+import com.thk.im.android.core.api.bean.UpdateSessionBean
 import com.thk.im.android.db.MsgOperateStatus
 import com.thk.im.android.db.MsgSendStatus
 import com.thk.im.android.db.entity.Message
@@ -82,6 +83,15 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         return sessionApi.createSession(bean).flatMap {
             Flowable.just(it.toSession())
         }
+    }
+
+    override fun deleteSession(uId: Long, session: Session): Flowable<Void> {
+        return sessionApi.deleteSession(uId, session.id)
+    }
+
+    override fun updateSession(uId: Long, session: Session): Flowable<Void> {
+        val updateSessionBean = UpdateSessionBean(uId, session.id, session.topTime, session.status)
+        return sessionApi.updateSession(updateSessionBean)
     }
 
     override fun sendMessageToServer(msg: Message): Flowable<Message> {

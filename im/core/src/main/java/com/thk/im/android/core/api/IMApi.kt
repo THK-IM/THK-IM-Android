@@ -21,6 +21,17 @@ interface IMApi {
      */
     fun createSession(uId: Long, sessionType: Int, entityId: Long, members: Set<Long>?): Flowable<Session>
 
+
+    /**
+     * 删除用户session
+     */
+    fun deleteSession(uId: Long, session: Session): Flowable<Void>
+
+    /**
+     * 根新用户session
+     */
+    fun updateSession(uId: Long, session: Session): Flowable<Void>
+
     /**
      * 发送消息到服务端
      */

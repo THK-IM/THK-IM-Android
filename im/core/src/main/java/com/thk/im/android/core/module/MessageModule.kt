@@ -50,7 +50,12 @@ interface MessageModule : CommonModule {
     /**
      * 批量删除多条Session
      */
-    fun deleteSession(sessionList: Array<Session>, deleteServer: Boolean): Flowable<Boolean>
+    fun deleteSession(session: Session, deleteServer: Boolean): Flowable<Void>
+
+    /**
+     * 更新session
+     */
+    fun updateSession(session: Session, updateServer: Boolean): Flowable<Void>
 
     /**
      * 收到新消息

@@ -31,7 +31,7 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
     private lateinit var sessionAdapter: SessionAdapter
     private val disposables = CompositeDisposable()
     private var hasMore = true
-    private val count = 5
+    private val count = 10
 
     private var sessionClick: OnSessionClick? = null
 
@@ -115,7 +115,10 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
                 isLoading = false
             }
         }
-        val current = IMCoreManager.signalModule.severTime
+        var current = IMCoreManager.signalModule.severTime
+        if (sessionAdapter.getSessionList().isNotEmpty()) {
+            current = sessionAdapter.getSessionList().last().mTime
+        }
         IMCoreManager.getMessageModule().queryLocalSessions(10, current)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)

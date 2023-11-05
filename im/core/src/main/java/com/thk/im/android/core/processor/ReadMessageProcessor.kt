@@ -65,10 +65,12 @@ class ReadMessageProcessor : BaseMsgProcessor() {
                 if (session != null) {
                     val count =
                         IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
-                    session.unRead = count
-                    session.mTime = IMCoreManager.signalModule.severTime
-                    IMCoreManager.getImDataBase().sessionDao().updateSession(session)
-                    XEventBus.post(IMEvent.SessionUpdate.value, session)
+                    if (session.unRead != count || session.mTime < msg.mTime) {
+                        session.unRead = count
+                        session.mTime = msg.mTime
+                        IMCoreManager.getImDataBase().sessionDao().updateSession(session)
+                        XEventBus.post(IMEvent.SessionUpdate.value, session)
+                    }
                 }
                 it.onNext(msg)
             } catch (e: Exception) {
@@ -97,10 +99,12 @@ class ReadMessageProcessor : BaseMsgProcessor() {
                     if (session != null) {
                         val count =
                             IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
-                        session.unRead = count
-                        session.mTime = IMCoreManager.signalModule.severTime
-                        IMCoreManager.getImDataBase().sessionDao().updateSession(session)
-                        XEventBus.post(IMEvent.SessionUpdate.value, session)
+                        if (session.unRead != count || session.mTime < msg.mTime) {
+                            session.unRead = count
+                            session.mTime = msg.mTime
+                            IMCoreManager.getImDataBase().sessionDao().updateSession(session)
+                            XEventBus.post(IMEvent.SessionUpdate.value, session)
+                        }
                     }
                 } else {
                     if (referMsg.rUsers != null) {

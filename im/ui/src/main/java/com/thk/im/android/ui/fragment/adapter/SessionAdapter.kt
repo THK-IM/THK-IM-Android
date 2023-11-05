@@ -105,4 +105,8 @@ class SessionAdapter(
             notifyItemRemoved(pos)
         }
     }
+
+    fun getSessionList(): List<Session> {
+        return sessionList
+    }
 }

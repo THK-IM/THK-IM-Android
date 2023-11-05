@@ -336,14 +336,15 @@ open class DefaultMessageModule : MessageModule {
         val sessionDao = IMCoreManager.getImDataBase().sessionDao()
         val dispose = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {
-                val processor = getMsgProcessor(msg.type)
-                processor.getSessionDesc(msg)?.let {
-                    t.lastMsg = it
+                val unReadCount = messageDao.getUnReadCount(t.id)
+                if (t.mTime < msg.mTime || t.unRead != unReadCount) {
+                    val processor = getMsgProcessor(msg.type)
+                    t.lastMsg = processor.getSessionDesc(msg)
+                    t.mTime = msg.mTime
+                    t.unRead = unReadCount
+                    sessionDao.insertOrUpdateSessions(t)
+                    XEventBus.post(IMEvent.SessionNew.value, t)
                 }
-                t.mTime = msg.mTime
-                t.unRead = messageDao.getUnReadCount(t.id)
-                sessionDao.insertOrUpdateSessions(t)
-                XEventBus.post(IMEvent.SessionNew.value, t)
             }
 
             override fun onError(t: Throwable?) {
@@ -435,7 +436,6 @@ open class DefaultMessageModule : MessageModule {
             it.onComplete()
         }, BackpressureStrategy.LATEST)
     }
-
 
 
     private fun ackServerMessage(sessionId: Long, msgIds: Set<Long>) {

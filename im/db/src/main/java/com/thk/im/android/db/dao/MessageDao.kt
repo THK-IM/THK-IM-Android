@@ -26,7 +26,7 @@ interface MessageDao {
     @Query("delete from message where sid= :sid and c_time >= :startTime and c_time <= :endTime")
     fun deleteMessageByCTimeInclude(sid: Long, startTime: Long, endTime: Long)
 
-    @Query("select * from message where sid = :sid and type > 0 and c_time < :cTime order by c_time desc limit :count")
+    @Query("select * from message where sid = :sid and type >= 0 and c_time < :cTime order by c_time desc limit :count")
     fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
 
     @Query("update message set send_status = :status where send_status < :successStatus")
@@ -35,11 +35,14 @@ interface MessageDao {
         successStatus: Int = MsgSendStatus.Success.value
     )
 
-    @Query("select count(id) from message where sid = :id and opr_status & :oprStatus = 0")
+    @Query("select count(id) from message where sid = :id and type >= 0 and opr_status & :oprStatus = 0")
     fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
 
-    @Query("select * from message where id = :id")
-    fun findMessage(id: Long): Message?
+    @Query("select * from message where id = :id and f_uid = :fUId and sid = :sid")
+    fun findMessageById(id: Long, fUId: Long, sid: Long): Message?
+
+    @Query("select * from message where msg_id = :msgId and sid = :sid")
+    fun findMessageByMsgId(msgId: Long, sid: Long): Message?
 
     @Query("select * from message where sid = :sId and msg_id != :msgId and type in (:types) and c_time <= :cTime order by c_time desc limit :count")
     fun findOlderMessage(
@@ -59,15 +62,13 @@ interface MessageDao {
         count: Int
     ): List<Message>
 
-    @Query("select count(id) from message")
-    fun getMessageCount(): Long
-
     @Query("select msg_id from message where sid = :sid and f_uid != :myId and msg_id in (:msgIds)")
     fun findUnReadMessage(myId: Long, sid: Long, msgIds: List<Long>): List<Long>
 
-    @Query("update message set opr_status = opr_status | (:oprStatus) where sid = :sid and msg_id in (:msgIds)")
-    fun updateOprStatus(sid: Long, msgIds: List<Long>, oprStatus: Int)
 
+    /**
+     * 更新消息的发送壮体啊
+     */
     @Query("update message set send_status = :sendStatus where id = :id and sid = :sId and f_uid = :fUId")
     fun updateSendStatus(
         sId: Long,
@@ -89,19 +90,21 @@ interface MessageDao {
      * 更新所有消息的发送状态
      */
     @Query("update message set send_status = :sendStatus where send_status < :sendStatus")
-    fun resetSendingMessagesStatus(sendStatus: Int)
+    fun resetSendStatusFailed(sendStatus: Int = MsgSendStatus.SendFailed.value)
 
+    /**
+     * 更新消息的操作状态
+     */
     @Query("update message set opr_status = opr_status | :oprStatus where sid = :sid and msg_id in (:msgIds)")
-    fun clientReadMessages(
+    fun updateMessageOperationStatus(
         sid: Long,
         msgIds: Set<Long>,
-        oprStatus: Int = MsgOperateStatus.ClientRead.value or MsgOperateStatus.Ack.value
+        oprStatus: Int
     )
 
-    @Query("update message set opr_status = opr_status | :oprStatus where sid = :sid and msg_id in (:msgIds)")
-    fun serverReadMessages(
-        sid: Long,
-        msgIds: Set<Long>,
-        oprStatus: Int = MsgOperateStatus.ServerRead.value or MsgOperateStatus.Ack.value
-    )
+    /**
+     * 查询session的最后一条消息
+     */
+    @Query("select * from message where sid = :sid and type >= 0 order by m_time desc limit 0, 1")
+    fun findLastMessageBySessionId(sid: Long): Message?
 }

@@ -24,7 +24,7 @@ abstract class BaseMsgProcessor {
     @WorkerThread
     open fun received(msg: Message) {
         // 默认插入数据库
-        val dbMsg = IMCoreManager.getImDataBase().messageDao().findMessage(msg.id)
+        val dbMsg = IMCoreManager.getImDataBase().messageDao().findMessageById(msg.id, msg.fUid, msg.sid)
         if (dbMsg == null) {
             if (msg.fUid == IMCoreManager.getUid()) {
                 // 如果发件人为自己，插入前补充消息状态为已接受并已读
@@ -89,13 +89,14 @@ abstract class BaseMsgProcessor {
             0 - id,
             type,
             content,
+            data,
             sendStatus,
             oprStatus,
-            cTime,
-            cTime,
-            data,
+            null,
             rMsgId,
-            atUsers
+            atUsers,
+            cTime,
+            cTime,
         )
     }
 
@@ -222,9 +223,9 @@ abstract class BaseMsgProcessor {
     }
 
 
-    open fun getSessionDesc(msg: Message): String? {
+    open fun getSessionDesc(msg: Message): String {
         return if (msg.content == null) {
-            null
+            ""
         } else {
             msg.content!!
         }

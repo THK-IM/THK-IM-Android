@@ -13,9 +13,9 @@ object StringUtils {
         return hexStringBuilder.toString()
     }
 
-    fun getMessageCount(count: Int) : String {
+    fun getMessageCount(count: Int) : String? {
         return if (count <= 0) {
-            ""
+            return null
         } else if (count < 100) {
             "$count"
         } else {

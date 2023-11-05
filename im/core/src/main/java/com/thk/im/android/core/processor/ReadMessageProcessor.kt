@@ -4,6 +4,9 @@ import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.db.MsgOperateStatus
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import io.reactivex.BackpressureStrategy
@@ -19,7 +22,7 @@ class ReadMessageProcessor : BaseMsgProcessor() {
     init {
         val subscriber = object : BaseSubscriber<Long>() {
             override fun onNext(t: Long?) {
-                readMessageToServer()
+                sendCacheReadMessagesToServer()
             }
         }
         Flowable.interval(2, 2, TimeUnit.SECONDS)
@@ -46,17 +49,27 @@ class ReadMessageProcessor : BaseMsgProcessor() {
                     LLog.v(it)
                 }
             }
+
             override fun onNext(t: Message?) {
                 t?.let {
-                    addReadMessages(t.sid, mutableSetOf(t.rMsgId!!))
-                    IMCoreManager.getMessageModule().processSessionByMessage(t)
+                    addReadMessagesToCache(t.sid, mutableSetOf(t.rMsgId!!))
                 }
             }
         }
         Flowable.create<Message>({
             try {
-                IMCoreManager.getImDataBase().messageDao()
-                    .clientReadMessages(msg.sid, mutableSetOf(msg.rMsgId!!))
+                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
+                    msg.sid, mutableSetOf(msg.rMsgId!!), MsgOperateStatus.ClientRead.value
+                )
+                val session = IMCoreManager.getImDataBase().sessionDao().findSession(msg.sid)
+                if (session != null) {
+                    val count =
+                        IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
+                    session.unRead = count
+                    session.mTime = IMCoreManager.signalModule.severTime
+                    IMCoreManager.getImDataBase().sessionDao().updateSession(session)
+                    XEventBus.post(IMEvent.SessionUpdate.value, session)
+                }
                 it.onNext(msg)
             } catch (e: Exception) {
                 it.onError(e)
@@ -69,18 +82,48 @@ class ReadMessageProcessor : BaseMsgProcessor() {
     }
 
     override fun received(msg: Message) {
-        LLog.v("ReadMessageProcessor ${msg.msgId}")
-        // 自己发的已读消息，更新rMsgId的消息状态为服务端已读
-        if (msg.fUid == IMCoreManager.getUid()) {
-            msg.rMsgId?.let {
-                IMCoreManager.getImDataBase().messageDao().serverReadMessages(msg.sid, mutableSetOf(it))
+        msg.rMsgId?.let {
+            // 别人发给自己的已读消息
+            val referMsg =
+                IMCoreManager.getImDataBase().messageDao().findMessageByMsgId(it, msg.sid)
+            if (referMsg != null) {
+                if (msg.fUid == IMCoreManager.getUid()) {
+                    // 自己发的已读消息不插入数据库，更新rMsgId的消息状态为服务端已读
+                    referMsg.oprStatus = MsgOperateStatus.ServerRead.value.or(MsgOperateStatus.ClientRead.value)
+                        .or(MsgOperateStatus.Ack.value)
+                    referMsg.mTime = msg.cTime
+                    insertOrUpdateDb(referMsg, notify = true, notifySession = false)
+                    val session = IMCoreManager.getImDataBase().sessionDao().findSession(msg.sid)
+                    if (session != null) {
+                        val count =
+                            IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
+                        session.unRead = count
+                        session.mTime = IMCoreManager.signalModule.severTime
+                        IMCoreManager.getImDataBase().sessionDao().updateSession(session)
+                        XEventBus.post(IMEvent.SessionUpdate.value, session)
+                    }
+                } else {
+                    if (referMsg.rUsers != null) {
+                        referMsg.rUsers = "${referMsg.rUsers}#${msg.fUid}"
+                    } else {
+                        referMsg.rUsers = "${msg.fUid}"
+                    }
+                    referMsg.mTime = msg.cTime
+                    insertOrUpdateDb(referMsg, notify = true, notifySession = false)
+                    // 状态操作消息对用户不可见，默认状态即位本身已读
+                    msg.oprStatus =
+                        MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
+                    // 已读消息入库，并ack
+                    insertOrUpdateDb(msg, notify = false, notifySession = false)
+                    if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
+                        IMCoreManager.getMessageModule().ackMessageToCache(msg)
+                    }
+                }
             }
-        } else {
-            // TODO
         }
     }
 
-    private fun addReadMessages(sessionId: Long, msgIds: Set<Long>) {
+    private fun addReadMessagesToCache(sessionId: Long, msgIds: Set<Long>) {
         LLog.v("ReadMessageProcessor addReadMessages $msgIds")
         try {
             readLock.writeLock().tryLock(1, TimeUnit.SECONDS)
@@ -100,7 +143,6 @@ class ReadMessageProcessor : BaseMsgProcessor() {
         try {
             readLock.writeLock().tryLock(1, TimeUnit.SECONDS)
             val cacheMsgIds = needReadMap[sessionId]
-            IMCoreManager.getImDataBase().messageDao().serverReadMessages(sessionId, msgIds)
             cacheMsgIds?.let {
                 it.removeAll(msgIds)
                 needReadMap[sessionId] = it
@@ -112,13 +154,16 @@ class ReadMessageProcessor : BaseMsgProcessor() {
         }
     }
 
-    private fun readServerMessage(sessionId: Long, msgIds: Set<Long>) {
+    private fun sendReadMessages(sessionId: Long, msgIds: Set<Long>) {
         LLog.v("ReadMessageProcessor readServerMessage $msgIds")
         val uId = IMCoreManager.getUid()
         val disposable = object : BaseSubscriber<Void>() {
 
             override fun onComplete() {
                 super.onComplete()
+                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
+                    sessionId, msgIds, MsgOperateStatus.ServerRead.value
+                )
                 readMessageToServerSuccess(sessionId, msgIds)
             }
 
@@ -135,13 +180,13 @@ class ReadMessageProcessor : BaseMsgProcessor() {
         this.disposables.add(disposable)
     }
 
-    private fun readMessageToServer() {
+    private fun sendCacheReadMessagesToServer() {
         LLog.v("ReadMessageProcessor readMessageToServer")
         try {
             readLock.readLock().tryLock(1, TimeUnit.SECONDS)
             this.needReadMap.forEach {
                 if (it.value.isNotEmpty()) {
-                    this.readServerMessage(it.key, it.value)
+                    this.sendReadMessages(it.key, it.value)
                 }
             }
         } catch (e: Exception) {

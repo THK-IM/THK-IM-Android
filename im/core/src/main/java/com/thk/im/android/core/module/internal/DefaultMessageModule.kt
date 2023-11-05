@@ -56,6 +56,7 @@ open class DefaultMessageModule : MessageModule {
             override fun onNext(messages: List<Message>) {
                 try {
                     val sessionMessages = mutableMapOf<Long, MutableList<Message>>()
+                    val unProcessorMessages = mutableListOf<Message>()
                     for (m in messages) {
                         if (m.fUid == IMCoreManager.getUid()) {
                             m.oprStatus = m.oprStatus or
@@ -64,28 +65,37 @@ open class DefaultMessageModule : MessageModule {
                                     MsgOperateStatus.ServerRead.value
                         }
                         m.sendStatus = MsgSendStatus.Success.value
-                        if (sessionMessages[m.sid] == null) {
-                            sessionMessages[m.sid] = mutableListOf(m)
+                        if (m.type < 0) {
+                            // 状态操作消息交给对应消息处理器自己处理
+                            getMsgProcessor(m.type).received(m)
                         } else {
-                            sessionMessages[m.sid]!!.add(m)
+                            // 其他消息批量处理
+                            if (sessionMessages[m.sid] == null) {
+                                sessionMessages[m.sid] = mutableListOf(m)
+                            } else {
+                                sessionMessages[m.sid]!!.add(m)
+                            }
+                            unProcessorMessages.add(m)
                         }
                     }
-
-                    if (messages.isNotEmpty()) {
+                    // 消息入库并ACK
+                    if (unProcessorMessages.isNotEmpty()) {
                         // 插入数据库
-                        IMCoreManager.getImDataBase().messageDao()
-                            .insertOrIgnoreMessages(messages)
-                    }
-
-                    for (m in messages) {
-                        ackMessageToCache(m)
+                        IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(messages)
+                        for (m in unProcessorMessages) {
+                            if (m.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
+                                ackMessageToCache(m)
+                            }
+                        }
                     }
 
                     // 更新每个session的最后一条消息
                     for (sessionMessage in sessionMessages) {
                         XEventBus.post(IMEvent.BatchMsgNew.value, sessionMessage.value)
-                        val lastMsg = sessionMessage.value.last()
-                        processSessionByMessage(lastMsg)
+                        val lastMsg = IMCoreManager.getImDataBase().messageDao().findLastMessageBySessionId(sessionMessage.key)
+                        lastMsg?.let {
+                            processSessionByMessage(it)
+                        }
                     }
 
                 } catch (e: Exception) {
@@ -185,7 +195,7 @@ open class DefaultMessageModule : MessageModule {
         sessionList: Array<Session>,
         deleteServer: Boolean
     ): Flowable<Boolean> {
-        TODO("Not yet implemented")
+        return Flowable.just(false)
     }
 
     override fun onNewMessage(msg: Message) {
@@ -280,7 +290,9 @@ open class DefaultMessageModule : MessageModule {
 
             override fun onComplete() {
                 super.onComplete()
-                IMCoreManager.getImDataBase().messageDao().clientReadMessages(sessionId, msgIds, MsgOperateStatus.Ack.value)
+                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
+                    sessionId, msgIds, MsgOperateStatus.Ack.value
+                )
                 ackMessagesSuccess(sessionId, msgIds)
             }
 
@@ -353,7 +365,7 @@ open class DefaultMessageModule : MessageModule {
                 processor.getSessionDesc(msg)?.let {
                     t.lastMsg = it
                 }
-                t.mTime = msg.cTime
+                t.mTime = msg.mTime
                 t.unRead = messageDao.getUnReadCount(t.id)
                 sessionDao.insertOrUpdateSessions(t)
                 XEventBus.post(IMEvent.SessionNew.value, t)

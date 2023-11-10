@@ -40,9 +40,7 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_session, null)
     }
@@ -115,13 +113,12 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
                 isLoading = false
             }
         }
-        var current = IMCoreManager.signalModule.severTime
+        var current = IMCoreManager.getCommonModule().getSeverTime()
         if (sessionAdapter.getSessionList().isNotEmpty()) {
             current = sessionAdapter.getSessionList().last().mTime
         }
         IMCoreManager.getMessageModule().queryLocalSessions(10, current)
-            .compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
+            .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
     }
 
@@ -136,10 +133,8 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
                 }
             }
         }
-        IMCoreManager.getMessageModule()
-            .updateSession(session, true)
-            .compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
+        IMCoreManager.getMessageModule().updateSession(session, true)
+            .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
     }
 
@@ -154,10 +149,8 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
                 }
             }
         }
-        IMCoreManager.getMessageModule()
-            .deleteSession(session, true)
-            .compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
+        IMCoreManager.getMessageModule().deleteSession(session, true)
+            .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
     }
 

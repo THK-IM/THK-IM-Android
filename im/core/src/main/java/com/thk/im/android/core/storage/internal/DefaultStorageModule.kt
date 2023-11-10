@@ -2,47 +2,13 @@ package com.thk.im.android.core.storage.internal
 
 import android.app.Application
 import android.graphics.Bitmap
-import android.util.Base64
 import com.thk.im.android.core.storage.StorageModule
-import okhttp3.internal.and
 import java.io.*
-import java.nio.charset.Charset
-import java.security.MessageDigest
 
 
 class DefaultStorageModule(private val app: Application, private val uid: Long) : StorageModule {
 
     private val rootPath: String = "${app.applicationContext.filesDir.path}/im/$uid"
-    private val rootDir: File = File(rootPath)
-
-    init {
-        val dir = File("${rootPath}/avatar")
-        if (dir.exists() && !dir.isDirectory) {
-            dir.delete()
-        } else {
-            dir.mkdirs()
-        }
-    }
-
-    private fun toHexString(ba: ByteArray): String {
-        val sb = StringBuilder()
-        for (b in ba) {
-            var hexChar = Integer.toHexString(b and 0xff)
-            if (hexChar.length == 1) {
-                hexChar = "0$hexChar"
-            }
-            sb.append(hexChar)
-        }
-
-        return sb.toString()
-    }
-
-    private fun getFileName(url: String): String {
-        val b64Url = Base64.encode(url.toByteArray(Charset.forName("UTF-8")), Base64.DEFAULT)
-        val md = MessageDigest.getInstance("MD5")
-        val digest = md.digest(b64Url)
-        return toHexString(digest)
-    }
 
     override fun getFileExt(path: String): Pair<String, String> {
         val i = path.lastIndexOf(".")
@@ -150,10 +116,6 @@ class DefaultStorageModule(private val app: Application, private val uid: Long) 
             output?.close()
         }
         return res
-    }
-
-    override fun allocAvatarPath(id: Long, avatarUrl: String): String {
-        return "${rootPath}/avatar/user-${id}.jpeg"
     }
 
     override fun allocSessionFilePath(sid: Long, fileName: String, format: String): String {

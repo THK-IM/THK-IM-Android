@@ -34,10 +34,12 @@ open class DefaultMessageModule : MessageModule {
     private val processorMap: MutableMap<Int, BaseMsgProcessor> = HashMap()
     private var lastTimestamp: Long = 0
     private var lastSequence: Int = 0
+    private val epoch = 1288834974657L
     private val needAckMap = HashMap<Long, MutableSet<Long>>()
     private val disposes = CompositeDisposable()
     private val idLock = ReentrantLock()
     private val ackLock = ReentrantReadWriteLock()
+    private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 IOS:1 Android: 2
 
     override fun registerMsgProcessor(processor: BaseMsgProcessor) {
         processorMap[processor.messageType()] = processor
@@ -59,10 +61,8 @@ open class DefaultMessageModule : MessageModule {
                     val unProcessorMessages = mutableListOf<Message>()
                     for (m in messages) {
                         if (m.fUid == IMCoreManager.getUid()) {
-                            m.oprStatus = m.oprStatus or
-                                    MsgOperateStatus.Ack.value or
-                                    MsgOperateStatus.ClientRead.value or
-                                    MsgOperateStatus.ServerRead.value
+                            m.oprStatus =
+                                m.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
                         }
                         m.sendStatus = MsgSendStatus.Success.value
                         if (m.type < 0) {
@@ -120,8 +120,7 @@ open class DefaultMessageModule : MessageModule {
             }
         }
         IMCoreManager.imApi.getLatestMessages(IMCoreManager.getUid(), lastTime, count)
-            .compose(RxTransform.flowableToIo())
-            .subscribe(disposable)
+            .compose(RxTransform.flowableToIo()).subscribe(disposable)
         this.disposes.add(disposable)
     }
 
@@ -146,8 +145,7 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap Flowable.just(session)
             } else {
                 val uId = IMCoreManager.getUid()
-                return@flatMap IMCoreManager.imApi
-                    .createSession(uId, sessionType, entityId, null)
+                return@flatMap IMCoreManager.imApi.createSession(uId, sessionType, entityId, null)
             }
         }
     }
@@ -180,9 +178,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun queryLocalMessages(
-        sessionId: Long,
-        cTime: Long,
-        count: Int
+        sessionId: Long, cTime: Long, count: Int
     ): Flowable<List<Message>> {
         return Flowable.create({
             val sessions = IMCoreManager.getImDataBase().messageDao()
@@ -193,8 +189,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun deleteSession(
-        session: Session,
-        deleteServer: Boolean
+        session: Session, deleteServer: Boolean
     ): Flowable<Void> {
         return if (deleteServer) {
             deleteSeverSession(session).concatWith(deleteLocalSession(session))
@@ -216,30 +211,26 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun generateNewMsgId(): Long {
+        val current = IMCoreManager.getCommonModule().getSeverTime()
         try {
             idLock.tryLock(1, TimeUnit.SECONDS)
-            val current = IMCoreManager.signalModule.severTime
             if (current == lastTimestamp) {
                 lastSequence++
             } else {
                 lastTimestamp = current
                 lastSequence = startSequence
             }
-            val seq = current * 1000 + lastSequence
+            val seq = (current-epoch).shl(22).or(snowFlakeMachine.shl(12)).or(lastSequence.toLong())
             idLock.unlock()
             return seq
         } catch (e: Exception) {
             LLog.e("generateNewMsgId err: $e")
         }
-        return IMCoreManager.signalModule.severTime * 1000 + 500 + startSequence
+        return (current-epoch).shl(22).or(snowFlakeMachine.shl(12)).or(1000L)
     }
 
     override fun sendMessage(
-        body: Any,
-        sessionId: Long,
-        type: Int,
-        atUser: String?,
-        replyMsgId: Long?
+        body: Any, sessionId: Long, type: Int, atUser: String?, replyMsgId: Long?
     ) {
         val processor = getMsgProcessor(type)
         processor.sendMessage(body, sessionId, atUser, replyMsgId)
@@ -261,8 +252,7 @@ open class DefaultMessageModule : MessageModule {
 
     override fun reeditMessage(message: Message): Flowable<Void> {
         val uId = IMCoreManager.getUid()
-        return IMCoreManager.imApi
-            .reeditMessage(uId, message.sid, message.msgId, message.content)
+        return IMCoreManager.imApi.reeditMessage(uId, message.sid, message.msgId, message.content)
     }
 
     override fun ackMessageToCache(message: Message) {
@@ -313,9 +303,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun deleteMessages(
-        sessionId: Long,
-        messages: List<Message>,
-        deleteServer: Boolean
+        sessionId: Long, messages: List<Message>, deleteServer: Boolean
     ): Flowable<Void> {
         return if (deleteServer) {
             val msgIds = mutableSetOf<Long>()
@@ -324,8 +312,7 @@ open class DefaultMessageModule : MessageModule {
                     msgIds.add(it.msgId)
                 }
             }
-            this.deleteSeverMessages(sessionId, msgIds)
-                .concatWith(deleteLocalMessages(messages))
+            this.deleteSeverMessages(sessionId, msgIds).concatWith(deleteLocalMessages(messages))
         } else {
             deleteLocalMessages(messages)
         }
@@ -352,9 +339,7 @@ open class DefaultMessageModule : MessageModule {
                 LLog.e("processSessionByMessage error $t")
             }
         }
-        getSession(msg.sid)
-            .compose(RxTransform.flowableToIo())
-            .subscribe(dispose)
+        getSession(msg.sid).compose(RxTransform.flowableToIo()).subscribe(dispose)
         disposes.add(dispose)
     }
 
@@ -457,8 +442,7 @@ open class DefaultMessageModule : MessageModule {
                 t?.message?.let { LLog.e(it) }
             }
         }
-        IMCoreManager.imApi.ackMessages(uId, sessionId, msgIds)
-            .compose(RxTransform.flowableToIo())
+        IMCoreManager.imApi.ackMessages(uId, sessionId, msgIds).compose(RxTransform.flowableToIo())
             .subscribe(disposable)
         this.disposes.add(disposable)
     }

@@ -4,25 +4,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.emoji2.widget.EmojiTextView
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.IMImageLoader
 import com.thk.im.android.base.utils.DateUtils
 import com.thk.im.android.base.utils.StringUtils
-import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 import io.reactivex.disposables.CompositeDisposable
-import java.io.File
 
 class SingleSessionVH(
     lifecycleOwner: LifecycleOwner,
@@ -61,7 +53,7 @@ class SingleSessionVH(
             override fun onNext(t: User) {
                 nickView.text = t.name
                 t.avatar?.let {
-                    displayAvatar(avatarView, t.id, it)
+                    displayAvatar(avatarView, it)
                 }
             }
         }
@@ -70,24 +62,8 @@ class SingleSessionVH(
     }
 
 
-    fun displayAvatar(imageView: ImageView, id: Long, url: String) {
-        val path = IMCoreManager.storageModule.allocAvatarPath(id, url)
-        val file = File(path)
-        if (file.exists()) {
-            IMImageLoader.displayImageByPath(imageView, path)
-        } else {
-            IMCoreManager.fileLoadModule.download(url, path, object : LoadListener {
-                override fun onProgress(progress: Int, state: Int, url: String, path: String) {
-                    if (state == LoadListener.Success) {
-                        XEventBus.post(IMEvent.SessionUpdate.value, session)
-                    }
-                }
-
-                override fun notifyOnUiThread(): Boolean {
-                    return true
-                }
-            })
-        }
+    fun displayAvatar(imageView: ImageView, url: String) {
+        IMImageLoader.displayImageUrl(imageView, url)
     }
 }
 

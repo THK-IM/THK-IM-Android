@@ -1,6 +1,5 @@
 package com.thk.im.android.core.module.internal
 
-import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.api.bean.UserBean

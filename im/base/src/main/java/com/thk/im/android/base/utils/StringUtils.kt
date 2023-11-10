@@ -1,8 +1,16 @@
 package com.thk.im.android.base.utils
 
-import java.lang.StringBuilder
+import java.security.MessageDigest
+
 
 object StringUtils {
+
+    fun shaEncrypt(strSrc: String): String {
+        val bt = strSrc.toByteArray()
+        val md = MessageDigest.getInstance("SHA-1") // 将此换成SHA-1、SHA-512、SHA-384等参数
+        md.update(bt)
+        return byteArray2HexString(md.digest()) // to HexString
+    }
 
     fun byteArray2HexString(array: ByteArray): String {
         val hexStringBuilder = StringBuilder()
@@ -13,7 +21,7 @@ object StringUtils {
         return hexStringBuilder.toString()
     }
 
-    fun getMessageCount(count: Int) : String? {
+    fun getMessageCount(count: Int): String? {
         return if (count <= 0) {
             return null
         } else if (count < 100) {

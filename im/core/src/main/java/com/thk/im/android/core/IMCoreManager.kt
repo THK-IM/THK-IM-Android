@@ -7,11 +7,12 @@ import com.thk.im.android.base.utils.ToastUtils
 import com.thk.im.android.core.api.IMApi
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadModule
+import com.thk.im.android.core.module.BaseModule
 import com.thk.im.android.core.module.CommonModule
 import com.thk.im.android.core.module.ContactorModule
 import com.thk.im.android.core.module.GroupModule
 import com.thk.im.android.core.module.MessageModule
-import com.thk.im.android.core.module.SelfDefineMsgModule
+import com.thk.im.android.core.module.CustomModule
 import com.thk.im.android.core.module.UserModule
 import com.thk.im.android.core.module.internal.DefaultCommonModule
 import com.thk.im.android.core.module.internal.DefaultContactorModule
@@ -30,7 +31,7 @@ import com.thk.im.android.db.IMDataBase
 
 object IMCoreManager {
 
-    private val moduleMap: MutableMap<Int, CommonModule> = HashMap()
+    private val moduleMap: MutableMap<Int, BaseModule> = HashMap()
 
     private var innerSignalModule: SignalModule? = null
     var signalModule: SignalModule
@@ -108,12 +109,16 @@ object IMCoreManager {
         db.close()
     }
 
-    fun registerModule(type: Int, module: CommonModule) {
+    fun registerModule(type: Int, module: BaseModule) {
         moduleMap[type] = module
     }
 
-    fun getModule(type: Int): CommonModule {
+    fun getModule(type: Int): BaseModule {
         return moduleMap[type]!!
+    }
+
+    fun getCommonModule(): CommonModule {
+        return getModule(SignalType.Common.value) as CommonModule
     }
 
     fun getUserModule(): UserModule {
@@ -128,8 +133,8 @@ object IMCoreManager {
         return getModule(SignalType.Message.value) as MessageModule
     }
 
-    fun getSelfDefineModule(): SelfDefineMsgModule {
-        return getModule(SignalType.SelfDefine.value) as SelfDefineMsgModule
+    fun getSelfDefineModule(): CustomModule {
+        return getModule(SignalType.SelfDefine.value) as CustomModule
     }
 
 

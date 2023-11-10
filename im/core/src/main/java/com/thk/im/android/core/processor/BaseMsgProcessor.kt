@@ -16,6 +16,7 @@ import io.reactivex.disposables.CompositeDisposable
 
 abstract class BaseMsgProcessor {
 
+    protected val downLoadingUrls = mutableListOf<String>()
     protected val disposables = CompositeDisposable()
 
     /**
@@ -80,7 +81,7 @@ abstract class BaseMsgProcessor {
         val sendStatus = MsgSendStatus.Init.value
         val type = this.messageType()
         val fUId = IMCoreManager.getUid()
-        val cTime = IMCoreManager.signalModule.severTime
+        val cTime = IMCoreManager.getCommonModule().getSeverTime()
         // tips：msgId初始值给-id,发送成功后更新为服务端返回的msgId
         return Message(
             id,

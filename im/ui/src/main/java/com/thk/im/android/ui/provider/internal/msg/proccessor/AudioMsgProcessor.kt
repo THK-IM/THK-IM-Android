@@ -9,7 +9,7 @@ import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.exception.UploadException
+import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.BaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
@@ -89,35 +89,33 @@ class AudioMsgProcessor : BaseMsgProcessor() {
             } else {
                 val pair = IMCoreManager.storageModule.getPathsFromFullPath(audioData.path!!)
                 return Flowable.create({
-
-                    val key = IMCoreManager.fileLoadModule.getUploadKey(
-                        entity.sid,
-                        entity.fUid,
-                        pair.second,
-                        entity.id
-                    )
-                    var over = false
                     IMCoreManager.fileLoadModule
-                        .upload(key, audioData.path!!, object : LoadListener {
+                        .upload(audioData.path!!, entity, object : LoadListener {
 
                             override fun onProgress(
                                 progress: Int,
                                 state: Int,
                                 url: String,
-                                path: String
+                                path: String,
+                                exception: Exception?
                             ) {
                                 XEventBus.post(
                                     IMEvent.MsgLoadStatusUpdate.value,
-                                    IMLoadProgress(IMLoadType.Upload.value, url, path, state, progress)
+                                    IMLoadProgress(
+                                        IMLoadType.Upload.value,
+                                        url,
+                                        path,
+                                        state,
+                                        progress
+                                    )
                                 )
                                 when (state) {
-                                    LoadListener.Init,
-                                    LoadListener.Wait,
-                                    LoadListener.Ing -> {
-
+                                    FileLoadState.Init.value,
+                                    FileLoadState.Wait.value,
+                                    FileLoadState.Ing.value -> {
                                     }
 
-                                    LoadListener.Success -> {
+                                    FileLoadState.Success.value -> {
                                         if (audioBody == null) {
                                             audioBody = IMAudioMsgBody()
                                         }
@@ -128,12 +126,14 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                                         entity.sendStatus = MsgSendStatus.Sending.value
                                         it.onNext(entity)
                                         it.onComplete()
-                                        over = true
                                     }
 
                                     else -> {
-                                        over = true
-                                        it.onError(UploadException())
+                                        if (exception != null) {
+                                            it.onError(exception)
+                                        } else {
+                                            it.onError(RuntimeException())
+                                        }
                                     }
                                 }
                             }
@@ -142,10 +142,6 @@ class AudioMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
-                    // 防止线程被回收
-                    while (!over) {
-                        Thread.sleep(200)
-                    }
                 }, BackpressureStrategy.LATEST)
             }
         } catch (e: Exception) {
@@ -172,44 +168,51 @@ class AudioMsgProcessor : BaseMsgProcessor() {
             return false
         }
 
-        val localPath = IMCoreManager.storageModule.allocSessionFilePath(
-            entity.sid,
-            fileName,
-            IMFileFormat.Image.value
-        )
+        if (downLoadingUrls.contains(downloadUrl)) {
+            return true
+        } else {
+            downLoadingUrls.add(downloadUrl)
+        }
 
         val listener = object : LoadListener {
             override fun onProgress(
                 progress: Int,
                 state: Int,
                 url: String,
-                path: String
+                path: String,
+                exception: Exception?
             ) {
                 XEventBus.post(
                     IMEvent.MsgLoadStatusUpdate.value,
                     IMLoadProgress(IMLoadType.Download.value, url, path, state, progress)
                 )
                 when (state) {
-                    LoadListener.Init,
-                    LoadListener.Wait,
-                    LoadListener.Ing -> {
+                    FileLoadState.Init.value,
+                    FileLoadState.Wait.value,
+                    FileLoadState.Ing.value -> {
                     }
-
-                    LoadListener.Success -> {
+                    FileLoadState.Success.value -> {
                         if (data == null) {
                             data = IMAudioMsgData()
                         }
-                        data.duration = body.duration
+                        val localPath = IMCoreManager.storageModule.allocSessionFilePath(
+                            entity.sid,
+                            fileName,
+                            IMFileFormat.Image.value
+                        )
+                        IMCoreManager.storageModule.copyFile(path, localPath)
                         if (resourceType == IMMsgResourceType.Thumbnail.value) {
-                            data.path = path
+                            data.path = localPath
                         } else {
-                            data.path = path
+                            data.path = localPath
                         }
+                        data.duration = body.duration
                         entity.data = Gson().toJson(data)
                         insertOrUpdateDb(entity, notify = true, notifySession = false)
+                        downLoadingUrls.remove(downloadUrl)
                     }
-
                     else -> {
+                        downLoadingUrls.remove(downloadUrl)
                     }
                 }
             }
@@ -219,11 +222,7 @@ class AudioMsgProcessor : BaseMsgProcessor() {
             }
 
         }
-        IMCoreManager.fileLoadModule.download(
-            downloadUrl,
-            localPath,
-            listener
-        )
+        IMCoreManager.fileLoadModule.download(downloadUrl, entity, listener)
         return true
     }
 }

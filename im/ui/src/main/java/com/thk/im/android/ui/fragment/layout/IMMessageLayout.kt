@@ -36,8 +36,11 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int)
-            : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     fun init(fragment: Fragment, sender: IMMsgSender, previewer: IMMsgPreviewer) {
         this.fragment = fragment
@@ -89,10 +92,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
             }
 
             override fun onScroll(
-                p0: MotionEvent?,
-                p1: MotionEvent,
-                p2: Float,
-                p3: Float
+                p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float
             ): Boolean {
                 return false
             }
@@ -119,7 +119,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     private fun loadMessages() {
         if (!hasMore || isLoading) return
         if (msgAdapter.getMessageCount() == 0) {
-            cTime = IMCoreManager.signalModule.severTime
+            cTime = IMCoreManager.getCommonModule().getSeverTime()
         }
         isLoading = true
         val subscriber = object : BaseSubscriber<List<Message>>() {
@@ -144,8 +144,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         }
         val session = msgSender.getSession()
         IMCoreManager.getMessageModule().queryLocalMessages(session.id, cTime, count)
-            .compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
+            .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
     }
 

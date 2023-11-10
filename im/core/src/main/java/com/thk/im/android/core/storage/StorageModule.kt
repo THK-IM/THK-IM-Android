@@ -30,11 +30,6 @@ interface StorageModule {
      */
     fun copyFile(srcPath :String, desPath: String) :Boolean
 
-    /**
-     * 申请存放用户头像的地址
-     */
-    fun allocAvatarPath(id: Long, avatarUrl: String): String
-
 
     /**
      * 申请本地文件路径

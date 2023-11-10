@@ -5,7 +5,7 @@ import com.thk.im.android.core.api.bean.ContactorApplyMessageBean
 import com.thk.im.android.core.api.bean.ContactorBean
 import io.reactivex.Flowable
 
-interface ContactorModule: CommonModule {
+interface ContactorModule : BaseModule {
 
     /**
      * 【收到服务器通知】联系人信息更新
@@ -75,7 +75,7 @@ interface ContactorModule: CommonModule {
     /**
      * 【用户主动发起】获取单个联系人信息
      */
-    fun getContactorInfo(cid:Long): Flowable<ContactorBean>
+    fun getContactorInfo(cid: Long): Flowable<ContactorBean>
 
     /**
      * 【用户主动发起】同步用户的联系人

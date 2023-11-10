@@ -33,10 +33,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     private var status: Int = SignalListener.StatusInit
     private var signalListener: SignalListener? = null
 
-    private val timeMap: MutableMap<String, Long> = HashMap()
     private var connId: String? = null
-    private val client = "client"
-    private val server = "server"
 
     init {
         this.app = app
@@ -93,24 +90,6 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
     override fun setConnId(id: String) {
         connId = id
-    }
-
-    override fun setSeverTime(serverTime: Long) {
-        synchronized(this) {
-            val current = System.currentTimeMillis()
-            timeMap[client] = current
-            timeMap[server] = serverTime
-        }
-    }
-
-    override fun getSeverTime(): Long {
-        synchronized(this) {
-            if (timeMap[client] == null || timeMap[server] == null) {
-                return System.currentTimeMillis()
-            } else {
-                return timeMap[server]!! + System.currentTimeMillis() - timeMap[client]!!
-            }
-        }
     }
 
     override fun getConnId(): String? {

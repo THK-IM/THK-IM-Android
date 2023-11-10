@@ -9,7 +9,7 @@ import com.thk.im.android.db.entity.GroupMember
 import io.reactivex.Flowable
 
 
-interface GroupModule : CommonModule {
+interface GroupModule : BaseModule {
 
     /**
      * 【收到服务器通知】 收到进入新群通知

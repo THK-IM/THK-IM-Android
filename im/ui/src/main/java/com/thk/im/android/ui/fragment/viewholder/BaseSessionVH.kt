@@ -64,7 +64,7 @@ abstract class BaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
             if (this.session.topTime > 0) {
                 this.session.topTime = 0
             } else {
-                this.session.topTime = IMCoreManager.signalModule.severTime
+                this.session.topTime = IMCoreManager.getCommonModule().getSeverTime()
             }
             this.sessionVHOperator?.updateSession(this.session)
         }

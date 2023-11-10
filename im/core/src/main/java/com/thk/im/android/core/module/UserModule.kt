@@ -4,7 +4,7 @@ import com.thk.im.android.core.api.bean.UserBean
 import com.thk.im.android.db.entity.User
 import io.reactivex.Flowable
 
-interface UserModule : CommonModule{
+interface UserModule : BaseModule {
 
     fun getServerUserInfo(id: Long): Flowable<UserBean>
 

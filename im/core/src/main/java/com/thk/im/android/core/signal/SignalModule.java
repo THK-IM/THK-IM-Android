@@ -3,18 +3,6 @@ package com.thk.im.android.core.signal;
 public interface SignalModule {
 
     /**
-     * 设置服务器时间
-     * @param time
-     */
-    void setSeverTime(long time);
-
-    /**
-     * 获取当前服务器时间
-     * @return long
-     */
-    long getSeverTime();
-
-    /**
      * 获取连接id
      * @return nullable
      */

@@ -12,9 +12,6 @@ import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.IMImageLoader
 import com.thk.im.android.base.LLog
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.db.MsgOperateStatus
 import com.thk.im.android.db.MsgSendStatus
 import com.thk.im.android.db.SessionType
@@ -24,7 +21,6 @@ import com.thk.im.android.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
-import java.io.File
 
 abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val viewType: Int) :
     BaseVH(liftOwner, itemView), View.OnClickListener, View.OnLongClickListener {
@@ -126,7 +122,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                     tvNicknameView?.text = t.name
                     ivAvatarView?.let { iv ->
                         t.avatar?.let {
-                            displayAvatar(iv, t.id, it)
+                            displayAvatar(iv, it)
                         }
                     }
                 }
@@ -182,24 +178,8 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         }
     }
 
-    open fun displayAvatar(imageView: ImageView, id: Long, url: String) {
-        val path = IMCoreManager.storageModule.allocAvatarPath(id, url)
-        val file = File(path)
-        if (file.exists()) {
-            IMImageLoader.displayImageByPath(imageView, path)
-        } else {
-            avatarTaskId = IMCoreManager.fileLoadModule.download(url, path, object : LoadListener {
-                override fun onProgress(progress: Int, state: Int, url: String, path: String) {
-                    if (state == LoadListener.Success) {
-                        XEventBus.post(IMEvent.MsgUpdate.value, message)
-                    }
-                }
-
-                override fun notifyOnUiThread(): Boolean {
-                    return true
-                }
-            })
-        }
+    open fun displayAvatar(imageView: ImageView, url: String) {
+        IMImageLoader.displayImageUrl(imageView, url)
     }
 
     override fun onClick(p0: View?) {
@@ -219,6 +199,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     override fun onViewRecycled() {
         super.onViewRecycled()
         msgVHOperator = null
+
     }
 
 }

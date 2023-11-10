@@ -24,22 +24,10 @@ object IMImageLoader {
         }
     }
 
-    @JvmStatic
-    fun displayCornerImageByPath(imageView: ImageView, path: String, cornerDp: Int = 5) {
-        val file = File(path)
-        if (file.exists()) {
-            val corner = dp2px(cornerDp).toFloat()
-            val roundedCorners = GranularRoundedCorners(corner, corner, corner, corner)
-            val isGif = CompressUtils.isGif(path)
-            if (isGif) {
-                Glide.with(imageView.context.applicationContext).asGif().load(File(path))
-                    .apply(RequestOptions().transform(roundedCorners)).into(imageView)
-            } else {
-                Glide.with(imageView.context.applicationContext).asBitmap().load(File(path))
-                    .apply(RequestOptions().transform(roundedCorners)).into(imageView)
-            }
-        }
+    fun displayImageUrl(imageView: ImageView, url: String) {
+        Glide.with(imageView.context.applicationContext).load(url).into(imageView)
     }
+
 
     private fun dp2px(dp: Int): Int {
         val scale = Resources.getSystem().displayMetrics.density

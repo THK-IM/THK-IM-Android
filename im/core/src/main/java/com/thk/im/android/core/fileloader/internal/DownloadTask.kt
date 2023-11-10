@@ -1,71 +1,92 @@
 package com.thk.im.android.core.fileloader.internal
 
 import com.thk.im.android.base.LLog
+import com.thk.im.android.base.utils.StringUtils
+import com.thk.im.android.core.exception.HttpStatusCodeException
+import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
 import okhttp3.Response
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 
 class DownloadTask(
     private val url: String,
-    private val path: String,
-    taskId: String,
+    private val downloadParam: String,
     private val fileLoaderModule: DefaultFileLoadModule
-) : LoadTask(taskId) {
+) : LoadTask(url) {
 
     private val tag = "DownloadTask"
     private var running = AtomicBoolean(true)
-    private val loadingPath = "$path.tmp"
+    private val localFile: File
+    private val localTmpFile: File
     private var call: Call? = null
 
     init {
-        notify(0, LoadListener.Wait)
+        val hashUrl = StringUtils.shaEncrypt(url)
+        localFile = File(fileLoaderModule.cacheDir, hashUrl)
+        localTmpFile = File(fileLoaderModule.cacheDir, "${hashUrl}.tmp")
+        notify(0, FileLoadState.Wait.value)
     }
 
     override fun start() {
-        LLog.v("MinioDownloadTask start $url")
-        notify(0, LoadListener.Init)
-        val request = Request.Builder().addHeader("token", fileLoaderModule.token)
-            //访问路径
-            .url(url).build()
-        call = fileLoaderModule.okHttpClient.newCall(request)
+        notify(0, FileLoadState.Init.value)
+        if (localFile.exists()) {
+            notify(100, FileLoadState.Success.value)
+            return
+        }
+        val requestBuilder = Request.Builder()
+        if (url.startsWith("http", true)) {
+            requestBuilder.url(url)
+        } else {
+            requestBuilder.addHeader("Token", fileLoaderModule.token)
+            requestBuilder.url("${fileLoaderModule.endpoint}/session/object/download_url?${downloadParam}")
+        }
+        call = fileLoaderModule.okHttpClient.newCall(requestBuilder.build())
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                notify(0, LoadListener.Failed)
+                notify(0, FileLoadState.Failed.value, e)
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.code !in 200..299) {
                     response.close()
-                    notify(0, LoadListener.Failed)
+                    notify(0, FileLoadState.Failed.value, HttpStatusCodeException(response.code))
                     return
                 }
                 if (response.body == null) {
                     response.close()
-                    notify(0, LoadListener.Failed)
+                    notify(0, FileLoadState.Failed.value, FileNotFoundException())
                     return
                 }
-                notify(0, LoadListener.Ing)
-                val file = File(loadingPath)
+                notify(0, FileLoadState.Ing.value)
                 // 如果文件存在 删除然后创建新文件
-                if (file.exists()) {
-                    if (!file.delete()) {
+                if (localTmpFile.exists()) {
+                    if (!localTmpFile.delete()) {
                         response.close()
-                        notify(0, LoadListener.Failed)
+                        notify(
+                            0,
+                            FileLoadState.Failed.value,
+                            FileSystemException(localTmpFile, null, "create Failed")
+                        )
                         return
                     }
                 }
-                if (!file.createNewFile()) {
+                if (!localTmpFile.createNewFile()) {
                     response.close()
-                    notify(0, LoadListener.Failed)
+                    notify(
+                        0,
+                        FileLoadState.Failed.value,
+                        FileSystemException(localTmpFile, null, "create Failed")
+                    )
                     return
                 }
-                val fos = FileOutputStream(file)
+                val fos = FileOutputStream(localTmpFile)
                 val inputStream = response.body!!.byteStream()
                 // 储存下载文件的目录
                 try {
@@ -78,21 +99,27 @@ class DownloadTask(
                             fos.write(buf, 0, len)
                             sum += len
                             val progress = (sum * 1.0f / total * 100).toInt()
-                            notify(progress, LoadListener.Ing)
+                            notify(progress, FileLoadState.Ing.value)
                         } else {
                             break
                         }
                     }
                     fos.flush()
-                    LLog.v("sum: $sum, total: $total")
+                    LLog.d("sum: $sum, total: $total")
                     if (sum == total) {
-                        notify(100, LoadListener.Success)
+                        localTmpFile.renameTo(localFile)
+                        notify(100, FileLoadState.Success.value)
                     } else {
-                        notify((sum * 1.0f / total * 100).toInt(), LoadListener.Failed)
+                        localTmpFile.delete()
+                        notify(
+                            (sum * 1.0f / total * 100).toInt(),
+                            FileLoadState.Failed.value,
+                            FileNotFoundException()
+                        )
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    notify(0, LoadListener.Failed)
+                    notify(0, FileLoadState.Failed.value, e)
                 } finally {
                     fos.close()
                     inputStream.close()
@@ -109,32 +136,16 @@ class DownloadTask(
             }
         }
         call = null
-        running.set(false)
     }
 
-    override fun notify(progress: Int, state: Int) {
-        if (!running.get()) {
-            return
+    override fun notify(progress: Int, state: Int, exception: Exception?) {
+        val path = if (localFile.exists()) {
+            localFile.absolutePath
+        } else {
+            ""
         }
         LLog.v(tag, "$taskId, $progress, $state")
-        // 下载成功时把文件拷贝到最终路径上
-        if (state == LoadListener.Success) {
-            val loadingFile = File(loadingPath)
-            val file = File(path)
-            if (file.exists()) {
-                if (!file.delete()) {
-                    fileLoaderModule.notifyListeners(
-                        taskId, progress, LoadListener.Failed, url, path
-                    )
-                    return
-                }
-            }
-            if (!loadingFile.renameTo(file)) {
-                fileLoaderModule.notifyListeners(taskId, progress, LoadListener.Failed, url, path)
-                return
-            }
-        }
-        fileLoaderModule.notifyListeners(taskId, progress, state, url, path)
+        fileLoaderModule.notifyListeners(progress, state, url, path, exception)
     }
 
 }

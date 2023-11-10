@@ -10,7 +10,7 @@ import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.exception.UploadException
+import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.BaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
@@ -45,9 +45,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                 extractVideoFrame(IMCoreManager.storageModule, videoData, pair.second)
             } else {
                 CompressUtils.compress(
-                    videoData.thumbnailPath!!,
-                    100 * 1024,
-                    videoData.thumbnailPath!!
+                    videoData.thumbnailPath!!, 100 * 1024, videoData.thumbnailPath!!
                 ).flatMap {
                     Flowable.just(message)
                 }
@@ -60,21 +58,15 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
 
     @Throws(Exception::class)
     private fun checkDir(
-        storageModule: StorageModule,
-        videoData: IMVideoMsgData,
-        entity: Message
+        storageModule: StorageModule, videoData: IMVideoMsgData, entity: Message
     ): Pair<IMVideoMsgData, Message> {
         val isAssignedPath = storageModule.isAssignedPath(
-            videoData.path!!,
-            IMFileFormat.Video.value,
-            entity.sid
+            videoData.path!!, IMFileFormat.Video.value, entity.sid
         )
         val pair = storageModule.getPathsFromFullPath(videoData.path!!)
         if (!isAssignedPath) {
             val dePath = storageModule.allocSessionFilePath(
-                entity.sid,
-                pair.second,
-                IMFileFormat.Video.value
+                entity.sid, pair.second, IMFileFormat.Video.value
             )
             storageModule.copyFile(videoData.path!!, dePath)
             videoData.path = dePath
@@ -84,13 +76,13 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
     }
 
     private fun extractVideoFrame(
-        storageModule: StorageModule,
-        videoData: IMVideoMsgData,
-        entity: Message
+        storageModule: StorageModule, videoData: IMVideoMsgData, entity: Message
     ): Flowable<Message> {
         try {
-            val videoParams = CompressUtils.getVideoParams(videoData.path!!)
-                ?: return Flowable.error(IOException("extractVideoFrame error: ${videoData.path!!}"))
+            val videoParams =
+                CompressUtils.getVideoParams(videoData.path!!) ?: return Flowable.error(
+                    IOException("extractVideoFrame error: ${videoData.path!!}")
+                )
             val paths = storageModule.getPathsFromFullPath(videoData.path!!)
             val names = storageModule.getFileExt(paths.second)
             val ext = if (videoParams.first.hasAlpha()) {
@@ -99,8 +91,9 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                 "jpeg"
             }
             val thumbName = "${System.currentTimeMillis() / 1000}_${names.first}_cover.${ext}"
-            val thumbnailPath = IMCoreManager.storageModule
-                .allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
+            val thumbnailPath = IMCoreManager.storageModule.allocSessionFilePath(
+                entity.sid, thumbName, IMFileFormat.Image.value
+            )
             CompressUtils.compressSync(videoParams.first, 4 * 1024 * 1024, thumbnailPath)
             videoParams.first.recycle()
             val sizePair = CompressUtils.getBitmapAspect(thumbnailPath)
@@ -137,39 +130,28 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                 val pair =
                     IMCoreManager.storageModule.getPathsFromFullPath(videoData.thumbnailPath!!)
                 return Flowable.create({
-                    val key = IMCoreManager.fileLoadModule.getUploadKey(
-                        entity.sid,
-                        entity.fUid,
-                        pair.second,
-                        entity.id
-                    )
-                    var over = false
-                    IMCoreManager.fileLoadModule
-                        .upload(key, videoData.thumbnailPath!!, object : LoadListener {
+                    IMCoreManager.fileLoadModule.upload(
+                        videoData.thumbnailPath!!,
+                        entity,
+                        object : LoadListener {
 
                             override fun onProgress(
                                 progress: Int,
                                 state: Int,
                                 url: String,
-                                path: String
+                                path: String,
+                                exception: Exception?
                             ) {
                                 XEventBus.post(
-                                    IMEvent.MsgLoadStatusUpdate.value,
-                                    IMLoadProgress(
-                                        IMLoadType.Upload.value,
-                                        url,
-                                        path,
-                                        state,
-                                        progress
+                                    IMEvent.MsgLoadStatusUpdate.value, IMLoadProgress(
+                                        IMLoadType.Upload.value, url, path, state, progress
                                     )
                                 )
                                 when (state) {
-                                    LoadListener.Init,
-                                    LoadListener.Wait,
-                                    LoadListener.Ing -> {
+                                    FileLoadState.Init.value, FileLoadState.Wait.value, FileLoadState.Ing.value -> {
                                     }
 
-                                    LoadListener.Success -> {
+                                    FileLoadState.Success.value -> {
                                         if (videoBody == null) {
                                             videoBody = IMVideoMsgBody()
                                         }
@@ -186,12 +168,14 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                         )
                                         it.onNext(entity)
                                         it.onComplete()
-                                        over = true
                                     }
 
                                     else -> {
-                                        it.onError(UploadException())
-                                        over = true
+                                        if (exception != null) {
+                                            it.onError(exception)
+                                        } else {
+                                            it.onError(RuntimeException())
+                                        }
                                     }
                                 }
                             }
@@ -200,10 +184,6 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
-                    // 防止线程被回收
-                    while (!over) {
-                        Thread.sleep(200)
-                    }
                 }, BackpressureStrategy.LATEST)
             }
         } catch (e: Exception) {
@@ -225,40 +205,28 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                 return Flowable.error(FileNotFoundException())
             } else {
                 val pair = IMCoreManager.storageModule.getPathsFromFullPath(videoData.path!!)
-                var over = false
                 return Flowable.create({
-                    val key = IMCoreManager.fileLoadModule.getUploadKey(
-                        entity.sid,
-                        entity.fUid,
-                        pair.second,
-                        entity.id
-                    )
-                    IMCoreManager.fileLoadModule
-                        .upload(key, videoData.path!!, object : LoadListener {
+                    IMCoreManager.fileLoadModule.upload(videoData.path!!,
+                        entity,
+                        object : LoadListener {
 
                             override fun onProgress(
                                 progress: Int,
                                 state: Int,
                                 url: String,
-                                path: String
+                                path: String,
+                                exception: Exception?
                             ) {
                                 XEventBus.post(
-                                    IMEvent.MsgLoadStatusUpdate.value,
-                                    IMLoadProgress(
-                                        IMLoadType.Upload.value,
-                                        url,
-                                        path,
-                                        state,
-                                        progress
+                                    IMEvent.MsgLoadStatusUpdate.value, IMLoadProgress(
+                                        IMLoadType.Upload.value, url, path, state, progress
                                     )
                                 )
                                 when (state) {
-                                    LoadListener.Init,
-                                    LoadListener.Wait,
-                                    LoadListener.Ing -> {
+                                    FileLoadState.Init.value, FileLoadState.Wait.value, FileLoadState.Ing.value -> {
                                     }
 
-                                    LoadListener.Success -> {
+                                    FileLoadState.Success.value -> {
                                         if (videoBody == null) {
                                             videoBody = IMVideoMsgBody()
                                         }
@@ -267,12 +235,14 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                         entity.content = Gson().toJson(videoBody)
                                         it.onNext(entity)
                                         it.onComplete()
-                                        over = true
                                     }
 
                                     else -> {
-                                        it.onError(UploadException())
-                                        over = true
+                                        if (exception != null) {
+                                            it.onError(exception)
+                                        } else {
+                                            it.onError(RuntimeException())
+                                        }
                                     }
                                 }
                             }
@@ -281,10 +251,6 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
-                    // 防止线程被回收
-                    while (!over) {
-                        Thread.sleep(200)
-                    }
                 }, BackpressureStrategy.LATEST)
             }
         } catch (e: Exception) {
@@ -311,49 +277,50 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             return true
         }
 
+        if (downLoadingUrls.contains(downloadUrl)) {
+            return true
+        } else {
+            downLoadingUrls.add(downloadUrl)
+        }
+
         if (resourceType == IMMsgResourceType.Thumbnail.value) {
             fileName = "cover_${fileName}"
         }
 
-        val localPath = IMCoreManager.storageModule.allocSessionFilePath(
-            entity.sid,
-            fileName,
-            IMFileFormat.Image.value
-        )
-
         val listener = object : LoadListener {
             override fun onProgress(
-                progress: Int,
-                state: Int,
-                url: String,
-                path: String
+                progress: Int, state: Int, url: String, path: String, exception: Exception?
             ) {
                 XEventBus.post(
                     IMEvent.MsgLoadStatusUpdate.value,
                     IMLoadProgress(IMLoadType.Download.value, url, path, state, progress)
                 )
                 when (state) {
-                    LoadListener.Init,
-                    LoadListener.Wait,
-                    LoadListener.Ing -> {
+                    FileLoadState.Init.value, FileLoadState.Wait.value, FileLoadState.Ing.value -> {
                     }
 
-                    LoadListener.Success -> {
+                    FileLoadState.Success.value -> {
                         if (data == null) {
                             data = IMVideoMsgData()
                         }
+                        val localPath = IMCoreManager.storageModule.allocSessionFilePath(
+                            entity.sid, fileName, IMFileFormat.Image.value
+                        )
+                        IMCoreManager.storageModule.copyFile(path, localPath)
                         data.height = body.height
                         data.width = body.width
                         if (resourceType == IMMsgResourceType.Thumbnail.value) {
-                            data.thumbnailPath = path
+                            data.thumbnailPath = localPath
                         } else {
-                            data.path = path
+                            data.path = localPath
                         }
                         entity.data = Gson().toJson(data)
                         insertOrUpdateDb(entity, notify = true, notifySession = false)
+                        downLoadingUrls.remove(downloadUrl)
                     }
 
                     else -> {
+                        downLoadingUrls.remove(downloadUrl)
                     }
                 }
             }
@@ -363,11 +330,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
             }
 
         }
-        IMCoreManager.fileLoadModule.download(
-            downloadUrl,
-            localPath,
-            listener
-        )
+        IMCoreManager.fileLoadModule.download(downloadUrl, entity, listener)
         return true
     }
 }

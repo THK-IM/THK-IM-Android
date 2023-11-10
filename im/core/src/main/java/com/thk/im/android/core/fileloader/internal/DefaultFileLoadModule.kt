@@ -3,11 +3,14 @@ package com.thk.im.android.core.fileloader.internal
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.fileloader.FileLoadModule
+import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
+import com.thk.im.android.db.entity.Message
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
-import java.lang.ref.WeakReference
+import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
@@ -17,6 +20,9 @@ class DefaultFileLoadModule(
     val token: String,
 ) : FileLoadModule {
 
+
+    val cacheDir = File(app.cacheDir, "message_cache")
+    private val cacheExpire = 10 * 24 * 3600 * 1000L
     private val handler = Handler(Looper.getMainLooper())
 
     private val defaultTimeout: Long = 30
@@ -32,136 +38,135 @@ class DefaultFileLoadModule(
         .build()
 
     private val downloadTaskMap =
-        ConcurrentHashMap<String, Pair<LoadTask, MutableList<WeakReference<LoadListener>>>>()
+        ConcurrentHashMap<String, Pair<LoadTask, MutableList<LoadListener>>>()
     private val uploadTaskMap =
-        ConcurrentHashMap<String, Pair<LoadTask, MutableList<WeakReference<LoadListener>>>>()
+        ConcurrentHashMap<String, Pair<LoadTask, MutableList<LoadListener>>>()
 
     init {
         okHttpClient.dispatcher.maxRequests = 32
         okHttpClient.dispatcher.maxRequestsPerHost = 16
+        if (cacheDir.exists()) {
+            if (cacheDir.isFile) {
+                cacheDir.delete()
+                cacheDir.mkdirs()
+            }
+        } else {
+            cacheDir.mkdirs()
+        }
+        val files = cacheDir.listFiles()
+        files?.let {
+            for (f in files) {
+                if (kotlin.math.abs(f.lastModified() - System.currentTimeMillis()) > cacheExpire) {
+                    f.delete()
+                }
+            }
+        }
     }
 
     fun notifyListeners(
-        taskId: String, progress: Int, state: Int, url: String, path: String
+        progress: Int, state: Int, url: String, path: String, exception: Exception?
     ) {
-        val dListeners = downloadTaskMap[taskId]?.second
+        val dListeners = downloadTaskMap[url]?.second
         dListeners?.let { ls ->
             ls.forEach {
-                it.get()?.let { l ->
-                    if (l.notifyOnUiThread()) {
-                        handler.post {
-                            l.onProgress(
-                                progress, state, url, path
-                            )
-                        }
-                    } else {
-                        l.onProgress(progress, state, url, path)
+                if (it.notifyOnUiThread()) {
+                    handler.post {
+                        it.onProgress(progress, state, url, path, exception)
                     }
+                } else {
+                    it.onProgress(progress, state, url, path, exception)
                 }
             }
         }
 
-        val uListeners = uploadTaskMap[taskId]?.second
+        val uListeners = uploadTaskMap[path]?.second
         uListeners?.let { ls ->
             ls.forEach {
-                it.get()?.let { l ->
-                    if (l.notifyOnUiThread()) {
-                        handler.post {
-                            l.onProgress(
-                                progress, state, url, path
-                            )
-                        }
-                    } else {
-                        l.onProgress(progress, state, url, path)
+                if (it.notifyOnUiThread()) {
+                    handler.post {
+                        it.onProgress(
+                            progress, state, url, path, null
+                        )
                     }
+                } else {
+                    it.onProgress(progress, state, url, path, null)
                 }
             }
         }
 
-        if (state == LoadListener.Failed || state == LoadListener.Success) {
-            cancelUpload(taskId)
-            cancelDownload(taskId)
+        if (state == FileLoadState.Failed.value || state == FileLoadState.Success.value) {
+            cancelUpload(path)
+            cancelDownload(url)
         }
     }
 
-    override fun getTaskId(key: String, path: String, type: String): String {
-        return "{$type}/{$key}/${path}"
+    private fun buildUploadParam(path: String, message: Message): String {
+        val (_, fileName) = IMCoreManager.storageModule.getPathsFromFullPath(path)
+        return "s_id=${message.sid}&u_id=${message.fUid}&f_name=${fileName}&client_id=${message.id}"
     }
 
-    override fun getUploadKey(sId: Long, uId: Long, fileName: String, msgClientId: Long): String {
-        return "im/session_${sId}/${uId}/" + msgClientId + "_${fileName}"
-    }
-
-    override fun parserUploadKey(key: String): Triple<Long, Long, String>? {
-        try {
-            val paths = key.split("/")
-            if (paths.size != 4) {
-                return null
-            }
-            val sessions = paths[1].split("_")
-            if (sessions.size != 2) {
-                return null
-            }
-            return Triple(sessions[1].toLong(), paths[2].toLong(), paths[3])
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return null
+    private fun buildDownloadParam(key: String, message: Message): String {
+        if (key.startsWith("http")) {
+            return ""
         }
+        return "s_id=${message.sid}&id=${key}"
     }
 
-    override fun download(url: String, path: String, listener: LoadListener): String {
-        val taskId = getTaskId(url, path, "download")
-        val p = downloadTaskMap[taskId]
+    override fun download(key: String, message: Message, listener: LoadListener) {
+        val p = downloadTaskMap[key]
         if (p == null) {
-            val dTask = DownloadTask(url, path, taskId, this)
-            val listeners = mutableListOf(WeakReference(listener))
-            downloadTaskMap[taskId] = Pair(dTask, listeners)
+            val downloadParam = this.buildDownloadParam(key, message)
+            val dTask = DownloadTask(key, downloadParam, this)
+            val listeners = mutableListOf(listener)
+            downloadTaskMap[key] = Pair(dTask, listeners)
             dTask.start()
         } else {
-            p.second.add(WeakReference(listener))
+            if (!p.second.contains(listener)) {
+                p.second.add(listener)
+            }
         }
-        return taskId
     }
 
-    override fun upload(key: String, path: String, listener: LoadListener): String {
-        val taskId = getTaskId(key, path, "upload")
-        val p = uploadTaskMap[taskId]
+    override fun upload(path: String, message: Message, listener: LoadListener) {
+        val p = uploadTaskMap[path]
         if (p == null) {
-            val uTask = UploadTask(key, path, taskId, this)
-            val listeners = mutableListOf(WeakReference(listener))
-            uploadTaskMap[taskId] = Pair(uTask, listeners)
+            val uploadParam = this.buildUploadParam(path, message)
+            val uTask = UploadTask(path, uploadParam, this)
+            val listeners = mutableListOf(listener)
+            uploadTaskMap[path] = Pair(uTask, listeners)
             uTask.start()
         } else {
-            p.second.add(WeakReference(listener))
+            if (!p.second.contains(listener)) {
+                p.second.add(listener)
+            }
         }
-        return taskId
     }
 
-    override fun cancelDownload(taskId: String) {
-        val p = downloadTaskMap[taskId]
+    override fun cancelDownload(url: String) {
+        val p = downloadTaskMap[url]
         if (p != null) {
-            p.first.cancel()
             p.second.clear()
-            downloadTaskMap.remove(taskId)
+            p.first.cancel()
+            downloadTaskMap.remove(url)
         }
     }
 
-    override fun cancelDownloadListener(taskId: String) {
-        val p = downloadTaskMap[taskId]
+    override fun cancelDownloadListener(url: String) {
+        val p = downloadTaskMap[url]
         p?.second?.clear()
     }
 
-    override fun cancelUpload(taskId: String) {
-        val p = uploadTaskMap[taskId]
+    override fun cancelUpload(path: String) {
+        val p = uploadTaskMap[path]
         if (p != null) {
             p.first.cancel()
             p.second.clear()
-            uploadTaskMap.remove(taskId)
+            uploadTaskMap.remove(path)
         }
     }
 
-    override fun cancelUploadListener(taskId: String) {
-        val p = uploadTaskMap[taskId]
+    override fun cancelUploadListener(path: String) {
+        val p = uploadTaskMap[path]
         p?.second?.clear()
     }
 }

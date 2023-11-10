@@ -10,7 +10,7 @@ import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.exception.UploadException
+import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.BaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
@@ -53,21 +53,15 @@ class ImageMsgProcessor : BaseMsgProcessor() {
 
     @Throws(Exception::class)
     private fun checkDir(
-        storageModule: StorageModule,
-        imageData: IMImageMsgData,
-        entity: Message
+        storageModule: StorageModule, imageData: IMImageMsgData, entity: Message
     ): Pair<IMImageMsgData, Message> {
         val isAssignedPath = storageModule.isAssignedPath(
-            imageData.path!!,
-            IMFileFormat.Image.value,
-            entity.sid
+            imageData.path!!, IMFileFormat.Image.value, entity.sid
         )
         val pair = storageModule.getPathsFromFullPath(imageData.path!!)
         if (!isAssignedPath) {
             val dePath = storageModule.allocSessionFilePath(
-                entity.sid,
-                pair.second,
-                IMFileFormat.Image.value
+                entity.sid, pair.second, IMFileFormat.Image.value
             )
             storageModule.copyFile(imageData.path!!, dePath)
             imageData.path = dePath
@@ -77,9 +71,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
     }
 
     private fun compress(
-        storageModule: StorageModule,
-        imageData: IMImageMsgData,
-        entity: Message
+        storageModule: StorageModule, imageData: IMImageMsgData, entity: Message
     ): Flowable<Message> {
         val paths = storageModule.getPathsFromFullPath(imageData.path!!)
         val names = storageModule.getFileExt(paths.second)
@@ -87,9 +79,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
         val thumbPath =
             storageModule.allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
         return CompressUtils.compress(
-            imageData.path!!,
-            100 * 1024,
-            thumbPath
+            imageData.path!!, 100 * 1024, thumbPath
         ).flatMap {
             val size = CompressUtils.getBitmapAspect(imageData.path!!)
             imageData.thumbnailPath = thumbPath
@@ -122,33 +112,28 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                 val pair =
                     IMCoreManager.storageModule.getPathsFromFullPath(imageData.thumbnailPath!!)
                 return Flowable.create({
-                    var over = false
-                    val key = IMCoreManager.fileLoadModule.getUploadKey(
-                        entity.sid,
-                        entity.fUid,
-                        pair.second,
-                        entity.id
-                    )
-                    IMCoreManager.fileLoadModule
-                        .upload(key, imageData.thumbnailPath!!, object : LoadListener {
+                    IMCoreManager.fileLoadModule.upload(
+                        imageData.thumbnailPath!!,
+                        entity,
+                        object : LoadListener {
 
                             override fun onProgress(
                                 progress: Int,
                                 state: Int,
                                 url: String,
-                                path: String
+                                path: String,
+                                exception: Exception?
                             ) {
                                 XEventBus.post(
-                                    IMEvent.MsgLoadStatusUpdate.value,
-                                    IMLoadProgress(IMLoadType.Upload.value, url, path, state, progress)
+                                    IMEvent.MsgLoadStatusUpdate.value, IMLoadProgress(
+                                        IMLoadType.Upload.value, url, path, state, progress
+                                    )
                                 )
                                 when (state) {
-                                    LoadListener.Init,
-                                    LoadListener.Wait,
-                                    LoadListener.Ing -> {
+                                    FileLoadState.Init.value, FileLoadState.Wait.value, FileLoadState.Ing.value -> {
                                     }
 
-                                    LoadListener.Success -> {
+                                    FileLoadState.Success.value -> {
                                         if (imageBody == null) {
                                             imageBody = IMImageMsgBody()
                                         }
@@ -164,14 +149,14 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                         )
                                         it.onNext(entity)
                                         it.onComplete()
-                                        LLog.v("uploadThumbImage success")
-                                        over = true
                                     }
 
                                     else -> {
-                                        LLog.v("uploadThumbImage error")
-                                        it.onError(UploadException())
-                                        over = true
+                                        if (exception != null) {
+                                            it.onError(exception)
+                                        } else {
+                                            it.onError(RuntimeException())
+                                        }
                                     }
                                 }
                             }
@@ -180,10 +165,6 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
-                    // 防止线程被回收
-                    while (!over) {
-                        Thread.sleep(200)
-                    }
                 }, BackpressureStrategy.LATEST)
             }
         } catch (e: Exception) {
@@ -212,34 +193,29 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                 }
                 val pair = IMCoreManager.storageModule.getPathsFromFullPath(imageData.path!!)
                 return Flowable.create({
-                    var over = false
-                    val key = IMCoreManager.fileLoadModule.getUploadKey(
-                        entity.sid,
-                        entity.fUid,
-                        pair.second,
-                        entity.id
-                    )
-                    IMCoreManager.fileLoadModule
-                        .upload(key, imageData.path!!, object : LoadListener {
+                    IMCoreManager.fileLoadModule.upload(
+                        imageData.path!!,
+                        entity,
+                        object : LoadListener {
 
                             override fun onProgress(
                                 progress: Int,
                                 state: Int,
                                 url: String,
-                                path: String
+                                path: String,
+                                exception: Exception?
                             ) {
                                 XEventBus.post(
-                                    IMEvent.MsgLoadStatusUpdate.value,
-                                    IMLoadProgress(IMLoadType.Upload.value, url, path, state, progress)
+                                    IMEvent.MsgLoadStatusUpdate.value, IMLoadProgress(
+                                        IMLoadType.Upload.value, url, path, state, progress
+                                    )
                                 )
 
                                 when (state) {
-                                    LoadListener.Init,
-                                    LoadListener.Wait,
-                                    LoadListener.Ing -> {
+                                    FileLoadState.Init.value, FileLoadState.Wait.value, FileLoadState.Ing.value -> {
                                     }
 
-                                    LoadListener.Success -> {
+                                    FileLoadState.Success.value -> {
                                         if (imageBody == null) {
                                             imageBody = IMImageMsgBody()
                                         }
@@ -248,14 +224,14 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                         entity.content = Gson().toJson(imageBody)
                                         it.onNext(entity)
                                         it.onComplete()
-                                        LLog.v("uploadOriginImage end")
-                                        over = true
                                     }
 
                                     else -> {
-                                        LLog.v("uploadOriginImage error")
-                                        it.onError(UploadException())
-                                        over = true
+                                        if (exception != null) {
+                                            it.onError(exception)
+                                        } else {
+                                            it.onError(RuntimeException())
+                                        }
                                     }
                                 }
                             }
@@ -264,10 +240,6 @@ class ImageMsgProcessor : BaseMsgProcessor() {
                                 return false
                             }
                         })
-                    // 防止线程被回收
-                    while (!over) {
-                        Thread.sleep(200)
-                    }
                 }, BackpressureStrategy.LATEST)
             }
         } catch (e: Exception) {
@@ -294,46 +266,50 @@ class ImageMsgProcessor : BaseMsgProcessor() {
             return false
         }
 
+        if (downLoadingUrls.contains(downloadUrl)) {
+            return true
+        } else {
+            downLoadingUrls.add(downloadUrl)
+        }
+
         if (resourceType == IMMsgResourceType.Thumbnail.value) {
             fileName = "thumb_${fileName}"
         }
 
-        val localPath = IMCoreManager.storageModule.allocSessionFilePath(
-            entity.sid,
-            fileName,
-            IMFileFormat.Image.value
-        )
-
         val listener = object : LoadListener {
             override fun onProgress(
-                progress: Int,
-                state: Int,
-                url: String,
-                path: String
+                progress: Int, state: Int, url: String, path: String, exception: Exception?
             ) {
                 XEventBus.post(
                     IMEvent.MsgLoadStatusUpdate.value,
                     IMLoadProgress(IMLoadType.Download.value, url, path, state, progress)
                 )
                 when (state) {
-                    LoadListener.Init,
-                    LoadListener.Wait,
-                    LoadListener.Ing -> {
+                    FileLoadState.Init.value, FileLoadState.Wait.value, FileLoadState.Ing.value -> {
                     }
 
-                    LoadListener.Success -> {
+                    FileLoadState.Success.value -> {
                         if (data == null) {
                             data = IMImageMsgData()
                         }
+                        val localPath = IMCoreManager.storageModule.allocSessionFilePath(
+                            entity.sid, fileName, IMFileFormat.Image.value
+                        )
+                        IMCoreManager.storageModule.copyFile(path, localPath)
                         data.height = body.height
                         data.width = body.width
                         if (resourceType == IMMsgResourceType.Thumbnail.value) {
-                            data.thumbnailPath = path
+                            data.thumbnailPath = localPath
                         } else {
-                            data.path = path
+                            data.path = localPath
                         }
                         entity.data = Gson().toJson(data)
                         insertOrUpdateDb(entity, notify = true, notifySession = false)
+                        downLoadingUrls.remove(downloadUrl)
+                    }
+
+                    else -> {
+                        downLoadingUrls.remove(downloadUrl)
                     }
                 }
             }
@@ -343,11 +319,7 @@ class ImageMsgProcessor : BaseMsgProcessor() {
             }
 
         }
-        IMCoreManager.fileLoadModule.download(
-            downloadUrl,
-            localPath,
-            listener
-        )
+        IMCoreManager.fileLoadModule.download(downloadUrl, entity, listener)
         return true
     }
 

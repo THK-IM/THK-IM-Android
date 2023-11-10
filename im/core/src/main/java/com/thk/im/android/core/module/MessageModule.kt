@@ -5,7 +5,7 @@ import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import io.reactivex.Flowable
 
-interface MessageModule : CommonModule {
+interface MessageModule : BaseModule {
 
     /**
      * 注册消息处理器

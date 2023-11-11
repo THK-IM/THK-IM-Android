@@ -40,7 +40,7 @@ public class MyApplication extends Application {
                 IMCoreManager.INSTANCE.setFileLoadModule(fileLoaderModule);
                 IMUIManager.INSTANCE.init(MyApplication.this);
                 IMUIManager.INSTANCE.setMediaProvider(new Provider(MyApplication.this, token));
-                IMUIManager.INSTANCE.setMediaPreviewer(new Previewer(MyApplication.this, token));
+                IMUIManager.INSTANCE.setMediaPreviewer(new Previewer(MyApplication.this, token, apiEndpoint));
                 IMCoreManager.INSTANCE.connect();
                 LiveManager.Companion.shared().init(MyApplication.this, String.valueOf(uid), true);
             }

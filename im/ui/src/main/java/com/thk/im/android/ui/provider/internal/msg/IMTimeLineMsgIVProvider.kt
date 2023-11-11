@@ -4,9 +4,9 @@ import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.ui.provider.IMBaseMessageIVProvider
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
-import com.thk.im.android.ui.provider.internal.msg.viewholder.TimeLineMsgVH
+import com.thk.im.android.ui.provider.internal.msg.viewholder.IMTimeLineMsgVH
 
-class TimeLineMsgIVProvider : IMBaseMessageIVProvider() {
+class IMTimeLineMsgIVProvider : IMBaseMessageIVProvider() {
 
     companion object {
         const val timeLineMsgType = 9999
@@ -21,6 +21,6 @@ class TimeLineMsgIVProvider : IMBaseMessageIVProvider() {
         itemView: View,
         viewType: Int
     ): BaseMsgVH {
-        return TimeLineMsgVH(lifecycleOwner, itemView, messageType())
+        return IMTimeLineMsgVH(lifecycleOwner, itemView, messageType())
     }
 }

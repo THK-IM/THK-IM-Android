@@ -73,17 +73,17 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.SessionNew.value, Observer<Session> {
             it?.let {
-                sessionAdapter.insertNew(it)
+                sessionAdapter.onNewSession(it)
             }
         })
         XEventBus.observe(this, IMEvent.SessionUpdate.value, Observer<Session> {
             it?.let {
-                sessionAdapter.update(it)
+                sessionAdapter.onSessionUpdate(it)
             }
         })
         XEventBus.observe(this, IMEvent.SessionDelete.value, Observer<Session> {
             it?.let {
-                sessionAdapter.delete(it)
+                sessionAdapter.onSessionRemove(it)
             }
         })
     }

@@ -2,29 +2,26 @@ package com.thk.im.android.ui.provider.internal.msg.viewholder
 
 import android.view.View
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
 import com.thk.im.android.base.IMImageLoader
 import com.thk.im.android.base.extension.dp2px
-import com.thk.im.android.base.utils.DateUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
-import com.thk.im.android.ui.manager.IMVideoMsgBody
-import com.thk.im.android.ui.manager.IMVideoMsgData
+import com.thk.im.android.ui.manager.IMImageMsgBody
+import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
-class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
+class IMImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     BaseMsgVH(liftOwner, itemView, viewType) {
 
-
     override fun getContentId(): Int {
-        return R.layout.itemview_msg_video
+        return R.layout.itemview_msg_image
     }
 
     override fun onViewBind(
@@ -34,49 +31,41 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-
         var imagePath = ""
         var width = 0
         var height = 0
-        var duration = 0
         if (!message.data.isNullOrEmpty()) {
-            val videoMsgData = Gson().fromJson(message.data, IMVideoMsgData::class.java)
-            videoMsgData?.let {
+            val imageMsgData = Gson().fromJson(message.data, IMImageMsgData::class.java)
+            imageMsgData?.let {
                 if (it.thumbnailPath != null) {
                     imagePath = it.thumbnailPath!!
                 }
-                if (it.width != null) {
+                if (it.width != null && it.width!! > 0) {
                     width = it.width!!
                 }
-                if (it.height != null) {
+                if (it.height != null&& it.height!! > 0) {
                     height = it.height!!
-                }
-                if (it.duration != null) {
-                    duration = it.duration!!
                 }
             }
         }
 
         if (!message.content.isNullOrEmpty()) {
-            val videoMsgBody = Gson().fromJson(message.content, IMVideoMsgBody::class.java)
-            videoMsgBody?.let {
-                if (it.width != null) {
+            val imageMsgBody = Gson().fromJson(message.content, IMImageMsgBody::class.java)
+            imageMsgBody?.let {
+                if (it.width != null && it.width!! > 0) {
                     width = it.width!!
                 }
-                if (it.height != null) {
+                if (it.height != null&& it.height!! > 0) {
                     height = it.height!!
-                }
-                if (it.duration != null) {
-                    duration = it.duration!!
                 }
             }
         }
+
         if (width != 0 && height != 0) {
             setLayoutParams(width, height)
         }
-        renderDuration(duration)
         if (imagePath != "") {
-            renderThumbnailImage(imagePath)
+            renderImage(imagePath)
         } else {
             IMCoreManager.getMessageModule().getMsgProcessor(message.type)
                 .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
@@ -85,6 +74,7 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
 
     private fun setLayoutParams(width: Int, height: Int) {
         val container: CardView = itemView.findViewById(R.id.card_msg_container)
+        val imageView: ImageView = itemView.findViewById(R.id.iv_msg_content)
         val lp = container.layoutParams
         if (width > height) {
             val calWidth = maxOf(80.dp2px(), minOf(200.dp2px(), width))
@@ -98,21 +88,11 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
             lp.height = calHeight
         }
         container.layoutParams = lp
-        val imageView: ImageView = itemView.findViewById(R.id.iv_msg_video_thumbnail)
-        val durationView: TextView = itemView.findViewById(R.id.tv_video_duration)
         imageView.visibility = View.INVISIBLE
-        durationView.visibility = View.INVISIBLE
     }
 
-
-    private fun renderDuration(duration: Int) {
-        val durationView: TextView = itemView.findViewById(R.id.tv_video_duration)
-        durationView.visibility = View.VISIBLE
-        durationView.text = DateUtils.getDuration(duration)
-    }
-
-    private fun renderThumbnailImage(path: String) {
-        val imageView: ImageView = itemView.findViewById(R.id.iv_msg_video_thumbnail)
+    private fun renderImage(path: String) {
+        val imageView: ImageView = itemView.findViewById(R.id.iv_msg_content)
         imageView.visibility = View.VISIBLE
         IMImageLoader.displayImageByPath(imageView, path)
     }
@@ -120,4 +100,5 @@ class VideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     override fun onViewDetached() {
         super.onViewDetached()
     }
+
 }

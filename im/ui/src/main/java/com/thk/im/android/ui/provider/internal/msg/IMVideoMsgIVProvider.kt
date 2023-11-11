@@ -5,12 +5,13 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.ui.provider.IMBaseMessageIVProvider
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
-import com.thk.im.android.ui.provider.internal.msg.viewholder.UnSupportMsgVH
+import com.thk.im.android.ui.provider.internal.msg.viewholder.IMVideoMsgVH
 
-class UnSupportMsgIVProvider : IMBaseMessageIVProvider() {
+class IMVideoMsgIVProvider : IMBaseMessageIVProvider() {
+
 
     override fun messageType(): Int {
-        return MsgType.UnSupport.value
+        return MsgType.VIDEO.value
     }
 
     override fun createViewHolder(
@@ -18,6 +19,6 @@ class UnSupportMsgIVProvider : IMBaseMessageIVProvider() {
         itemView: View,
         viewType: Int
     ): BaseMsgVH {
-        return UnSupportMsgVH(lifecycleOwner, itemView, viewType)
+        return IMVideoMsgVH(lifecycleOwner, itemView, viewType)
     }
 }

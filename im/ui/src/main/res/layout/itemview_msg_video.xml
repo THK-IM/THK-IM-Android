@@ -21,19 +21,18 @@
             />
         <ImageView
             android:id="@+id/iv_video_play"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_video_play" />
+            android:src="@drawable/icon_video_play" />
 
         <TextView
             android:id="@+id/tv_video_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="8dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
+            android:padding="2dp"
+            android:layout_gravity="bottom|right"
             android:layout_marginRight="4dp"
             android:layout_marginBottom="6dp"
             android:textAlignment="center"

@@ -9,10 +9,10 @@ import android.view.View
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.ui.protocol.IMPreviewer
 
-class Previewer(app: Application, token: String) : IMPreviewer {
+class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer {
 
     init {
-        VideoCache.init(app, token)
+        VideoCache.init(app, token, endpoint)
     }
 
     override fun previewMediaMessage(

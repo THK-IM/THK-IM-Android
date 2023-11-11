@@ -11,7 +11,7 @@ import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
-class TextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
+class IMTextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     BaseMsgVH(liftOwner, itemView, viewType) {
 
 

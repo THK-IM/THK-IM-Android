@@ -21,12 +21,11 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "THK-IM-Android"
-include ':app'
-include ':im:provider'
-include ':im:db'
-include ':im:ui'
-include ':im:core'
 include ':im:base'
-include ':im:live'
-include ':preview'
+include ':im:db'
+include ':im:core'
+include ':im:ui'
 include ':im:preview'
+include ':im:provider'
+include ':im:live'
+include ':app'

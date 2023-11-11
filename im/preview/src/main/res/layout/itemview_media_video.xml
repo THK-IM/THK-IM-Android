@@ -33,7 +33,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_video_play" />
+            android:src="@drawable/icon_video_play" />
 
     </RelativeLayout>
 

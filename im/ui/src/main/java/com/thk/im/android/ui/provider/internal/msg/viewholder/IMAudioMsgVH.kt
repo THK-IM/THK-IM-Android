@@ -16,7 +16,7 @@ import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
-class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
+class IMAudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     BaseMsgVH(liftOwner, itemView, viewType) {
 
     override fun getContentId(): Int {
@@ -62,11 +62,11 @@ class AudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         }
     }
 
-    private fun render(duration: Int, played: Boolean) {
+    private fun render(seconds: Int, played: Boolean) {
         val audioDurationView: TextView = itemView.findViewById(R.id.tv_audio_duration)
         val audioStatusView: View =
             itemView.findViewById(R.id.iv_audio_status)
-        audioDurationView.text = DateUtils.getDuration(duration)
+        audioDurationView.text = DateUtils.secondToDuration(seconds)
         if (played) {
             audioStatusView.visibility = View.GONE
         } else {

@@ -5,81 +5,44 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-/**
- * 主要终于页面时间的转化
- * 日期工具类
- *
- * @yingmu
- */
 public class DateUtils {
 
 
     /**
      * 获取聊天消息时间线
-     *
-     * @param timestamp
-     * @return
      */
-    public static String getTimeline(long timestamp) {
-        Calendar calendar1 = Calendar.getInstance(); // 今天
-        Calendar calendar2 = Calendar.getInstance();
-        calendar2.setTime(new Date(timestamp));
+    public static String timeToMsgTime(long ms, long now) {
+        Calendar showDate = Calendar.getInstance();
+        showDate.setTime(new Date(ms));
+        Calendar nowData = Calendar.getInstance();
+        nowData.setTime(new Date(now));
 
-        Calendar yesterday = Calendar.getInstance(); // 昨天
-        yesterday.setTime(calendar1.getTime());
-        yesterday.add(Calendar.DATE, -1);
-        yesterday.set(Calendar.HOUR_OF_DAY, 0);
-        yesterday.set(Calendar.MINUTE, 0);
-        yesterday.set(Calendar.SECOND, 0);
-
-        //今天
-        if ((calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR))
-                && (calendar1.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH)
-                && (calendar1.get(Calendar.DAY_OF_MONTH) == calendar2.get(Calendar.DAY_OF_MONTH)))) {
-            SimpleDateFormat format = new SimpleDateFormat("HH:mm");
-            Date date = new Date(timestamp);
-            if (calendar2.get(Calendar.HOUR_OF_DAY) < 13) {
-                return "上午 " + format.format(date);
-            } else {
-                return "下午 " + format.format(date);
-            }
-        }
-        //昨天
-        if ((yesterday.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR))
-                && (yesterday.get(Calendar.MONTH) == calendar2.get(Calendar.MONTH)
-                && (yesterday.get(Calendar.DAY_OF_MONTH) == calendar2.get(Calendar.DAY_OF_MONTH)))) {
-            SimpleDateFormat format = new SimpleDateFormat("HH:mm");
-            Date date = new Date(timestamp);
-            return "昨天 " + format.format(date);
-        }
-        //今年
-        if (calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR)) {
-            SimpleDateFormat format = new SimpleDateFormat("MM月dd日");
-            Date date = new Date(timestamp);
+        // 不是今年
+        if (showDate.get(Calendar.YEAR) != nowData.get(Calendar.YEAR)) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = new Date(ms);
             return format.format(date);
         }
-        //前几年
-        SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日");
-        Date date = new Date(timestamp);
+        // 今天
+        if ((showDate.get(Calendar.YEAR) == nowData.get(Calendar.YEAR))
+                && (showDate.get(Calendar.MONTH) == nowData.get(Calendar.MONTH)
+                && (showDate.get(Calendar.DAY_OF_MONTH) == nowData.get(Calendar.DAY_OF_MONTH)))) {
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+            Date date = new Date(ms);
+            return format.format(date);
+        }
+
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd");
+        Date date = new Date(ms);
         return format.format(date);
     }
 
-    public static String getDuration(int duration) {
-        if (duration < 60) {
-            return addZero(duration) + "s";
-        } else if (duration < 3600) {
-            return addZero(duration / 60) + "m" + addZero(duration % 60) + "s";
-        } else {
-            return addZero(duration / 3600) + "m" + addZero((duration % 3600) / 60) + "m" + addZero(duration % 60) + "s";
-        }
-    }
 
-    private static String addZero(int number) {
-        if (number >= 10) {
-            return String.valueOf(number);
-        } else {
-            return "0" + number;
-        }
+    public static String secondToDuration(int seconds) {
+        int h = seconds / 3600;
+        int m = seconds / 60;
+        int s = seconds % 60;
+        return h == 0 ? String.format("%02d:%02d", m, s) : String.format("%02d:%02d:%02d", h, m, s);
     }
 
 

@@ -11,7 +11,7 @@ import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
-class UnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
+class IMUnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     BaseMsgVH(liftOwner, itemView, viewType) {
 
     override fun getContentId(): Int {

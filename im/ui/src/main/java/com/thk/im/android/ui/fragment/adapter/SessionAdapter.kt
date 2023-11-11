@@ -55,24 +55,32 @@ class SessionAdapter(
 
     fun addData(sessions: List<Session>) {
         for (s in sessions) {
-            insertNew(s)
+            onNewSession(s)
         }
     }
 
-    fun insertNew(session: Session) {
-        update(session)
+    fun onNewSession(session: Session) {
+        onSessionUpdate(session)
     }
 
-    fun update(session: Session) {
+    fun onSessionUpdate(session: Session) {
         // 当前位置
-        val pos = findPosition(session)
-        if (pos >= 0 && pos < sessionList.size) {
-            sessionList.removeAt(pos)
-            notifyItemRemoved(pos)
+        val oldPos = findPosition(session)
+        if (oldPos >= 0 && oldPos < sessionList.size) {
+            sessionList.removeAt(oldPos)
+            val newPos = findInsertPosition(session)
+            sessionList.add(newPos, session)
+            if (newPos == oldPos) {
+                notifyItemChanged(newPos)
+            } else {
+                notifyItemRemoved(oldPos)
+                notifyItemInserted(newPos)
+            }
+        } else {
+            val newPos = findInsertPosition(session)
+            sessionList.add(newPos, session)
+            notifyItemInserted(newPos)
         }
-        val position = findInsertPosition(session)
-        sessionList.add(position, session)
-        notifyItemInserted(position)
     }
 
     private fun findPosition(session: Session): Int {
@@ -98,7 +106,7 @@ class SessionAdapter(
         return sessionList.size
     }
 
-    fun delete(session: Session) {
+    fun onSessionRemove(session: Session) {
         val pos = findPosition(session)
         if (pos >= 0) {
             sessionList.removeAt(pos)

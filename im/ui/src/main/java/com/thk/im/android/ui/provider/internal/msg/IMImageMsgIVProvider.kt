@@ -5,12 +5,11 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.ui.provider.IMBaseMessageIVProvider
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
-import com.thk.im.android.ui.provider.internal.msg.viewholder.TextMsgVH
+import com.thk.im.android.ui.provider.internal.msg.viewholder.IMImageMsgVH
 
-class TextMsgIVProvider : IMBaseMessageIVProvider() {
-
+class IMImageMsgIVProvider : IMBaseMessageIVProvider() {
     override fun messageType(): Int {
-        return MsgType.TEXT.value
+        return MsgType.IMAGE.value
     }
 
     override fun createViewHolder(
@@ -18,6 +17,6 @@ class TextMsgIVProvider : IMBaseMessageIVProvider() {
         itemView: View,
         viewType: Int
     ): BaseMsgVH {
-        return TextMsgVH(lifecycleOwner, itemView, viewType)
+        return IMImageMsgVH(lifecycleOwner, itemView, viewType)
     }
 }

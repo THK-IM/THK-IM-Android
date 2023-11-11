@@ -86,13 +86,14 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                 if (it.content != null) {
                     val body = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
                     if (body?.url != null) {
-                        val cachePath = VideoCache.getCachePath(body.url!!)
+                        val realUrl = getRealUrl(body.url!!, it.sid)
+                        val cachePath = VideoCache.getCachePath(realUrl)
                         if (cachePath == null) {
-                            VideoCache.registerCacheListener(this, body.url!!)
-                            pvVideo.initPlay(body.url!!)
+                            VideoCache.registerCacheListener(this, realUrl)
+                            pvVideo.initPlay(realUrl)
                             pvVideo.play()
                         } else {
-                            updateDb(it, File(cachePath), body.url!!)
+                            updateDb(it, File(cachePath), realUrl)
                             pvVideo.initPlay(cachePath)
                             pvVideo.play()
                         }
@@ -100,6 +101,14 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                 }
             }
         }
+    }
+
+    private fun getRealUrl(url: String, sId: Long): String {
+        var realUrl = url
+        if (!url.startsWith("http")) {
+            realUrl = "${VideoCache.getEndpoint()}/session/object/download_url?id=${url}&s_id=${sId}"
+        }
+        return realUrl
     }
 
     override fun stopPreview() {
@@ -148,7 +157,11 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                     t?.let {
                         if (it.content != null) {
                             val body = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
-                            if (body?.url != null && body.url == url) {
+                            if (body?.url != null) {
+                                val realUrl = getRealUrl(body.url!!, it.sid)
+                                if (realUrl != url) {
+                                    return
+                                }
                                 body.name?.let { name ->
                                     val path = IMCoreManager.storageModule.allocSessionFilePath(
                                         it.sid,

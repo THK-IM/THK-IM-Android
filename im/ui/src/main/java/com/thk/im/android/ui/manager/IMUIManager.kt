@@ -13,17 +13,17 @@ import com.thk.im.android.ui.provider.IMBasePanelFragmentProvider
 import com.thk.im.android.ui.provider.IMBaseSessionIVProvider
 import com.thk.im.android.ui.provider.internal.function.IMAlbumFunctionIVProvider
 import com.thk.im.android.ui.provider.internal.function.IMCameraFunctionIVProvider
-import com.thk.im.android.ui.provider.internal.msg.AudioMsgIVProvider
-import com.thk.im.android.ui.provider.internal.msg.ImageMsgIVProvider
-import com.thk.im.android.ui.provider.internal.msg.TextMsgIVProvider
-import com.thk.im.android.ui.provider.internal.msg.TimeLineMsgIVProvider
-import com.thk.im.android.ui.provider.internal.msg.UnSupportMsgIVProvider
-import com.thk.im.android.ui.provider.internal.msg.VideoMsgIVProvider
-import com.thk.im.android.ui.provider.internal.msg.proccessor.AudioMsgProcessor
-import com.thk.im.android.ui.provider.internal.msg.proccessor.ImageMsgProcessor
-import com.thk.im.android.ui.provider.internal.msg.proccessor.TextMsgProcessor
-import com.thk.im.android.ui.provider.internal.msg.proccessor.UnSupportMsgProcessor
-import com.thk.im.android.ui.provider.internal.msg.proccessor.VideoMsgProcessor
+import com.thk.im.android.ui.provider.internal.msg.IMAudioMsgIVProvider
+import com.thk.im.android.ui.provider.internal.msg.IMImageMsgIVProvider
+import com.thk.im.android.ui.provider.internal.msg.IMTextMsgIVProvider
+import com.thk.im.android.ui.provider.internal.msg.IMTimeLineMsgIVProvider
+import com.thk.im.android.ui.provider.internal.msg.IMUnSupportMsgIVProvider
+import com.thk.im.android.ui.provider.internal.msg.IMVideoMsgIVProvider
+import com.thk.im.android.ui.provider.internal.msg.proccessor.IMAudioMsgProcessor
+import com.thk.im.android.ui.provider.internal.msg.proccessor.IMImageMsgProcessor
+import com.thk.im.android.ui.provider.internal.msg.proccessor.IMTextMsgProcessor
+import com.thk.im.android.ui.provider.internal.msg.proccessor.IMUnSupportMsgProcessor
+import com.thk.im.android.ui.provider.internal.msg.proccessor.IMVideoMsgProcessor
 import com.thk.im.android.ui.provider.internal.panel.IMUnicodeEmojiPanelProvider
 import com.thk.im.android.ui.provider.internal.session.provider.SingleSessionIVProvider
 
@@ -65,20 +65,20 @@ object IMUIManager {
     fun init(app: Application) {
         EmojiCompat.init(BundledEmojiCompatConfig(app))
 
-        IMCoreManager.getMessageModule().registerMsgProcessor(UnSupportMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(TextMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(ImageMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(AudioMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(VideoMsgProcessor())
+        IMCoreManager.getMessageModule().registerMsgProcessor(IMUnSupportMsgProcessor())
+        IMCoreManager.getMessageModule().registerMsgProcessor(IMTextMsgProcessor())
+        IMCoreManager.getMessageModule().registerMsgProcessor(IMImageMsgProcessor())
+        IMCoreManager.getMessageModule().registerMsgProcessor(IMAudioMsgProcessor())
+        IMCoreManager.getMessageModule().registerMsgProcessor(IMVideoMsgProcessor())
 
         IMKeyboardUtils.init(app)
         val providers = arrayOf(
-            TimeLineMsgIVProvider(),
-            UnSupportMsgIVProvider(),
-            TextMsgIVProvider(),
-            ImageMsgIVProvider(),
-            AudioMsgIVProvider(),
-            VideoMsgIVProvider()
+            IMTimeLineMsgIVProvider(),
+            IMUnSupportMsgIVProvider(),
+            IMTextMsgIVProvider(),
+            IMImageMsgIVProvider(),
+            IMAudioMsgIVProvider(),
+            IMVideoMsgIVProvider()
         )
         registerMsgIVProvider(*providers)
         registerSessionIVProvider(SingleSessionIVProvider())

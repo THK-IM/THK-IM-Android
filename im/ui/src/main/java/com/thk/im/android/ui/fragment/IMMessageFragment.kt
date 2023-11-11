@@ -287,7 +287,6 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         }
 
         mediaMessages.addAll(rightMessages.reversed())
-        val previewPos = mediaMessages.size - 1
         count = 0
         for (i in 0 until position) {
             if (messages[position - 1 - i].type == MsgType.IMAGE.value || messages[position - 1 - i].type == MsgType.VIDEO.value) {

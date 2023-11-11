@@ -16,39 +16,34 @@ import com.thk.im.android.core.processor.BaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
-import com.thk.im.android.ui.manager.IMVideoMsgBody
-import com.thk.im.android.ui.manager.IMVideoMsgData
+import com.thk.im.android.ui.manager.IMImageMsgBody
+import com.thk.im.android.ui.manager.IMImageMsgData
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.FileNotFoundException
-import java.io.IOException
 
-open class VideoMsgProcessor : BaseMsgProcessor() {
+class IMImageMsgProcessor : BaseMsgProcessor() {
 
     override fun messageType(): Int {
-        return MsgType.VIDEO.value
+        return MsgType.IMAGE.value
     }
 
     override fun getSessionDesc(msg: Message): String {
-        return "[视频]"
+        return "[图片]"
     }
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {
         try {
-            var videoData = Gson().fromJson(message.data, IMVideoMsgData::class.java)
-            if (videoData.path == null) {
+            var imageData = Gson().fromJson(message.data, IMImageMsgData::class.java)
+            if (imageData.path == null) {
                 return Flowable.error(FileNotFoundException())
             }
-            val pair = checkDir(IMCoreManager.storageModule, videoData, message)
-            videoData = pair.first
-            return if (videoData.thumbnailPath == null) {
-                extractVideoFrame(IMCoreManager.storageModule, videoData, pair.second)
+            val pair = checkDir(IMCoreManager.storageModule, imageData, message)
+            imageData = pair.first
+            return if (imageData.thumbnailPath == null) {
+                compress(IMCoreManager.storageModule, imageData, pair.second)
             } else {
-                CompressUtils.compress(
-                    videoData.thumbnailPath!!, 100 * 1024, videoData.thumbnailPath!!
-                ).flatMap {
-                    Flowable.just(message)
-                }
+                Flowable.just(pair.second)
             }
         } catch (e: Exception) {
             e.message?.let { LLog.e(it) }
@@ -58,80 +53,67 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
 
     @Throws(Exception::class)
     private fun checkDir(
-        storageModule: StorageModule, videoData: IMVideoMsgData, entity: Message
-    ): Pair<IMVideoMsgData, Message> {
+        storageModule: StorageModule, imageData: IMImageMsgData, entity: Message
+    ): Pair<IMImageMsgData, Message> {
         val isAssignedPath = storageModule.isAssignedPath(
-            videoData.path!!, IMFileFormat.Video.value, entity.sid
+            imageData.path!!, IMFileFormat.Image.value, entity.sid
         )
-        val pair = storageModule.getPathsFromFullPath(videoData.path!!)
+        val pair = storageModule.getPathsFromFullPath(imageData.path!!)
         if (!isAssignedPath) {
             val dePath = storageModule.allocSessionFilePath(
-                entity.sid, pair.second, IMFileFormat.Video.value
+                entity.sid, pair.second, IMFileFormat.Image.value
             )
-            storageModule.copyFile(videoData.path!!, dePath)
-            videoData.path = dePath
-            entity.data = Gson().toJson(videoData)
+            storageModule.copyFile(imageData.path!!, dePath)
+            imageData.path = dePath
+            entity.data = Gson().toJson(imageData)
         }
-        return Pair(videoData, entity)
+        return Pair(imageData, entity)
     }
 
-    private fun extractVideoFrame(
-        storageModule: StorageModule, videoData: IMVideoMsgData, entity: Message
+    private fun compress(
+        storageModule: StorageModule, imageData: IMImageMsgData, entity: Message
     ): Flowable<Message> {
-        try {
-            val videoParams =
-                CompressUtils.getVideoParams(videoData.path!!) ?: return Flowable.error(
-                    IOException("extractVideoFrame error: ${videoData.path!!}")
-                )
-            val paths = storageModule.getPathsFromFullPath(videoData.path!!)
-            val names = storageModule.getFileExt(paths.second)
-            val ext = if (videoParams.first.hasAlpha()) {
-                "png"
-            } else {
-                "jpeg"
-            }
-            val thumbName = "${System.currentTimeMillis() / 1000}_${names.first}_cover.${ext}"
-            val thumbnailPath = IMCoreManager.storageModule.allocSessionFilePath(
-                entity.sid, thumbName, IMFileFormat.Image.value
-            )
-            CompressUtils.compressSync(videoParams.first, 4 * 1024 * 1024, thumbnailPath)
-            videoParams.first.recycle()
-            val sizePair = CompressUtils.getBitmapAspect(thumbnailPath)
-            videoData.thumbnailPath = thumbnailPath
-            videoData.duration = videoParams.second
-            videoData.width = sizePair.first
-            videoData.height = sizePair.second
-            entity.data = Gson().toJson(videoData)
-            return Flowable.just(entity)
-        } catch (e: Exception) {
-            LLog.e(e.toString())
-            return Flowable.error(e)
+        val paths = storageModule.getPathsFromFullPath(imageData.path!!)
+        val names = storageModule.getFileExt(paths.second)
+        val thumbName = "${names.first}_thumb.${names.second}"
+        val thumbPath =
+            storageModule.allocSessionFilePath(entity.sid, thumbName, IMFileFormat.Image.value)
+        return CompressUtils.compress(
+            imageData.path!!, 100 * 1024, thumbPath
+        ).flatMap {
+            val size = CompressUtils.getBitmapAspect(imageData.path!!)
+            imageData.thumbnailPath = thumbPath
+            imageData.width = size.first
+            imageData.height = size.second
+            entity.data = Gson().toJson(imageData)
+            return@flatMap Flowable.just(entity)
         }
     }
 
     override fun uploadFlowable(entity: Message): Flowable<Message>? {
-        return this.uploadCoverImage(entity).flatMap {
-            return@flatMap this.uploadVideo(it)
+        return this.uploadThumbImage(entity).flatMap {
+            return@flatMap this.uploadOriginImage(it)
         }
     }
 
-    private fun uploadCoverImage(entity: Message): Flowable<Message> {
+    private fun uploadThumbImage(entity: Message): Flowable<Message> {
         try {
-            val videoData = Gson().fromJson(entity.data, IMVideoMsgData::class.java)
-            var videoBody = Gson().fromJson(entity.content, IMVideoMsgBody::class.java)
-            if (videoBody != null) {
-                if (!videoBody.thumbnailUrl.isNullOrEmpty()) {
+            LLog.v("uploadThumbImage start")
+            val imageData = Gson().fromJson(entity.data, IMImageMsgData::class.java)
+            var imageBody = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
+            if (imageBody != null) {
+                if (!imageBody.thumbnailUrl.isNullOrEmpty()) {
                     return Flowable.just(entity)
                 }
             }
-            if (videoData == null || videoData.thumbnailPath.isNullOrEmpty()) {
+            if (imageData == null || imageData.thumbnailPath.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
                 val pair =
-                    IMCoreManager.storageModule.getPathsFromFullPath(videoData.thumbnailPath!!)
+                    IMCoreManager.storageModule.getPathsFromFullPath(imageData.thumbnailPath!!)
                 return Flowable.create({
                     IMCoreManager.fileLoadModule.upload(
-                        videoData.thumbnailPath!!,
+                        imageData.thumbnailPath!!,
                         entity,
                         object : LoadListener {
 
@@ -152,15 +134,14 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                     }
 
                                     FileLoadState.Success.value -> {
-                                        if (videoBody == null) {
-                                            videoBody = IMVideoMsgBody()
+                                        if (imageBody == null) {
+                                            imageBody = IMImageMsgBody()
                                         }
-                                        videoBody.name = pair.second
-                                        videoBody.thumbnailUrl = url
-                                        videoBody.duration = videoData.duration
-                                        videoBody.width = videoData.width
-                                        videoBody.height = videoData.height
-                                        entity.content = Gson().toJson(videoBody)
+                                        imageBody.thumbnailUrl = url
+                                        imageBody.name = pair.second
+                                        imageBody.width = imageData.width
+                                        imageBody.height = imageData.height
+                                        entity.content = Gson().toJson(imageBody)
                                         insertOrUpdateDb(
                                             entity,
                                             notify = false,
@@ -192,21 +173,28 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
         }
     }
 
-    private fun uploadVideo(entity: Message): Flowable<Message> {
+    private fun uploadOriginImage(entity: Message): Flowable<Message> {
+        LLog.v("uploadOriginImage start")
         try {
-            val videoData = Gson().fromJson(entity.data, IMVideoMsgData::class.java)
-            var videoBody = Gson().fromJson(entity.content, IMVideoMsgBody::class.java)
-            if (videoBody != null) {
-                if (!videoBody.url.isNullOrEmpty()) {
+            val imageData = Gson().fromJson(entity.data, IMImageMsgData::class.java)
+            var imageBody = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
+            if (imageBody != null) {
+                if (!imageBody.url.isNullOrEmpty()) {
                     return Flowable.just(entity)
                 }
             }
-            if (videoData == null || videoData.path.isNullOrEmpty()) {
+            if (imageData == null || imageData.path.isNullOrEmpty()) {
                 return Flowable.error(FileNotFoundException())
             } else {
-                val pair = IMCoreManager.storageModule.getPathsFromFullPath(videoData.path!!)
+                if (imageData.path.equals(imageData.thumbnailPath)) {
+                    imageBody.url = imageBody.thumbnailUrl
+                    entity.content = Gson().toJson(imageBody)
+                    return Flowable.just(entity)
+                }
+                val pair = IMCoreManager.storageModule.getPathsFromFullPath(imageData.path!!)
                 return Flowable.create({
-                    IMCoreManager.fileLoadModule.upload(videoData.path!!,
+                    IMCoreManager.fileLoadModule.upload(
+                        imageData.path!!,
                         entity,
                         object : LoadListener {
 
@@ -222,17 +210,18 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
                                         IMLoadType.Upload.value, url, path, state, progress
                                     )
                                 )
+
                                 when (state) {
                                     FileLoadState.Init.value, FileLoadState.Wait.value, FileLoadState.Ing.value -> {
                                     }
 
                                     FileLoadState.Success.value -> {
-                                        if (videoBody == null) {
-                                            videoBody = IMVideoMsgBody()
+                                        if (imageBody == null) {
+                                            imageBody = IMImageMsgBody()
                                         }
-                                        videoBody.name = pair.second
-                                        videoBody.url = url
-                                        entity.content = Gson().toJson(videoBody)
+                                        imageBody.url = url
+                                        imageBody.name = pair.second
+                                        entity.content = Gson().toJson(imageBody)
                                         it.onNext(entity)
                                         it.onComplete()
                                     }
@@ -263,8 +252,8 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
         if (entity.content.isNullOrEmpty()) {
             return false
         }
-        var data = Gson().fromJson(entity.data, IMVideoMsgData::class.java)
-        val body = Gson().fromJson(entity.content, IMVideoMsgBody::class.java)
+        var data = Gson().fromJson(entity.data, IMImageMsgData::class.java)
+        val body = Gson().fromJson(entity.content, IMImageMsgBody::class.java)
 
         val downloadUrl = if (resourceType == IMMsgResourceType.Thumbnail.value) {
             body.thumbnailUrl
@@ -274,7 +263,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
 
         var fileName = body.name
         if (downloadUrl == null || fileName == null) {
-            return true
+            return false
         }
 
         if (downLoadingUrls.contains(downloadUrl)) {
@@ -284,7 +273,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
         }
 
         if (resourceType == IMMsgResourceType.Thumbnail.value) {
-            fileName = "cover_${fileName}"
+            fileName = "thumb_${fileName}"
         }
 
         val listener = object : LoadListener {
@@ -301,7 +290,7 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
 
                     FileLoadState.Success.value -> {
                         if (data == null) {
-                            data = IMVideoMsgData()
+                            data = IMImageMsgData()
                         }
                         val localPath = IMCoreManager.storageModule.allocSessionFilePath(
                             entity.sid, fileName, IMFileFormat.Image.value
@@ -333,4 +322,5 @@ open class VideoMsgProcessor : BaseMsgProcessor() {
         IMCoreManager.fileLoadModule.download(downloadUrl, entity, listener)
         return true
     }
+
 }

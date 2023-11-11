@@ -9,6 +9,7 @@ import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.IMImageLoader
 import com.thk.im.android.base.utils.DateUtils
 import com.thk.im.android.base.utils.StringUtils
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.db.entity.User
 import com.thk.im.android.ui.R
@@ -28,7 +29,8 @@ class SingleSessionVH(
     override fun onViewBind(session: Session, sessionVHOperator: IMSessionVHOperator) {
         super.onViewBind(session, sessionVHOperator)
         lastMsgView.text = session.lastMsg
-        lastTimeView.text = DateUtils.getTimeline(session.mTime)
+        lastTimeView.text =
+            DateUtils.timeToMsgTime(session.mTime, IMCoreManager.getCommonModule().getSeverTime())
         if (session.unRead == 0) {
             unReadCountView.visibility = View.GONE
         } else {

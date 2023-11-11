@@ -5,18 +5,19 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.ui.provider.IMBaseMessageIVProvider
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
-import com.thk.im.android.ui.provider.internal.msg.viewholder.ImageMsgVH
+import com.thk.im.android.ui.provider.internal.msg.viewholder.IMAudioMsgVH
 
-class ImageMsgIVProvider : IMBaseMessageIVProvider() {
+class IMAudioMsgIVProvider : IMBaseMessageIVProvider() {
     override fun messageType(): Int {
-        return MsgType.IMAGE.value
+        return MsgType.Audio.value
     }
+
 
     override fun createViewHolder(
         lifecycleOwner: LifecycleOwner,
         itemView: View,
         viewType: Int
     ): BaseMsgVH {
-        return ImageMsgVH(lifecycleOwner, itemView, viewType)
+        return IMAudioMsgVH(lifecycleOwner, itemView, viewType)
     }
 }

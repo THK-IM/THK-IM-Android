@@ -8,7 +8,7 @@ import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
-import com.thk.im.android.ui.provider.internal.msg.TimeLineMsgIVProvider
+import com.thk.im.android.ui.provider.internal.msg.IMTimeLineMsgIVProvider
 import kotlin.math.abs
 
 class MessageAdapter(
@@ -64,7 +64,7 @@ class MessageAdapter(
 
     private fun newTimelineMessage(cTime: Long): Message {
         return Message(
-            0L, 0L, 0L, 0L, TimeLineMsgIVProvider.timeLineMsgType, cTime.toString(),
+            0L, 0L, 0L, 0L, IMTimeLineMsgIVProvider.timeLineMsgType, cTime.toString(),
             cTime.toString(), 0, 0, null, null, null, cTime, cTime
         )
     }
@@ -192,7 +192,7 @@ class MessageAdapter(
             }
             // 附加在该消息上的时间线消息也一并删除
             if (pos < messageList.size - 1 && pos > 0) {
-                if (messageList[pos].type == TimeLineMsgIVProvider.timeLineMsgType) {
+                if (messageList[pos].type == IMTimeLineMsgIVProvider.timeLineMsgType) {
                     messageList.removeAt(pos)
                     notifyItemRemoved(pos)
                 }

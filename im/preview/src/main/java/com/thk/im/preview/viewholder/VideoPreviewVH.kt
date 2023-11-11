@@ -12,6 +12,7 @@ import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
+import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.preview.R
 import com.thk.im.android.ui.manager.IMVideoMsgBody
@@ -41,7 +42,8 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                 try {
                     val content = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
                     if (content != null) {
-                        // TODO
+                        IMCoreManager.getMessageModule().getMsgProcessor(it.type)
+                            .downloadMsgContent(it, IMMsgResourceType.Thumbnail.value)
                     }
                 } catch (e: Exception) {
                     LLog.e("${it.content} ${e.toString()}")

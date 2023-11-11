@@ -11,8 +11,7 @@ import java.io.File
 @UnstableApi
 class VideoActivity : AppCompatActivity(), CacheListener {
     private lateinit var binding: ActivityVideoBinding
-    private val videoUrl =
-        "https://smilemiao.oss-cn-beijing.aliyuncs.com/im/session_1670948901844160512/50778/1689652409151_A846F817-773E-4E20-A3E2-8BB6CF72E23A_EeL7oR0z.mov"
+    private val videoUrl =""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

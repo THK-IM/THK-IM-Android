@@ -284,7 +284,7 @@ open class IMVideoMsgProcessor : BaseMsgProcessor() {
         }
 
         if (resourceType == IMMsgResourceType.Thumbnail.value) {
-            fileName = "cover_${fileName}"
+            fileName = "cover_${fileName}.jpeg"
         }
 
         val listener = object : LoadListener {

@@ -3,6 +3,8 @@ package com.thk.im.android.ui.fragment
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.graphics.Color
+import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,20 +17,24 @@ import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
+import com.lxj.xpopup.XPopup
+import com.lxj.xpopup.enums.PopupAnimation
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.LLog
 import com.thk.im.android.base.RxTransform
+import com.thk.im.android.base.extension.dp2px
 import com.thk.im.android.base.popup.KeyboardPopupWindow
+import com.thk.im.android.base.utils.AppUtils
 import com.thk.im.android.base.utils.ToastUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.db.MsgOperateStatus
 import com.thk.im.android.db.MsgType
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
+import com.thk.im.android.ui.fragment.popup.MessageOperatorPopup
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.IMImageMsgData
@@ -267,7 +273,49 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     override fun readMessage(message: Message) {
         // 对于不是自己发的消息才能发送已读消息
         if (message.fUid != IMCoreManager.getUid() && message.msgId > 0) {
-            IMCoreManager.getMessageModule().sendMessage("", message.sid, MsgType.READ.value, null, message.msgId)
+            IMCoreManager.getMessageModule()
+                .sendMessage("", message.sid, MsgType.READ.value, null, message.msgId)
+        }
+    }
+
+    override fun popupMessageOperatorPanel(view: View, message: Message) {
+        if (isKeyboardShowing()) {
+            closeKeyboard()
+        }
+        val locations = IntArray(2)
+        view.getLocationOnScreen(locations)
+        context?.let {
+            val point = PointF()
+            val popupWidth = 320.dp2px()
+            val operators = IMUIManager.getMsgOperators(message)
+            val popupHeight = ((operators.size / 5 + 1) * 60 + 30).dp2px()
+            point.x = (AppUtils.instance().screenWidth / 2).toFloat()
+            if (locations[1] > (300.dp2px())) {
+                point.y = (locations[1] - popupHeight).toFloat()
+            } else {
+                if (view.height > AppUtils.instance().screenHeight - 300.dp2px()) {
+                    point.y = ((AppUtils.instance().screenHeight - popupHeight) / 2).toFloat()
+                } else {
+                    point.y = (locations[1] + view.height).toFloat()
+                }
+            }
+            val popupView = MessageOperatorPopup(it)
+            popupView.message = message
+            popupView.sender = this
+            popupView.operators = operators
+            XPopup.Builder(context)
+                .popupAnimation(PopupAnimation.ScaleAlphaFromCenter)
+                .shadowBgColor(Color.TRANSPARENT)
+                .hasShadowBg(false)
+                .isViewMode(true)
+                .isCenterHorizontal(true)
+                .isDestroyOnDismiss(true)
+                .popupWidth(popupWidth)
+                .popupHeight(popupHeight)
+                .hasBlurBg(false)
+                .atPoint(point)
+                .asCustom(popupView)
+                .show()
         }
     }
 

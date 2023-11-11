@@ -186,12 +186,12 @@ class MessageAdapter(
     fun delete(message: Message) {
         synchronized(this) {
             val pos = findPosition(message)
-            if (pos >= 0) {
+            if (pos >= 0 && pos < messageList.size) {
                 messageList.removeAt(pos)
                 notifyItemRemoved(pos)
             }
             // 附加在该消息上的时间线消息也一并删除
-            if (pos < messageList.size - 1 && pos > 0) {
+            if (pos < messageList.size - 1 && pos >= 0) {
                 if (messageList[pos].type == IMTimeLineMsgIVProvider.timeLineMsgType) {
                     messageList.removeAt(pos)
                     notifyItemRemoved(pos)

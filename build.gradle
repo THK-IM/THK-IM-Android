@@ -70,7 +70,9 @@ ext {
                     "media3-exoplayer-dash"            : "androidx.media3:media3-exoplayer-dash:$version_exoplayer",
                     "media3-exoplayer-ui"              : "androidx.media3:media3-ui:$version_exoplayer",
                     "videocache"                       : "com.danikula:videocache:2.7.1",
-                    "SwipeMenuRecyclerView"            : "com.github.aitsuki:SwipeMenuRecyclerView:2.1.5"
+                    "SwipeMenuRecyclerView"            : "com.github.aitsuki:SwipeMenuRecyclerView:2.1.5",
+                    "XPopup"                           : "com.github.li-xiaojun:XPopup:2.9.19",
+                    "flexbox"                          : "com.google.android.flexbox:flexbox:3.0.0",
 
     ]
 }

@@ -10,11 +10,14 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.lxj.xpopup.XPopup
+import com.lxj.xpopup.enums.PopupAnimation
 import com.thk.im.android.base.BaseSubscriber
 import com.thk.im.android.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.ui.fragment.adapter.MessageAdapter
+import com.thk.im.android.ui.fragment.popup.MessageOperatorPopup
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
@@ -185,7 +188,8 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgCellLongClick(message: Message, position: Int, view: View) {
-        msgSender.setSelectMode(true, message)
+//        msgSender.setSelectMode(true, message)
+        msgSender.popupMessageOperatorPanel(view, message)
     }
 
     override fun onMsgResendClick(message: Message) {

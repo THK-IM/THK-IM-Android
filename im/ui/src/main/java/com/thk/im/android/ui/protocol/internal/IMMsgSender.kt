@@ -1,13 +1,16 @@
 package com.thk.im.android.ui.protocol.internal
 
+import android.view.View
 import androidx.emoji2.widget.EmojiEditText
 import com.thk.im.android.db.entity.Message
 import com.thk.im.android.db.entity.Session
 
 interface IMMsgSender {
 
+    /// 获取session
     fun getSession(): Session
 
+    /// 重发消息
     fun resendMessage(msg: Message)
 
     /// 发送消息
@@ -16,8 +19,10 @@ interface IMMsgSender {
     /// 输入框添加内容
     fun addInputContent(text: String)
 
+    /// 获取输入框内容
     fun getEditText(): EmojiEditText
 
+    /// 删除输入框内容
     fun deleteContent(count: Int)
 
     /// 选择照片
@@ -55,5 +60,8 @@ interface IMMsgSender {
 
     /// 已读消息
     fun readMessage(message: Message)
+
+    /// 弹出消息操作面板弹窗
+    fun popupMessageOperatorPanel(view: View, message: Message)
 
 }

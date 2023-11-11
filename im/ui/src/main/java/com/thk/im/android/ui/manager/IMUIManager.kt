@@ -5,8 +5,11 @@ import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import com.thk.im.android.base.utils.IMKeyboardUtils
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.db.entity.Message
+import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.IMPreviewer
 import com.thk.im.android.ui.protocol.IMProvider
+import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import com.thk.im.android.ui.provider.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.provider.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.IMBasePanelFragmentProvider
@@ -24,6 +27,12 @@ import com.thk.im.android.ui.provider.internal.msg.proccessor.IMImageMsgProcesso
 import com.thk.im.android.ui.provider.internal.msg.proccessor.IMTextMsgProcessor
 import com.thk.im.android.ui.provider.internal.msg.proccessor.IMUnSupportMsgProcessor
 import com.thk.im.android.ui.provider.internal.msg.proccessor.IMVideoMsgProcessor
+import com.thk.im.android.ui.provider.internal.operator.IMMsgCopyOperator
+import com.thk.im.android.ui.provider.internal.operator.IMMsgDeleteOperator
+import com.thk.im.android.ui.provider.internal.operator.IMMsgForwardOperator
+import com.thk.im.android.ui.provider.internal.operator.IMMsgMultiSelectOperator
+import com.thk.im.android.ui.provider.internal.operator.IMMsgReplyOperator
+import com.thk.im.android.ui.provider.internal.operator.IMMsgRevokeOperator
 import com.thk.im.android.ui.provider.internal.panel.IMUnicodeEmojiPanelProvider
 import com.thk.im.android.ui.provider.internal.session.provider.SingleSessionIVProvider
 
@@ -31,8 +40,9 @@ object IMUIManager {
 
     private val messageIVProviders = HashMap<Int, IMBaseMessageIVProvider>()
     private val sessionIVProviders = HashMap<Int, IMBaseSessionIVProvider>()
-    var panelFragmentProviders = HashMap<Int, IMBasePanelFragmentProvider>()
-    var functionIVProviders = HashMap<Int, IMBaseFunctionIVProvider>()
+    val panelFragmentProviders = HashMap<Int, IMBasePanelFragmentProvider>()
+    val functionIVProviders = HashMap<Int, IMBaseFunctionIVProvider>()
+    private val msgOperators = HashMap<String, IMMessageOperator>()
     var mediaProvider: IMProvider? = null
     var mediaPreviewer: IMPreviewer? = null
 
@@ -60,6 +70,14 @@ object IMUIManager {
     fun getSessionIVProvider(type: Int): IMBaseSessionIVProvider {
         val provider = sessionIVProviders[type]
         return provider ?: sessionIVProviders[1]!!
+    }
+
+    fun registerMsgOperator(operator: IMMessageOperator) {
+        msgOperators[operator.id()] = operator
+    }
+
+    fun getMsgOperators(message: Message): List<IMMessageOperator> {
+        return msgOperators.values.toList()
     }
 
     fun init(app: Application) {
@@ -93,6 +111,13 @@ object IMUIManager {
 
         functionIVProviders[cameraFunctionProvider.position()] = cameraFunctionProvider
         functionIVProviders[albumFunctionIVProvider.position()] = albumFunctionIVProvider
+
+        registerMsgOperator(IMMsgDeleteOperator())
+        registerMsgOperator(IMMsgRevokeOperator())
+        registerMsgOperator(IMMsgCopyOperator())
+        registerMsgOperator(IMMsgForwardOperator())
+        registerMsgOperator(IMMsgReplyOperator())
+        registerMsgOperator(IMMsgMultiSelectOperator())
     }
 
 }

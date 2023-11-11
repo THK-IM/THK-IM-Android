@@ -8,7 +8,6 @@ import com.thk.im.android.base.LLog
 import com.thk.im.android.databinding.ActivityVideoBinding
 import java.io.File
 
-@UnstableApi
 class VideoActivity : AppCompatActivity(), CacheListener {
     private lateinit var binding: ActivityVideoBinding
     private val videoUrl =""

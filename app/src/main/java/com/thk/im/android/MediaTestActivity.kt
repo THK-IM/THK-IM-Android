@@ -2,6 +2,9 @@ package com.thk.im.android
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
@@ -90,7 +93,31 @@ class MediaTestActivity : AppCompatActivity() {
             val intent = Intent(this@MediaTestActivity, VideoActivity::class.java)
             startActivity(intent)
         }
+
+        binding.etRoom.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                if (charSequence.isNotEmpty()) {
+                    binding.buttonThird.text = "进入" + charSequence + "房间"
+                } else {
+                    binding.buttonThird.text = "创建房间"
+                }
+            }
+
+            override fun afterTextChanged(editable: Editable) {}
+        })
+
+        binding.buttonThird.setOnClickListener(View.OnClickListener {
+            val intent = Intent()
+            intent.setClass(this, WebRtcActivity::class.java)
+            if (binding.etRoom.text.toString().isNotEmpty()) {
+                val roomId: String = binding.etRoom.text.toString()
+                intent.putExtra("room_id", roomId)
+            }
+            startActivity(intent)
+        })
     }
+
     private fun checkPermission() {
         XXPermissions.with(this).permission(Permission.RECORD_AUDIO)
             .request(object : OnPermissionCallback {

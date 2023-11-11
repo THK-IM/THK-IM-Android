@@ -56,40 +56,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        binding.edtRoom.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.length() > 0) {
-                    binding.buttonThird.setText("进入" + charSequence + "房间");
-                } else {
-                    binding.buttonThird.setText("创建房间");
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
-        binding.buttonThird.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this, WebRtcActivity.class);
-                if (Objects.requireNonNull(binding.edtRoom.getText()).toString().length() > 0) {
-                    String roomId = binding.edtRoom.getText().toString();
-                    intent.putExtra("room_id", roomId);
-                }
-                startActivity(intent);
-            }
-        });
-
         binding.buttonAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

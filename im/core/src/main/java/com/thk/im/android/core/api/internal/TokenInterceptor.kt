@@ -7,7 +7,7 @@ import okhttp3.Response
 
 class TokenInterceptor(private var token: String) : Interceptor {
 
-    private val headTokenKey = "token"
+    private val headTokenKey = "Token"
 
     fun updateToken(token: String) {
         this.token = token

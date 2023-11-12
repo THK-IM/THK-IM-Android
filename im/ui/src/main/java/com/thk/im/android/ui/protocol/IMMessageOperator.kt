@@ -7,5 +7,5 @@ abstract class IMMessageOperator {
     abstract fun id(): String
     abstract fun title(): String
     abstract fun resId(): Int
-    abstract fun operator(sender: IMMsgSender, message: Message)
+    abstract fun onClick(sender: IMMsgSender, message: Message)
 }

@@ -53,14 +53,10 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     private lateinit var binding: FragmentMessageBinding
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentMessageBinding.inflate(
-            inflater,
-            container,
-            false
+            inflater, container, false
         )
         return binding.root
     }
@@ -109,18 +105,14 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         msgAnimator.setTarget(binding.rcvMessage)
         msgAnimator.duration = 150
         val animator = ObjectAnimator.ofFloat(
-            binding.llAlwaysShow,
-            "translationY",
-            0 - bottomHeight.toFloat()
+            binding.llAlwaysShow, "translationY", 0 - bottomHeight.toFloat()
         )
         animator.duration = duration
         val lp = binding.llBottomLayout.layoutParams
         lp.height = bottomHeight
         binding.llBottomLayout.layoutParams = lp
         val bottomAnimator = ObjectAnimator.ofFloat(
-            binding.llBottomLayout,
-            "translationY",
-            0 - bottomHeight.toFloat()
+            binding.llBottomLayout, "translationY", 0 - bottomHeight.toFloat()
         )
         bottomAnimator.duration = duration
         animators.play(msgAnimator).with(animator).with(bottomAnimator)
@@ -228,10 +220,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                     data.path?.let { path ->
                         IMUIManager.mediaProvider?.startPlayAudio(path, object : AudioCallback {
                             override fun audioData(
-                                path: String,
-                                second: Int,
-                                db: Double,
-                                state: AudioStatus
+                                path: String, second: Int, db: Double, state: AudioStatus
                             ) {
                                 ToastUtils.show("play: $second, $db")
                             }
@@ -240,8 +229,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                 }
             }
 
-            MsgType.IMAGE.value,
-            MsgType.VIDEO.value -> {
+            MsgType.IMAGE.value, MsgType.VIDEO.value -> {
                 previewImageAndVideo(msg, position, originView)
             }
         }
@@ -255,17 +243,12 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     override fun deleteSelectedMessages() {
         val messages = binding.rcvMessage.getSelectMessages()
         session?.let {
-            IMCoreManager.getMessageModule()
-                .deleteMessages(it.id, messages.toList(), true)
-                .compose(RxTransform.flowableToMain())
-                .subscribe(object : BaseSubscriber<Void>() {
+            IMCoreManager.getMessageModule().deleteMessages(it.id, messages.toList(), true)
+                .compose(RxTransform.flowableToMain()).subscribe(object : BaseSubscriber<Void>() {
                     override fun onNext(t: Void?) {
 
                     }
 
-                    override fun onError(t: Throwable?) {
-                        super.onError(t)
-                    }
                 })
         }
     }
@@ -288,34 +271,24 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
             val point = PointF()
             val popupWidth = 320.dp2px()
             val operators = IMUIManager.getMsgOperators(message)
-            val popupHeight = ((operators.size / 5 + 1) * 60 + 30).dp2px()
+            val rowCount = 5
+            val popupHeight = ((operators.size / rowCount + operators.size % rowCount) * 60 + 30).dp2px()
             point.x = (AppUtils.instance().screenWidth / 2).toFloat()
-            if (locations[1] > (300.dp2px())) {
+            if (locations[1] <= 300.dp2px() && (locations[1] + view.height) >= (AppUtils.instance().screenHeight - 300.dp2px())) {
+                point.y = ((AppUtils.instance().screenHeight - popupHeight) / 2).toFloat()
+            } else if (locations[1] > (300.dp2px())) {
                 point.y = (locations[1] - popupHeight).toFloat()
             } else {
-                if (view.height > AppUtils.instance().screenHeight - 300.dp2px()) {
-                    point.y = ((AppUtils.instance().screenHeight - popupHeight) / 2).toFloat()
-                } else {
-                    point.y = (locations[1] + view.height).toFloat()
-                }
+                point.y = (locations[1] + view.height).toFloat()
             }
             val popupView = MessageOperatorPopup(it)
             popupView.message = message
             popupView.sender = this
             popupView.operators = operators
-            XPopup.Builder(context)
-                .popupAnimation(PopupAnimation.ScaleAlphaFromCenter)
-                .shadowBgColor(Color.TRANSPARENT)
-                .hasShadowBg(false)
-                .isViewMode(true)
-                .isCenterHorizontal(true)
-                .isDestroyOnDismiss(true)
-                .popupWidth(popupWidth)
-                .popupHeight(popupHeight)
-                .hasBlurBg(false)
-                .atPoint(point)
-                .asCustom(popupView)
-                .show()
+            XPopup.Builder(context).popupAnimation(PopupAnimation.ScaleAlphaFromCenter)
+                .shadowBgColor(Color.TRANSPARENT).hasShadowBg(false).isViewMode(true)
+                .isCenterHorizontal(true).isDestroyOnDismiss(true).popupWidth(popupWidth)
+                .popupHeight(popupHeight).hasBlurBg(false).atPoint(point).asCustom(popupView).show()
         }
     }
 
@@ -347,10 +320,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         }
         activity?.let {
             IMUIManager.mediaPreviewer?.previewMediaMessage(
-                it,
-                mediaMessages,
-                originView,
-                msg.id
+                it, mediaMessages, originView, msg.id
             )
         }
     }
@@ -393,13 +363,11 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     override fun openCamera() {
         context?.let {
-            XXPermissions.with(it)
-                .permission(Permission.CAMERA)
-                .request { _, all ->
-                    if (all) {
-                        cameraMedia()
-                    }
+            XXPermissions.with(it).permission(Permission.CAMERA).request { _, all ->
+                if (all) {
+                    cameraMedia()
                 }
+            }
         }
     }
 

@@ -18,7 +18,7 @@ class MessageOperatorPopup(context: Context) : AttachPopupView(context) {
         super.onCreate()
         val operatorLayout = findViewById<FlexboxLayout>(R.id.layout_operators)
         for (operator in operators) {
-            val operatorView = MessageOperatorView(context)
+            val operatorView = MessageOperatorItemView(context)
             operatorLayout.addView(operatorView)
             operatorView.setOperator(operator, sender, message) {
                 dismiss()

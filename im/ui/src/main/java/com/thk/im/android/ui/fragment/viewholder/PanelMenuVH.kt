@@ -4,7 +4,7 @@ import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.provider.IMBasePanelFragmentProvider
+import com.thk.im.android.ui.protocol.IMBasePanelFragmentProvider
 
 class PanelMenuVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 

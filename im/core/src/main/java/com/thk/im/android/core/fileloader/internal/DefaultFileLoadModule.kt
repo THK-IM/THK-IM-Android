@@ -28,12 +28,15 @@ class DefaultFileLoadModule(
     private val defaultTimeout: Long = 30
     private val maxIdleConnection = 4
     private val keepAliveDuration: Long = 60
-    private val tokenInterceptor = TokenInterceptor(token)
+    private val tokenInterceptor = TokenInterceptor(token, endpoint)
 
     val okHttpClient = OkHttpClient.Builder().connectTimeout(defaultTimeout, TimeUnit.SECONDS)
         .writeTimeout(defaultTimeout, TimeUnit.SECONDS)
-        .readTimeout(defaultTimeout, TimeUnit.SECONDS).retryOnConnectionFailure(true)
-        .followRedirects(true).addInterceptor(tokenInterceptor)
+        .readTimeout(defaultTimeout, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .followRedirects(false)
+        .followSslRedirects(false)
+        .addInterceptor(tokenInterceptor)
         .connectionPool(ConnectionPool(maxIdleConnection, keepAliveDuration, TimeUnit.SECONDS))
         .build()
 
@@ -69,34 +72,46 @@ class DefaultFileLoadModule(
         val dListeners = downloadTaskMap[url]?.second
         dListeners?.let { ls ->
             ls.forEach {
-                if (it.notifyOnUiThread()) {
-                    handler.post {
-                        it.onProgress(progress, state, url, path, exception)
-                    }
-                } else {
-                    it.onProgress(progress, state, url, path, exception)
-                }
+                notify(it, progress, state, url, path, exception)
             }
         }
 
         val uListeners = uploadTaskMap[path]?.second
         uListeners?.let { ls ->
             ls.forEach {
-                if (it.notifyOnUiThread()) {
-                    handler.post {
-                        it.onProgress(
-                            progress, state, url, path, null
-                        )
-                    }
-                } else {
-                    it.onProgress(progress, state, url, path, null)
-                }
+                notify(it, progress, state, url, path, exception)
             }
         }
 
         if (state == FileLoadState.Failed.value || state == FileLoadState.Success.value) {
             cancelUpload(path)
             cancelDownload(url)
+        }
+    }
+
+    private fun notify(listener: LoadListener, progress: Int, state: Int, url: String, path: String, exception: Exception?) {
+        if (listener.notifyOnUiThread()) {
+            if (Looper.getMainLooper() == Looper.myLooper()) {
+                listener.onProgress(
+                    progress, state, url, path, exception
+                )
+            } else {
+                handler.post {
+                    listener.onProgress(
+                        progress, state, url, path, exception
+                    )
+                }
+            }
+        } else {
+            if (Looper.getMainLooper() == Looper.myLooper()) {
+                Thread {
+                    kotlin.run {
+                        listener.onProgress(progress, state, url, path, exception)
+                    }
+                }.start()
+            } else {
+                listener.onProgress(progress, state, url, path, exception)
+            }
         }
     }
 

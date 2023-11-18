@@ -4,15 +4,30 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.os.Build;
 import android.util.DisplayMetrics;
+import android.util.SparseLongArray;
 import android.view.WindowManager;
+
+import com.thk.im.android.core.R;
+
+import java.util.ArrayList;
 
 public class AppUtils {
 
     private static final AppUtils sAppUtils = new AppUtils();
     private Application mApp;
 
+    private SoundPool soundPoll;
+
+
+    private int newMsgSound;
+
     private AppUtils() {
+
     }
 
     public static AppUtils instance() {
@@ -25,6 +40,19 @@ public class AppUtils {
 
     public void init(Application app) {
         this.mApp = app;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setAllowedCapturePolicy(AudioAttributes.ALLOW_CAPTURE_BY_ALL)
+                    .build();
+            soundPoll = new SoundPool.Builder().setContext(app)
+                    .setMaxStreams(2)
+                    .setAudioAttributes(audioAttributes)
+                    .build();
+        } else {
+            soundPoll = new SoundPool(1, AudioManager.STREAM_ALARM, 0);
+        }
+        newMsgSound = soundPoll.load(app, R.raw.new_message, 1);
     }
 
     /**
@@ -104,6 +132,18 @@ public class AppUtils {
     public Float px2sp(final float pxValue) {
         final float fontScale = Resources.getSystem().getDisplayMetrics().scaledDensity;
         return (pxValue / fontScale + 0.5f);
+    }
+
+    public void notifyNewMessage() {
+        AudioManager audioManager = (AudioManager) getApp().getSystemService(Context.AUDIO_SERVICE);
+        if (audioManager != null) {
+            if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
+                soundPoll.play(newMsgSound, 1f, 1f, 1, 0, 1f);
+            } else {
+                long[] pattern = new long[] {200, 200, 200, 200};
+                VibrateUtils.INSTANCE.vibrate(getApp(), pattern, -1);
+            }
+        }
     }
 
 

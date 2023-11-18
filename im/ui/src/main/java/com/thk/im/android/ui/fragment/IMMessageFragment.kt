@@ -19,20 +19,18 @@ import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.enums.PopupAnimation
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.dp2px
 import com.thk.im.android.core.base.popup.KeyboardPopupWindow
-import com.thk.im.android.core.base.utils.AppUtils
-import com.thk.im.android.core.base.utils.ToastUtils
-import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.IMFileFormat
-import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.db.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.fragment.popup.MessageOperatorPopup
 import com.thk.im.android.ui.manager.IMAudioMsgData
@@ -179,6 +177,13 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
 
     private fun initEventBus() {
+        XEventBus.observe(this, IMEvent.BatchMsgNew.value, Observer<List<Message>> {
+            if (it.isNotEmpty()) {
+                if (it[0].sid == session!!.id) {
+                    binding.rcvMessage.insertMessages(it)
+                }
+            }
+        })
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
             it?.let {
                 if (it.sid == session!!.id) {
@@ -272,10 +277,13 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
             val popupWidth = 320.dp2px()
             val operators = IMUIManager.getMsgOperators(message)
             val rowCount = 5
-            val popupHeight = ((operators.size / rowCount + operators.size % rowCount) * 60 + 30).dp2px()
-            point.x = (com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth / 2).toFloat()
+            val popupHeight =
+                ((operators.size / rowCount + operators.size % rowCount) * 60 + 30).dp2px()
+            point.x =
+                (com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth / 2).toFloat()
             if (locations[1] <= 300.dp2px() && (locations[1] + view.height) >= (com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight - 300.dp2px())) {
-                point.y = ((com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight - popupHeight) / 2).toFloat()
+                point.y =
+                    ((com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight - popupHeight) / 2).toFloat()
             } else if (locations[1] > (300.dp2px())) {
                 point.y = (locations[1] - popupHeight).toFloat()
             } else {

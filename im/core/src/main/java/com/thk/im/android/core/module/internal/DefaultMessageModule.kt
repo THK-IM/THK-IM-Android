@@ -14,6 +14,7 @@ import com.thk.im.android.core.api.bean.MessageBean
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
+import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.base.utils.VibrateUtils
 import com.thk.im.android.core.db.MsgOperateStatus
 import com.thk.im.android.core.db.MsgSendStatus
@@ -48,24 +49,6 @@ open class DefaultMessageModule : MessageModule {
     private val idLock = ReentrantLock()
     private val ackLock = ReentrantReadWriteLock()
     private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 IOS:1 Android: 2
-
-
-    private val soundPoll: SoundPool =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            val audioAttributes = AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setAllowedCapturePolicy(AudioAttributes.ALLOW_CAPTURE_BY_ALL)
-                .build()
-            SoundPool.Builder().setContext(IMCoreManager.getApplication())
-                .setMaxStreams(2)
-                .setAudioAttributes(audioAttributes)
-                .build()
-        } else {
-            SoundPool(1, AudioManager.STREAM_ALARM, 0)
-        }
-
-    private val newMsgSound: Int =
-        soundPoll.load(IMCoreManager.getApplication(), R.raw.new_message, 1)
 
     override fun registerMsgProcessor(processor: BaseMsgProcessor) {
         processorMap[processor.messageType()] = processor
@@ -375,19 +358,7 @@ open class DefaultMessageModule : MessageModule {
         if (message.type < 0 || message.fUid == IMCoreManager.getUid()) {
             return
         }
-        val audioManager =
-            IMCoreManager.getApplication().getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-        audioManager?.let {
-            if (it.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
-                soundPoll.play(newMsgSound, 1f, 1f, 1, 0, 1f)
-            } else {
-                VibrateUtils.vibrate(
-                    IMCoreManager.getApplication(),
-                    longArrayOf(200, 200, 200, 200),
-                    -1
-                )
-            }
-        }
+        AppUtils.instance().notifyNewMessage()
     }
 
     override fun onSignalReceived(subType: Int, body: String) {

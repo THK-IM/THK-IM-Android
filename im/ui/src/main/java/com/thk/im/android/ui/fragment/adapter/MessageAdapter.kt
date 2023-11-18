@@ -116,6 +116,26 @@ class MessageAdapter(
         }
     }
 
+
+    fun insertNews(messages: List<Message>) {
+        val inserts = mutableListOf<Message>()
+        for (m in messages) {
+            val pos = findPosition(m)
+            if (pos == -1) {
+                inserts.add(m)
+            } else {
+                if (this.messageList[pos].sendStatus != m.sendStatus) {
+                    this.messageList[pos].sendStatus = m.sendStatus
+                    this.messageList[pos].msgId = m.msgId
+                    notifyItemChanged(pos)
+                }
+            }
+        }
+        for (m in inserts) {
+            insertNew(m)
+        }
+    }
+
     fun insertNew(message: Message): Int {
         if (message.type < 0) {
             return -1

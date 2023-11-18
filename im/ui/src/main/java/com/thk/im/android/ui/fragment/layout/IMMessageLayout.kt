@@ -156,6 +156,10 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         }
     }
 
+    fun insertMessages(messages: List<Message>) {
+        msgAdapter.insertNews(messages)
+    }
+
     fun insertMessage(message: Message) {
         val pos = msgAdapter.insertNew(message)
         if (pos == 0) {

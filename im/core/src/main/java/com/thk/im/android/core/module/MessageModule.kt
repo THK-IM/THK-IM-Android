@@ -90,17 +90,6 @@ interface MessageModule : BaseModule {
     fun sendMessageToServer(message: Message): Flowable<Message>
 
     /**
-     * 撤回消息
-     */
-    fun revokeMessage(message: Message): Flowable<Void>
-
-
-    /**
-     * 重新编辑消息
-     */
-    fun reeditMessage(message: Message): Flowable<Void>
-
-    /**
      * 消息ack:需要ack的消息存入客户端缓存,批量按sessionId进行ack
      */
     fun ackMessageToCache(message: Message)

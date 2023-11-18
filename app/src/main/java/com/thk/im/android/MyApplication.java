@@ -24,8 +24,6 @@ public class MyApplication extends Application {
         int value = MsgType.valueOf("UnSupport").getValue();
         LLog.v("value:" + value);
         LLog.v("onCreate MyApplication");
-        AppUtils.instance().init(this);
-        ToastUtils.init(this);
         new Thread() {
             public void run() {
                 Long uid = 4L;

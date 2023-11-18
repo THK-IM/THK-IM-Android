@@ -256,8 +256,7 @@ class IMInputLayout : ConstraintLayout {
         if (!granted) {
             XXPermissions.with(context).permission(Permission.RECORD_AUDIO).request { _, all ->
                 if (!all) {
-                    // TODO
-                    com.thk.im.android.core.base.utils.ToastUtils.show("请开启录音权限")
+                    ToastUtils.show("请开启录音权限")
                 }
             }
         } else {

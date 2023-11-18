@@ -221,6 +221,11 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         msgSender.readMessage(message)
     }
 
+    override fun setEditText(text: String) {
+        msgSender.openKeyboard()
+        msgSender.addInputContent(text)
+    }
+
     fun getSelectMessages(): Set<Message> {
         return (adapter as MessageAdapter).getSelectIds()
     }

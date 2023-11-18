@@ -54,16 +54,15 @@ enum class MsgOperateStatus(var value: Int) {
     Ack(1),        // 用户已接收
     ClientRead(2), // 用户已读
     ServerRead(4), // 用户已告知服务端已读
-    Revoke(8),     // 用户撤回
-    Update(16)     // 用户更新消息（重新编辑等操作）
+    Update(8)     // 用户更新消息（重新编辑等操作）
 }
 
 /**
  * 消息类型
  */
 enum class MsgType(var value: Int) {
-    Reedit(-4), // 重编辑消息
-    Revoke(-3), // 撤回消息消息
+    Revoke(-1001), // 撤回消息
+    Reedit(-3), // 重编辑消息
     READ(-2), // 读消息消息
     ACK(-1), // 收消息消息
     UnSupport(0),  // 未知消息

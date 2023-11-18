@@ -22,6 +22,7 @@ class ReadMessageProcessor : BaseMsgProcessor() {
     init {
         val subscriber = object : BaseSubscriber<Long>() {
             override fun onNext(t: Long?) {
+                LLog.v("ReadMessageProcessor ${disposables.size()}")
                 sendCacheReadMessagesToServer()
             }
         }
@@ -54,6 +55,11 @@ class ReadMessageProcessor : BaseMsgProcessor() {
                 t?.let {
                     addReadMessagesToCache(t.sid, mutableSetOf(t.rMsgId!!))
                 }
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                disposables.remove(this)
             }
         }
         Flowable.create<Message>({
@@ -169,6 +175,7 @@ class ReadMessageProcessor : BaseMsgProcessor() {
                     sessionId, msgIds, MsgOperateStatus.ServerRead.value
                 )
                 readMessageToServerSuccess(sessionId, msgIds)
+                disposables.remove(this)
             }
 
             override fun onNext(t: Void?) {}

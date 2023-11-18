@@ -19,5 +19,6 @@ class IMMsgForwardOperator : IMMessageOperator() {
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
+
     }
 }

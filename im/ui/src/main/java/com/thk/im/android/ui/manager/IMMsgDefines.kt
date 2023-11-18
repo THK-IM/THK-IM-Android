@@ -73,4 +73,15 @@ class IMVideoMsgBody(
     var name: String? = null,
 )
 
+class IMRevokeMsgData(
+    @SerializedName("nick")
+    var nick: String,
+    @SerializedName("type")
+    var type: Int? = null,
+    @SerializedName("content")
+    var content: String? = null,
+    @SerializedName("data")
+    var data: String? = null
+)
+
 

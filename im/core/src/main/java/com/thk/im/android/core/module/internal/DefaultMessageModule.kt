@@ -1,21 +1,14 @@
 package com.thk.im.android.core.module.internal
 
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import android.media.AudioAttributes
-import android.media.AudioManager
-import android.media.SoundPool
-import android.os.Build
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.R
 import com.thk.im.android.core.api.bean.MessageBean
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.utils.AppUtils
-import com.thk.im.android.core.base.utils.VibrateUtils
 import com.thk.im.android.core.db.MsgOperateStatus
 import com.thk.im.android.core.db.MsgSendStatus
 import com.thk.im.android.core.db.SessionType
@@ -48,7 +41,7 @@ open class DefaultMessageModule : MessageModule {
     private val disposes = CompositeDisposable()
     private val idLock = ReentrantLock()
     private val ackLock = ReentrantReadWriteLock()
-    private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 IOS:1 Android: 2
+    private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 Ios:1 Android:2
 
     override fun registerMsgProcessor(processor: BaseMsgProcessor) {
         processorMap[processor.messageType()] = processor
@@ -255,16 +248,6 @@ open class DefaultMessageModule : MessageModule {
         return IMCoreManager.imApi.sendMessageToServer(message)
     }
 
-    override fun revokeMessage(message: Message): Flowable<Void> {
-        val uId = IMCoreManager.getUid()
-        return IMCoreManager.imApi.revokeMessage(uId, message.sid, message.msgId)
-    }
-
-    override fun reeditMessage(message: Message): Flowable<Void> {
-        val uId = IMCoreManager.getUid()
-        return IMCoreManager.imApi.reeditMessage(uId, message.sid, message.msgId, message.content)
-    }
-
     override fun ackMessageToCache(message: Message) {
         try {
             ackLock.writeLock().tryLock(1, TimeUnit.SECONDS)
@@ -349,13 +332,18 @@ open class DefaultMessageModule : MessageModule {
                 super.onError(t)
                 LLog.e("processSessionByMessage error $t")
             }
+
+            override fun onComplete() {
+                super.onComplete()
+                disposes.remove(this)
+            }
         }
         getSession(msg.sid).compose(RxTransform.flowableToIo()).subscribe(dispose)
         disposes.add(dispose)
     }
 
     override fun notifyNewMessage(session: Session, message: Message) {
-        if (message.type < 0 || message.fUid == IMCoreManager.getUid()) {
+        if ((message.type < 0 && message.type > -1000) || message.fUid == IMCoreManager.getUid()) {
             return
         }
         AppUtils.instance().notifyNewMessage()
@@ -451,6 +439,7 @@ open class DefaultMessageModule : MessageModule {
                     sessionId, msgIds, MsgOperateStatus.Ack.value
                 )
                 ackMessagesSuccess(sessionId, msgIds)
+                disposes.remove(this)
             }
 
             override fun onNext(t: Void?) {}

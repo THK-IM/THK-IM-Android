@@ -26,7 +26,7 @@ interface MessageDao {
     @Query("delete from message where sid= :sid and c_time >= :startTime and c_time <= :endTime")
     fun deleteMessageByCTimeInclude(sid: Long, startTime: Long, endTime: Long)
 
-    @Query("select * from message where sid = :sid and type >= 0 and c_time < :cTime order by c_time desc limit :count")
+    @Query("select * from message where sid = :sid and (type >= 0 or type < -1000) and c_time < :cTime order by c_time desc limit :count")
     fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
 
     @Query("update message set send_status = :status where send_status < :successStatus")

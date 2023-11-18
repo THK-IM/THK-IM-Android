@@ -3,8 +3,10 @@ package com.thk.im.android.ui.manager
 import android.app.Application
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
-import com.thk.im.android.core.base.utils.IMKeyboardUtils
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.base.utils.AppUtils
+import com.thk.im.android.core.base.utils.IMKeyboardUtils
+import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.protocol.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
@@ -13,8 +15,18 @@ import com.thk.im.android.ui.protocol.IMBaseSessionIVProvider
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.IMPreviewer
 import com.thk.im.android.ui.protocol.IMProvider
+import com.thk.im.android.ui.provider.function.IMAlbumFunctionIVProvider
+import com.thk.im.android.ui.provider.function.IMCameraFunctionIVProvider
+import com.thk.im.android.ui.provider.msg.IMAudioMsgIVProvider
+import com.thk.im.android.ui.provider.msg.IMImageMsgIVProvider
+import com.thk.im.android.ui.provider.msg.IMRevokeMsgIVProvider
+import com.thk.im.android.ui.provider.msg.IMTextMsgIVProvider
+import com.thk.im.android.ui.provider.msg.IMTimeLineMsgIVProvider
+import com.thk.im.android.ui.provider.msg.IMUnSupportMsgIVProvider
+import com.thk.im.android.ui.provider.msg.IMVideoMsgIVProvider
 import com.thk.im.android.ui.provider.msg.proccessor.IMAudioMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMImageMsgProcessor
+import com.thk.im.android.ui.provider.msg.proccessor.IMRevokeMessageProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMTextMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMUnSupportMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMVideoMsgProcessor
@@ -72,6 +84,9 @@ object IMUIManager {
     }
 
     fun init(app: Application) {
+        IMKeyboardUtils.init(app)
+        AppUtils.instance().init(app)
+        ToastUtils.init(app)
         EmojiCompat.init(BundledEmojiCompatConfig(app))
 
         IMCoreManager.getMessageModule().registerMsgProcessor(IMUnSupportMsgProcessor())
@@ -79,15 +94,16 @@ object IMUIManager {
         IMCoreManager.getMessageModule().registerMsgProcessor(IMImageMsgProcessor())
         IMCoreManager.getMessageModule().registerMsgProcessor(IMAudioMsgProcessor())
         IMCoreManager.getMessageModule().registerMsgProcessor(IMVideoMsgProcessor())
+        IMCoreManager.getMessageModule().registerMsgProcessor(IMRevokeMessageProcessor())
 
-        com.thk.im.android.core.base.utils.IMKeyboardUtils.init(app)
         val providers = arrayOf(
-            com.thk.im.android.ui.provider.msg.IMTimeLineMsgIVProvider(),
-            com.thk.im.android.ui.provider.msg.IMUnSupportMsgIVProvider(),
-            com.thk.im.android.ui.provider.msg.IMTextMsgIVProvider(),
-            com.thk.im.android.ui.provider.msg.IMImageMsgIVProvider(),
-            com.thk.im.android.ui.provider.msg.IMAudioMsgIVProvider(),
-            com.thk.im.android.ui.provider.msg.IMVideoMsgIVProvider()
+            IMTimeLineMsgIVProvider(),
+            IMUnSupportMsgIVProvider(),
+            IMTextMsgIVProvider(),
+            IMImageMsgIVProvider(),
+            IMAudioMsgIVProvider(),
+            IMVideoMsgIVProvider(),
+            IMRevokeMsgIVProvider(),
         )
         registerMsgIVProvider(*providers)
         registerSessionIVProvider(SingleSessionIVProvider())
@@ -97,11 +113,8 @@ object IMUIManager {
             panelFragmentProviders[unicodeEmojiProvider.position()] = unicodeEmojiProvider
         }
 
-        val cameraFunctionProvider =
-            com.thk.im.android.ui.provider.function.IMCameraFunctionIVProvider()
-        val albumFunctionIVProvider =
-            com.thk.im.android.ui.provider.function.IMAlbumFunctionIVProvider()
-
+        val cameraFunctionProvider = IMCameraFunctionIVProvider()
+        val albumFunctionIVProvider = IMAlbumFunctionIVProvider()
         functionIVProviders[cameraFunctionProvider.position()] = cameraFunctionProvider
         functionIVProviders[albumFunctionIVProvider.position()] = albumFunctionIVProvider
 

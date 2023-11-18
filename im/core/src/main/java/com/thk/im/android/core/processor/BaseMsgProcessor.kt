@@ -130,8 +130,6 @@ abstract class BaseMsgProcessor {
         var originMsg = msg
         val subscriber = object : BaseSubscriber<Message>() {
             override fun onNext(t: Message) {
-                onComplete()
-                disposables.remove(this)
                 insertOrUpdateDb(
                     msg,
                     notify = true,
@@ -145,6 +143,11 @@ abstract class BaseMsgProcessor {
                 disposables.remove(this)
                 originMsg.sendStatus = MsgSendStatus.SendFailed.value
                 updateFailedMsgStatus(originMsg)
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                disposables.remove(this)
             }
         }
         Flowable.just(msg).flatMap {

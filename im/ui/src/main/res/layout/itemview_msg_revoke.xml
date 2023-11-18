@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:paddingVertical="5dp"
+    android:paddingBottom="10dp">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        >
+        <androidx.emoji2.widget.EmojiTextView
+            android:id="@+id/tv_who_revoke"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#aaaaaa"
+            android:text="你撤回了一条消息"
+            android:textSize="12sp" />
+        <TextView
+            android:id="@+id/tv_reedit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#1988f0"
+            android:visibility="gone"
+            android:layout_marginHorizontal="5dp"
+            android:text="重新编辑"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</LinearLayout>

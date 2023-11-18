@@ -1,9 +1,10 @@
-package com.thk.im.android.core.processor
+package com.thk.im.android.ui.provider.msg.proccessor
 
 import com.thk.im.android.core.db.MsgType
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.processor.BaseMsgProcessor
 
-class ReeditMessageProcessor: BaseMsgProcessor() {
+class IMReeditMessageProcessor: BaseMsgProcessor() {
     override fun messageType(): Int {
         return MsgType.Reedit.value
     }

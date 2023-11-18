@@ -137,7 +137,7 @@ class MessageAdapter(
     }
 
     fun insertNew(message: Message): Int {
-        if (message.type < 0) {
+        if (message.type < 0 && message.type > -1000) {
             return -1
         }
         synchronized(this) {
@@ -168,7 +168,7 @@ class MessageAdapter(
     }
 
     fun update(message: Message) {
-        if (message.type < 0) {
+        if (message.type < 0 && message.type > -1000) {
             return
         }
         synchronized(this) {

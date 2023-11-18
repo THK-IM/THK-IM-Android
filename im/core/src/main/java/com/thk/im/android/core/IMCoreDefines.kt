@@ -49,3 +49,9 @@ enum class IMMsgResourceType(val value: String) {
     Thumbnail("thumbnail"),
     Source("source"),
 }
+
+interface IMSendMsgCallback {
+    fun onStart()
+
+    fun onResult(e: Exception?)
+}

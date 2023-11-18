@@ -1,8 +1,9 @@
 package com.thk.im.android.core.module
 
-import com.thk.im.android.core.processor.BaseMsgProcessor
+import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.processor.BaseMsgProcessor
 import io.reactivex.Flowable
 
 interface MessageModule : BaseModule {
@@ -75,13 +76,14 @@ interface MessageModule : BaseModule {
         sessionId: Long,
         type: Int,
         atUser: String? = null,
-        replyMsgId: Long? = null
+        replyMsgId: Long? = null,
+        callback: IMSendMsgCallback? = null
     )
 
     /**
      * 重发
      */
-    fun resend(msg: Message)
+    fun resend(msg: Message, callback: IMSendMsgCallback? = null)
 
 
     /**

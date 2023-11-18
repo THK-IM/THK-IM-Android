@@ -5,6 +5,7 @@ import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.db.MsgOperateStatus
 import com.thk.im.android.core.db.MsgType
@@ -36,7 +37,7 @@ class ReadMessageProcessor : BaseMsgProcessor() {
         return MsgType.READ.value
     }
 
-    override fun send(msg: Message, resend: Boolean) {
+    override fun send(msg: Message, resend: Boolean, callback: IMSendMsgCallback?) {
         LLog.v("ReadMessageProcessor send ${msg.rMsgId}")
         if (msg.rMsgId == null) {
             return

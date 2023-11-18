@@ -4,6 +4,7 @@ import android.view.View
 import androidx.emoji2.widget.EmojiEditText
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import io.reactivex.internal.operators.maybe.MaybeDoAfterSuccess
 
 interface IMMsgSender {
 
@@ -14,7 +15,7 @@ interface IMMsgSender {
     fun resendMessage(msg: Message)
 
     /// 发送消息
-    fun sendMessage(type: Int, body: Any)
+    fun sendMessage(type: Int, body: Any, atUser: String? = null, referMsgId: Long? = null)
 
     /// 输入框添加内容
     fun addInputContent(text: String)
@@ -63,5 +64,14 @@ interface IMMsgSender {
 
     /// 弹出消息操作面板弹窗
     fun popupMessageOperatorPanel(view: View, message: Message)
+
+    /// show loading
+    fun showLoading(text: String)
+
+    /// dismiss Loading
+    fun dismissLoading()
+
+    /// show message
+    fun showMessage(text: String, success: Boolean)
 
 }

@@ -22,11 +22,13 @@ import com.lxj.xpopup.enums.PopupAnimation
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
+import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.dp2px
 import com.thk.im.android.core.base.popup.KeyboardPopupWindow
+import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
@@ -159,15 +161,13 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         try {
             for (media in result) {
                 if (media.mimeType.startsWith("video", true)) {
-                    val imageMsgData = IMVideoMsgData()
-                    imageMsgData.path = media.path
-                    IMCoreManager.getMessageModule()
-                        .sendMessage(imageMsgData, session!!.id, MsgType.VIDEO.value)
+                    val videoMsgData = IMVideoMsgData()
+                    videoMsgData.path = media.path
+                    sendMessage(MsgType.VIDEO.value, videoMsgData)
                 } else if (media.mimeType.startsWith("image", true)) {
                     val imageMsgData = IMImageMsgData()
                     imageMsgData.path = media.path
-                    IMCoreManager.getMessageModule()
-                        .sendMessage(imageMsgData, session!!.id, MsgType.IMAGE.value)
+                    sendMessage(MsgType.IMAGE.value, imageMsgData)
                 }
             }
         } catch (e: Exception) {
@@ -300,6 +300,22 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         }
     }
 
+    override fun showLoading(text: String) {
+    }
+
+    override fun dismissLoading() {
+
+    }
+
+    override fun showMessage(text: String, success: Boolean) {
+        dismissLoading()
+        activity?.let {
+            it.runOnUiThread {
+                ToastUtils.show(text)
+            }
+        }
+    }
+
     private fun previewImageAndVideo(msg: Message, position: Int, originView: View) {
         val messages = binding.rcvMessage.getMessages()
         val mediaMessages = ArrayList<Message>()
@@ -341,8 +357,19 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         IMCoreManager.getMessageModule().resend(msg)
     }
 
-    override fun sendMessage(type: Int, body: Any) {
-        IMCoreManager.getMessageModule().sendMessage(body, session!!.id, type)
+    override fun sendMessage(type: Int, body: Any, atUser: String?, referMsgId: Long?) {
+        val callback = object : IMSendMsgCallback {
+            override fun onStart() {
+                
+            }
+
+            override fun onResult(e: Exception?) {
+
+            }
+
+        }
+        IMCoreManager.getMessageModule()
+            .sendMessage(body, session!!.id, type, atUser, referMsgId, callback)
     }
 
     override fun addInputContent(text: String) {

@@ -2,15 +2,16 @@ package com.thk.im.android.core.processor
 
 import androidx.annotation.WorkerThread
 import com.google.gson.Gson
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.db.MsgOperateStatus
 import com.thk.im.android.core.db.MsgSendStatus
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.event.XEventBus
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 
@@ -25,7 +26,8 @@ abstract class BaseMsgProcessor {
     @WorkerThread
     open fun received(msg: Message) {
         // 默认插入数据库
-        val dbMsg = IMCoreManager.getImDataBase().messageDao().findMessageById(msg.id, msg.fUid, msg.sid)
+        val dbMsg =
+            IMCoreManager.getImDataBase().messageDao().findMessageById(msg.id, msg.fUid, msg.sid)
         if (dbMsg == null) {
             if (msg.fUid == IMCoreManager.getUid()) {
                 // 如果发件人为自己，插入前补充消息状态为已接受并已读
@@ -113,28 +115,34 @@ abstract class BaseMsgProcessor {
         sid: Long,
         atUsers: String? = null,
         rMsgId: Long? = null,
-        map: Map<String, Any> = mutableMapOf()
+        callback: IMSendMsgCallback? = null
     ) {
         val msg = buildSendMsg(body, sid, atUsers, rMsgId)
-        this.send(msg)
+        this.send(msg, false, callback)
     }
 
-    open fun resend(msg: Message) {
-        send(msg, true)
+    open fun resend(msg: Message, callback: IMSendMsgCallback? = null) {
+        send(msg, true, callback)
     }
 
     /**
      * 重发
      */
-    open fun send(msg: Message, resend: Boolean = false) {
+    open fun send(msg: Message, resend: Boolean = false, callback: IMSendMsgCallback? = null) {
         var originMsg = msg
         val subscriber = object : BaseSubscriber<Message>() {
+            override fun onStart() {
+                super.onStart()
+                callback?.onStart()
+            }
+
             override fun onNext(t: Message) {
                 insertOrUpdateDb(
                     msg,
                     notify = true,
                     notifySession = true,
                 )
+                callback?.onResult(null)
             }
 
             override fun onError(t: Throwable?) {
@@ -143,6 +151,7 @@ abstract class BaseMsgProcessor {
                 disposables.remove(this)
                 originMsg.sendStatus = MsgSendStatus.SendFailed.value
                 updateFailedMsgStatus(originMsg)
+                callback?.onResult(Exception(t))
             }
 
             override fun onComplete() {

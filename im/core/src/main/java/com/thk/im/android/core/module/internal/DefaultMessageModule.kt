@@ -4,6 +4,7 @@ import android.content.Context.MODE_PRIVATE
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.api.bean.MessageBean
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
@@ -233,15 +234,15 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun sendMessage(
-        body: Any, sessionId: Long, type: Int, atUser: String?, replyMsgId: Long?
+        body: Any, sessionId: Long, type: Int, atUser: String?, replyMsgId: Long?, callback: IMSendMsgCallback?
     ) {
         val processor = getMsgProcessor(type)
-        processor.sendMessage(body, sessionId, atUser, replyMsgId)
+        processor.sendMessage(body, sessionId, atUser, replyMsgId, callback)
     }
 
-    override fun resend(msg: Message) {
+    override fun resend(msg: Message, callback: IMSendMsgCallback?) {
         val processor = getMsgProcessor(msg.type)
-        processor.resend(msg)
+        processor.resend(msg, callback)
     }
 
     override fun sendMessageToServer(message: Message): Flowable<Message> {

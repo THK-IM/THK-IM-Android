@@ -3,6 +3,7 @@ package com.thk.im.android.ui.provider.msg.proccessor
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.MsgType
@@ -17,13 +18,21 @@ open class IMRevokeMessageProcessor : BaseMsgProcessor() {
         return MsgType.Revoke.value
     }
 
-    override fun send(msg: Message, resend: Boolean) {
+    override fun send(msg: Message, resend: Boolean, callback: IMSendMsgCallback?) {
         if (msg.fUid != IMCoreManager.getUid()) {
             return
         }
         val subscriber = object : BaseSubscriber<Void>() {
+            override fun onStart() {
+                super.onStart()
+                callback?.onStart()
+            }
             override fun onNext(t: Void?) {
+                callback?.onResult(null)
+            }
 
+            override fun onError(t: Throwable?) {
+                callback?.onResult(Exception(t))
             }
 
             override fun onComplete() {

@@ -1,27 +1,35 @@
 package com.thk.im.android.core.module.internal
 
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.SoundPool
+import android.os.Build
 import com.google.gson.Gson
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.R
+import com.thk.im.android.core.api.bean.MessageBean
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.api.bean.MessageBean
-import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.module.MessageModule
-import com.thk.im.android.core.processor.BaseMsgProcessor
+import com.thk.im.android.core.base.utils.VibrateUtils
 import com.thk.im.android.core.db.MsgOperateStatus
 import com.thk.im.android.core.db.MsgSendStatus
 import com.thk.im.android.core.db.SessionType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.core.module.MessageModule
+import com.thk.im.android.core.processor.BaseMsgProcessor
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
+
 
 /**
  * 内部默认的消息处理器
@@ -40,6 +48,24 @@ open class DefaultMessageModule : MessageModule {
     private val idLock = ReentrantLock()
     private val ackLock = ReentrantReadWriteLock()
     private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 IOS:1 Android: 2
+
+
+    private val soundPoll: SoundPool =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val audioAttributes = AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setAllowedCapturePolicy(AudioAttributes.ALLOW_CAPTURE_BY_ALL)
+                .build()
+            SoundPool.Builder().setContext(IMCoreManager.getApplication())
+                .setMaxStreams(2)
+                .setAudioAttributes(audioAttributes)
+                .build()
+        } else {
+            SoundPool(1, AudioManager.STREAM_ALARM, 0)
+        }
+
+    private val newMsgSound: Int =
+        soundPoll.load(IMCoreManager.getApplication(), R.raw.new_message, 1)
 
     override fun registerMsgProcessor(processor: BaseMsgProcessor) {
         processorMap[processor.messageType()] = processor
@@ -220,13 +246,14 @@ open class DefaultMessageModule : MessageModule {
                 lastTimestamp = current
                 lastSequence = startSequence
             }
-            val seq = (current-epoch).shl(22).or(snowFlakeMachine.shl(12)).or(lastSequence.toLong())
+            val seq =
+                (current - epoch).shl(22).or(snowFlakeMachine.shl(12)).or(lastSequence.toLong())
             idLock.unlock()
             return seq
         } catch (e: Exception) {
             LLog.e("generateNewMsgId err: $e")
         }
-        return (current-epoch).shl(22).or(snowFlakeMachine.shl(12)).or(1000L)
+        return (current - epoch).shl(22).or(snowFlakeMachine.shl(12)).or(1000L)
     }
 
     override fun sendMessage(
@@ -331,6 +358,7 @@ open class DefaultMessageModule : MessageModule {
                     t.unRead = unReadCount
                     sessionDao.insertOrUpdateSessions(t)
                     XEventBus.post(IMEvent.SessionNew.value, t)
+                    notifyNewMessage(t, msg)
                 }
             }
 
@@ -341,6 +369,25 @@ open class DefaultMessageModule : MessageModule {
         }
         getSession(msg.sid).compose(RxTransform.flowableToIo()).subscribe(dispose)
         disposes.add(dispose)
+    }
+
+    override fun notifyNewMessage(session: Session, message: Message) {
+        if (message.type < 0 || message.fUid == IMCoreManager.getUid()) {
+            return
+        }
+        val audioManager =
+            IMCoreManager.getApplication().getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+        audioManager?.let {
+            if (it.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
+                soundPoll.play(newMsgSound, 1f, 1f, 1, 0, 1f)
+            } else {
+                VibrateUtils.vibrate(
+                    IMCoreManager.getApplication(),
+                    longArrayOf(200, 200, 200, 200),
+                    -1
+                )
+            }
+        }
     }
 
     override fun onSignalReceived(subType: Int, body: String) {

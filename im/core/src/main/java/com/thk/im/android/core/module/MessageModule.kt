@@ -124,4 +124,9 @@ interface MessageModule : BaseModule {
      */
     fun processSessionByMessage(msg: Message)
 
+    /**
+     * session下有新消息，发出提示音/震动等通知
+     */
+    fun notifyNewMessage(session: Session, message: Message)
+
 }

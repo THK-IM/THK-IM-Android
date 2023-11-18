@@ -1,8 +1,8 @@
 package com.thk.im.android.ui.provider.msg.proccessor
 
 import com.google.gson.Gson
-import com.thk.im.android.base.LLog
-import com.thk.im.android.base.utils.CompressUtils
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.utils.CompressUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
@@ -14,8 +14,8 @@ import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.BaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
-import com.thk.im.android.db.MsgType
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.manager.IMImageMsgBody
 import com.thk.im.android.ui.manager.IMImageMsgData
 import io.reactivex.BackpressureStrategy

@@ -8,13 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.thk.im.android.base.BaseSubscriber
-import com.thk.im.android.base.LLog
-import com.thk.im.android.base.RxTransform
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.db.entity.Session
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.adapter.SessionAdapter
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator

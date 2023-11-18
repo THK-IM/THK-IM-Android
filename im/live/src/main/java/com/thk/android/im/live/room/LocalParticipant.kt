@@ -1,17 +1,16 @@
 package com.thk.android.im.live.room
 
-import android.content.Context
 import android.util.Base64
 import com.google.gson.Gson
 import com.thk.android.im.live.LiveManager
 import com.thk.android.im.live.api.ApiManager
 import com.thk.android.im.live.api.RtcApi
+import com.thk.android.im.live.base.BaseSubscriber
+import com.thk.android.im.live.base.LLog
+import com.thk.android.im.live.base.RxTransform
 import com.thk.android.im.live.bean.PublishReqBean
 import com.thk.android.im.live.bean.PublishResBean
 import com.thk.android.im.live.utils.MediaConstraintsHelper
-import com.thk.im.android.base.BaseSubscriber
-import com.thk.im.android.base.LLog
-import com.thk.im.android.base.RxTransform
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer
@@ -19,7 +18,6 @@ import org.webrtc.DataChannel
 import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
-import org.webrtc.VideoCapturer
 import org.webrtc.VideoSource
 import java.nio.ByteBuffer
 import java.nio.charset.Charset

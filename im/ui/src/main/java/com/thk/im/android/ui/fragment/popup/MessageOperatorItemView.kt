@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ItemViewMessageOperatorBinding
 import com.thk.im.android.ui.protocol.IMMessageOperator

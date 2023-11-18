@@ -3,8 +3,8 @@ package com.thk.im.android
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.thk.im.android.base.LLog
-import com.thk.im.android.db.entity.Session
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.fragment.IMMessageFragment
 
 class MessageActivity : AppCompatActivity() {

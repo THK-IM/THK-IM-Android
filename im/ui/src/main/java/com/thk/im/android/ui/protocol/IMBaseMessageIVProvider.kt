@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType

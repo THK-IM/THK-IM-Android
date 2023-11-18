@@ -1,8 +1,8 @@
 package com.thk.im.android.core.module
 
 import com.thk.im.android.core.processor.BaseMsgProcessor
-import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.Session
+import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import io.reactivex.Flowable
 
 interface MessageModule : BaseModule {

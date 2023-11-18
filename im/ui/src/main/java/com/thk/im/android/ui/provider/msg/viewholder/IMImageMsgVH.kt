@@ -5,12 +5,12 @@ import android.widget.ImageView
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
-import com.thk.im.android.base.IMImageLoader
-import com.thk.im.android.base.extension.dp2px
+import com.thk.im.android.core.base.IMImageLoader
+import com.thk.im.android.core.base.extension.dp2px
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMMsgResourceType
-import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.Session
+import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMImageMsgBody

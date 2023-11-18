@@ -1,15 +1,15 @@
 package com.thk.im.android.core.module.internal
 
-import com.thk.im.android.base.BaseSubscriber
-import com.thk.im.android.base.RxTransform
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.api.bean.GroupApplyBean
 import com.thk.im.android.core.api.bean.GroupApplyMessageBean
 import com.thk.im.android.core.api.bean.GroupBean
 import com.thk.im.android.core.api.bean.GroupMemberBean
 import com.thk.im.android.core.module.GroupModule
-import com.thk.im.android.db.entity.Group
-import com.thk.im.android.db.entity.GroupMember
+import com.thk.im.android.core.db.entity.Group
+import com.thk.im.android.core.db.entity.GroupMember
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 

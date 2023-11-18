@@ -6,7 +6,7 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Build
 import android.view.View
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.protocol.IMPreviewer
 
 class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer {

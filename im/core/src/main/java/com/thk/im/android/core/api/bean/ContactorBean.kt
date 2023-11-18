@@ -1,7 +1,7 @@
 package com.thk.im.android.core.api.bean
 
 import com.google.gson.annotations.SerializedName
-import com.thk.im.android.db.entity.Contactor
+import com.thk.im.android.core.db.entity.Contactor
 
 data class ContactorBean(
     @SerializedName("id")

@@ -23,12 +23,12 @@ import com.thk.android.im.live.room.Mode
 import com.thk.android.im.live.room.Role
 import com.thk.android.im.live.room.RoomObserver
 import com.thk.im.android.adapter.MessageAdapter
-import com.thk.im.android.base.BaseSubscriber
-import com.thk.im.android.base.LLog
-import com.thk.im.android.base.RxTransform
-import com.thk.im.android.base.utils.ToastUtils
-import com.thk.im.android.base.popup.KeyboardPopupWindow
-import com.thk.im.android.base.utils.IMKeyboardUtils
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.RxTransform
+import com.thk.im.android.core.base.utils.ToastUtils
+import com.thk.im.android.core.base.popup.KeyboardPopupWindow
+import com.thk.im.android.core.base.utils.IMKeyboardUtils
 import com.thk.im.android.databinding.ActivityWebrtcBinding
 import com.thk.im.android.view.ParticipantView
 import io.reactivex.disposables.CompositeDisposable
@@ -51,7 +51,7 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
             moveLayout(bottomHeight)
         } else {
             if (keyboardShowing) {
-                IMKeyboardUtils.hideSoftInput(binding.etMessage, object : ResultReceiver(handler) {
+                com.thk.im.android.core.base.utils.IMKeyboardUtils.hideSoftInput(binding.etMessage, object : ResultReceiver(handler) {
                     override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
                         super.onReceiveResult(resultCode, resultData)
                         moveLayout(bottomHeight, false)
@@ -130,7 +130,7 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
                 if (it.sendMessage(content)) {
                     binding.etMessage.text = null
                 } else {
-                    ToastUtils.show("发送失败")
+                    com.thk.im.android.core.base.utils.ToastUtils.show("发送失败")
                 }
             }
         }
@@ -148,7 +148,7 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
 
                 override fun onError(t: Throwable?) {
                     super.onError(t)
-                    ToastUtils.show("加入失败")
+                    com.thk.im.android.core.base.utils.ToastUtils.show("加入失败")
                     finish()
                 }
             }
@@ -166,7 +166,7 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
 
                 override fun onError(t: Throwable?) {
                     super.onError(t)
-                    ToastUtils.show("创建失败")
+                    com.thk.im.android.core.base.utils.ToastUtils.show("创建失败")
                     finish()
                 }
             }
@@ -210,7 +210,7 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
 
                 override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
                     super.onDenied(permissions, doNotAskAgain)
-                    ToastUtils.show("permission denied")
+                    com.thk.im.android.core.base.utils.ToastUtils.show("permission denied")
                 }
             })
     }

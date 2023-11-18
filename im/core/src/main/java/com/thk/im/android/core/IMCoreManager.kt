@@ -2,8 +2,8 @@ package com.thk.im.android.core
 
 import android.app.Application
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.thk.im.android.base.utils.AppUtils
-import com.thk.im.android.base.utils.ToastUtils
+import com.thk.im.android.core.base.utils.AppUtils
+import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.api.IMApi
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadModule
@@ -27,7 +27,7 @@ import com.thk.im.android.core.signal.SignalModule
 import com.thk.im.android.core.signal.SignalType
 import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.core.storage.internal.DefaultStorageModule
-import com.thk.im.android.db.IMDataBase
+import com.thk.im.android.core.db.IMDataBase
 
 object IMCoreManager {
 
@@ -68,8 +68,8 @@ object IMCoreManager {
 
     fun init(app: Application, uid: Long, debug: Boolean) {
         application = app
-        AppUtils.instance().init(app)
-        ToastUtils.init(app)
+        com.thk.im.android.core.base.utils.AppUtils.instance().init(app)
+        com.thk.im.android.core.base.utils.ToastUtils.init(app)
         LiveEventBus.config()
             .setContext(app)
             .autoClear(true)

@@ -4,7 +4,7 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
-import com.thk.im.android.base.LLog
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.signal.Signal
 import com.thk.im.android.core.signal.SignalListener
 import com.thk.im.android.core.signal.SignalModule

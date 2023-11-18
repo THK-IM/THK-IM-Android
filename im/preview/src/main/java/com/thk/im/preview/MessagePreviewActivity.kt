@@ -20,14 +20,14 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.thk.im.android.base.utils.AppUtils
-import com.thk.im.android.base.BaseSubscriber
-import com.thk.im.android.base.RxTransform
+import com.thk.im.android.core.base.utils.AppUtils
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.db.MsgType
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.preview.databinding.ActivityMediaPreviewBinding
 import com.thk.im.preview.adapter.MessagePreviewAdapter
 import com.thk.im.preview.view.VideoPlayerView
@@ -181,7 +181,7 @@ class MessagePreviewActivity : AppCompatActivity() {
     }
 
     private fun translatePreview(transitionX: Float, transitionY: Float) {
-        val alpha = 1 - abs(transitionY) / AppUtils.instance().screenHeight
+        val alpha = 1 - abs(transitionY) / com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight
         val scale = maxOf(minOf(1f, alpha), 0.7f)
         binding.vpMediaPreview.translationX = transitionX / binding.clContent.scaleX
         binding.vpMediaPreview.translationY = transitionY / binding.clContent.scaleX
@@ -215,10 +215,10 @@ class MessagePreviewActivity : AppCompatActivity() {
     }
 
     private fun startEnterAnimation() {
-        val scaleStart = originRect.width().toFloat() / AppUtils.instance().screenWidth
+        val scaleStart = originRect.width().toFloat() / com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth
         val startLocation = floatArrayOf(
-            (originRect.left).toFloat() + (originRect.width() / 2) - AppUtils.instance().screenWidth / 2,
-            (originRect.top).toFloat() + (originRect.height() / 2) - AppUtils.instance().screenHeight / 2,
+            (originRect.left).toFloat() + (originRect.width() / 2) - com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth / 2,
+            (originRect.top).toFloat() + (originRect.height() / 2) - com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight / 2,
         )
         val location = floatArrayOf(0f, 0f)
 
@@ -265,10 +265,10 @@ class MessagePreviewActivity : AppCompatActivity() {
         if (binding.vpMediaPreview.currentItem != defaultPosition) {
             finish()
         } else {
-            val scaleStart = originRect.width().toFloat() / AppUtils.instance().screenWidth
+            val scaleStart = originRect.width().toFloat() / com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth
             val startLocation = floatArrayOf(
-                (originRect.left).toFloat() + (originRect.width() / 2) - AppUtils.instance().screenWidth / 2,
-                (originRect.top).toFloat() + (originRect.height() / 2) - AppUtils.instance().screenHeight / 2,
+                (originRect.left).toFloat() + (originRect.width() / 2) - com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth / 2,
+                (originRect.top).toFloat() + (originRect.height() / 2) - com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight / 2,
             )
             val translationX: PropertyValuesHolder = PropertyValuesHolder.ofFloat(
                 "translationX",

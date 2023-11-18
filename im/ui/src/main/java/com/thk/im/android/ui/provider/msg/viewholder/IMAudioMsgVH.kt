@@ -4,11 +4,11 @@ import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
-import com.thk.im.android.base.utils.DateUtils
+import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMMsgResourceType
-import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.Session
+import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMAudioMsgBody
@@ -66,7 +66,7 @@ class IMAudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         val audioDurationView: TextView = itemView.findViewById(R.id.tv_audio_duration)
         val audioStatusView: View =
             itemView.findViewById(R.id.iv_audio_status)
-        audioDurationView.text = DateUtils.secondToDuration(seconds)
+        audioDurationView.text = com.thk.im.android.core.base.utils.DateUtils.secondToDuration(seconds)
         if (played) {
             audioStatusView.visibility = View.GONE
         } else {

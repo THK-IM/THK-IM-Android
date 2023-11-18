@@ -2,8 +2,8 @@ package com.thk.im.android.ui.protocol.internal
 
 import android.view.View
 import androidx.emoji2.widget.EmojiEditText
-import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.Session
+import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 
 interface IMMsgSender {
 

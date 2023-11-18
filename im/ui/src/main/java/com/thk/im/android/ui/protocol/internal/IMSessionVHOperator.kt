@@ -1,6 +1,6 @@
 package com.thk.im.android.ui.protocol.internal
 
-import com.thk.im.android.db.entity.Session
+import com.thk.im.android.core.db.entity.Session
 
 interface IMSessionVHOperator {
 

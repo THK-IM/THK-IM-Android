@@ -1,5 +1,8 @@
 pluginManagement {
     repositories {
+        maven() {
+            url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+        }
         maven { url 'https://maven.aliyun.com/repository/central' }
         maven { url 'https://maven.aliyun.com/repository/public' }
         maven { url 'https://maven.aliyun.com/repository/google' }
@@ -12,6 +15,9 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        maven() {
+            url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+        }
         maven { url 'https://maven.aliyun.com/repository/central' }
         maven { url 'https://maven.aliyun.com/repository/public' }
         maven { url 'https://maven.aliyun.com/repository/google' }
@@ -21,8 +27,6 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "THK-IM-Android"
-include ':im:base'
-include ':im:db'
 include ':im:core'
 include ':im:ui'
 include ':im:preview'

@@ -7,7 +7,7 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.fileloader.FileLoadModule
 import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import java.io.File

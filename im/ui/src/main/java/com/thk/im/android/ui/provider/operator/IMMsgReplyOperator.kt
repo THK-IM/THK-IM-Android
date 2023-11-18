@@ -1,6 +1,6 @@
 package com.thk.im.android.ui.provider.operator
 
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender

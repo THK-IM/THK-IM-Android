@@ -1,6 +1,6 @@
 package com.thk.im.android.core.fileloader
 
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 
 interface FileLoadModule {
 

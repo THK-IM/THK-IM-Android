@@ -1,7 +1,7 @@
 package com.thk.im.android.core.api.bean
 
 import com.google.gson.annotations.SerializedName
-import com.thk.im.android.db.entity.User
+import com.thk.im.android.core.db.entity.User
 
 data class UserBean(
     @SerializedName("id")

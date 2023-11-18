@@ -1,7 +1,7 @@
 package com.thk.android.im.live.room
 
 import com.thk.android.im.live.LiveManager
-import com.thk.im.android.base.LLog
+import com.thk.android.im.live.base.LLog
 import java.nio.ByteBuffer
 
 class Room(

@@ -3,8 +3,8 @@ package com.thk.im.android.ui.fragment.adapter
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
-import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.Session
+import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
@@ -64,7 +64,7 @@ class MessageAdapter(
 
     private fun newTimelineMessage(cTime: Long): Message {
         return Message(
-            0L, 0L, 0L, 0L, com.thk.im.android.ui.provider.msg.IMTimeLineMsgIVProvider.timeLineMsgType, cTime.toString(),
+            0L, 0L, 0L, 0L, IMTimeLineMsgIVProvider.timeLineMsgType, cTime.toString(),
             cTime.toString(), 0, 0, null, null, null, cTime, cTime
         )
     }

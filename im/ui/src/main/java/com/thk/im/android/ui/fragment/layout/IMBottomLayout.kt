@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.thk.im.android.base.extension.dp2px
+import com.thk.im.android.core.base.extension.dp2px
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageBottomBinding
 import com.thk.im.android.ui.fragment.adapter.PanelFragmentAdapter

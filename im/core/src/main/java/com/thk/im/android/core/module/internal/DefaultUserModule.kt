@@ -1,10 +1,10 @@
 package com.thk.im.android.core.module.internal
 
-import com.thk.im.android.base.RxTransform
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.api.bean.UserBean
 import com.thk.im.android.core.module.UserModule
-import com.thk.im.android.db.entity.User
+import com.thk.im.android.core.db.entity.User
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 

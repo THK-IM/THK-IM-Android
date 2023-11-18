@@ -1,7 +1,7 @@
 package com.thk.im.android.ui.provider.msg.proccessor
 
 import com.thk.im.android.core.processor.BaseMsgProcessor
-import com.thk.im.android.db.MsgType
+import com.thk.im.android.core.db.MsgType
 
 
 class IMTextMsgProcessor : BaseMsgProcessor() {

@@ -7,8 +7,8 @@ import com.luck.picture.lib.config.SelectMimeType
 import com.luck.picture.lib.engine.CompressFileEngine
 import com.luck.picture.lib.entity.LocalMedia
 import com.luck.picture.lib.interfaces.OnResultCallbackListener
-import com.thk.im.android.base.LLog
-import com.thk.im.android.base.utils.CompressUtils
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.utils.CompressUtils
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.media.audio.OggOpusRecorder

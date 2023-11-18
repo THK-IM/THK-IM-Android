@@ -3,7 +3,7 @@ package com.thk.im.android.core.api.bean
 import android.os.Parcelable
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
-import com.thk.im.android.db.entity.GroupMember
+import com.thk.im.android.core.db.entity.GroupMember
 import kotlinx.parcelize.Parcelize
 
 @Keep

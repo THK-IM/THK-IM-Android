@@ -19,20 +19,20 @@ import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.enums.PopupAnimation
-import com.thk.im.android.base.BaseSubscriber
-import com.thk.im.android.base.LLog
-import com.thk.im.android.base.RxTransform
-import com.thk.im.android.base.extension.dp2px
-import com.thk.im.android.base.popup.KeyboardPopupWindow
-import com.thk.im.android.base.utils.AppUtils
-import com.thk.im.android.base.utils.ToastUtils
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.RxTransform
+import com.thk.im.android.core.base.extension.dp2px
+import com.thk.im.android.core.base.popup.KeyboardPopupWindow
+import com.thk.im.android.core.base.utils.AppUtils
+import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.db.MsgType
-import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.Session
+import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.fragment.popup.MessageOperatorPopup
 import com.thk.im.android.ui.manager.IMAudioMsgData
@@ -222,7 +222,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                             override fun audioData(
                                 path: String, second: Int, db: Double, state: AudioStatus
                             ) {
-                                ToastUtils.show("play: $second, $db")
+                                com.thk.im.android.core.base.utils.ToastUtils.show("play: $second, $db")
                             }
                         })
                     }
@@ -273,9 +273,9 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
             val operators = IMUIManager.getMsgOperators(message)
             val rowCount = 5
             val popupHeight = ((operators.size / rowCount + operators.size % rowCount) * 60 + 30).dp2px()
-            point.x = (AppUtils.instance().screenWidth / 2).toFloat()
-            if (locations[1] <= 300.dp2px() && (locations[1] + view.height) >= (AppUtils.instance().screenHeight - 300.dp2px())) {
-                point.y = ((AppUtils.instance().screenHeight - popupHeight) / 2).toFloat()
+            point.x = (com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth / 2).toFloat()
+            if (locations[1] <= 300.dp2px() && (locations[1] + view.height) >= (com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight - 300.dp2px())) {
+                point.y = ((com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight - popupHeight) / 2).toFloat()
             } else if (locations[1] > (300.dp2px())) {
                 point.y = (locations[1] - popupHeight).toFloat()
             } else {

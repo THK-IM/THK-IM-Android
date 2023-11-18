@@ -4,7 +4,7 @@ import android.app.Application
 import android.net.Uri
 import com.danikula.videocache.CacheListener
 import com.danikula.videocache.HttpProxyCacheServer
-import com.thk.im.android.base.utils.StringUtils
+import com.thk.im.android.core.base.utils.StringUtils
 import java.io.File
 
 object VideoCache {

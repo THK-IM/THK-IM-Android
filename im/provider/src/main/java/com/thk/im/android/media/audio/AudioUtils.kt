@@ -1,6 +1,6 @@
 package com.thk.im.android.media.audio
 
-import com.thk.im.android.base.LLog
+import com.thk.im.android.core.base.LLog
 import kotlin.math.abs
 import kotlin.math.log10
 

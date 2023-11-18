@@ -3,10 +3,10 @@ package com.thk.im.preview.viewholder
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
-import com.thk.im.android.base.IMImageLoader
+import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMMsgResourceType
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.preview.R
 import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.preview.view.ZoomableImageView

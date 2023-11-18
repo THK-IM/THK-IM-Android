@@ -9,10 +9,10 @@ import com.thk.im.android.core.api.bean.ReadMsgBean
 import com.thk.im.android.core.api.bean.ReeditMsgBean
 import com.thk.im.android.core.api.bean.RevokeMsgBean
 import com.thk.im.android.core.api.bean.UpdateSessionBean
-import com.thk.im.android.db.MsgOperateStatus
-import com.thk.im.android.db.MsgSendStatus
-import com.thk.im.android.db.entity.Message
-import com.thk.im.android.db.entity.Session
+import com.thk.im.android.core.db.MsgOperateStatus
+import com.thk.im.android.core.db.MsgSendStatus
+import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import io.reactivex.Flowable
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient

@@ -2,9 +2,8 @@ package com.thk.im.android
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.media3.common.util.UnstableApi
 import com.danikula.videocache.CacheListener
-import com.thk.im.android.base.LLog
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.databinding.ActivityVideoBinding
 import java.io.File
 

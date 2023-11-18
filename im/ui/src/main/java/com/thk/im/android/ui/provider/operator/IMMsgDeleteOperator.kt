@@ -1,9 +1,9 @@
 package com.thk.im.android.ui.provider.operator
 
-import com.thk.im.android.base.BaseSubscriber
-import com.thk.im.android.base.RxTransform
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender

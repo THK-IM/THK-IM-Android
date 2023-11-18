@@ -5,13 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
-import com.thk.im.android.base.BaseSubscriber
-import com.thk.im.android.base.IMImageLoader
-import com.thk.im.android.base.utils.DateUtils
-import com.thk.im.android.base.utils.StringUtils
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.IMImageLoader
+import com.thk.im.android.core.base.utils.DateUtils
+import com.thk.im.android.core.base.utils.StringUtils
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.db.entity.Session
-import com.thk.im.android.db.entity.User
+import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
@@ -30,7 +30,7 @@ class SingleSessionVH(
         super.onViewBind(session, sessionVHOperator)
         lastMsgView.text = session.lastMsg
         lastTimeView.text =
-            DateUtils.timeToMsgTime(session.mTime, IMCoreManager.getCommonModule().getSeverTime())
+            com.thk.im.android.core.base.utils.DateUtils.timeToMsgTime(session.mTime, IMCoreManager.getCommonModule().getSeverTime())
         if (session.unRead == 0) {
             unReadCountView.visibility = View.GONE
         } else {

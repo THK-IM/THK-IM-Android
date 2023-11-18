@@ -3,14 +3,14 @@ package com.thk.im.android;
 import android.app.Application;
 
 import com.thk.android.im.live.LiveManager;
-import com.thk.im.android.base.utils.AppUtils;
-import com.thk.im.android.base.LLog;
-import com.thk.im.android.base.utils.ToastUtils;
 import com.thk.im.android.core.IMCoreManager;
 import com.thk.im.android.core.api.internal.DefaultIMApi;
+import com.thk.im.android.core.base.LLog;
+import com.thk.im.android.core.base.utils.AppUtils;
+import com.thk.im.android.core.base.utils.ToastUtils;
+import com.thk.im.android.core.db.MsgType;
 import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule;
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule;
-import com.thk.im.android.db.MsgType;
 import com.thk.im.android.media.Provider;
 import com.thk.im.android.ui.manager.IMUIManager;
 import com.thk.im.preview.Previewer;

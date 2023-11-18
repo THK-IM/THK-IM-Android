@@ -4,7 +4,6 @@ import com.thk.im.android.core.api.bean.CreateSessionBean
 import com.thk.im.android.core.api.bean.ListBean
 import com.thk.im.android.core.api.bean.SessionBean
 import com.thk.im.android.core.api.bean.UpdateSessionBean
-import com.thk.im.android.db.entity.Session
 import io.reactivex.Flowable
 import retrofit2.http.Body
 import retrofit2.http.DELETE

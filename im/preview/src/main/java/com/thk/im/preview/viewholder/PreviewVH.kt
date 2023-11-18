@@ -2,12 +2,8 @@ package com.thk.im.preview.viewholder
 
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
-import com.thk.im.android.base.BaseSubscriber
-import com.thk.im.android.base.RxTransform
-import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.fragment.viewholder.BaseVH
-import io.reactivex.Flowable
 
 open class PreviewVH(liftOwner: LifecycleOwner, itemView: View) :
     BaseVH(liftOwner, itemView) {

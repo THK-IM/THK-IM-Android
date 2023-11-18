@@ -17,11 +17,11 @@ import androidx.emoji2.widget.EmojiEditText
 import androidx.fragment.app.Fragment
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import com.thk.im.android.base.LLog
-import com.thk.im.android.base.utils.ToastUtils
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
-import com.thk.im.android.db.MsgType
+import com.thk.im.android.core.db.MsgType
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
 import com.thk.im.android.ui.manager.IMAudioMsgData
@@ -257,7 +257,7 @@ class IMInputLayout : ConstraintLayout {
             XXPermissions.with(context).permission(Permission.RECORD_AUDIO).request { _, all ->
                 if (!all) {
                     // TODO
-                    ToastUtils.show("请开启录音权限")
+                    com.thk.im.android.core.base.utils.ToastUtils.show("请开启录音权限")
                 }
             }
         } else {
@@ -300,7 +300,7 @@ class IMInputLayout : ConstraintLayout {
     private fun onAudioCallback(path: String, second: Int, db: Double, state: AudioStatus) {
         when (state) {
             AudioStatus.Ing, AudioStatus.Waiting -> {
-                ToastUtils.show("录音时长:$second, db: $db")
+                com.thk.im.android.core.base.utils.ToastUtils.show("录音时长:$second, db: $db")
             }
 
             AudioStatus.Finished -> {
@@ -320,7 +320,7 @@ class IMInputLayout : ConstraintLayout {
                         return
                     }
                 }
-                ToastUtils.show("录音失败")
+                com.thk.im.android.core.base.utils.ToastUtils.show("录音失败")
             }
         }
     }

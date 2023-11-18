@@ -1,10 +1,9 @@
 package com.thk.im.android.core.fileloader.internal
 
-import com.thk.im.android.base.LLog
-import com.thk.im.android.base.utils.StringUtils
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.utils.StringUtils
 import com.thk.im.android.core.exception.HttpStatusCodeException
 import com.thk.im.android.core.fileloader.FileLoadState
-import com.thk.im.android.core.fileloader.LoadListener
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request

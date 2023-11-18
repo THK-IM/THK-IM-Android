@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import com.thk.im.android.base.LLog
-import com.thk.im.android.base.utils.ToastUtils
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.databinding.ActivityMediaTestBinding
 import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.media.audio.OggOpusRecorder
@@ -125,7 +125,7 @@ class MediaTestActivity : AppCompatActivity() {
 
                 override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
                     super.onDenied(permissions, doNotAskAgain)
-                    ToastUtils.show("permission denied")
+                    com.thk.im.android.core.base.utils.ToastUtils.show("permission denied")
                     finish()
                 }
 

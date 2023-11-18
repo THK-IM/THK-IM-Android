@@ -3,9 +3,8 @@ package com.thk.im.android.core.signal.inernal.network;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
-import com.thk.im.android.base.LLog;
+import com.thk.im.android.core.base.LLog;
 import com.thk.im.android.core.signal.inernal.network.utils.Constants;
 import com.thk.im.android.core.signal.inernal.network.utils.NetworkUtils;
 

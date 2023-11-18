@@ -4,9 +4,9 @@ import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
 import com.thk.android.im.live.LiveManager
+import com.thk.android.im.live.base.LLog
+import com.thk.android.im.live.base.StringUtils
 import com.thk.android.im.live.utils.MediaConstraintsHelper
-import com.thk.im.android.base.LLog
-import com.thk.im.android.base.utils.StringUtils
 import io.reactivex.disposables.CompositeDisposable
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel

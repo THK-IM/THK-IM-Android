@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 import kotlinx.parcelize.Parcelize
 
 @Keep

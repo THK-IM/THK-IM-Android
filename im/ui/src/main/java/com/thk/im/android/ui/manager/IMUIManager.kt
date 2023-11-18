@@ -3,9 +3,9 @@ package com.thk.im.android.ui.manager
 import android.app.Application
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
-import com.thk.im.android.base.utils.IMKeyboardUtils
+import com.thk.im.android.core.base.utils.IMKeyboardUtils
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.db.entity.Message
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.protocol.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.protocol.IMBasePanelFragmentProvider
@@ -80,7 +80,7 @@ object IMUIManager {
         IMCoreManager.getMessageModule().registerMsgProcessor(IMAudioMsgProcessor())
         IMCoreManager.getMessageModule().registerMsgProcessor(IMVideoMsgProcessor())
 
-        IMKeyboardUtils.init(app)
+        com.thk.im.android.core.base.utils.IMKeyboardUtils.init(app)
         val providers = arrayOf(
             com.thk.im.android.ui.provider.msg.IMTimeLineMsgIVProvider(),
             com.thk.im.android.ui.provider.msg.IMUnSupportMsgIVProvider(),

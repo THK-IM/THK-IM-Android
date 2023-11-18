@@ -3,10 +3,15 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
+    id 'signing'
+    id 'maven-publish'
 }
 
+
+def moduleName = "core"
+
 android {
-    namespace "${rootProject.ext.android.applicationId}.core"
+    namespace "${rootProject.ext.android.applicationId}.${moduleName}"
     compileSdk rootProject.ext.android.compileSdkVersion
 
     defaultConfig {
@@ -14,6 +19,13 @@ android {
         targetSdk rootProject.ext.android.targetSdkVersion
         versionCode rootProject.ext.android.versionCode
         versionName rootProject.ext.android.versionName
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -45,7 +57,10 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    implementation rootProject.ext.dependencies["appcompat"]
+    implementation rootProject.ext.dependencies["glide"]
+    implementation rootProject.ext.dependencies["glide-gifencoder-integration"]
+    implementation rootProject.ext.dependencies["android-gif-drawable"]
+
     implementation rootProject.ext.dependencies["rxjava"]
     implementation rootProject.ext.dependencies["rxandroid"]
     implementation rootProject.ext.dependencies["live-event-bus"]
@@ -54,7 +69,137 @@ dependencies {
     implementation rootProject.ext.dependencies["retrofit"]
     implementation rootProject.ext.dependencies["retrofit-converter-gson"]
     implementation rootProject.ext.dependencies["retrofit-adapter-rxjava2"]
+    debugImplementation rootProject.ext.dependencies["sqlite-glance"]
+    implementation rootProject.ext.dependencies["room"]
+    annotationProcessor rootProject.ext.dependencies["room-compiler-annotationProcessor"]
+    kapt rootProject.ext.dependencies["room-compiler-kapt"]
+}
 
-    implementation project(":im:db")
-    implementation project(":im:base")
+
+afterEvaluate {
+    publishing {
+        repositories {
+            maven {
+                name "local"
+                url = "$buildDir/repo"
+            }
+            maven {
+                name "sonartype-Staging"
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                credentials {
+                    username = ossrhUsername
+                    password = ossrhPassword
+                }
+            }
+            // 定义snapshot仓库
+            maven {
+                name "sonatype-Snapshots"
+                url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                credentials {
+                    username = ossrhUsername
+                    password = ossrhPassword
+                }
+            }
+        }
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+                groupId = 'io.github.thk-im'
+                artifactId = moduleName
+                version = rootProject.ext.android.versionName
+                pom {
+                    name = 'THK-IM Android Plugin Framework'
+                    description = 'A Android Plugin Framework'
+                    url = 'https://github.com/THK-IM/THK-IM-Android'
+                    licenses {
+                        license {
+                            name='The Apache Software License, Version 2.0'
+                            url='http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'thk-im'
+                            name = 'vizoss'
+                            email = 'think220216@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'https://github.com/THK-IM/THK-IM-Android'
+                        developerConnection = 'https://github.com/THK-IM/THK-IM-Android.git'
+                        url = 'https://github.com/THK-IM/THK-IM-Android'
+                    }
+                    dependencies {
+                        implementation rootProject.ext.dependencies["glide"]
+                        implementation rootProject.ext.dependencies["glide-gifencoder-integration"]
+                        implementation rootProject.ext.dependencies["android-gif-drawable"]
+
+                        implementation rootProject.ext.dependencies["rxjava"]
+                        implementation rootProject.ext.dependencies["rxandroid"]
+                        implementation rootProject.ext.dependencies["live-event-bus"]
+                        implementation rootProject.ext.dependencies["gson"]
+                        implementation rootProject.ext.dependencies["okhttp"]
+                        implementation rootProject.ext.dependencies["retrofit"]
+                        implementation rootProject.ext.dependencies["retrofit-converter-gson"]
+                        implementation rootProject.ext.dependencies["retrofit-adapter-rxjava2"]
+                        debugImplementation rootProject.ext.dependencies["sqlite-glance"]
+                        implementation rootProject.ext.dependencies["room"]
+                    }
+                }
+            }
+            // Creates a Maven publication called “debug”.
+            debug(MavenPublication) {
+                // Applies the component for the debug build variant.
+                from components.debug
+                groupId = 'io.github.thk-im'
+                artifactId = moduleName
+                version = String.format("%s-SNAPSHOT", rootProject.ext.android.versionName)
+                pom {
+                    name = 'THK-IM Android Plugin Framework'
+                    description = 'A Android Plugin Framework'
+                    url = 'https://github.com/THK-IM/THK-IM-Android'
+                    licenses {
+                        license {
+                            name='The Apache Software License, Version 2.0'
+                            url='http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'thk-im'
+                            name = 'vizoss'
+                            email = 'think220216@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'https://github.com/THK-IM/THK-IM-Android'
+                        developerConnection = 'https://github.com/THK-IM/THK-IM-Android.git'
+                        url = 'https://github.com/THK-IM/THK-IM-Android'
+                    }
+                    dependencies {
+                        implementation rootProject.ext.dependencies["glide"]
+                        implementation rootProject.ext.dependencies["glide-gifencoder-integration"]
+                        implementation rootProject.ext.dependencies["android-gif-drawable"]
+
+                        implementation rootProject.ext.dependencies["rxjava"]
+                        implementation rootProject.ext.dependencies["rxandroid"]
+                        implementation rootProject.ext.dependencies["live-event-bus"]
+                        implementation rootProject.ext.dependencies["gson"]
+                        implementation rootProject.ext.dependencies["okhttp"]
+                        implementation rootProject.ext.dependencies["retrofit"]
+                        implementation rootProject.ext.dependencies["retrofit-converter-gson"]
+                        implementation rootProject.ext.dependencies["retrofit-adapter-rxjava2"]
+                        debugImplementation rootProject.ext.dependencies["sqlite-glance"]
+                        implementation rootProject.ext.dependencies["room"]
+                    }
+                }
+            }
+        }
+
+        signing {
+            sign publishing.publications.release , publishing.publications.debug
+        }
+    }
 }

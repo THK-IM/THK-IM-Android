@@ -1,7 +1,7 @@
 package com.thk.im.android.core.api.bean
 
 import com.google.gson.annotations.SerializedName
-import com.thk.im.android.db.entity.Group
+import com.thk.im.android.core.db.entity.Group
 
 data class GroupBean(
     @SerializedName("id")

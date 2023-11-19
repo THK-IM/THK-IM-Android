@@ -359,11 +359,11 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     override fun sendMessage(type: Int, body: Any, atUser: String?, referMsgId: Long?) {
         val callback = object : IMSendMsgCallback {
-            override fun onStart() {
+            override fun onStart(message: Message) {
                 
             }
 
-            override fun onResult(e: Exception?) {
+            override fun onResult(message: Message, e: Exception?) {
 
             }
 

@@ -12,7 +12,7 @@ import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
-import com.thk.im.android.core.processor.BaseMsgProcessor
+import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.core.db.MsgType
 import com.thk.im.android.core.db.entity.Message
@@ -23,7 +23,7 @@ import io.reactivex.Flowable
 import java.io.FileNotFoundException
 import java.io.IOException
 
-open class IMVideoMsgProcessor : BaseMsgProcessor() {
+open class IMVideoMsgProcessor : IMBaseMsgProcessor() {
 
     override fun messageType(): Int {
         return MsgType.VIDEO.value

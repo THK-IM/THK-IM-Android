@@ -12,6 +12,7 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.MsgOperateStatus
 import com.thk.im.android.core.db.MsgSendStatus
 import com.thk.im.android.core.db.SessionType
@@ -60,7 +61,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     }
 
     fun updateSelectMode() {
-        if (!supportSelect()) {
+        if (!canSelect()) {
             selectView.visibility = View.GONE
             return
         }
@@ -75,7 +76,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         }
     }
 
-    open fun supportSelect(): Boolean {
+    open fun canSelect(): Boolean {
         return true
     }
 
@@ -127,7 +128,9 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                     }
                 }
             }
-            IMCoreManager.getUserModule().getUserInfo(message.fUid).subscribe(subscriber)
+            IMCoreManager.getUserModule().getUserInfo(message.fUid)
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
             disposable.add(subscriber)
         }
     }

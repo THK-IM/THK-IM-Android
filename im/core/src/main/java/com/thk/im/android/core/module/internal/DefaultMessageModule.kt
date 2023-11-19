@@ -12,12 +12,13 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.db.MsgOperateStatus
 import com.thk.im.android.core.db.MsgSendStatus
+import com.thk.im.android.core.db.SessionStatus
 import com.thk.im.android.core.db.SessionType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.module.MessageModule
-import com.thk.im.android.core.processor.BaseMsgProcessor
+import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
@@ -34,7 +35,7 @@ open class DefaultMessageModule : MessageModule {
     private val startSequence = 0
     private val spName = "THK_IM"
     private val lastSyncMsgTime = "Last_Sync_Message_Time"
-    private val processorMap: MutableMap<Int, BaseMsgProcessor> = HashMap()
+    private val processorMap: MutableMap<Int, IMBaseMsgProcessor> = HashMap()
     private var lastTimestamp: Long = 0
     private var lastSequence: Int = 0
     private val epoch = 1288834974657L
@@ -44,11 +45,11 @@ open class DefaultMessageModule : MessageModule {
     private val ackLock = ReentrantReadWriteLock()
     private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 Ios:1 Android:2
 
-    override fun registerMsgProcessor(processor: BaseMsgProcessor) {
+    override fun registerMsgProcessor(processor: IMBaseMsgProcessor) {
         processorMap[processor.messageType()] = processor
     }
 
-    override fun getMsgProcessor(msgType: Int): BaseMsgProcessor {
+    override fun getMsgProcessor(msgType: Int): IMBaseMsgProcessor {
         val processor = processorMap[msgType]
         return processor ?: processorMap[0]!!
     }
@@ -62,6 +63,7 @@ open class DefaultMessageModule : MessageModule {
                 try {
                     val sessionMessages = mutableMapOf<Long, MutableList<Message>>()
                     val unProcessorMessages = mutableListOf<Message>()
+                    val operatorMessages = mutableListOf<Message>()
                     for (m in messages) {
                         if (m.fUid == IMCoreManager.getUid()) {
                             m.oprStatus =
@@ -70,7 +72,7 @@ open class DefaultMessageModule : MessageModule {
                         m.sendStatus = MsgSendStatus.Success.value
                         if (m.type < 0) {
                             // 状态操作消息交给对应消息处理器自己处理
-                            getMsgProcessor(m.type).received(m)
+                            operatorMessages.add(m)
                         } else {
                             // 其他消息批量处理
                             if (sessionMessages[m.sid] == null) {
@@ -84,12 +86,16 @@ open class DefaultMessageModule : MessageModule {
                     // 消息入库并ACK
                     if (unProcessorMessages.isNotEmpty()) {
                         // 插入数据库
-                        IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(messages)
+                        IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(unProcessorMessages)
                         for (m in unProcessorMessages) {
                             if (m.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
                                 ackMessageToCache(m)
                             }
                         }
+                    }
+
+                    for (m in operatorMessages) {
+                        getMsgProcessor(m.type).received(m)
                     }
 
                     // 更新每个session的最后一条消息
@@ -234,7 +240,12 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun sendMessage(
-        body: Any, sessionId: Long, type: Int, atUser: String?, replyMsgId: Long?, callback: IMSendMsgCallback?
+        body: Any,
+        sessionId: Long,
+        type: Int,
+        atUser: String?,
+        replyMsgId: Long?,
+        callback: IMSendMsgCallback?
     ) {
         val processor = getMsgProcessor(type)
         processor.sendMessage(body, sessionId, atUser, replyMsgId, callback)
@@ -345,6 +356,9 @@ open class DefaultMessageModule : MessageModule {
 
     override fun notifyNewMessage(session: Session, message: Message) {
         if ((message.type < 0 && message.type > -1000) || message.fUid == IMCoreManager.getUid()) {
+            return
+        }
+        if (session.status.and(SessionStatus.Silence.value) > 0) {
             return
         }
         AppUtils.instance().notifyNewMessage()

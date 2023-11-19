@@ -15,7 +15,7 @@ import io.reactivex.Flowable
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
-class ReadMessageProcessor : BaseMsgProcessor() {
+class IMReadMessageProcessor : IMBaseMsgProcessor() {
 
     private val needReadMap = HashMap<Long, MutableSet<Long>>()
     private val readLock = ReentrantReadWriteLock()

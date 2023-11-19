@@ -11,7 +11,7 @@ import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
-import com.thk.im.android.core.processor.BaseMsgProcessor
+import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.core.db.MsgSendStatus
 import com.thk.im.android.core.db.MsgType
@@ -22,7 +22,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.FileNotFoundException
 
-class IMAudioMsgProcessor : BaseMsgProcessor() {
+class IMAudioMsgProcessor : IMBaseMsgProcessor() {
 
     override fun messageType(): Int {
         return MsgType.Audio.value

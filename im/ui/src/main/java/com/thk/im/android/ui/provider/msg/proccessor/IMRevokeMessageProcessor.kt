@@ -6,14 +6,15 @@ import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
+import com.thk.im.android.core.db.MsgOperateStatus
 import com.thk.im.android.core.db.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.processor.BaseMsgProcessor
+import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.ui.manager.IMRevokeMsgData
 import io.reactivex.Flowable
 
-open class IMRevokeMessageProcessor : BaseMsgProcessor() {
+open class IMRevokeMessageProcessor : IMBaseMsgProcessor() {
     override fun messageType(): Int {
         return MsgType.Revoke.value
     }
@@ -27,6 +28,7 @@ open class IMRevokeMessageProcessor : BaseMsgProcessor() {
                 super.onStart()
                 callback?.onStart()
             }
+
             override fun onNext(t: Void?) {
                 callback?.onResult(null)
             }
@@ -47,14 +49,8 @@ open class IMRevokeMessageProcessor : BaseMsgProcessor() {
     }
 
     override fun received(msg: Message) {
-        val subscriber = object : BaseSubscriber<IMRevokeMsgData>() {
-            override fun onNext(t: IMRevokeMsgData?) {
-                if (t != null) {
-                    msg.data = Gson().toJson(t)
-                }
-                IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(listOf(msg))
-                XEventBus.post(IMEvent.MsgNew.value, msg)
-                IMCoreManager.getMessageModule().processSessionByMessage(msg)
+        val subscriber = object : BaseSubscriber<Message>() {
+            override fun onNext(t: Message?) {
             }
 
             override fun onComplete() {
@@ -62,15 +58,19 @@ open class IMRevokeMessageProcessor : BaseMsgProcessor() {
                 disposables.remove(this)
             }
         }
-        getRevokeMsgData(msg)
+        getRevokeMsg(msg)
             .compose(RxTransform.flowableToIo())
             .subscribe(subscriber)
         disposables.add(subscriber)
+        if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.getUid()) {
+            IMCoreManager.getMessageModule().ackMessageToCache(msg)
+        }
     }
 
-    open fun getRevokeMsgData(msg: Message): Flowable<IMRevokeMsgData> {
+    open fun getRevokeMsg(msg: Message): Flowable<Message> {
         return getNickname(msg).flatMap {
             val data = IMRevokeMsgData(it)
+            var existed = false
             if (msg.rMsgId != null) {
                 val dbMsg = IMCoreManager.getImDataBase().messageDao()
                     .findMessageByMsgId(msg.rMsgId!!, msg.sid)
@@ -82,9 +82,16 @@ open class IMRevokeMessageProcessor : BaseMsgProcessor() {
                         data.data = dbMsg.data
                         data.type = dbMsg.type
                     }
+                    existed = true
                 }
             }
-            return@flatMap Flowable.just(data)
+            msg.data = Gson().toJson(data)
+            if (existed) {
+                IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(listOf(msg))
+                XEventBus.post(IMEvent.MsgNew.value, msg)
+                IMCoreManager.getMessageModule().processSessionByMessage(msg)
+            }
+            return@flatMap Flowable.just(msg)
         }
     }
 
@@ -99,7 +106,7 @@ open class IMRevokeMessageProcessor : BaseMsgProcessor() {
         }
     }
 
-    open override fun getSessionDesc(msg: Message): String {
+    override fun getSessionDesc(msg: Message): String {
         return if (msg.data != null) {
             val revokeData = Gson().fromJson(msg.data!!, IMRevokeMsgData::class.java)
             "${revokeData.nick}撤回了一条消息"

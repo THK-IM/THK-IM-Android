@@ -3,7 +3,7 @@ package com.thk.im.android.core.module
 import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.core.processor.BaseMsgProcessor
+import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import io.reactivex.Flowable
 
 interface MessageModule : BaseModule {
@@ -11,12 +11,12 @@ interface MessageModule : BaseModule {
     /**
      * 注册消息处理器
      */
-    fun registerMsgProcessor(processor: BaseMsgProcessor)
+    fun registerMsgProcessor(processor: IMBaseMsgProcessor)
 
     /**
      * 获取注册消息处理器
      */
-    fun getMsgProcessor(msgType: Int): BaseMsgProcessor
+    fun getMsgProcessor(msgType: Int): IMBaseMsgProcessor
 
     /**
      * 同步离线消息

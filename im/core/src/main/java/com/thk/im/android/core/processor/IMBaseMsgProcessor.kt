@@ -15,7 +15,7 @@ import com.thk.im.android.core.event.XEventBus
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 
-abstract class BaseMsgProcessor {
+abstract class IMBaseMsgProcessor {
 
     protected val downLoadingUrls = mutableListOf<String>()
     protected val disposables = CompositeDisposable()
@@ -270,7 +270,7 @@ abstract class BaseMsgProcessor {
      * 消息是否在界面上显示，撤回/已读/已接受等状态消息不显示
      */
     open fun isShow(msg: Message): Boolean {
-        return true
+        return msg.type >= 0 || msg.type <= -1000
     }
 
     /**

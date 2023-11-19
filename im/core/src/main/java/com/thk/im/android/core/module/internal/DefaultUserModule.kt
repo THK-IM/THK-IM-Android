@@ -38,7 +38,7 @@ open class DefaultUserModule : UserModule {
             } else {
                 Flowable.just(it)
             }
-        }.compose(RxTransform.flowableToMain())
+        }
     }
 
     override fun updateUserInfo(userBean: UserBean): Flowable<Void> {

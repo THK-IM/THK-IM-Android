@@ -40,7 +40,7 @@ class IMTimeLineMsgVH(
     override fun onLifeOwnerPause() {
     }
 
-    override fun supportSelect(): Boolean {
+    override fun canSelect(): Boolean {
         return false
     }
 }

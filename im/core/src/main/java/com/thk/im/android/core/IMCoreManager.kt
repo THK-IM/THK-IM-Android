@@ -3,27 +3,27 @@ package com.thk.im.android.core
 import android.app.Application
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.thk.im.android.core.api.IMApi
+import com.thk.im.android.core.db.IMDataBase
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadModule
 import com.thk.im.android.core.module.BaseModule
 import com.thk.im.android.core.module.CommonModule
 import com.thk.im.android.core.module.ContactorModule
+import com.thk.im.android.core.module.CustomModule
 import com.thk.im.android.core.module.GroupModule
 import com.thk.im.android.core.module.MessageModule
-import com.thk.im.android.core.module.CustomModule
 import com.thk.im.android.core.module.UserModule
 import com.thk.im.android.core.module.internal.DefaultCommonModule
 import com.thk.im.android.core.module.internal.DefaultContactorModule
 import com.thk.im.android.core.module.internal.DefaultGroupModule
 import com.thk.im.android.core.module.internal.DefaultMessageModule
 import com.thk.im.android.core.module.internal.DefaultUserModule
-import com.thk.im.android.core.processor.ReadMessageProcessor
+import com.thk.im.android.core.processor.IMReadMessageProcessor
 import com.thk.im.android.core.signal.SignalListener
 import com.thk.im.android.core.signal.SignalModule
 import com.thk.im.android.core.signal.SignalType
 import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.core.storage.internal.DefaultStorageModule
-import com.thk.im.android.core.db.IMDataBase
 
 object IMCoreManager {
 
@@ -81,7 +81,7 @@ object IMCoreManager {
         registerModule(SignalType.Group.value, DefaultGroupModule())
         registerModule(SignalType.Message.value, DefaultMessageModule())
 
-        getMessageModule().registerMsgProcessor(ReadMessageProcessor())
+        getMessageModule().registerMsgProcessor(IMReadMessageProcessor())
     }
 
     fun connect() {

@@ -10,6 +10,7 @@ import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.base.utils.StringUtils
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
@@ -59,7 +60,9 @@ class SingleSessionVH(
                 }
             }
         }
-        getUserModule().getUserInfo(session.entityId).subscribe(subscriber)
+        getUserModule().getUserInfo(session.entityId)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
         disposable.add(subscriber)
     }
 

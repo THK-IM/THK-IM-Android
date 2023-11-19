@@ -30,18 +30,27 @@ class IMRevokeMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         val reeditView: TextView = itemView.findViewById(R.id.tv_reedit)
 
         val revokeData = Gson().fromJson(message.data, IMRevokeMsgData::class.java)
-        contentView.text = "${revokeData.nick}撤回了一条消息"
-        if (message.fUid == IMCoreManager.getUid()
-            && revokeData.content != null
-            && revokeData.type != null && revokeData.type == MsgType.TEXT.value) {
-            reeditView.visibility = View.VISIBLE
-            reeditView.isClickable = true
-            reeditView.setOnClickListener {
-                msgVHOperator.setEditText(revokeData.content!!)
+        if (revokeData != null) {
+            contentView.text = "${revokeData.nick}撤回了一条消息"
+            if (message.fUid == IMCoreManager.getUid()
+                && revokeData.content != null
+                && revokeData.type != null && revokeData.type == MsgType.TEXT.value) {
+                reeditView.visibility = View.VISIBLE
+                reeditView.isClickable = true
+                reeditView.setOnClickListener {
+                    msgVHOperator.setEditText(revokeData.content!!)
+                }
+            } else {
+                reeditView.visibility = View.GONE
             }
         } else {
+            contentView.text = "对方撤回了一条消息"
             reeditView.visibility = View.GONE
         }
+    }
+
+    override fun canSelect(): Boolean {
+        return false
     }
 
 }

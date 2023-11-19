@@ -1,6 +1,7 @@
 package com.thk.im.android.core
 
 import com.google.gson.annotations.SerializedName
+import com.thk.im.android.core.db.entity.Message
 
 
 /**
@@ -51,7 +52,7 @@ enum class IMMsgResourceType(val value: String) {
 }
 
 interface IMSendMsgCallback {
-    fun onStart()
+    fun onStart(message: Message)
 
-    fun onResult(e: Exception?)
+    fun onResult(message: Message, e: Exception?)
 }

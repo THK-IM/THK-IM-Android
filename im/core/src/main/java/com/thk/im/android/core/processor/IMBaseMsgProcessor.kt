@@ -133,7 +133,7 @@ abstract class IMBaseMsgProcessor {
         val subscriber = object : BaseSubscriber<Message>() {
             override fun onStart() {
                 super.onStart()
-                callback?.onStart()
+                callback?.onStart(originMsg)
             }
 
             override fun onNext(t: Message) {
@@ -142,7 +142,7 @@ abstract class IMBaseMsgProcessor {
                     notify = true,
                     notifySession = true,
                 )
-                callback?.onResult(null)
+                callback?.onResult(t, null)
             }
 
             override fun onError(t: Throwable?) {
@@ -151,7 +151,7 @@ abstract class IMBaseMsgProcessor {
                 disposables.remove(this)
                 originMsg.sendStatus = MsgSendStatus.SendFailed.value
                 updateFailedMsgStatus(originMsg)
-                callback?.onResult(Exception(t))
+                callback?.onResult(originMsg, Exception(t))
             }
 
             override fun onComplete() {

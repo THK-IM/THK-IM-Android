@@ -86,7 +86,7 @@ class IMRevokeMsgData(
 )
 
 
-class IMRecordMsgBody(
+data class IMRecordMsgBody(
     @SerializedName("title")
     var title: String,
     @SerializedName("messages")

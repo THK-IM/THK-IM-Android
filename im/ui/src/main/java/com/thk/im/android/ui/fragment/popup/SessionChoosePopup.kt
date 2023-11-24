@@ -74,8 +74,19 @@ class SessionChoosePopup constructor(
         } else {
             val subscriber = object : BaseSubscriber<IMRecordMsgBody>() {
                 override fun onNext(t: IMRecordMsgBody) {
+                    val data = t.copy()
+                    val cleanMessages = mutableListOf<Message>()
+                    for (m in data.messages) {
+                        val msg = m.copy()
+                        msg.sendStatus = 0
+                        msg.oprStatus = 0
+                        msg.rUsers = null
+                        msg.data = null
+                        cleanMessages.add(msg)
+                    }
+                    val body = IMRecordMsgBody(t.title, cleanMessages, t.content)
                     IMCoreManager.getMessageModule()
-                        .sendMessage(session.id, MsgType.RECORD.value, t, null)
+                        .sendMessage(session.id, MsgType.RECORD.value, body, data)
                 }
             }
             reprocessingFlowable().compose(RxTransform.flowableToMain())
@@ -102,7 +113,7 @@ class SessionChoosePopup constructor(
                     content = content.plus("\n")
                 }
             }
-            val recordMsgBody = IMRecordMsgBody("", messages, content)
+            val recordMsgBody = IMRecordMsgBody("", messages.toList(), content)
             return@flatMap Flowable.just(recordMsgBody)
         }.flatMap {
             return@flatMap IMCoreManager.getUserModule().getUserInfo(IMCoreManager.getUid())
@@ -112,10 +123,11 @@ class SessionChoosePopup constructor(
                 }
         }.flatMap {
             val title = if (session.type == SessionType.Group.value) {
-                it.title = "${it.title}的群聊记录"
+                "的群聊记录"
             } else {
-                it.title = "${it.title}的会话记录"
+                "的会话记录"
             }
+            it.title = "${it.title}${title}"
             return@flatMap Flowable.just(it)
         }
     }

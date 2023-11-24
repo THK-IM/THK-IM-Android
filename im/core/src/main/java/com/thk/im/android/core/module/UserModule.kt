@@ -12,7 +12,18 @@ interface UserModule : BaseModule {
     /**
      * 【用户主动发起】 获取用户信息
      */
+    fun getServerUsersInfo(ids: Set<Long>): Flowable<List<UserBean>>
+
+
+    /**
+     * 【用户主动发起】 获取用户信息
+     */
     fun getUserInfo(id: Long): Flowable<User>
+
+    /**
+     * 【用户主动发起】 批量获取用户信息
+     */
+    fun getUserInfo(ids: Set<Long>): Flowable<Map<Long, User>>
 
     /**
      * 【用户主动发起】 获取用户信息

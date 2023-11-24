@@ -61,7 +61,7 @@ class IMInputLayout : ConstraintLayout {
         binding.etMessage.requestFocus()
         binding.tvSendMsg.setOnClickListener {
             binding.etMessage.text?.let {
-                msgSender.sendMessage(MsgType.TEXT.value, it.toString())
+                msgSender.sendMessage(MsgType.TEXT.value, it.toString(), null)
             }
             binding.etMessage.text = null
         }
@@ -179,6 +179,7 @@ class IMInputLayout : ConstraintLayout {
         }
 
         binding.ivMsgOprForward.setOnClickListener {
+            msgSender.forwardSelectedMessages(1)
             msgSender.setSelectMode(false, null)
         }
     }
@@ -308,7 +309,7 @@ class IMInputLayout : ConstraintLayout {
                     audioMsgData.duration = second
                     audioMsgData.path = path
                     audioMsgData.played = true
-                    msgSender.sendMessage(MsgType.Audio.value, audioMsgData)
+                    msgSender.sendMessage(MsgType.Audio.value, null, audioMsgData)
                 }
             }
 

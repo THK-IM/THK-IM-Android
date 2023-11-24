@@ -63,6 +63,11 @@ interface IMApi {
     fun deleteMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Void>
 
     /**
+     * 转发消息
+     */
+    fun forwardMessages(msg: Message, forwardSid: Long, fromUserIds: Set<Long>, clientMsgIds: Set<Long>): Flowable<Message>
+
+    /**
      * 获取cTime之后创建的消息
      */
     fun getLatestMessages(uId: Long, cTime: Long, count: Int): Flowable<List<Message>>

@@ -86,7 +86,8 @@ open class DefaultMessageModule : MessageModule {
                     // 消息入库并ACK
                     if (unProcessorMessages.isNotEmpty()) {
                         // 插入数据库
-                        IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(unProcessorMessages)
+                        IMCoreManager.getImDataBase().messageDao()
+                            .insertOrIgnoreMessages(unProcessorMessages)
                         for (m in unProcessorMessages) {
                             if (m.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
                                 ackMessageToCache(m)
@@ -240,15 +241,16 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun sendMessage(
-        body: Any,
         sessionId: Long,
         type: Int,
+        body: Any?,
+        data: Any?,
         atUser: String?,
         replyMsgId: Long?,
         callback: IMSendMsgCallback?
     ) {
         val processor = getMsgProcessor(type)
-        processor.sendMessage(body, sessionId, atUser, replyMsgId, callback)
+        processor.sendMessage(sessionId, body, data, atUser, replyMsgId, callback)
     }
 
     override fun resend(msg: Message, callback: IMSendMsgCallback?) {

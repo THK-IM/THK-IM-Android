@@ -14,6 +14,9 @@ interface UserDao {
     @Query("select * from user where id = :id")
     fun queryUser(id: Long): User?
 
+    @Query("select * from user where id in (:id)")
+    fun queryUsers(id: Set<Long>): List<User>
+
     @Delete
     fun deleteUser(user: User): Int
 }

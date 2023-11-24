@@ -14,7 +14,7 @@ import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.ui.manager.IMRevokeMsgData
 import io.reactivex.Flowable
 
-open class IMRevokeMessageProcessor : IMBaseMsgProcessor() {
+open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
     override fun messageType(): Int {
         return MsgType.Revoke.value
     }

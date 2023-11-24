@@ -1,5 +1,10 @@
 package com.thk.im.android.ui.provider.operator
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.db.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
@@ -19,6 +24,11 @@ class IMMsgCopyOperator: IMMessageOperator() {
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
-        // TODO
+        if (message.type == MsgType.TEXT.value) {
+            val clipboard = IMCoreManager.getApplication()
+                .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip: ClipData = ClipData.newPlainText("text", message.content)
+            clipboard.setPrimaryClip(clip)
+        }
     }
 }

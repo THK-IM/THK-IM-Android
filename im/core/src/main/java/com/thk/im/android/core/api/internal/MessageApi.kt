@@ -2,6 +2,7 @@ package com.thk.im.android.core.api.internal
 
 import com.thk.im.android.core.api.bean.AckMsgBean
 import com.thk.im.android.core.api.bean.DeleteMsgBean
+import com.thk.im.android.core.api.bean.ForwardMessageBean
 import com.thk.im.android.core.api.bean.ListBean
 import com.thk.im.android.core.api.bean.MessageBean
 import com.thk.im.android.core.api.bean.ReadMsgBean
@@ -9,7 +10,6 @@ import com.thk.im.android.core.api.bean.ReeditMsgBean
 import com.thk.im.android.core.api.bean.RevokeMsgBean
 import io.reactivex.Flowable
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.POST
@@ -56,6 +56,14 @@ interface MessageApi {
     fun reeditMsg(
         @Body body: ReeditMsgBean
     ): Flowable<Void>
+
+    /**
+     * 发送消息
+     */
+    @POST("/message/forward")
+    fun forwardMsg(
+        @Body body: ForwardMessageBean
+    ): Flowable<ForwardMessageBean>
 
     /**
      * 查询最近消息

@@ -19,6 +19,7 @@ import com.thk.im.android.ui.provider.function.IMAlbumFunctionIVProvider
 import com.thk.im.android.ui.provider.function.IMCameraFunctionIVProvider
 import com.thk.im.android.ui.provider.msg.IMAudioMsgIVProvider
 import com.thk.im.android.ui.provider.msg.IMImageMsgIVProvider
+import com.thk.im.android.ui.provider.msg.IMRecordMsgIVProvider
 import com.thk.im.android.ui.provider.msg.IMRevokeMsgIVProvider
 import com.thk.im.android.ui.provider.msg.IMTextMsgIVProvider
 import com.thk.im.android.ui.provider.msg.IMTimeLineMsgIVProvider
@@ -26,7 +27,8 @@ import com.thk.im.android.ui.provider.msg.IMUnSupportMsgIVProvider
 import com.thk.im.android.ui.provider.msg.IMVideoMsgIVProvider
 import com.thk.im.android.ui.provider.msg.proccessor.IMAudioMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMImageMsgProcessor
-import com.thk.im.android.ui.provider.msg.proccessor.IMRevokeMessageProcessor
+import com.thk.im.android.ui.provider.msg.proccessor.IMRecordMsgProcessor
+import com.thk.im.android.ui.provider.msg.proccessor.IMRevokeMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMTextMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMUnSupportMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMVideoMsgProcessor
@@ -94,7 +96,8 @@ object IMUIManager {
         IMCoreManager.getMessageModule().registerMsgProcessor(IMImageMsgProcessor())
         IMCoreManager.getMessageModule().registerMsgProcessor(IMAudioMsgProcessor())
         IMCoreManager.getMessageModule().registerMsgProcessor(IMVideoMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(IMRevokeMessageProcessor())
+        IMCoreManager.getMessageModule().registerMsgProcessor(IMRevokeMsgProcessor())
+        IMCoreManager.getMessageModule().registerMsgProcessor(IMRecordMsgProcessor())
 
         val providers = arrayOf(
             IMTimeLineMsgIVProvider(),
@@ -104,6 +107,7 @@ object IMUIManager {
             IMAudioMsgIVProvider(),
             IMVideoMsgIVProvider(),
             IMRevokeMsgIVProvider(),
+            IMRecordMsgIVProvider()
         )
         registerMsgIVProvider(*providers)
         registerSessionIVProvider(SingleSessionIVProvider())

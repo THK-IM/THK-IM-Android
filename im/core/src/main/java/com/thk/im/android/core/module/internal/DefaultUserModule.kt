@@ -1,10 +1,9 @@
 package com.thk.im.android.core.module.internal
 
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.api.bean.UserBean
-import com.thk.im.android.core.module.UserModule
 import com.thk.im.android.core.db.entity.User
+import com.thk.im.android.core.module.UserModule
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 
@@ -17,6 +16,19 @@ open class DefaultUserModule : UserModule {
             (id % 2).toInt(), now, now
         )
         return Flowable.just(userBean)
+    }
+
+    override fun getServerUsersInfo(ids: Set<Long>): Flowable<List<UserBean>> {
+        val now = System.currentTimeMillis()
+        val userBeans = mutableListOf<UserBean>()
+        for (id in ids) {
+            val userBean = UserBean(
+                id, "user$id", "https://picsum.photos/300/300",
+                (id % 2).toInt(), now, now
+            )
+            userBeans.add(userBean)
+        }
+        return Flowable.just(userBeans)
     }
 
     override fun getUserInfo(id: Long): Flowable<User> {
@@ -37,6 +49,39 @@ open class DefaultUserModule : UserModule {
                 }
             } else {
                 Flowable.just(it)
+            }
+        }
+    }
+
+    override fun getUserInfo(ids: Set<Long>): Flowable<Map<Long, User>> {
+        return Flowable.create<Map<Long, User>?>({
+            val users = IMCoreManager.getImDataBase().userDao().queryUsers(ids)
+            val userMap = mutableMapOf<Long, User>()
+            for (u in users) {
+                userMap[u.id] = u
+            }
+            it.onNext(userMap)
+            it.onComplete()
+        }, BackpressureStrategy.LATEST).flatMap {
+            val userNotInDb = mutableSetOf<Long>()
+            for (id in ids) {
+                if (it[id] == null) {
+                    userNotInDb.add(id)
+                }
+            }
+            if (userNotInDb.isEmpty()) {
+                return@flatMap Flowable.just(it)
+            } else {
+                val result = mutableMapOf<Long, User>()
+                result.putAll(it)
+                return@flatMap getServerUsersInfo(userNotInDb).flatMap { beans ->
+                    for (bean in beans) {
+                        val user = bean.toUser()
+                        IMCoreManager.getImDataBase().userDao().insertUsers(user)
+                        result[user.id] = user
+                    }
+                    Flowable.just(result)
+                }
             }
         }
     }

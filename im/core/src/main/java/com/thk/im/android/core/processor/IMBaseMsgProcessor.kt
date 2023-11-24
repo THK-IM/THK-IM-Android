@@ -67,15 +67,29 @@ abstract class IMBaseMsgProcessor {
     /**
      * 创建发送消息
      */
-    open fun buildSendMsg(
-        body: Any, sid: Long, atUsers: String? = null, rMsgId: Long? = null
-    ): Message {
-        var content = ""
-        var data = ""
-        if (body is String) {
-            content = body
-        } else {
-            data = Gson().toJson(body)
+    open fun buildSendMsg(sid: Long, content: Any? = null, data: Any? = null,
+                          atUsers: String? = null, rMsgId: Long? = null): Message {
+        val dbContent = when (content) {
+            null -> {
+                null
+            }
+            is String -> {
+                content
+            }
+            else -> {
+                Gson().toJson(content)
+            }
+        }
+        val dbData = when (data) {
+            null -> {
+                null
+            }
+            is String -> {
+                data
+            }
+            else -> {
+                Gson().toJson(data)
+            }
         }
         val id = IMCoreManager.getMessageModule().generateNewMsgId()
         val oprStatus =
@@ -91,8 +105,8 @@ abstract class IMBaseMsgProcessor {
             sid,
             0 - id,
             type,
-            content,
-            data,
+            dbContent,
+            dbData,
             sendStatus,
             oprStatus,
             null,
@@ -111,13 +125,14 @@ abstract class IMBaseMsgProcessor {
      * 4、调用api发送消息到服务器
      */
     open fun sendMessage(
-        body: Any,
         sid: Long,
+        body: Any?,
+        data: Any?,
         atUsers: String? = null,
         rMsgId: Long? = null,
         callback: IMSendMsgCallback? = null
     ) {
-        val msg = buildSendMsg(body, sid, atUsers, rMsgId)
+        val msg = buildSendMsg(sid, body, data, atUsers, rMsgId)
         this.send(msg, false, callback)
     }
 
@@ -148,7 +163,6 @@ abstract class IMBaseMsgProcessor {
             override fun onError(t: Throwable?) {
                 super.onError(t)
                 LLog.e("Message Send err $t")
-                disposables.remove(this)
                 originMsg.sendStatus = MsgSendStatus.SendFailed.value
                 updateFailedMsgStatus(originMsg)
                 callback?.onResult(originMsg, Exception(t))
@@ -159,10 +173,10 @@ abstract class IMBaseMsgProcessor {
                 disposables.remove(this)
             }
         }
-        Flowable.just(msg).flatMap {
+        Flowable.just(originMsg).flatMap {
             if (!resend) {
                 insertOrUpdateDb(
-                    msg,
+                    originMsg,
                     notify = true,
                     notifySession = true,
                 )
@@ -198,9 +212,53 @@ abstract class IMBaseMsgProcessor {
                 notify = false,
                 notifySession = false,
             )
-            IMCoreManager.getMessageModule().sendMessageToServer(it)
+            return@flatMap sendToServer(it)
         }.compose(RxTransform.flowableToIo()).subscribe(subscriber)
         disposables.add(subscriber)
+    }
+
+    open fun sendToServer(message: Message): Flowable<Message> {
+        return IMCoreManager.getMessageModule().sendMessageToServer(message)
+    }
+
+    open fun forward(msg: Message, sid: Long, callback: IMSendMsgCallback? = null) {
+        val oldSessionId = msg.sid
+        val oldMsgClientId = msg.id
+        val oldFromUserId = msg.fUid
+        val forwardMessage = msg.copy()
+        forwardMessage.id = IMCoreManager.getMessageModule().generateNewMsgId()
+        forwardMessage.fUid = IMCoreManager.getUid()
+        forwardMessage.sid = sid
+        forwardMessage.oprStatus =
+            MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
+        forwardMessage.sendStatus = MsgSendStatus.Init.value
+        forwardMessage.cTime = IMCoreManager.getCommonModule().getSeverTime()
+        forwardMessage.mTime = forwardMessage.cTime
+
+        val subscriber = object : BaseSubscriber<Message>() {
+            override fun onNext(t: Message) {
+                insertOrUpdateDb(t)
+                callback?.onResult(t, null)
+            }
+
+            override fun onStart() {
+                super.onStart()
+                callback?.onStart(forwardMessage)
+            }
+
+            override fun onError(t: Throwable?) {
+                super.onError(t)
+                callback?.onResult(forwardMessage, Exception(t))
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                disposables.remove(this)
+            }
+        }
+        IMCoreManager.imApi.forwardMessages(forwardMessage, oldSessionId, setOf(oldFromUserId), setOf(oldMsgClientId))
+            .compose(RxTransform.flowableToIo())
+            .subscribe(subscriber)
     }
 
 

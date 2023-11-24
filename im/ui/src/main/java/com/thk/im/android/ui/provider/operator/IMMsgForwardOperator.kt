@@ -19,6 +19,6 @@ class IMMsgForwardOperator : IMMessageOperator() {
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
-
+        sender.forwardMessageToSession(arrayListOf(message), 0)
     }
 }

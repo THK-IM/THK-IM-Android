@@ -35,6 +35,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.fragment.popup.MessageOperatorPopup
+import com.thk.im.android.ui.fragment.popup.SessionChoosePopup
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.IMImageMsgData
@@ -163,11 +164,11 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                 if (media.mimeType.startsWith("video", true)) {
                     val videoMsgData = IMVideoMsgData()
                     videoMsgData.path = media.path
-                    sendMessage(MsgType.VIDEO.value, videoMsgData)
+                    sendMessage(MsgType.VIDEO.value, null, videoMsgData)
                 } else if (media.mimeType.startsWith("image", true)) {
                     val imageMsgData = IMImageMsgData()
                     imageMsgData.path = media.path
-                    sendMessage(MsgType.IMAGE.value, imageMsgData)
+                    sendMessage(MsgType.IMAGE.value, null, imageMsgData)
                 }
             }
         } catch (e: Exception) {
@@ -250,10 +251,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         session?.let {
             IMCoreManager.getMessageModule().deleteMessages(it.id, messages.toList(), true)
                 .compose(RxTransform.flowableToMain()).subscribe(object : BaseSubscriber<Void>() {
-                    override fun onNext(t: Void?) {
-
-                    }
-
+                    override fun onNext(t: Void?) {}
                 })
         }
     }
@@ -262,7 +260,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         // 对于不是自己发的消息才能发送已读消息
         if (message.fUid != IMCoreManager.getUid() && message.msgId > 0) {
             IMCoreManager.getMessageModule()
-                .sendMessage("", message.sid, MsgType.READ.value, null, message.msgId)
+                .sendMessage(message.sid, MsgType.READ.value, null, null, null, message.msgId)
         }
     }
 
@@ -316,6 +314,36 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         }
     }
 
+    override fun forwardMessageToSession(messages: List<Message>, forwardType: Int) {
+        context?.let {ctx ->
+            session?.let {
+                XPopup.Builder(ctx).isDestroyOnDismiss(true)
+                    .isLightStatusBar(false)
+                    .hasShadowBg(false)
+                    .isViewMode(true)
+                    .moveUpToKeyboard(false)
+                    .asCustom(SessionChoosePopup(ctx, it, messages, forwardType))
+                    .show()
+            }
+        }
+    }
+
+    override fun forwardSelectedMessages(forwardType: Int) {
+        val messages = binding.rcvMessage.getSelectMessages().toList()
+        context?.let {ctx ->
+            session?.let {
+                XPopup.Builder(ctx).isDestroyOnDismiss(true)
+                    .isLightStatusBar(false)
+                    .hasShadowBg(false)
+                    .isViewMode(true)
+                    .moveUpToKeyboard(false)
+                    .asCustom(SessionChoosePopup(ctx, it, messages, forwardType))
+                    .show()
+            }
+        }
+    }
+
+
     private fun previewImageAndVideo(msg: Message, position: Int, originView: View) {
         val messages = binding.rcvMessage.getMessages()
         val mediaMessages = ArrayList<Message>()
@@ -357,19 +385,20 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         IMCoreManager.getMessageModule().resend(msg)
     }
 
-    override fun sendMessage(type: Int, body: Any, atUser: String?, referMsgId: Long?) {
+    override fun sendMessage(
+        type: Int,
+        body: Any?,
+        data: Any?,
+        atUser: String?,
+        referMsgId: Long?
+    ) {
         val callback = object : IMSendMsgCallback {
-            override fun onStart(message: Message) {
-                
-            }
+            override fun onStart(message: Message) {}
 
-            override fun onResult(message: Message, e: Exception?) {
-
-            }
-
+            override fun onResult(message: Message, e: Exception?) {}
         }
         IMCoreManager.getMessageModule()
-            .sendMessage(body, session!!.id, type, atUser, referMsgId, callback)
+            .sendMessage(session!!.id, type, body, data, atUser, referMsgId, callback)
     }
 
     override fun addInputContent(text: String) {

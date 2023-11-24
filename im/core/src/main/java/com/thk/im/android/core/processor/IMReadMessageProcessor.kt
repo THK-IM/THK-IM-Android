@@ -91,6 +91,11 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
     }
 
     override fun received(msg: Message) {
+        val dbMsg =
+            IMCoreManager.getImDataBase().messageDao().findMessageById(msg.id, msg.fUid, msg.sid)
+        if (dbMsg != null) {
+            return
+        }
         msg.rMsgId?.let {
             // 别人发给自己的已读消息
             val referMsg =

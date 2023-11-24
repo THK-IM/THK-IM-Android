@@ -18,7 +18,7 @@ class IMMsgRevokeOperator : IMMessageOperator() {
     }
 
     override fun resId(): Int {
-        return R.drawable.ic_keyboard
+        return R.drawable.icon_keyboard
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {

@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.manager
 
 import com.google.gson.annotations.SerializedName
+import com.thk.im.android.core.db.entity.Message
 
 
 class IMAudioMsgData(
@@ -82,6 +83,16 @@ class IMRevokeMsgData(
     var content: String? = null,
     @SerializedName("data")
     var data: String? = null
+)
+
+
+class IMRecordMsgBody(
+    @SerializedName("title")
+    var title: String,
+    @SerializedName("messages")
+    var messages: List<Message>,
+    @SerializedName("content")
+    var content: String
 )
 
 

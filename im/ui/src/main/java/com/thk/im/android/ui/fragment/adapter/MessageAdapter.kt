@@ -259,7 +259,7 @@ class MessageAdapter(
         }
     }
 
-    fun getSelectIds(): MutableSet<Message> {
+    fun getSelectedMessages(): MutableSet<Message> {
         return selectedMessages
     }
 

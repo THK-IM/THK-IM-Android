@@ -4,6 +4,7 @@ import com.thk.im.android.core.api.IMApi
 import com.thk.im.android.core.api.bean.AckMsgBean
 import com.thk.im.android.core.api.bean.CreateSessionBean
 import com.thk.im.android.core.api.bean.DeleteMsgBean
+import com.thk.im.android.core.api.bean.ForwardMessageBean
 import com.thk.im.android.core.api.bean.MessageBean
 import com.thk.im.android.core.api.bean.ReadMsgBean
 import com.thk.im.android.core.api.bean.ReeditMsgBean
@@ -144,6 +145,22 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
             return Flowable.empty()
         }
         return messageApi.deleteMessages(bean)
+    }
+
+    override fun forwardMessages(
+        msg: Message,
+        forwardSid: Long, fromUserIds: Set<Long>, clientMsgIds: Set<Long>
+    ): Flowable<Message> {
+        val bean = ForwardMessageBean.buildMessageBean(msg, forwardSid, fromUserIds, clientMsgIds)
+        return messageApi.forwardMsg(bean).flatMap {
+            msg.msgId = it.msgId
+            msg.mTime = it.cTime
+            msg.sendStatus = MsgSendStatus.Success.value
+            msg.oprStatus = MsgOperateStatus.Ack.value or
+                    MsgOperateStatus.ClientRead.value or
+                    MsgOperateStatus.ServerRead.value
+            Flowable.just(msg)
+        }
     }
 
     override fun getLatestMessages(uId: Long, cTime: Long, count: Int): Flowable<List<Message>> {

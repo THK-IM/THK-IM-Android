@@ -4,7 +4,6 @@ import android.view.View
 import androidx.emoji2.widget.EmojiEditText
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
-import io.reactivex.internal.operators.maybe.MaybeDoAfterSuccess
 
 interface IMMsgSender {
 
@@ -15,7 +14,13 @@ interface IMMsgSender {
     fun resendMessage(msg: Message)
 
     /// 发送消息
-    fun sendMessage(type: Int, body: Any, atUser: String? = null, referMsgId: Long? = null)
+    fun sendMessage(
+        type: Int,
+        body: Any?,
+        data: Any?,
+        atUser: String? = null,
+        referMsgId: Long? = null
+    )
 
     /// 输入框添加内容
     fun addInputContent(text: String)
@@ -73,5 +78,11 @@ interface IMMsgSender {
 
     /// show message
     fun showMessage(text: String, success: Boolean)
+
+    /// 发送消息到session
+    fun forwardMessageToSession(messages: List<Message>, forwardType: Int)
+
+    /// 转发选定的消息 forwardType 0单条转发, 1合并转发
+    fun forwardSelectedMessages(forwardType: Int)
 
 }

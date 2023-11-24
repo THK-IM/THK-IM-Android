@@ -72,9 +72,10 @@ interface MessageModule : BaseModule {
      * 发送消息
      */
     fun sendMessage(
-        body: Any,
         sessionId: Long,
         type: Int,
+        body: Any?,
+        data: Any?,
         atUser: String? = null,
         replyMsgId: Long? = null,
         callback: IMSendMsgCallback? = null

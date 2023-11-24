@@ -6,7 +6,7 @@ import com.thk.im.android.core.db.entity.Message
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class MessageBean(
+data class ForwardMessageBean(
     @SerializedName("c_id")
     var clientId: Long = 0,
     @SerializedName("f_u_id")
@@ -27,29 +27,21 @@ data class MessageBean(
     var rMsgId: Long? = null,
     @SerializedName("c_time")
     var cTime: Long = 0,
+    @SerializedName("fwd_s_id")
+    var forwardSid: Long = 0,
+    @SerializedName("fwd_from_u_ids")
+    var forwardFromUIds: Set<Long>? = null,
+    @SerializedName("fwd_client_ids")
+    var forwardClientIds: Set<Long>? = null,
 ) : Parcelable {
-
-    fun toMessage(): Message {
-        val message = Message()
-        message.id = clientId
-        message.fUid = fUId
-        message.sid = sessionId
-        message.msgId = msgId
-        message.type = type
-        message.content = body
-        message.atUsers = atUsers
-        message.rMsgId = rMsgId
-        message.cTime = cTime
-        message.mTime = cTime
-        status?.let {
-            message.oprStatus = it
-        }
-        return message
-    }
-
     companion object {
-        fun buildMessageBean(message: Message): MessageBean {
-            val messageBean = MessageBean()
+        fun buildMessageBean(
+            message: Message,
+            forwardSid: Long,
+            forwardFromUIds: Set<Long>,
+            forwardClientIds: Set<Long>
+        ): ForwardMessageBean {
+            val messageBean = ForwardMessageBean()
             messageBean.clientId = message.id
             messageBean.fUId = message.fUid
             messageBean.sessionId = message.sid
@@ -59,6 +51,9 @@ data class MessageBean(
             messageBean.atUsers = message.atUsers
             messageBean.rMsgId = message.rMsgId
             messageBean.cTime = message.cTime
+            messageBean.forwardSid = forwardSid
+            messageBean.forwardFromUIds = forwardFromUIds
+            messageBean.forwardClientIds = forwardClientIds
             return messageBean
         }
     }

@@ -1,6 +1,5 @@
 package com.thk.im.android.ui.fragment
 
-import android.media.RingtoneManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMCoreManager.getApplication
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
@@ -34,6 +32,7 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
     private val disposables = CompositeDisposable()
     private var hasMore = true
     private val count = 10
+    private var isLoading = false
 
     private var sessionClick: OnSessionClick? = null
 
@@ -94,8 +93,6 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
         super.onDestroyView()
         disposables.clear()
     }
-
-    private var isLoading = false
     private fun loadSessions() {
         if (!hasMore || isLoading) return
         isLoading = true

@@ -211,10 +211,18 @@ class MessageAdapter(
                 notifyItemRemoved(pos)
             }
             // 附加在该消息上的时间线消息也一并删除
-            if (pos < messageList.size - 1 && pos >= 0) {
-                if (messageList[pos].type == com.thk.im.android.ui.provider.msg.IMTimeLineMsgIVProvider.timeLineMsgType) {
+            if (pos <= messageList.size - 1 && pos >= 0) {
+                if (messageList[pos].type == IMTimeLineMsgIVProvider.timeLineMsgType) {
                     messageList.removeAt(pos)
                     notifyItemRemoved(pos)
+                }
+            }
+
+            val lastPos = pos - 1
+            if (lastPos <= messageList.size - 1 && lastPos >= 0) {
+                if (messageList[lastPos].type == IMTimeLineMsgIVProvider.timeLineMsgType) {
+                    messageList.removeAt(lastPos)
+                    notifyItemRemoved(lastPos)
                 }
             }
         }

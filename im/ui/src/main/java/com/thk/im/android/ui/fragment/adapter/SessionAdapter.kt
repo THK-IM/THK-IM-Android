@@ -8,6 +8,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
+import kotlin.math.abs
 
 class SessionAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -70,12 +71,18 @@ class SessionAdapter(
             sessionList.removeAt(oldPos)
             val newPos = findInsertPosition(session)
             sessionList.add(newPos, session)
-            if (newPos == oldPos) {
-                notifyItemChanged(newPos)
+            val lessPos = if (newPos > oldPos) {
+                oldPos
             } else {
-                notifyItemRemoved(oldPos)
-                notifyItemInserted(newPos)
+                newPos
             }
+            notifyItemRangeChanged(lessPos, abs(newPos - oldPos) + 1)
+//            if (newPos == oldPos) {
+//                notifyItemChanged(newPos)
+//            } else {
+//                notifyItemRemoved(oldPos)
+//                notifyItemInserted(newPos)
+//            }
         } else {
             val newPos = findInsertPosition(session)
             sessionList.add(newPos, session)

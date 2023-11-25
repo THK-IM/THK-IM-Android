@@ -79,7 +79,7 @@ interface IMMsgSender {
     /// show message
     fun showMessage(text: String, success: Boolean)
 
-    /// 发送消息到session
+    /// 发送消息到session forwardType 0单条转发, 1合并转发
     fun forwardMessageToSession(messages: List<Message>, forwardType: Int)
 
     /// 转发选定的消息 forwardType 0单条转发, 1合并转发

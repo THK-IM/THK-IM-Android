@@ -1,7 +1,7 @@
 package com.thk.im.android.ui.provider.panel
 
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.panel.BasePanelFragment
+import com.thk.im.android.ui.fragment.panel.IMBasePanelFragment
 import com.thk.im.android.ui.protocol.IMBasePanelFragmentProvider
 
 class IMUnicodeEmojiPanelProvider(private val position: Int) : IMBasePanelFragmentProvider() {
@@ -18,7 +18,7 @@ class IMUnicodeEmojiPanelProvider(private val position: Int) : IMBasePanelFragme
         return R.drawable.icon_chat_emoji
     }
 
-    override fun newFragment(): BasePanelFragment {
-        return IMUnicodeEmojiFragment()
+    override fun newFragment(): IMBasePanelFragment {
+        return IMUnicodeEmojiFragmentIM()
     }
 }

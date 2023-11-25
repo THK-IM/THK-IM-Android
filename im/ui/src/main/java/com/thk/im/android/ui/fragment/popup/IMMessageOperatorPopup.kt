@@ -8,7 +8,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class MessageOperatorPopup(context: Context) : AttachPopupView(context) {
+class IMMessageOperatorPopup(context: Context) : AttachPopupView(context) {
 
     lateinit var message: Message
     lateinit var sender: IMMsgSender
@@ -18,7 +18,7 @@ class MessageOperatorPopup(context: Context) : AttachPopupView(context) {
         super.onCreate()
         val operatorLayout = findViewById<FlexboxLayout>(R.id.layout_operators)
         for (operator in operators) {
-            val operatorView = MessageOperatorItemView(context)
+            val operatorView = IMMessageOperatorItemView(context)
             operatorLayout.addView(operatorView)
             operatorView.setOperator(operator, sender, message) {
                 dismiss()

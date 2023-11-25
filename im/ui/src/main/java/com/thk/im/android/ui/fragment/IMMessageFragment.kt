@@ -34,8 +34,8 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
-import com.thk.im.android.ui.fragment.popup.MessageOperatorPopup
-import com.thk.im.android.ui.fragment.popup.SessionChoosePopup
+import com.thk.im.android.ui.fragment.popup.IMMessageOperatorPopup
+import com.thk.im.android.ui.fragment.popup.IMSessionChoosePopup
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.IMImageMsgData
@@ -287,7 +287,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
             } else {
                 point.y = (locations[1] + view.height).toFloat()
             }
-            val popupView = MessageOperatorPopup(it)
+            val popupView = IMMessageOperatorPopup(it)
             popupView.message = message
             popupView.sender = this
             popupView.operators = operators
@@ -322,7 +322,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                     .hasShadowBg(false)
                     .isViewMode(true)
                     .moveUpToKeyboard(false)
-                    .asCustom(SessionChoosePopup(ctx, it, messages, forwardType))
+                    .asCustom(IMSessionChoosePopup(ctx, it, messages, forwardType))
                     .show()
             }
         }
@@ -337,7 +337,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                     .hasShadowBg(false)
                     .isViewMode(true)
                     .moveUpToKeyboard(false)
-                    .asCustom(SessionChoosePopup(ctx, it, messages, forwardType))
+                    .asCustom(IMSessionChoosePopup(ctx, it, messages, forwardType))
                     .show()
             }
         }
@@ -393,7 +393,6 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         referMsgId: Long?
     ) {
         val callback = object : IMSendMsgCallback {
-            override fun onStart(message: Message) {}
 
             override fun onResult(message: Message, e: Exception?) {}
         }

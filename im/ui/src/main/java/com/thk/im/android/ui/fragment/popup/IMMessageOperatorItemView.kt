@@ -10,7 +10,7 @@ import com.thk.im.android.ui.databinding.ItemViewMessageOperatorBinding
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class MessageOperatorItemView : LinearLayout {
+class IMMessageOperatorItemView : LinearLayout {
 
     private var binding: ItemViewMessageOperatorBinding
 

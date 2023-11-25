@@ -17,7 +17,7 @@ import com.thk.im.android.ui.fragment.IMSessionFragment
 import com.thk.im.android.ui.manager.IMRecordMsgBody
 import io.reactivex.Flowable
 
-class SessionChoosePopup constructor(
+class IMSessionChoosePopup constructor(
     context: Context,
     private val session: Session,
     private val messages: List<Message>,
@@ -89,13 +89,13 @@ class SessionChoosePopup constructor(
                         .sendMessage(session.id, MsgType.RECORD.value, body, data)
                 }
             }
-            reprocessingFlowable().compose(RxTransform.flowableToMain())
+            buildRecordBody().compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
         }
         dismiss()
     }
 
-    private fun reprocessingFlowable(): Flowable<IMRecordMsgBody> {
+    private fun buildRecordBody(): Flowable<IMRecordMsgBody> {
         val uIds = mutableSetOf<Long>()
         for (subMessage in messages) {
             uIds.add(subMessage.fUid)

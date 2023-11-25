@@ -1,6 +1,6 @@
 package com.thk.im.android.ui.protocol
 
-import com.thk.im.android.ui.fragment.panel.BasePanelFragment
+import com.thk.im.android.ui.fragment.panel.IMBasePanelFragment
 
 abstract class IMBasePanelFragmentProvider {
 
@@ -10,7 +10,7 @@ abstract class IMBasePanelFragmentProvider {
 
     abstract fun iconResId(): Int
 
-    abstract fun newFragment(): BasePanelFragment
+    abstract fun newFragment(): IMBasePanelFragment
 
 
 }

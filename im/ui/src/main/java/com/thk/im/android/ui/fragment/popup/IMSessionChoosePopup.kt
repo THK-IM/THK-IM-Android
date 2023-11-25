@@ -109,7 +109,7 @@ class IMSessionChoosePopup constructor(
                     .getMsgProcessor(subMessage.type).getSessionDesc(subMessage)
                 content = content.plus("${userName}:${subContent}")
                 i++
-                if (i < messages.size - 1) {
+                if (i <= messages.size - 1) {
                     content = content.plus("\n")
                 }
             }

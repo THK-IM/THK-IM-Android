@@ -91,7 +91,7 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     }
 
     override fun updateSession(uId: Long, session: Session): Flowable<Void> {
-        val updateSessionBean = UpdateSessionBean(uId, session.id, session.topTime, session.status)
+        val updateSessionBean = UpdateSessionBean(uId, session.id, session.topTimestamp, session.status)
         return sessionApi.updateSession(updateSessionBean)
     }
 

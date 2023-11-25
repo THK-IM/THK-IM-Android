@@ -72,8 +72,8 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
                 if (session != null) {
                     val count =
                         IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
-                    if (session.unRead != count || session.mTime < msg.mTime) {
-                        session.unRead = count
+                    if (session.unReadCount != count || session.mTime < msg.mTime) {
+                        session.unReadCount = count
                         session.mTime = msg.mTime
                         IMCoreManager.getImDataBase().sessionDao().updateSession(session)
                         XEventBus.post(IMEvent.SessionUpdate.value, session)
@@ -111,8 +111,8 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
                     if (session != null) {
                         val count =
                             IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
-                        if (session.unRead != count || session.mTime < msg.mTime) {
-                            session.unRead = count
+                        if (session.unReadCount != count || session.mTime < msg.mTime) {
+                            session.unReadCount = count
                             session.mTime = msg.mTime
                             IMCoreManager.getImDataBase().sessionDao().updateSession(session)
                             XEventBus.post(IMEvent.SessionUpdate.value, session)

@@ -48,7 +48,7 @@ abstract class BaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
             statusView.visibility = View.GONE
             muteView.text = "静音"
         }
-        if (session.topTime > 0) {
+        if (session.topTimestamp > 0) {
             topView.text = "取消置顶"
         } else {
             topView.text = "置顶"
@@ -61,10 +61,10 @@ abstract class BaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
             this.sessionVHOperator?.updateSession(this.session)
         }
         topView.setOnClickListener {
-            if (this.session.topTime > 0) {
-                this.session.topTime = 0
+            if (this.session.topTimestamp > 0) {
+                this.session.topTimestamp = 0
             } else {
-                this.session.topTime = IMCoreManager.getCommonModule().getSeverTime()
+                this.session.topTimestamp = IMCoreManager.getCommonModule().getSeverTime()
             }
             this.sessionVHOperator?.updateSession(this.session)
         }

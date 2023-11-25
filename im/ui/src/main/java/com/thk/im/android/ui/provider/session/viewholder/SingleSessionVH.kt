@@ -30,13 +30,12 @@ class SingleSessionVH(
     override fun onViewBind(session: Session, sessionVHOperator: IMSessionVHOperator) {
         super.onViewBind(session, sessionVHOperator)
         lastMsgView.text = session.lastMsg
-        lastTimeView.text =
-            com.thk.im.android.core.base.utils.DateUtils.timeToMsgTime(session.mTime, IMCoreManager.getCommonModule().getSeverTime())
-        if (session.unRead == 0) {
+        lastTimeView.text = DateUtils.timeToMsgTime(session.mTime, IMCoreManager.getCommonModule().getSeverTime())
+        if (session.unReadCount == 0) {
             unReadCountView.visibility = View.GONE
         } else {
             unReadCountView.visibility = View.VISIBLE
-            unReadCountView.text = StringUtils.getMessageCount(session.unRead)
+            unReadCountView.text = StringUtils.getMessageCount(session.unReadCount)
         }
         showUserInfo(session)
     }

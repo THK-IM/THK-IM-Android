@@ -47,7 +47,7 @@ data class SessionBean(
             sessionBean.id = session.id
             sessionBean.type = session.type
             sessionBean.entityId = session.entityId
-            sessionBean.top = session.topTime
+            sessionBean.top = session.topTimestamp
             sessionBean.status = session.status
             sessionBean.cTime = session.cTime
             sessionBean.mTime = session.mTime

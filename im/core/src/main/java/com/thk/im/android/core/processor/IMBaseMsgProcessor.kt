@@ -112,6 +112,7 @@ abstract class IMBaseMsgProcessor {
             null,
             rMsgId,
             atUsers,
+            null,
             cTime,
             cTime,
         )

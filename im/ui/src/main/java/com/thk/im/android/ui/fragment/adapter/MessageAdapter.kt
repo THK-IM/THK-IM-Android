@@ -65,7 +65,7 @@ class MessageAdapter(
     private fun newTimelineMessage(cTime: Long): Message {
         return Message(
             0L, 0L, 0L, 0L, IMTimeLineMsgIVProvider.timeLineMsgType, cTime.toString(),
-            cTime.toString(), 0, 0, null, null, null, cTime, cTime
+            cTime.toString(), 0, 0, null, null, null, null, cTime, cTime
         )
     }
 

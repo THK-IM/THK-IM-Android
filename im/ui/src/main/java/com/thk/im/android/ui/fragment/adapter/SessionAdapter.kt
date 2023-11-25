@@ -102,9 +102,9 @@ class SessionAdapter(
 
     private fun findInsertPosition(session: Session): Int {
         for ((pos, s) in sessionList.withIndex()) {
-            if (session.topTime > s.topTime) {
+            if (session.topTimestamp > s.topTimestamp) {
                 return pos
-            } else if (session.topTime == s.topTime) {
+            } else if (session.topTimestamp == s.topTimestamp) {
                 if (session.mTime >= s.mTime) {
                     return pos
                 }

@@ -23,10 +23,6 @@ class IMMsgRevokeOperator : IMMessageOperator() {
 
     override fun onClick(sender: IMMsgSender, message: Message) {
         val callback = object : IMSendMsgCallback {
-            override fun onStart(message: Message) {
-                sender.showLoading("正在撤回")
-            }
-
             override fun onResult(message: Message, e: Exception?) {
                 if (e != null) {
                     sender.showMessage("撤回失败", false)
@@ -34,8 +30,6 @@ class IMMsgRevokeOperator : IMMessageOperator() {
                     sender.showMessage("撤回成功", false)
                 }
             }
-
-
         }
         IMCoreManager.getMessageModule()
             .getMsgProcessor(MsgType.Revoke.value)

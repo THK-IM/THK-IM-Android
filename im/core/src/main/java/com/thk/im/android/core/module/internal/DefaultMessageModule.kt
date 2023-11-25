@@ -331,11 +331,11 @@ open class DefaultMessageModule : MessageModule {
         val dispose = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {
                 val unReadCount = messageDao.getUnReadCount(t.id)
-                if (t.mTime < msg.mTime || t.unRead != unReadCount) {
+                if (t.mTime < msg.mTime || t.unReadCount != unReadCount) {
                     val processor = getMsgProcessor(msg.type)
                     t.lastMsg = processor.getSessionDesc(msg)
                     t.mTime = msg.mTime
-                    t.unRead = unReadCount
+                    t.unReadCount = unReadCount
                     sessionDao.insertOrUpdateSessions(t)
                     XEventBus.post(IMEvent.SessionNew.value, t)
                     notifyNewMessage(t, msg)

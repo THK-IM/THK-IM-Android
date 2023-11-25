@@ -24,10 +24,6 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
             return
         }
         val subscriber = object : BaseSubscriber<Void>() {
-            override fun onStart() {
-                super.onStart()
-                callback?.onStart(msg)
-            }
 
             override fun onNext(t: Void?) {
                 callback?.onResult(msg,null)

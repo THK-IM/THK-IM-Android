@@ -146,10 +146,6 @@ abstract class IMBaseMsgProcessor {
     open fun send(msg: Message, resend: Boolean = false, callback: IMSendMsgCallback? = null) {
         var originMsg = msg
         val subscriber = object : BaseSubscriber<Message>() {
-            override fun onStart() {
-                super.onStart()
-                callback?.onStart(originMsg)
-            }
 
             override fun onNext(t: Message) {
                 insertOrUpdateDb(
@@ -221,7 +217,7 @@ abstract class IMBaseMsgProcessor {
         return IMCoreManager.getMessageModule().sendMessageToServer(message)
     }
 
-    open fun forward(msg: Message, sid: Long, callback: IMSendMsgCallback? = null) {
+    open fun forwardMessage(msg: Message, sid: Long, callback: IMSendMsgCallback? = null) {
         val oldSessionId = msg.sid
         val oldMsgClientId = msg.id
         val oldFromUserId = msg.fUid
@@ -239,11 +235,6 @@ abstract class IMBaseMsgProcessor {
             override fun onNext(t: Message) {
                 insertOrUpdateDb(t)
                 callback?.onResult(t, null)
-            }
-
-            override fun onStart() {
-                super.onStart()
-                callback?.onStart(forwardMessage)
             }
 
             override fun onError(t: Throwable?) {

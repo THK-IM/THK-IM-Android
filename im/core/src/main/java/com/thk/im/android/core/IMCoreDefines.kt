@@ -52,7 +52,5 @@ enum class IMMsgResourceType(val value: String) {
 }
 
 interface IMSendMsgCallback {
-    fun onStart(message: Message)
-
     fun onResult(message: Message, e: Exception?)
 }

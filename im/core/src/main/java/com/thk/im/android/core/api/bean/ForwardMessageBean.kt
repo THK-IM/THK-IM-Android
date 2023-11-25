@@ -28,7 +28,7 @@ data class ForwardMessageBean(
     @SerializedName("c_time")
     var cTime: Long = 0,
     @SerializedName("fwd_s_id")
-    var forwardSid: Long = 0,
+    var forwardSid: Long? = null,
     @SerializedName("fwd_from_u_ids")
     var forwardFromUIds: Set<Long>? = null,
     @SerializedName("fwd_client_ids")

@@ -69,7 +69,7 @@ class SessionChoosePopup constructor(
     private fun forward(session: Session) {
         if (forwardType == 0) {
             for (m in messages) {
-                IMCoreManager.getMessageModule().getMsgProcessor(m.type).forward(m, session.id)
+                IMCoreManager.getMessageModule().getMsgProcessor(m.type).forwardMessage(m, session.id)
             }
         } else {
             val subscriber = object : BaseSubscriber<IMRecordMsgBody>() {

@@ -1,10 +1,10 @@
-package com.thk.im.android.core.db.dao
+package com.thk.im.android.core.db.internal.room.dao
 
 import androidx.room.*
 import com.thk.im.android.core.db.entity.Session
 
 @Dao
-interface SessionDao {
+internal interface SessionDao {
 
     @Query("select * from session where m_time <= :mTime order by top_timestamp desc, m_time desc limit 0, :count")
     fun querySessions(count: Int, mTime: Long): List<Session>

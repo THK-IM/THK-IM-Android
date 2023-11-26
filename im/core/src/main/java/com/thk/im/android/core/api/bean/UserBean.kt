@@ -26,7 +26,7 @@ data class UserBean(
         user.sex,
         user.cTime,
         user.mTime,
-        user.ext_data
+        user.extData
     )
 
     fun toUser(): User {

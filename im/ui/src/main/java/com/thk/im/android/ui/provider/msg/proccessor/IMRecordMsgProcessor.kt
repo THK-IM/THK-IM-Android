@@ -2,7 +2,7 @@ package com.thk.im.android.ui.provider.msg.proccessor
 
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.ui.manager.IMRecordMsgBody

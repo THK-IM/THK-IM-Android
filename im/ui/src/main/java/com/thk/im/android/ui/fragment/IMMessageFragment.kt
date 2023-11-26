@@ -23,13 +23,13 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.IMSendMsgCallback
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.dp2px
 import com.thk.im.android.core.base.popup.KeyboardPopupWindow
 import com.thk.im.android.core.base.utils.ToastUtils
-import com.thk.im.android.core.db.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.event.XEventBus
@@ -258,7 +258,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     override fun readMessage(message: Message) {
         // 对于不是自己发的消息才能发送已读消息
-        if (message.fUid != IMCoreManager.getUid() && message.msgId > 0) {
+        if (message.fUid != IMCoreManager.uId && message.msgId > 0) {
             IMCoreManager.getMessageModule()
                 .sendMessage(message.sid, MsgType.READ.value, null, null, null, message.msgId)
         }
@@ -315,7 +315,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     }
 
     override fun forwardMessageToSession(messages: List<Message>, forwardType: Int) {
-        context?.let {ctx ->
+        context?.let { ctx ->
             session?.let {
                 XPopup.Builder(ctx).isDestroyOnDismiss(true)
                     .isLightStatusBar(false)
@@ -330,7 +330,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     override fun forwardSelectedMessages(forwardType: Int) {
         val messages = binding.rcvMessage.getSelectMessages().toList()
-        context?.let {ctx ->
+        context?.let { ctx ->
             session?.let {
                 XPopup.Builder(ctx).isDestroyOnDismiss(true)
                     .isLightStatusBar(false)

@@ -13,9 +13,9 @@ import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.db.MsgOperateStatus
-import com.thk.im.android.core.db.MsgSendStatus
-import com.thk.im.android.core.db.SessionType
+import com.thk.im.android.core.MsgOperateStatus
+import com.thk.im.android.core.MsgSendStatus
+import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User

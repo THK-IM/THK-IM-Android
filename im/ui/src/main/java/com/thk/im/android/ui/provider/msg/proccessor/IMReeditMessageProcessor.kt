@@ -1,7 +1,7 @@
 package com.thk.im.android.ui.provider.msg.proccessor
 
 import com.thk.im.android.core.IMSendMsgCallback
-import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 

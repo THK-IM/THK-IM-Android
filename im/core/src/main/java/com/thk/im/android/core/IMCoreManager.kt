@@ -3,7 +3,10 @@ package com.thk.im.android.core
 import android.app.Application
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.thk.im.android.core.api.IMApi
+import com.thk.im.android.core.base.utils.AppUtils
+import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.IMDataBase
+import com.thk.im.android.core.db.internal.DefaultIMDataBase
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadModule
 import com.thk.im.android.core.module.BaseModule
@@ -29,51 +32,26 @@ object IMCoreManager {
 
     private val moduleMap: MutableMap<Int, BaseModule> = HashMap()
 
-    private var innerSignalModule: SignalModule? = null
-    var signalModule: SignalModule
-        get() = this.innerSignalModule!!
-        set(value) {
-            this.innerSignalModule = value
-        }
+    lateinit var signalModule: SignalModule
+    lateinit var imApi: IMApi
+    lateinit var fileLoadModule: FileLoadModule
 
+    lateinit var db: IMDataBase
+    lateinit var app: Application
+    lateinit var storageModule: StorageModule
+    var uId: Long = 0L
 
-    private var innerImApi: IMApi? = null
-    var imApi: IMApi
-        get() = this.innerImApi!!
-        set(value) {
-            this.innerImApi = value
-        }
-
-    private var innerFileLoadModule: FileLoadModule? = null
-    var fileLoadModule: FileLoadModule
-        get() = this.innerFileLoadModule!!
-        set(value) {
-            this.innerFileLoadModule = value
-        }
-
-    private var innerStorageModule: StorageModule? = null
-    var storageModule: StorageModule
-        get() = this.innerStorageModule!!
-        set(value) {
-            this.innerStorageModule = value
-        }
-
-    private lateinit var db: IMDataBase
-    private var uid: Long = 0L
-    private lateinit var application: Application
-
-    fun init(app: Application, uid: Long, debug: Boolean) {
-        application = app
-        com.thk.im.android.core.base.utils.AppUtils.instance().init(app)
-        com.thk.im.android.core.base.utils.ToastUtils.init(app)
+    fun init(app: Application, uId: Long, debug: Boolean) {
+        this.app = app
+        AppUtils.instance().init(app)
+        ToastUtils.init(app)
         LiveEventBus.config()
             .setContext(app)
             .autoClear(true)
             .lifecycleObserverAlwaysActive(true)
-        this.uid = uid
-        db = IMDataBase(app, uid)
-
-        innerStorageModule = DefaultStorageModule(app, uid)
+        this.uId = uId
+        db = DefaultIMDataBase(app, uId, debug)
+        storageModule = DefaultStorageModule(app, uId)
 
         registerModule(SignalType.Common.value, DefaultCommonModule())
         registerModule(SignalType.User.value, DefaultUserModule())
@@ -144,11 +122,4 @@ object IMCoreManager {
         return db
     }
 
-    fun getUid(): Long {
-        return uid
-    }
-
-    fun getApplication(): Application {
-        return application
-    }
 }

@@ -1,12 +1,12 @@
-package com.thk.im.android.core.db.dao
+package com.thk.im.android.core.db.internal.room.dao
 
 import androidx.room.*
-import com.thk.im.android.core.db.MsgOperateStatus
-import com.thk.im.android.core.db.MsgSendStatus
+import com.thk.im.android.core.MsgOperateStatus
+import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.db.entity.Message
 
 @Dao
-interface MessageDao {
+internal interface MessageDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOrUpdateMessages(messages: List<Message>)

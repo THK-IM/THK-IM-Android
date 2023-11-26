@@ -13,8 +13,8 @@ import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
-import com.thk.im.android.core.db.MsgSendStatus
-import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.MsgSendStatus
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.manager.IMAudioMsgBody
 import com.thk.im.android.ui.manager.IMAudioMsgData

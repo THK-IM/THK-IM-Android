@@ -2,7 +2,7 @@ package com.thk.im.android.ui.provider.msg
 
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
-import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType

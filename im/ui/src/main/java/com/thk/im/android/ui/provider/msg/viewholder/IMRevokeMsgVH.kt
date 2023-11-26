@@ -5,7 +5,7 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
@@ -32,7 +32,7 @@ class IMRevokeMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         val revokeData = Gson().fromJson(message.data, IMRevokeMsgData::class.java)
         if (revokeData != null) {
             contentView.text = "${revokeData.nick}撤回了一条消息"
-            if (message.fUid == IMCoreManager.getUid()
+            if (message.fUid == IMCoreManager.uId
                 && revokeData.content != null
                 && revokeData.type != null && revokeData.type == MsgType.TEXT.value) {
                 reeditView.visibility = View.VISIBLE

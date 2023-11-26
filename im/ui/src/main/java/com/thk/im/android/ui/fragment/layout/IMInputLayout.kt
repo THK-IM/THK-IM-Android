@@ -21,7 +21,7 @@ import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
-import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
 import com.thk.im.android.ui.manager.IMAudioMsgData

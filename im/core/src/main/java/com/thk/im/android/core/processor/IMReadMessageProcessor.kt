@@ -1,15 +1,15 @@
 package com.thk.im.android.core.processor
 
-import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.LLog
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
-import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.db.MsgOperateStatus
-import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.MsgOperateStatus
+import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.event.XEventBus
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.util.concurrent.TimeUnit
@@ -101,10 +101,11 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
             val referMsg =
                 IMCoreManager.getImDataBase().messageDao().findMessageByMsgId(it, msg.sid)
             if (referMsg != null) {
-                if (msg.fUid == IMCoreManager.getUid()) {
+                if (msg.fUid == IMCoreManager.uId) {
                     // 自己发的已读消息不插入数据库，更新rMsgId的消息状态为服务端已读
-                    referMsg.oprStatus = MsgOperateStatus.ServerRead.value.or(MsgOperateStatus.ClientRead.value)
-                        .or(MsgOperateStatus.Ack.value)
+                    referMsg.oprStatus =
+                        MsgOperateStatus.ServerRead.value.or(MsgOperateStatus.ClientRead.value)
+                            .or(MsgOperateStatus.Ack.value)
                     referMsg.mTime = msg.cTime
                     insertOrUpdateDb(referMsg, notify = true, notifySession = false)
                     val session = IMCoreManager.getImDataBase().sessionDao().findSession(msg.sid)
@@ -172,7 +173,7 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
 
     private fun sendReadMessages(sessionId: Long, msgIds: Set<Long>) {
         LLog.v("ReadMessageProcessor readServerMessage $msgIds")
-        val uId = IMCoreManager.getUid()
+        val uId = IMCoreManager.uId
         val disposable = object : BaseSubscriber<Void>() {
 
             override fun onComplete() {

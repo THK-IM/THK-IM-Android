@@ -6,6 +6,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 
@@ -13,14 +14,30 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(tableName = "user")
 data class User(
-    @PrimaryKey @ColumnInfo(name = "id") val id: Long,
-    @ColumnInfo(name = "name") var name: String,
-    @ColumnInfo(name = "avatar") var avatar: String?,
-    @ColumnInfo(name = "sex") var sex: Int?,
-    @ColumnInfo(name = "status") var status: Int?,
-    @ColumnInfo(name = "ext_data") var ext_data: String?,   //扩展字段
-    @ColumnInfo(name = "c_time") var cTime: Long,
-    @ColumnInfo(name = "m_time") var mTime: Long,
+    @SerializedName("id")
+    @PrimaryKey @ColumnInfo(name = "id")
+    val id: Long,
+    @SerializedName("name")
+    @ColumnInfo(name = "name")
+    var name: String,
+    @SerializedName("avatar")
+    @ColumnInfo(name = "avatar")
+    var avatar: String?,
+    @SerializedName("sex")
+    @ColumnInfo(name = "sex")
+    var sex: Int?,
+    @SerializedName("status")
+    @ColumnInfo(name = "status")
+    var status: Int?,
+    @SerializedName("ext_data")
+    @ColumnInfo(name = "ext_data")
+    var extData: String?,   //扩展字段
+    @SerializedName("c_time")
+    @ColumnInfo(name = "c_time")
+    var cTime: Long,
+    @SerializedName("m_time")
+    @ColumnInfo(name = "m_time")
+    var mTime: Long,
 ) : Parcelable {
 
     @Ignore

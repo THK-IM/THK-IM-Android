@@ -2,7 +2,7 @@ package com.thk.im.android.ui.provider.operator
 
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMSendMsgCallback
-import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator

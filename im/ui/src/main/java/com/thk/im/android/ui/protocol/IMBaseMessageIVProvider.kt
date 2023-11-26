@@ -13,7 +13,7 @@ import com.thk.im.android.ui.manager.IMMsgPosType
 abstract class IMBaseMessageIVProvider {
 
     open fun getSelfId(): Long {
-        return IMCoreManager.getUid()
+        return IMCoreManager.uId
     }
 
     /**

@@ -5,11 +5,11 @@ import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
+import com.thk.im.android.core.MsgOperateStatus
+import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.db.MsgOperateStatus
-import com.thk.im.android.core.db.MsgSendStatus
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
 import io.reactivex.Flowable
@@ -29,7 +29,7 @@ abstract class IMBaseMsgProcessor {
         val dbMsg =
             IMCoreManager.getImDataBase().messageDao().findMessageById(msg.id, msg.fUid, msg.sid)
         if (dbMsg == null) {
-            if (msg.fUid == IMCoreManager.getUid()) {
+            if (msg.fUid == IMCoreManager.uId) {
                 // 如果发件人为自己，插入前补充消息状态为已接受并已读
                 msg.oprStatus =
                     msg.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
@@ -40,14 +40,14 @@ abstract class IMBaseMsgProcessor {
                 notify = true,
                 notifySession = true,
             )
-            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.getUid()) {
+            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
                 IMCoreManager.getMessageModule().ackMessageToCache(msg)
             }
         } else {
             if (dbMsg.sendStatus != MsgSendStatus.Success.value) {
                 msg.data = dbMsg.data
                 msg.sendStatus = MsgSendStatus.Success.value
-                if (msg.fUid == IMCoreManager.getUid()) {
+                if (msg.fUid == IMCoreManager.uId) {
                     // 如果发件人为自己，插入前补充消息状态为已接受并已读
                     msg.oprStatus =
                         msg.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
@@ -58,7 +58,7 @@ abstract class IMBaseMsgProcessor {
                     notifySession = true,
                 )
             }
-            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.getUid()) {
+            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
                 IMCoreManager.getMessageModule().ackMessageToCache(msg)
             }
         }
@@ -67,15 +67,19 @@ abstract class IMBaseMsgProcessor {
     /**
      * 创建发送消息
      */
-    open fun buildSendMsg(sid: Long, content: Any? = null, data: Any? = null,
-                          atUsers: String? = null, rMsgId: Long? = null): Message {
+    open fun buildSendMsg(
+        sid: Long, content: Any? = null, data: Any? = null,
+        atUsers: String? = null, rMsgId: Long? = null
+    ): Message {
         val dbContent = when (content) {
             null -> {
                 null
             }
+
             is String -> {
                 content
             }
+
             else -> {
                 Gson().toJson(content)
             }
@@ -84,9 +88,11 @@ abstract class IMBaseMsgProcessor {
             null -> {
                 null
             }
+
             is String -> {
                 data
             }
+
             else -> {
                 Gson().toJson(data)
             }
@@ -96,7 +102,7 @@ abstract class IMBaseMsgProcessor {
             MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
         val sendStatus = MsgSendStatus.Init.value
         val type = this.messageType()
-        val fUId = IMCoreManager.getUid()
+        val fUId = IMCoreManager.uId
         val cTime = IMCoreManager.getCommonModule().getSeverTime()
         // tips：msgId初始值给-id,发送成功后更新为服务端返回的msgId
         return Message(
@@ -224,7 +230,7 @@ abstract class IMBaseMsgProcessor {
         val oldFromUserId = msg.fUid
         val forwardMessage = msg.copy()
         forwardMessage.id = IMCoreManager.getMessageModule().generateNewMsgId()
-        forwardMessage.fUid = IMCoreManager.getUid()
+        forwardMessage.fUid = IMCoreManager.uId
         forwardMessage.sid = sid
         forwardMessage.oprStatus =
             MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
@@ -248,7 +254,12 @@ abstract class IMBaseMsgProcessor {
                 disposables.remove(this)
             }
         }
-        IMCoreManager.imApi.forwardMessages(forwardMessage, oldSessionId, setOf(oldFromUserId), setOf(oldMsgClientId))
+        IMCoreManager.imApi.forwardMessages(
+            forwardMessage,
+            oldSessionId,
+            setOf(oldFromUserId),
+            setOf(oldMsgClientId)
+        )
             .compose(RxTransform.flowableToIo())
             .subscribe(subscriber)
     }

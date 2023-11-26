@@ -1,4 +1,4 @@
-package com.thk.im.android.core.db
+package com.thk.im.android.core
 
 /**
  * session状态

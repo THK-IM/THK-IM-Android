@@ -8,8 +8,8 @@ import com.lxj.xpopup.core.BottomPopupView
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.db.MsgType
-import com.thk.im.android.core.db.SessionType
+import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
@@ -116,7 +116,7 @@ class IMSessionChoosePopup constructor(
             val recordMsgBody = IMRecordMsgBody("", messages.toList(), content)
             return@flatMap Flowable.just(recordMsgBody)
         }.flatMap {
-            return@flatMap IMCoreManager.getUserModule().getUserInfo(IMCoreManager.getUid())
+            return@flatMap IMCoreManager.getUserModule().getUserInfo(IMCoreManager.uId)
                 .flatMap { user ->
                     it.title = user.name
                     return@flatMap Flowable.just(it)

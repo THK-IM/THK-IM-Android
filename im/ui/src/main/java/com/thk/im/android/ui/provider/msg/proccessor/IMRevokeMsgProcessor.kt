@@ -6,8 +6,8 @@ import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.db.MsgOperateStatus
-import com.thk.im.android.core.db.MsgType
+import com.thk.im.android.core.MsgOperateStatus
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
@@ -20,7 +20,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
     }
 
     override fun send(msg: Message, resend: Boolean, callback: IMSendMsgCallback?) {
-        if (msg.fUid != IMCoreManager.getUid()) {
+        if (msg.fUid != IMCoreManager.uId) {
             return
         }
         val subscriber = object : BaseSubscriber<Void>() {
@@ -58,7 +58,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
             .compose(RxTransform.flowableToIo())
             .subscribe(subscriber)
         disposables.add(subscriber)
-        if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.getUid()) {
+        if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
             IMCoreManager.getMessageModule().ackMessageToCache(msg)
         }
     }
@@ -73,7 +73,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
                 if (dbMsg != null) {
                     IMCoreManager.getImDataBase().messageDao().deleteMessages(listOf(dbMsg))
                     XEventBus.post(IMEvent.MsgDelete.value, dbMsg)
-                    if (dbMsg.fUid == IMCoreManager.getUid()) {
+                    if (dbMsg.fUid == IMCoreManager.uId) {
                         data.content = dbMsg.content
                         data.data = dbMsg.data
                         data.type = dbMsg.type
@@ -92,7 +92,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
     }
 
     open fun getNickname(msg: Message): Flowable<String> {
-        if (msg.fUid == IMCoreManager.getUid()) {
+        if (msg.fUid == IMCoreManager.uId) {
             return Flowable.just("你")
         } else {
             return IMCoreManager.getUserModule().getUserInfo(msg.fUid)

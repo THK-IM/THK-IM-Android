@@ -1,10 +1,10 @@
-package com.thk.im.android.core.db.dao
+package com.thk.im.android.core.db.internal.room.dao
 
 import androidx.room.*
 import com.thk.im.android.core.db.entity.User
 
 @Dao
-interface UserDao {
+internal interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUsers(vararg users: User)
 
@@ -14,9 +14,9 @@ interface UserDao {
     @Query("select * from user where id = :id")
     fun queryUser(id: Long): User?
 
-    @Query("select * from user where id in (:id)")
-    fun queryUsers(id: Set<Long>): List<User>
+    @Query("select * from user where id in (:ids)")
+    fun queryUsers(ids: Set<Long>): List<User>
 
     @Delete
-    fun deleteUser(user: User): Int
+    fun deleteUser(user: User)
 }

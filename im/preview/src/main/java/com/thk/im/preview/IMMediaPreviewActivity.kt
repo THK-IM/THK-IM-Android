@@ -125,7 +125,7 @@ class IMMediaPreviewActivity : AppCompatActivity() {
     private fun findPosition(id: Long): Int {
         val messages = adapter.getMessages()
         for (i in messages.indices) {
-            if (messages[i].id == id) {
+            if (messages[i].msgId == id) {
                 return i
             }
         }

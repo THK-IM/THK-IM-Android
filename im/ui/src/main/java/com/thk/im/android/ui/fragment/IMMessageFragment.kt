@@ -228,7 +228,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                             override fun audioData(
                                 path: String, second: Int, db: Double, state: AudioStatus
                             ) {
-                                com.thk.im.android.core.base.utils.ToastUtils.show("play: $second, $db")
+                                ToastUtils.show("play: $second, $db")
                             }
                         })
                     }
@@ -378,7 +378,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         }
         activity?.let {
             IMUIManager.mediaPreviewer?.previewMediaMessage(
-                it, mediaMessages, originView, msg.id
+                it, mediaMessages, originView, msg.msgId
             )
         }
     }

@@ -92,33 +92,35 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
     }
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {
-        val messages = binding.rcvMessage.getMessages()
-        val mediaMessages = ArrayList<Message>()
-        var count = 0
-        val rightMessages = mutableListOf<Message>()
-        for (i in position until messages.size) {
-            if (messages[i].type == MsgType.IMAGE.value || messages[i].type == MsgType.VIDEO.value) {
-                rightMessages.add(messages[i])
-                count++
+        if (msg.type == MsgType.IMAGE.value || msg.type == MsgType.VIDEO.value) {
+            val messages = binding.rcvMessage.getMessages()
+            val mediaMessages = ArrayList<Message>()
+            var count = 0
+            val rightMessages = mutableListOf<Message>()
+            for (i in position until messages.size) {
+                if (messages[i].type == MsgType.IMAGE.value || messages[i].type == MsgType.VIDEO.value) {
+                    rightMessages.add(messages[i])
+                    count++
+                }
+                if (count == 5) {
+                    break
+                }
             }
-            if (count == 5) {
-                break
-            }
-        }
 
-        mediaMessages.addAll(rightMessages.reversed())
-        count = 0
-        for (i in 0 until position) {
-            if (messages[position - 1 - i].type == MsgType.IMAGE.value || messages[position - 1 - i].type == MsgType.VIDEO.value) {
-                mediaMessages.add(messages[position - 1 - i])
-                count++
+            mediaMessages.addAll(rightMessages.reversed())
+            count = 0
+            for (i in 0 until position) {
+                if (messages[position - 1 - i].type == MsgType.IMAGE.value || messages[position - 1 - i].type == MsgType.VIDEO.value) {
+                    mediaMessages.add(messages[position - 1 - i])
+                    count++
+                }
+                if (count == 5) {
+                    break
+                }
             }
-            if (count == 5) {
-                break
-            }
+            IMUIManager.mediaPreviewer?.previewMediaMessage(
+                this, mediaMessages, originView, msg.msgId
+            )
         }
-        IMUIManager.mediaPreviewer?.previewMediaMessage(
-            this, mediaMessages, originView, msg.id
-        )
     }
 }

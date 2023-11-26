@@ -7,13 +7,14 @@ import android.view.GestureDetector
 import android.view.GestureDetector.OnGestureListener
 import android.view.MotionEvent
 import android.view.View
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.fragment.adapter.MessageAdapter
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
@@ -30,9 +31,10 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     private val disposables = CompositeDisposable()
     private lateinit var msgAdapter: MessageAdapter
 
-    private lateinit var msgSender: IMMsgSender
-    private lateinit var msgPreviewer: IMMsgPreviewer
-    private lateinit var fragment: Fragment
+    private lateinit var lifecycleOwner: LifecycleOwner
+    private lateinit var session: Session
+    private var msgPreviewer: IMMsgPreviewer? = null
+    private var msgSender: IMMsgSender? = null
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -42,8 +44,14 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         defStyleAttr
     )
 
-    fun init(fragment: Fragment, sender: IMMsgSender, previewer: IMMsgPreviewer) {
-        this.fragment = fragment
+    fun init(
+        lifecycleOwner: LifecycleOwner,
+        session: Session,
+        sender: IMMsgSender?,
+        previewer: IMMsgPreviewer?
+    ) {
+        this.lifecycleOwner = lifecycleOwner
+        this.session = session
         this.msgSender = sender
         this.msgPreviewer = previewer
         initUI()
@@ -55,8 +63,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         val linearLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
         linearLayoutManager.stackFromEnd = true
         layoutManager = linearLayoutManager
-        val session = msgSender.getSession()
-        msgAdapter = MessageAdapter(session, fragment, this)
+        msgAdapter = MessageAdapter(session, lifecycleOwner, this)
         adapter = msgAdapter
 
         addOnScrollListener(object : OnScrollListener() {
@@ -80,12 +87,14 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
             }
 
             override fun onSingleTapUp(p0: MotionEvent): Boolean {
-                if (msgSender.isKeyboardShowing()) {
-                    msgSender.closeKeyboard()
-                    return true
-                } else {
-                    if (msgSender.closeBottomPanel()) {
+                msgSender?.let {
+                    if (it.isKeyboardShowing()) {
+                        it.closeKeyboard()
                         return true
+                    } else {
+                        if (it.closeBottomPanel()) {
+                            return true
+                        }
                     }
                 }
                 return false
@@ -142,7 +151,6 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                 isLoading = false
             }
         }
-        val session = msgSender.getSession()
         IMCoreManager.getMessageModule().queryLocalMessages(session.id, cTime, count)
             .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
@@ -185,12 +193,12 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgCellClick(message: Message, position: Int, view: View) {
-        msgPreviewer.previewMessage(message, position, view)
+        msgPreviewer?.previewMessage(message, position, view)
     }
 
     override fun onMsgCellLongClick(message: Message, position: Int, view: View) {
 //        msgSender.setSelectMode(true, message)
-        msgSender.popupMessageOperatorPanel(view, message)
+        msgSender?.popupMessageOperatorPanel(view, message)
     }
 
     override fun onMsgResendClick(message: Message) {
@@ -218,12 +226,12 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun readMessage(message: Message) {
-        msgSender.readMessage(message)
+        msgSender?.readMessage(message)
     }
 
     override fun setEditText(text: String) {
-        msgSender.openKeyboard()
-        msgSender.addInputContent(text)
+        msgSender?.openKeyboard()
+        msgSender?.addInputContent(text)
     }
 
     fun getSelectMessages(): Set<Message> {

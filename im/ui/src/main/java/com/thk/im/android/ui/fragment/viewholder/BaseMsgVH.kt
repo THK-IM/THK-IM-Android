@@ -8,14 +8,14 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.lifecycle.LifecycleOwner
-import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.IMImageLoader
-import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.SessionType
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.IMImageLoader
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
@@ -85,18 +85,26 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         renderUserInfo()
         renderMsgStatus()
         updateSelectMode()
-        if (message.msgId <= 0) {
-            return
-        }
-        if (message.oprStatus.and(MsgOperateStatus.ClientRead.value) > 0
-            && message.oprStatus.and(MsgOperateStatus.ServerRead.value) > 0
+        readMessage()
+    }
+
+    private fun readMessage() {
+        if (session.type == SessionType.Single.value ||
+            session.type == SessionType.Group.value
         ) {
-            return
+            if (message.msgId <= 0) {
+                return
+            }
+            if (message.oprStatus.and(MsgOperateStatus.ClientRead.value) > 0
+                && message.oprStatus.and(MsgOperateStatus.ServerRead.value) > 0
+            ) {
+                return
+            }
+            LLog.v("readMessage ${message.id} ${message.oprStatus}")
+            msgVHOperator?.readMessage(message)
+            message.oprStatus = message.oprStatus.or(MsgOperateStatus.ClientRead.value)
+                .or(MsgOperateStatus.ServerRead.value)
         }
-        LLog.v("readMessage ${message.id} ${message.oprStatus}")
-        msgVHOperator?.readMessage(message)
-        message.oprStatus = message.oprStatus.or(MsgOperateStatus.ClientRead.value)
-            .or(MsgOperateStatus.ServerRead.value)
     }
 
     fun onCreate() {

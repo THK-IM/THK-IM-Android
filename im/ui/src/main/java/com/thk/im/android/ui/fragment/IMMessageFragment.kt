@@ -75,9 +75,9 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         } else {
             arguments?.getParcelable("session")!!
         }
-        binding.rcvMessage.init(this, this, this)
-        binding.llInputLayout.init(this, this, this)
-        binding.llBottomLayout.init(this, this, this)
+        binding.rcvMessage.init(this, session!!, this, this)
+        binding.llInputLayout.init(this, session!!, this, this)
+        binding.llBottomLayout.init(this, session!!, this, this)
         initKeyboardWindow()
         initEventBus()
     }
@@ -238,6 +238,10 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
             MsgType.IMAGE.value, MsgType.VIDEO.value -> {
                 previewImageAndVideo(msg, position, originView)
             }
+
+            MsgType.RECORD.value -> {
+                previewRecord(msg)
+            }
         }
     }
 
@@ -322,6 +326,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                     .hasShadowBg(false)
                     .isViewMode(true)
                     .moveUpToKeyboard(false)
+                    .enableDrag(false)
                     .asCustom(IMSessionChoosePopup(ctx, it, messages, forwardType))
                     .show()
             }
@@ -337,6 +342,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
                     .hasShadowBg(false)
                     .isViewMode(true)
                     .moveUpToKeyboard(false)
+                    .enableDrag(false)
                     .asCustom(IMSessionChoosePopup(ctx, it, messages, forwardType))
                     .show()
             }
@@ -374,6 +380,14 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
             IMUIManager.mediaPreviewer?.previewMediaMessage(
                 it, mediaMessages, originView, msg.id
             )
+        }
+    }
+
+    private fun previewRecord(msg: Message) {
+        activity?.let {
+            session?.let { session ->
+                IMUIManager.mediaPreviewer?.previewRecordMessage(it, session, msg)
+            }
         }
     }
 

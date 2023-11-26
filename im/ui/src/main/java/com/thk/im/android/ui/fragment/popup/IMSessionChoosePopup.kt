@@ -6,10 +6,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentActivity
 import com.lxj.xpopup.core.BottomPopupView
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.SessionType
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
@@ -69,14 +69,14 @@ class IMSessionChoosePopup constructor(
     private fun forward(session: Session) {
         if (forwardType == 0) {
             for (m in messages) {
-                IMCoreManager.getMessageModule().getMsgProcessor(m.type).forwardMessage(m, session.id)
+                IMCoreManager.getMessageModule().getMsgProcessor(m.type)
+                    .forwardMessage(m, session.id)
             }
         } else {
             val subscriber = object : BaseSubscriber<IMRecordMsgBody>() {
                 override fun onNext(t: IMRecordMsgBody) {
-                    val data = t.copy()
                     val cleanMessages = mutableListOf<Message>()
-                    for (m in data.messages) {
+                    for (m in t.messages) {
                         val msg = m.copy()
                         msg.sendStatus = 0
                         msg.oprStatus = 0
@@ -86,7 +86,7 @@ class IMSessionChoosePopup constructor(
                     }
                     val body = IMRecordMsgBody(t.title, cleanMessages, t.content)
                     IMCoreManager.getMessageModule()
-                        .sendMessage(session.id, MsgType.RECORD.value, body, data)
+                        .sendMessage(session.id, MsgType.RECORD.value, body, null)
                 }
             }
             buildRecordBody().compose(RxTransform.flowableToMain())

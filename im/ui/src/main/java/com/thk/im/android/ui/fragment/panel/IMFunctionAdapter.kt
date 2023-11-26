@@ -7,7 +7,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class IMFunctionAdapter(private val msgSender: IMMsgSender) : RecyclerView.Adapter<IMFunctionsVH>() {
+class IMFunctionAdapter(private val msgSender: IMMsgSender?) : RecyclerView.Adapter<IMFunctionsVH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IMFunctionsVH {
         val view = LayoutInflater.from(parent.context)
@@ -22,9 +22,12 @@ class IMFunctionAdapter(private val msgSender: IMMsgSender) : RecyclerView.Adapt
     override fun onBindViewHolder(holder: IMFunctionsVH, position: Int) {
         holder.position = position
         holder.itemView.setOnClickListener {
-            IMUIManager.functionIVProviders[position]?.let { provider ->
-                provider.click(msgSender)
+            msgSender?.let { sender ->
+                IMUIManager.functionIVProviders[position]?.let { provider ->
+                    provider.click(sender)
+                }
             }
+
         }
     }
 }

@@ -6,8 +6,16 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Build
 import android.view.View
+import com.google.gson.Gson
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.SessionType
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.ui.manager.IMRecordMsgBody
 import com.thk.im.android.ui.protocol.IMPreviewer
+import io.reactivex.Flowable
 
 class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer {
 
@@ -21,7 +29,7 @@ class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer
         view: View,
         defaultId: Long
     ) {
-        val intent = Intent(activity, MessagePreviewActivity::class.java)
+        val intent = Intent(activity, IMMediaPreviewActivity::class.java)
         val locations = IntArray(2)
         view.getLocationOnScreen(locations)
         intent.putParcelableArrayListExtra("messages", items)
@@ -39,5 +47,46 @@ class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer
         } else {
             activity.overridePendingTransition(0, 0)
         }
+    }
+
+    override fun previewRecordMessage(activity: Activity, originSession: Session, message: Message) {
+        if (message.content != null) {
+            val recordBody =
+                Gson().fromJson(message.content!!, IMRecordMsgBody::class.java) ?: return
+
+            val subscriber = object : BaseSubscriber<List<Message>>() {
+                override fun onNext(t: List<Message>) {
+                    val intent = Intent(activity, IMRecordPreviewActivity::class.java)
+                    val arrayList = arrayListOf<Message>()
+                    arrayList.addAll(t)
+                    intent.putParcelableArrayListExtra("recordMessages", arrayList)
+                    val session = Session()
+                    session.type = SessionType.MsgRecord.value
+                    intent.putExtra("session", session)
+                    intent.putExtra("originSession", originSession)
+                    intent.putExtra("title", recordBody.title)
+                    activity.startActivity(intent)
+                }
+            }
+
+            Flowable.just(recordBody.messages).flatMap {
+                val dbMessages = mutableListOf<Message>()
+                for (m in it) {
+                    val dbMsg = IMCoreManager.getImDataBase().messageDao().findMessageByMsgId(
+                        m.msgId,
+                        m.sid
+                    )
+                    if (dbMsg == null) {
+                        IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(listOf(m))
+                        dbMessages.add(m)
+                    } else {
+                        dbMessages.add(dbMsg)
+                    }
+                }
+                return@flatMap Flowable.just(dbMessages.toList())
+            }.compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+        }
+
     }
 }

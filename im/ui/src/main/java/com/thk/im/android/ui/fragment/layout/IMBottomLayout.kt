@@ -5,11 +5,13 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.thk.im.android.core.base.extension.dp2px
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageBottomBinding
 import com.thk.im.android.ui.fragment.adapter.PanelFragmentAdapter
@@ -23,9 +25,10 @@ class IMBottomLayout : ConstraintLayout {
     private var contentHeight = 0
     private var binding: LayoutMessageBottomBinding
 
-    private lateinit var msgSender: IMMsgSender
-    private lateinit var msgPreviewer: IMMsgPreviewer
-    private lateinit var fragment: Fragment
+    private lateinit var lifecycleOwner: LifecycleOwner
+    private lateinit var session: Session
+    private var msgPreviewer: IMMsgPreviewer? = null
+    private var msgSender: IMMsgSender? = null
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -37,8 +40,14 @@ class IMBottomLayout : ConstraintLayout {
         binding = LayoutMessageBottomBinding.bind(view)
     }
 
-    fun init(fragment: Fragment, sender: IMMsgSender, previewer: IMMsgPreviewer) {
-        this.fragment = fragment
+    fun init(
+        lifecycleOwner: LifecycleOwner,
+        session: Session,
+        sender: IMMsgSender?,
+        previewer: IMMsgPreviewer?
+    ) {
+        this.lifecycleOwner = lifecycleOwner
+        this.session = session
         this.msgSender = sender
         this.msgPreviewer = previewer
         initView()
@@ -46,7 +55,8 @@ class IMBottomLayout : ConstraintLayout {
 
     private fun initView() {
         binding.root.visibility = INVISIBLE
-        val linearLayoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        val linearLayoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding.vpMenu.layoutManager = linearLayoutManager
 
         val adapter = PanelMenuAdapter()
@@ -57,7 +67,7 @@ class IMBottomLayout : ConstraintLayout {
         }
         binding.vpMenu.adapter = adapter
 
-        binding.vpContent.adapter = PanelFragmentAdapter(fragment)
+        binding.vpContent.adapter = PanelFragmentAdapter(lifecycleOwner as Fragment)
         binding.vpContent.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         binding.vpContent.offscreenPageLimit = 5
         binding.vpContent.registerOnPageChangeCallback(object : OnPageChangeCallback() {
@@ -88,7 +98,7 @@ class IMBottomLayout : ConstraintLayout {
             binding.rcvFunctions.visibility = VISIBLE
             200.dp2px()
         }
-        msgSender.moveUpAlwaysShowView(false, contentHeight, 150)
+        msgSender?.moveUpAlwaysShowView(false, contentHeight, 150)
     }
 
 
@@ -100,7 +110,7 @@ class IMBottomLayout : ConstraintLayout {
     fun closeBottomPanel() {
         binding.root.visibility = INVISIBLE
         contentHeight = 0
-        msgSender.moveUpAlwaysShowView(false, contentHeight, 150)
+        msgSender?.moveUpAlwaysShowView(false, contentHeight, 150)
     }
 
     fun onKeyboardChange(isKeyShowing: Boolean, height: Int, duration: Long) {

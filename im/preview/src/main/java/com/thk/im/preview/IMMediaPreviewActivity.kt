@@ -35,7 +35,7 @@ import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import kotlin.math.abs
 
-class MessagePreviewActivity : AppCompatActivity() {
+class IMMediaPreviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMediaPreviewBinding
     private lateinit var adapter: MessagePreviewAdapter
@@ -170,7 +170,7 @@ class MessagePreviewActivity : AppCompatActivity() {
                 if (binding.clContent.background.alpha != 255) {
                     if (binding.clContent.background.alpha < 180) {
                         binding.clContent.background.alpha = 0
-                        this@MessagePreviewActivity.exit()
+                        this@IMMediaPreviewActivity.exit()
                     } else {
                         reset()
                     }

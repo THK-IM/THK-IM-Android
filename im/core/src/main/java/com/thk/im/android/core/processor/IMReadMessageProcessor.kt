@@ -213,4 +213,8 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
             readLock.readLock().unlock()
         }
     }
+
+    override fun needReprocess(msg: Message): Boolean {
+        return true
+    }
 }

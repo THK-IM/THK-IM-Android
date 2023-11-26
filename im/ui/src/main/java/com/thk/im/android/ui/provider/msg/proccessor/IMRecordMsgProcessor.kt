@@ -13,6 +13,22 @@ class IMRecordMsgProcessor : IMBaseMsgProcessor() {
         return MsgType.RECORD.value
     }
 
+    override fun received(msg: Message) {
+        super.received(msg)
+        if (msg.content != null) {
+            val recordBody = Gson().fromJson(msg.content, IMRecordMsgBody::class.java)
+            IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(recordBody.messages)
+        }
+    }
+
+    override fun reprocessingFlowable(message: Message): Flowable<Message>? {
+        if (message.content != null) {
+            val recordBody = Gson().fromJson(message.content, IMRecordMsgBody::class.java)
+            IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(recordBody.messages)
+        }
+        return Flowable.just(message)
+    }
+
     override fun sendToServer(message: Message): Flowable<Message> {
         if (message.content == null) {
             return super.sendToServer(message)
@@ -37,6 +53,10 @@ class IMRecordMsgProcessor : IMBaseMsgProcessor() {
             recordFromUIds,
             recordClientIds
         )
+    }
+
+    override fun needReprocess(msg: Message): Boolean {
+        return true
     }
 
     override fun getSessionDesc(msg: Message): String {

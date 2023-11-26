@@ -102,6 +102,10 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
         }
     }
 
+    override fun needReprocess(msg: Message): Boolean {
+        return true
+    }
+
     override fun getSessionDesc(msg: Message): String {
         return if (msg.data != null) {
             val revokeData = Gson().fromJson(msg.data!!, IMRevokeMsgData::class.java)

@@ -2,7 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <activity
-            android:name="com.thk.im.preview.MessagePreviewActivity"
+            android:name="com.thk.im.preview.IMMediaPreviewActivity"
             android:theme="@style/AppThemeMediaPreview" />
+
+        <activity
+            android:name="com.thk.im.preview.IMRecordPreviewActivity"
+            android:theme="@style/Common"/>
     </application>
 </manifest>

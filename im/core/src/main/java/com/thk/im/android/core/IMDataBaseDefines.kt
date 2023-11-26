@@ -14,7 +14,8 @@ enum class SessionStatus(val value: Int) {
 enum class SessionType(val value: Int) {
     Single(1),
     Group(2),
-    SuperGroup(3)
+    SuperGroup(3),
+    MsgRecord(4)
 }
 
 /**
@@ -61,7 +62,6 @@ enum class MsgOperateStatus(var value: Int) {
  * 消息类型
  */
 enum class MsgType(var value: Int) {
-    Revoke(-1001),  // 撤回消息
     Reedit(-3),     // 重编辑消息
     READ(-2),       // 读消息消息
     RECEIVED(-1),   // 收消息消息
@@ -72,6 +72,7 @@ enum class MsgType(var value: Int) {
     IMAGE(4),       // 图片消息
     VIDEO(6),       // 视频消息
     RECORD(7),      // 消息记录
+    Revoke(100),    // 撤回消息
 }
 
 /**

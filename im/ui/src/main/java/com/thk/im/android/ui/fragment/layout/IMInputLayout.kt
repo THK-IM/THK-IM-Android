@@ -14,14 +14,15 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.emoji2.widget.EmojiEditText
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import com.thk.im.android.core.base.LLog
-import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.utils.ToastUtils
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
 import com.thk.im.android.ui.manager.IMAudioMsgData
@@ -38,9 +39,10 @@ class IMInputLayout : ConstraintLayout {
 
     private var binding: LayoutMessageInputBinding
 
-    private lateinit var msgSender: IMMsgSender
-    private lateinit var msgPreviewer: IMMsgPreviewer
-    private lateinit var fragment: Fragment
+    private lateinit var lifecycleOwner: LifecycleOwner
+    private lateinit var session: Session
+    private var msgPreviewer: IMMsgPreviewer? = null
+    private var msgSender: IMMsgSender? = null
 
     private var audioEventY = 0f
     private var audioCancel = false
@@ -61,7 +63,7 @@ class IMInputLayout : ConstraintLayout {
         binding.etMessage.requestFocus()
         binding.tvSendMsg.setOnClickListener {
             binding.etMessage.text?.let {
-                msgSender.sendMessage(MsgType.TEXT.value, it.toString(), null)
+                msgSender?.sendMessage(MsgType.TEXT.value, it.toString(), null)
             }
             binding.etMessage.text = null
         }
@@ -101,17 +103,20 @@ class IMInputLayout : ConstraintLayout {
             binding.etMessage.visibility = View.VISIBLE
             binding.ivEmo.isSelected = !binding.ivEmo.isSelected
             if (binding.ivEmo.isSelected) {
-                // 关闭键盘 显示表情
-                if (msgSender.isKeyboardShowing()) {
-                    closeKeyboard(object : ResultReceiver(handler) {
-                        override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
-                            super.onReceiveResult(resultCode, resultData)
-                            msgSender.showBottomPanel(0)
-                        }
-                    })
-                } else {
-                    msgSender.showBottomPanel(0)
+                msgSender?.let {
+                    // 关闭键盘 显示表情
+                    if (it.isKeyboardShowing()) {
+                        closeKeyboard(object : ResultReceiver(handler) {
+                            override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+                                super.onReceiveResult(resultCode, resultData)
+                                it.showBottomPanel(0)
+                            }
+                        })
+                    } else {
+                        it.showBottomPanel(0)
+                    }
                 }
+
             } else {
                 // 关闭表情 显示键盘
                 openKeyboard()
@@ -125,20 +130,22 @@ class IMInputLayout : ConstraintLayout {
             binding.etMessage.visibility = View.VISIBLE
             binding.ivAddMore.isSelected = !binding.ivAddMore.isSelected
             if (binding.ivAddMore.isSelected) {
-                // 关闭键盘 显示更多
-                if (msgSender.isKeyboardShowing()) {
-                    closeKeyboard(object : ResultReceiver(handler) {
-                        override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
-                            super.onReceiveResult(resultCode, resultData)
-                            msgSender.showBottomPanel(1)
-                        }
-                    })
-                } else {
-                    msgSender.showBottomPanel(1)
+                msgSender?.let {
+                    // 关闭键盘 显示更多
+                    if (it.isKeyboardShowing()) {
+                        closeKeyboard(object : ResultReceiver(handler) {
+                            override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+                                super.onReceiveResult(resultCode, resultData)
+                                it.showBottomPanel(1)
+                            }
+                        })
+                    } else {
+                        it.showBottomPanel(1)
+                    }
                 }
             } else {
                 // 关闭更多 显示键盘
-                msgSender.openKeyboard()
+                msgSender?.openKeyboard()
             }
         }
 
@@ -170,22 +177,28 @@ class IMInputLayout : ConstraintLayout {
         }
 
         binding.ivMsgOprCancel.setOnClickListener {
-            msgSender.setSelectMode(false, null)
+            msgSender?.setSelectMode(false, null)
         }
 
         binding.ivMsgOprDelete.setOnClickListener {
-            msgSender.deleteSelectedMessages()
-            msgSender.setSelectMode(false, null)
+            msgSender?.deleteSelectedMessages()
+            msgSender?.setSelectMode(false, null)
         }
 
         binding.ivMsgOprForward.setOnClickListener {
-            msgSender.forwardSelectedMessages(1)
-            msgSender.setSelectMode(false, null)
+            msgSender?.forwardSelectedMessages(1)
+            msgSender?.setSelectMode(false, null)
         }
     }
 
-    fun init(fragment: Fragment, sender: IMMsgSender, previewer: IMMsgPreviewer) {
-        this.fragment = fragment
+    fun init(
+        lifecycleOwner: LifecycleOwner,
+        session: Session,
+        sender: IMMsgSender?,
+        previewer: IMMsgPreviewer?
+    ) {
+        this.lifecycleOwner = lifecycleOwner
+        this.session = session
         this.msgSender = sender
         this.msgPreviewer = previewer
     }
@@ -271,7 +284,7 @@ class IMInputLayout : ConstraintLayout {
         if (!contentProvider.isRecordingAudio()) {
             binding.btRecordVoice.text = "松开 发送"
             val path = IMCoreManager.storageModule.allocSessionFilePath(
-                msgSender.getSession().id,
+                session.id,
                 "${System.currentTimeMillis() / 100}_audio.oga",
                 IMFileFormat.Audio.value
             )
@@ -300,7 +313,7 @@ class IMInputLayout : ConstraintLayout {
     private fun onAudioCallback(path: String, second: Int, db: Double, state: AudioStatus) {
         when (state) {
             AudioStatus.Ing, AudioStatus.Waiting -> {
-                com.thk.im.android.core.base.utils.ToastUtils.show("录音时长:$second, db: $db")
+                ToastUtils.show("录音时长:$second, db: $db")
             }
 
             AudioStatus.Finished -> {
@@ -309,7 +322,7 @@ class IMInputLayout : ConstraintLayout {
                     audioMsgData.duration = second
                     audioMsgData.path = path
                     audioMsgData.played = true
-                    msgSender.sendMessage(MsgType.Audio.value, null, audioMsgData)
+                    msgSender?.sendMessage(MsgType.Audio.value, null, audioMsgData)
                 }
             }
 

@@ -137,9 +137,6 @@ class MessageAdapter(
     }
 
     fun insertNew(message: Message): Int {
-        if (message.type < 0 && message.type > -1000) {
-            return -1
-        }
         synchronized(this) {
             val pos = findPosition(message)
             if (pos >= 0 && pos < messageList.size) {
@@ -168,9 +165,6 @@ class MessageAdapter(
     }
 
     fun update(message: Message) {
-        if (message.type < 0 && message.type > -1000) {
-            return
-        }
         synchronized(this) {
             val pos = findPosition(message)
             if (pos >= 0 && pos < messageList.size) {

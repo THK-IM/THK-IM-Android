@@ -63,16 +63,16 @@ open class DefaultMessageModule : MessageModule {
                 try {
                     val sessionMessages = mutableMapOf<Long, MutableList<Message>>()
                     val unProcessorMessages = mutableListOf<Message>()
-                    val operatorMessages = mutableListOf<Message>()
+                    val needProcessMessages = mutableListOf<Message>()
                     for (m in messages) {
                         if (m.fUid == IMCoreManager.uId) {
                             m.oprStatus =
                                 m.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
                         }
                         m.sendStatus = MsgSendStatus.Success.value
-                        if (m.type < 0) {
+                        if (getMsgProcessor(m.type).needReprocess(m)) {
                             // 状态操作消息交给对应消息处理器自己处理
-                            operatorMessages.add(m)
+                            needProcessMessages.add(m)
                         } else {
                             // 其他消息批量处理
                             if (sessionMessages[m.sid] == null) {
@@ -95,7 +95,7 @@ open class DefaultMessageModule : MessageModule {
                         }
                     }
 
-                    for (m in operatorMessages) {
+                    for (m in needProcessMessages) {
                         getMsgProcessor(m.type).received(m)
                     }
 
@@ -357,7 +357,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun notifyNewMessage(session: Session, message: Message) {
-        if ((message.type < 0 && message.type > -1000) || message.fUid == IMCoreManager.uId) {
+        if (message.type < 0  || message.fUid == IMCoreManager.uId) {
             return
         }
         if (session.status.and(SessionStatus.Silence.value) > 0) {

@@ -63,6 +63,7 @@ object IMCoreManager {
     }
 
     fun connect() {
+        db.open()
         signalModule.setSignalListener(object : SignalListener {
             override fun onSignalStatusChange(status: Int) {
                 XEventBus.post(IMEvent.OnlineStatusUpdate.value, status)

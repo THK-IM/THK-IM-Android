@@ -418,6 +418,7 @@ open class DefaultMessageModule : MessageModule {
     private fun deleteLocalSession(session: Session): Flowable<Void> {
         return Flowable.create({
             try {
+                IMCoreManager.getImDataBase().messageDao().deleteSessionMessages(session.id)
                 IMCoreManager.getImDataBase().sessionDao().deleteSessions(session)
             } catch (e: Exception) {
                 it.onError(e)

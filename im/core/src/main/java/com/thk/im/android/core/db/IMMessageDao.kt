@@ -1,10 +1,5 @@
 package com.thk.im.android.core.db
 
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.db.entity.Message
@@ -22,6 +17,8 @@ interface IMMessageDao {
     fun deleteMessageByCTimeExclude(sid: Long, startTime: Long, endTime: Long)
 
     fun deleteMessageByCTimeInclude(sid: Long, startTime: Long, endTime: Long)
+
+    fun deleteSessionMessages(sid: Long)
 
     fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
 

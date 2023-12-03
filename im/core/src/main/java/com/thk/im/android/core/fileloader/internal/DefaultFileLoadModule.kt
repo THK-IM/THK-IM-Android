@@ -4,10 +4,10 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.fileloader.FileLoadModule
 import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
-import com.thk.im.android.core.db.entity.Message
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import java.io.File
@@ -89,7 +89,14 @@ class DefaultFileLoadModule(
         }
     }
 
-    private fun notify(listener: LoadListener, progress: Int, state: Int, url: String, path: String, exception: Exception?) {
+    private fun notify(
+        listener: LoadListener,
+        progress: Int,
+        state: Int,
+        url: String,
+        path: String,
+        exception: Exception?
+    ) {
         if (listener.notifyOnUiThread()) {
             if (Looper.getMainLooper() == Looper.myLooper()) {
                 listener.onProgress(
@@ -124,7 +131,7 @@ class DefaultFileLoadModule(
         if (key.startsWith("http")) {
             return ""
         }
-        return "s_id=${message.sid}&id=${key}"
+        return "id=${key}"
     }
 
     override fun download(key: String, message: Message, listener: LoadListener) {

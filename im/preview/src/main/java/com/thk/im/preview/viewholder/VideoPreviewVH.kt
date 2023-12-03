@@ -88,7 +88,7 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                 if (it.content != null) {
                     val body = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
                     if (body?.url != null) {
-                        val realUrl = getRealUrl(body.url!!, it.sid)
+                        val realUrl = getRealUrl(body.url!!)
                         val cachePath = VideoCache.getCachePath(realUrl)
                         if (cachePath == null) {
                             VideoCache.registerCacheListener(this, realUrl)
@@ -105,10 +105,10 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
         }
     }
 
-    private fun getRealUrl(url: String, sId: Long): String {
+    private fun getRealUrl(url: String): String {
         var realUrl = url
         if (!url.startsWith("http")) {
-            realUrl = "${VideoCache.getEndpoint()}/session/object/download_url?id=${url}&s_id=${sId}"
+            realUrl = "${VideoCache.getEndpoint()}/session/object/download_url?id=${url}"
         }
         return realUrl
     }
@@ -160,7 +160,7 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                         if (it.content != null) {
                             val body = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
                             if (body?.url != null) {
-                                val realUrl = getRealUrl(body.url!!, it.sid)
+                                val realUrl = getRealUrl(body.url!!)
                                 if (realUrl != url) {
                                     return
                                 }

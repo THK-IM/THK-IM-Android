@@ -16,10 +16,10 @@ class SessionActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentByTag(tag) as IMSessionFragment?
         if (fragment == null) {
             fragment = IMSessionFragment()
-            val ft = supportFragmentManager.beginTransaction()
-            ft.add(R.id.fragment_container, fragment, tag)
-            ft.commit()
         }
+        val ft = supportFragmentManager.beginTransaction()
+        ft.add(R.id.fragment_container, fragment, tag)
+        ft.commit()
         fragment.setSessionClick(object : IMSessionFragment.OnSessionClick {
             override fun onSessionClick(session: Session) {
                 val intent = Intent()

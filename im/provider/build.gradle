@@ -77,8 +77,8 @@ afterEvaluate {
                 name "sonartype-Staging"
                 url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
                 credentials {
-                    username = ossrhUsername
-                    password = ossrhPassword
+                    username = System.getenv("ossrhUsername")
+                    password = System.getenv("ossrhPassword")
                 }
             }
             // 定义snapshot仓库
@@ -86,8 +86,8 @@ afterEvaluate {
                 name "sonatype-Snapshots"
                 url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
                 credentials {
-                    username = ossrhUsername
-                    password = ossrhPassword
+                    username = System.getenv("ossrhUsername")
+                    password = System.getenv("ossrhPassword")
                 }
             }
         }

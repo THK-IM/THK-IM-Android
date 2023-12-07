@@ -1,7 +1,7 @@
 package com.thk.im.android.core.module.internal
 
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.api.bean.UserBean
+import com.thk.im.android.core.api.vo.UserInfoVo
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.module.UserModule
 import io.reactivex.BackpressureStrategy
@@ -9,26 +9,26 @@ import io.reactivex.Flowable
 
 open class DefaultUserModule : UserModule {
 
-    override fun getServerUserInfo(id: Long): Flowable<UserBean> {
+    override fun getServerUserInfo(id: Long): Flowable<UserInfoVo> {
         val now = System.currentTimeMillis()
-        val userBean = UserBean(
+        val userInfoVo = UserInfoVo(
             id, "user$id", "https://picsum.photos/300/300",
             (id % 2).toInt(), now, now
         )
-        return Flowable.just(userBean)
+        return Flowable.just(userInfoVo)
     }
 
-    override fun getServerUsersInfo(ids: Set<Long>): Flowable<List<UserBean>> {
+    override fun getServerUsersInfo(ids: Set<Long>): Flowable<List<UserInfoVo>> {
         val now = System.currentTimeMillis()
-        val userBeans = mutableListOf<UserBean>()
+        val userInfoVos = mutableListOf<UserInfoVo>()
         for (id in ids) {
-            val userBean = UserBean(
+            val userInfoVo = UserInfoVo(
                 id, "user$id", "https://picsum.photos/300/300",
                 (id % 2).toInt(), now, now
             )
-            userBeans.add(userBean)
+            userInfoVos.add(userInfoVo)
         }
-        return Flowable.just(userBeans)
+        return Flowable.just(userInfoVos)
     }
 
     override fun getUserInfo(id: Long): Flowable<User> {
@@ -86,15 +86,15 @@ open class DefaultUserModule : UserModule {
         }
     }
 
-    override fun updateUserInfo(userBean: UserBean): Flowable<Void> {
-        TODO("Not yet implemented")
+    override fun updateUserInfo(userInfoVo: UserInfoVo): Flowable<Void> {
+        return Flowable.empty()
     }
 
-    override fun onUserInfoUpdate(userBean: UserBean) {
+    override fun onUserInfoUpdate(userInfoVo: UserInfoVo) {
 
     }
 
-    override fun onSignalReceived(subType: Int, body: String) {
+    override fun onSignalReceived(type: Int, body: String) {
 
     }
 }

@@ -6,8 +6,8 @@ import com.thk.im.android.core.db.entity.Session
 @Dao
 internal interface SessionDao {
 
-    @Query("select * from session where m_time <= :mTime order by top_timestamp desc, m_time desc limit 0, :count")
-    fun querySessions(count: Int, mTime: Long): List<Session>
+    @Query("select * from session where parent_id = :parentId and m_time <= :mTime order by top_timestamp desc, m_time desc limit 0, :count")
+    fun querySessions(parentId: Long, count: Int, mTime: Long): List<Session>
 
     @Query("select * from session order by m_time desc")
     fun querySessionsByMTime(): List<Session>

@@ -18,10 +18,9 @@ public interface SignalListener {
     /**
      * 收到信令
      *
-     * @param type    信令类型
-     * @param subType 信令子类型
-     * @param signal  信令正文
+     * @param type   信令类型
+     * @param signal 信令正文
      */
-    void onNewSignal(int type, int subType, String signal);
+    void onNewSignal(int type, String signal);
 
 }

@@ -3,7 +3,7 @@ package com.thk.im.android.core.db
 import com.thk.im.android.core.db.entity.Session
 
 interface IMSessionDao {
-    fun querySessions(count: Int, mTime: Long): List<Session>
+    fun querySessions(parentId: Long, count: Int, mTime: Long): List<Session>
 
     fun querySessionsByMTime(): List<Session>
 

@@ -28,7 +28,7 @@ class IMTimeLineMsgVH(
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
         val tvTime: TextView = itemView.findViewById(R.id.tv_time)
-        tvTime.text = com.thk.im.android.core.base.utils.DateUtils.timeToMsgTime(message.cTime, IMCoreManager.getCommonModule().getSeverTime())
+        tvTime.text = DateUtils.timeToMsgTime(message.cTime, IMCoreManager.commonModule.getSeverTime())
     }
 
     override fun onViewDetached() {

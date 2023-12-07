@@ -1,17 +1,17 @@
 package com.thk.im.android.core.api.internal
 
-import com.thk.im.android.core.api.IMApi
-import com.thk.im.android.core.api.bean.AckMsgBean
-import com.thk.im.android.core.api.bean.CreateSessionBean
-import com.thk.im.android.core.api.bean.DeleteMsgBean
-import com.thk.im.android.core.api.bean.ForwardMessageBean
-import com.thk.im.android.core.api.bean.MessageBean
-import com.thk.im.android.core.api.bean.ReadMsgBean
-import com.thk.im.android.core.api.bean.ReeditMsgBean
-import com.thk.im.android.core.api.bean.RevokeMsgBean
-import com.thk.im.android.core.api.bean.UpdateSessionBean
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
+import com.thk.im.android.core.api.IMApi
+import com.thk.im.android.core.api.vo.AckMsgVo
+import com.thk.im.android.core.api.vo.CreateSessionVo
+import com.thk.im.android.core.api.vo.DeleteMsgVo
+import com.thk.im.android.core.api.vo.ForwardMessageVo
+import com.thk.im.android.core.api.vo.MessageVo
+import com.thk.im.android.core.api.vo.ReadMsgVo
+import com.thk.im.android.core.api.vo.ReeditMsgVo
+import com.thk.im.android.core.api.vo.RevokeMsgVo
+import com.thk.im.android.core.api.vo.UpdateSessionVo
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import io.reactivex.Flowable
@@ -77,10 +77,12 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     override fun createSession(
         uId: Long,
         sessionType: Int,
+        name: String,
+        remark: String,
         entityId: Long,
         members: Set<Long>?
     ): Flowable<Session> {
-        val bean = CreateSessionBean(uId, sessionType, entityId, members)
+        val bean = CreateSessionVo(uId, sessionType, entityId, members, name, remark)
         return sessionApi.createSession(bean).flatMap {
             Flowable.just(it.toSession())
         }
@@ -91,13 +93,19 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     }
 
     override fun updateSession(uId: Long, session: Session): Flowable<Void> {
-        val updateSessionBean = UpdateSessionBean(uId, session.id, session.topTimestamp, session.status)
-        return sessionApi.updateSession(updateSessionBean)
+        val updateSessionVo = UpdateSessionVo(
+            uId,
+            session.id,
+            session.topTimestamp,
+            session.status,
+            session.parentId
+        )
+        return sessionApi.updateSession(updateSessionVo)
     }
 
     override fun sendMessageToServer(msg: Message): Flowable<Message> {
-        val bean = MessageBean.buildMessageBean(msg)
-        return messageApi.sendMsg(bean).flatMap {
+        val req = MessageVo.buildMessageVo(msg)
+        return messageApi.sendMsg(req).flatMap {
             msg.msgId = it.msgId
             msg.mTime = it.cTime
             msg.sendStatus = MsgSendStatus.Success.value
@@ -109,7 +117,7 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     }
 
     override fun ackMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
-        val bean = AckMsgBean(sessionId, uId, msgIds)
+        val bean = AckMsgVo(sessionId, uId, msgIds)
         if (msgIds.isEmpty()) {
             return Flowable.empty()
         }
@@ -117,7 +125,7 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     }
 
     override fun readMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
-        val bean = ReadMsgBean(sessionId, uId, msgIds)
+        val bean = ReadMsgVo(sessionId, uId, msgIds)
         if (msgIds.isEmpty()) {
             return Flowable.empty()
         }
@@ -125,7 +133,7 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     }
 
     override fun revokeMessage(uId: Long, sessionId: Long, msgId: Long): Flowable<Void> {
-        val bean = RevokeMsgBean(sessionId, uId, msgId)
+        val bean = RevokeMsgVo(sessionId, uId, msgId)
         return messageApi.revokeMsg(bean)
     }
 
@@ -135,12 +143,12 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         msgId: Long,
         body: String?,
     ): Flowable<Void> {
-        val bean = ReeditMsgBean(sessionId, uId, msgId, body)
+        val bean = ReeditMsgVo(sessionId, uId, msgId, body)
         return messageApi.reeditMsg(bean)
     }
 
     override fun deleteMessages(uId: Long, sessionId: Long, msgIds: Set<Long>): Flowable<Void> {
-        val bean = DeleteMsgBean(sessionId, uId, msgIds)
+        val bean = DeleteMsgVo(sessionId, uId, msgIds)
         if (msgIds.isEmpty()) {
             return Flowable.empty()
         }
@@ -151,7 +159,7 @@ class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         msg: Message,
         forwardSid: Long, fromUserIds: Set<Long>, clientMsgIds: Set<Long>
     ): Flowable<Message> {
-        val bean = ForwardMessageBean.buildMessageBean(msg, forwardSid, fromUserIds, clientMsgIds)
+        val bean = ForwardMessageVo.buildMessageBean(msg, forwardSid, fromUserIds, clientMsgIds)
         return messageApi.forwardMsg(bean).flatMap {
             msg.msgId = it.msgId
             msg.mTime = it.cTime

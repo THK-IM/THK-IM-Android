@@ -91,13 +91,13 @@ object IMUIManager {
         ToastUtils.init(app)
         EmojiCompat.init(BundledEmojiCompatConfig(app))
 
-        IMCoreManager.getMessageModule().registerMsgProcessor(IMUnSupportMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(IMTextMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(IMImageMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(IMAudioMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(IMVideoMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(IMRevokeMsgProcessor())
-        IMCoreManager.getMessageModule().registerMsgProcessor(IMRecordMsgProcessor())
+        IMCoreManager.messageModule.registerMsgProcessor(IMUnSupportMsgProcessor())
+        IMCoreManager.messageModule.registerMsgProcessor(IMTextMsgProcessor())
+        IMCoreManager.messageModule.registerMsgProcessor(IMImageMsgProcessor())
+        IMCoreManager.messageModule.registerMsgProcessor(IMAudioMsgProcessor())
+        IMCoreManager.messageModule.registerMsgProcessor(IMVideoMsgProcessor())
+        IMCoreManager.messageModule.registerMsgProcessor(IMRevokeMsgProcessor())
+        IMCoreManager.messageModule.registerMsgProcessor(IMRecordMsgProcessor())
 
         val providers = arrayOf(
             IMTimeLineMsgIVProvider(),

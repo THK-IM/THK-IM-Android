@@ -253,7 +253,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     override fun deleteSelectedMessages() {
         val messages = binding.rcvMessage.getSelectMessages()
         session?.let {
-            IMCoreManager.getMessageModule().deleteMessages(it.id, messages.toList(), true)
+            IMCoreManager.messageModule.deleteMessages(it.id, messages.toList(), true)
                 .compose(RxTransform.flowableToMain()).subscribe(object : BaseSubscriber<Void>() {
                     override fun onNext(t: Void?) {}
                 })
@@ -263,7 +263,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     override fun readMessage(message: Message) {
         // 对于不是自己发的消息才能发送已读消息
         if (message.fUid != IMCoreManager.uId && message.msgId > 0) {
-            IMCoreManager.getMessageModule()
+            IMCoreManager.messageModule
                 .sendMessage(message.sid, MsgType.READ.value, null, null, null, message.msgId)
         }
     }
@@ -396,7 +396,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
     }
 
     override fun resendMessage(msg: Message) {
-        IMCoreManager.getMessageModule().resend(msg)
+        IMCoreManager.messageModule.resend(msg)
     }
 
     override fun sendMessage(
@@ -410,7 +410,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
             override fun onResult(message: Message, e: Exception?) {}
         }
-        IMCoreManager.getMessageModule()
+        IMCoreManager.messageModule
             .sendMessage(session!!.id, type, body, data, atUser, referMsgId, callback)
     }
 

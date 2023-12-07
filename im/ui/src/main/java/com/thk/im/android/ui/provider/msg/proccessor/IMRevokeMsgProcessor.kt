@@ -59,7 +59,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
             .subscribe(subscriber)
         disposables.add(subscriber)
         if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
-            IMCoreManager.getMessageModule().ackMessageToCache(msg)
+            IMCoreManager.messageModule.ackMessageToCache(msg)
         }
     }
 
@@ -85,7 +85,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
             if (existed) {
                 IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(listOf(msg))
                 XEventBus.post(IMEvent.MsgNew.value, msg)
-                IMCoreManager.getMessageModule().processSessionByMessage(msg)
+                IMCoreManager.messageModule.processSessionByMessage(msg)
             }
             return@flatMap Flowable.just(msg)
         }
@@ -95,7 +95,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
         if (msg.fUid == IMCoreManager.uId) {
             return Flowable.just("你")
         } else {
-            return IMCoreManager.getUserModule().getUserInfo(msg.fUid)
+            return IMCoreManager.userModule.getUserInfo(msg.fUid)
                 .flatMap {
                     return@flatMap Flowable.just(it.name)
                 }

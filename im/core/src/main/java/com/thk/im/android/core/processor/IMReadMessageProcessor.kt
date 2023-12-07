@@ -133,7 +133,7 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
                     // 已读消息入库，并ack
                     insertOrUpdateDb(msg, notify = false, notifySession = false)
                     if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
-                        IMCoreManager.getMessageModule().ackMessageToCache(msg)
+                        IMCoreManager.messageModule.ackMessageToCache(msg)
                     }
                 }
             }

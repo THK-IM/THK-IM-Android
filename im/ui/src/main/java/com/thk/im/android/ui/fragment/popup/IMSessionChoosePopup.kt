@@ -69,7 +69,7 @@ class IMSessionChoosePopup constructor(
     private fun forward(session: Session) {
         if (forwardType == 0) {
             for (m in messages) {
-                IMCoreManager.getMessageModule().getMsgProcessor(m.type)
+                IMCoreManager.messageModule.getMsgProcessor(m.type)
                     .forwardMessage(m, session.id)
             }
         } else {
@@ -85,7 +85,7 @@ class IMSessionChoosePopup constructor(
                         cleanMessages.add(msg)
                     }
                     val body = IMRecordMsgBody(t.title, cleanMessages, t.content)
-                    IMCoreManager.getMessageModule()
+                    IMCoreManager.messageModule
                         .sendMessage(session.id, MsgType.RECORD.value, body, null)
                 }
             }
@@ -100,12 +100,12 @@ class IMSessionChoosePopup constructor(
         for (subMessage in messages) {
             uIds.add(subMessage.fUid)
         }
-        return IMCoreManager.getUserModule().getUserInfo(uIds).flatMap {
+        return IMCoreManager.userModule.getUserInfo(uIds).flatMap {
             var content = ""
             var i = 0
             for (subMessage in messages) {
                 val userName = it[subMessage.fUid]?.name ?: "XX"
-                val subContent = IMCoreManager.getMessageModule()
+                val subContent = IMCoreManager.messageModule
                     .getMsgProcessor(subMessage.type).getSessionDesc(subMessage)
                 content = content.plus("${userName}:${subContent}")
                 i++
@@ -116,7 +116,7 @@ class IMSessionChoosePopup constructor(
             val recordMsgBody = IMRecordMsgBody("", messages.toList(), content)
             return@flatMap Flowable.just(recordMsgBody)
         }.flatMap {
-            return@flatMap IMCoreManager.getUserModule().getUserInfo(IMCoreManager.uId)
+            return@flatMap IMCoreManager.userModule.getUserInfo(IMCoreManager.uId)
                 .flatMap { user ->
                     it.title = user.name
                     return@flatMap Flowable.just(it)

@@ -4,7 +4,7 @@ import com.thk.im.android.core.module.GroupModule
 
 open class DefaultGroupModule : GroupModule {
 
-    override fun onSignalReceived(subType: Int, body: String) {
+    override fun onSignalReceived(type: Int, body: String) {
 
     }
 }

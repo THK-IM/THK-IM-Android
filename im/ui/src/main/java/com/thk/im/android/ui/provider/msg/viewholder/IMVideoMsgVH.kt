@@ -78,7 +78,7 @@ class IMVideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         if (imagePath != "") {
             renderThumbnailImage(imagePath)
         } else {
-            IMCoreManager.getMessageModule().getMsgProcessor(message.type)
+            IMCoreManager.messageModule.getMsgProcessor(message.type)
                 .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
         }
     }

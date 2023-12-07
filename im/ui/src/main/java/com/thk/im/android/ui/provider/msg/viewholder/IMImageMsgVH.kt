@@ -67,7 +67,7 @@ class IMImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         if (imagePath != "") {
             renderImage(imagePath)
         } else {
-            IMCoreManager.getMessageModule().getMsgProcessor(message.type)
+            IMCoreManager.messageModule.getMsgProcessor(message.type)
                 .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
         }
     }

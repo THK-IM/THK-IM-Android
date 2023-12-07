@@ -1,13 +1,13 @@
 package com.thk.im.android.core.api.internal
 
-import com.thk.im.android.core.api.bean.AckMsgBean
-import com.thk.im.android.core.api.bean.DeleteMsgBean
-import com.thk.im.android.core.api.bean.ForwardMessageBean
-import com.thk.im.android.core.api.bean.ListBean
-import com.thk.im.android.core.api.bean.MessageBean
-import com.thk.im.android.core.api.bean.ReadMsgBean
-import com.thk.im.android.core.api.bean.ReeditMsgBean
-import com.thk.im.android.core.api.bean.RevokeMsgBean
+import com.thk.im.android.core.api.vo.AckMsgVo
+import com.thk.im.android.core.api.vo.DeleteMsgVo
+import com.thk.im.android.core.api.vo.ForwardMessageVo
+import com.thk.im.android.core.api.vo.ListVo
+import com.thk.im.android.core.api.vo.MessageVo
+import com.thk.im.android.core.api.vo.ReadMsgVo
+import com.thk.im.android.core.api.vo.ReeditMsgVo
+import com.thk.im.android.core.api.vo.RevokeMsgVo
 import io.reactivex.Flowable
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -22,15 +22,15 @@ interface MessageApi {
      */
     @POST("/message")
     fun sendMsg(
-        @Body body: MessageBean
-    ): Flowable<MessageBean>
+        @Body body: MessageVo
+    ): Flowable<MessageVo>
 
     /**
      * 发送消息ack
      */
     @POST("/message/ack")
     fun ackMsg(
-        @Body body: AckMsgBean
+        @Body body: AckMsgVo
     ): Flowable<Void>
 
     /**
@@ -38,7 +38,7 @@ interface MessageApi {
      */
     @POST("/message/read")
     fun readMsg(
-        @Body body: ReadMsgBean
+        @Body body: ReadMsgVo
     ): Flowable<Void>
 
     /**
@@ -46,7 +46,7 @@ interface MessageApi {
      */
     @POST("/message/revoke")
     fun revokeMsg(
-        @Body body: RevokeMsgBean
+        @Body body: RevokeMsgVo
     ): Flowable<Void>
 
     /**
@@ -54,7 +54,7 @@ interface MessageApi {
      */
     @POST("/message/reedit")
     fun reeditMsg(
-        @Body body: ReeditMsgBean
+        @Body body: ReeditMsgVo
     ): Flowable<Void>
 
     /**
@@ -62,8 +62,8 @@ interface MessageApi {
      */
     @POST("/message/forward")
     fun forwardMsg(
-        @Body body: ForwardMessageBean
-    ): Flowable<ForwardMessageBean>
+        @Body body: ForwardMessageVo
+    ): Flowable<ForwardMessageVo>
 
     /**
      * 查询最近消息
@@ -74,14 +74,14 @@ interface MessageApi {
         @Query("c_time") cTime: Long,
         @Query("offset") offset: Int,
         @Query("count") count: Int
-    ): Flowable<ListBean<MessageBean>>
+    ): Flowable<ListVo<MessageVo>>
 
     /**
      * 删除消息
      */
     @HTTP(method = "DELETE", path = "/message", hasBody = true)
     fun deleteMessages(
-        @Body body: DeleteMsgBean
+        @Body body: DeleteMsgVo
     ): Flowable<Void>
 
 }

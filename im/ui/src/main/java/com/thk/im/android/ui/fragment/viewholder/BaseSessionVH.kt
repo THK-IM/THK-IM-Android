@@ -64,7 +64,7 @@ abstract class BaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
             if (this.session.topTimestamp > 0) {
                 this.session.topTimestamp = 0
             } else {
-                this.session.topTimestamp = IMCoreManager.getCommonModule().getSeverTime()
+                this.session.topTimestamp = IMCoreManager.commonModule.getSeverTime()
             }
             this.sessionVHOperator?.updateSession(this.session)
         }
@@ -74,11 +74,11 @@ abstract class BaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
     }
 
     fun getUserModule(): UserModule {
-        return IMCoreManager.getModule(SignalType.User.value) as UserModule
+        return IMCoreManager.userModule
     }
 
     fun getGroupModule(): GroupModule {
-        return IMCoreManager.getModule(SignalType.Group.value) as GroupModule
+        return IMCoreManager.groupModule
     }
 
     override fun onViewRecycled() {

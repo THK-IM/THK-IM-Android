@@ -2,9 +2,9 @@ package com.thk.im.android.core.module.internal
 
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.module.CommonModule
+import com.thk.im.android.core.signal.SignalType
 
 open class DefaultCommonModule : CommonModule {
-
 
     private val timeMap: MutableMap<String, Long> = HashMap()
     private val client = "client"
@@ -28,17 +28,17 @@ open class DefaultCommonModule : CommonModule {
         }
     }
 
-    override fun onSignalReceived(subType: Int, body: String) {
-        if (subType == CommonSubType.PONG.value) {
-            IMCoreManager.getMessageModule().ackMessagesToServer()
-        } else if (subType == CommonSubType.ServerTime.value) {
+    override fun onSignalReceived(type: Int, body: String) {
+        if (type == SignalType.SignalPong.value) {
+            IMCoreManager.messageModule.ackMessagesToServer()
+        } else if (type == SignalType.SignalSyncTime.value) {
             val time = body.toLong()
             if (time != 0L) {
                 setSeverTime(time)
             }
-        } else if (subType == CommonSubType.ConnId.value) {
+        } else if (type == SignalType.SignalConnId.value) {
             IMCoreManager.signalModule.connId = body
-            IMCoreManager.getMessageModule().syncOfflineMessages()
+            IMCoreManager.messageModule.syncOfflineMessages()
         }
     }
 }

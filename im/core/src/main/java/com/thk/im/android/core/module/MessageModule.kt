@@ -41,7 +41,7 @@ interface MessageModule : BaseModule {
     /**
      * 分页获取本地session
      */
-    fun queryLocalSessions(count: Int, mTime: Long): Flowable<List<Session>>
+    fun queryLocalSessions(parentId: Long, count: Int, mTime: Long): Flowable<List<Session>>
 
     /**
      * 分页获取本地message

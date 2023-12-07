@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
-import com.thk.im.android.core.api.bean.MessageBean
+import com.thk.im.android.core.api.vo.MessageVo
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
@@ -45,6 +45,10 @@ open class DefaultMessageModule : MessageModule {
     private val ackLock = ReentrantReadWriteLock()
     private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 Ios:1 Android:2
 
+    open fun getOfflineMsgCountPerRequest(): Int {
+        return 200
+    }
+
     override fun registerMsgProcessor(processor: IMBaseMsgProcessor) {
         processorMap[processor.messageType()] = processor
     }
@@ -56,7 +60,7 @@ open class DefaultMessageModule : MessageModule {
 
     override fun syncOfflineMessages() {
         val lastTime = this.getOfflineMsgLastSyncTime()
-        val count = 200
+        val count = this.getOfflineMsgCountPerRequest()
         LLog.v("syncOfflineMessages $lastTime")
         val disposable = object : BaseSubscriber<List<Message>>() {
             override fun onNext(messages: List<Message>) {
@@ -155,7 +159,7 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap Flowable.just(session)
             } else {
                 val uId = IMCoreManager.uId
-                return@flatMap IMCoreManager.imApi.createSession(uId, sessionType, entityId, null)
+                return@flatMap IMCoreManager.imApi.createSession(uId, sessionType, "", "", entityId, null)
             }
         }
     }
@@ -179,9 +183,9 @@ open class DefaultMessageModule : MessageModule {
         }
     }
 
-    override fun queryLocalSessions(count: Int, mTime: Long): Flowable<List<Session>> {
+    override fun queryLocalSessions(parentId: Long, count: Int, mTime: Long): Flowable<List<Session>> {
         return Flowable.create({
-            val sessions = IMCoreManager.getImDataBase().sessionDao().querySessions(count, mTime)
+            val sessions = IMCoreManager.getImDataBase().sessionDao().querySessions(parentId, count, mTime)
             it.onNext(sessions)
             it.onComplete()
         }, BackpressureStrategy.LATEST)
@@ -221,7 +225,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun generateNewMsgId(): Long {
-        val current = IMCoreManager.getCommonModule().getSeverTime()
+        val current = IMCoreManager.commonModule.getSeverTime()
         try {
             idLock.tryLock(1, TimeUnit.SECONDS)
             if (current == lastTimestamp) {
@@ -366,17 +370,13 @@ open class DefaultMessageModule : MessageModule {
         AppUtils.instance().notifyNewMessage()
     }
 
-    override fun onSignalReceived(subType: Int, body: String) {
-        if (subType == 0) {
-            try {
-                val bean = Gson().fromJson(body, MessageBean::class.java)
-                val msg = bean.toMessage()
-                onNewMessage(msg)
-            } catch (e: Exception) {
-                LLog.e("onSignalReceived err, $e")
-            }
-        } else {
-            LLog.e("onSignalReceived err $subType, $body")
+    override fun onSignalReceived(type: Int, body: String) {
+        try {
+            val bean = Gson().fromJson(body, MessageVo::class.java)
+            val msg = bean.toMessage()
+            onNewMessage(msg)
+        } catch (e: Exception) {
+            LLog.e("onSignalReceived err, $e, $type, $body")
         }
     }
 

@@ -33,6 +33,7 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
     private var hasMore = true
     private val count = 10
     private var isLoading = false
+    private var parentId: Long = 0L
 
     private var sessionClick: OnSessionClick? = null
 
@@ -48,6 +49,11 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        parentId = if (arguments == null) {
+            0L
+        } else {
+            requireArguments().getLong("parentId")
+        }
         initSessionRecyclerView(view)
         loadSessions()
         initEventBus()
@@ -74,17 +80,23 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.SessionNew.value, Observer<Session> {
             it?.let {
-                sessionAdapter.onNewSession(it)
+                if (it.parentId == parentId) {
+                    sessionAdapter.onNewSession(it)
+                }
             }
         })
         XEventBus.observe(this, IMEvent.SessionUpdate.value, Observer<Session> {
             it?.let {
-                sessionAdapter.onSessionUpdate(it)
+                if (it.parentId == parentId) {
+                    sessionAdapter.onSessionUpdate(it)
+                }
             }
         })
         XEventBus.observe(this, IMEvent.SessionDelete.value, Observer<Session> {
             it?.let {
-                sessionAdapter.onSessionRemove(it)
+                if (it.parentId == parentId) {
+                    sessionAdapter.onSessionRemove(it)
+                }
             }
         })
     }
@@ -112,11 +124,11 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
                 isLoading = false
             }
         }
-        var current = IMCoreManager.getCommonModule().getSeverTime()
+        var current = IMCoreManager.commonModule.getSeverTime()
         if (sessionAdapter.getSessionList().isNotEmpty()) {
             current = sessionAdapter.getSessionList().last().mTime
         }
-        IMCoreManager.getMessageModule().queryLocalSessions(10, current)
+        IMCoreManager.messageModule.queryLocalSessions(parentId, 10, current)
             .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
     }
@@ -132,7 +144,7 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
                 }
             }
         }
-        IMCoreManager.getMessageModule().updateSession(session, true)
+        IMCoreManager.messageModule.updateSession(session, true)
             .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
     }
@@ -148,7 +160,7 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
                 }
             }
         }
-        IMCoreManager.getMessageModule().deleteSession(session, true)
+        IMCoreManager.messageModule.deleteSession(session, true)
             .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
     }

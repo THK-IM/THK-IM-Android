@@ -40,7 +40,7 @@ class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
 
     private fun downloadOriginImage() {
         message?.let {
-            val processor = IMCoreManager.getMessageModule().getMsgProcessor(it.type)
+            val processor = IMCoreManager.messageModule.getMsgProcessor(it.type)
             processor.downloadMsgContent(it, IMMsgResourceType.Source.value)
         }
     }

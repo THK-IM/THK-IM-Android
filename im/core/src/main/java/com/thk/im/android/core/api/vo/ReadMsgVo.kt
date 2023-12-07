@@ -1,8 +1,8 @@
-package com.thk.im.android.core.api.bean
+package com.thk.im.android.core.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class DeleteMsgBean(
+data class ReadMsgVo(
     @SerializedName("s_id")
     val sid: Long,
     @SerializedName("u_id")

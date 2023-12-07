@@ -1,9 +1,9 @@
-package com.thk.im.android.core.api.bean
+package com.thk.im.android.core.api.vo
 
 import com.google.gson.annotations.SerializedName
 import com.thk.im.android.core.db.entity.User
 
-data class UserBean(
+data class UserInfoVo(
     @SerializedName("id")
     var id: Long = 0,
     @SerializedName("name")

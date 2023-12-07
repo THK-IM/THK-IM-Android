@@ -17,6 +17,9 @@ class SessionActivity : AppCompatActivity() {
         if (fragment == null) {
             fragment = IMSessionFragment()
         }
+        val bundle = Bundle()
+        bundle.putLong("parentId", 0L)
+        fragment.arguments = bundle
         val ft = supportFragmentManager.beginTransaction()
         ft.add(R.id.fragment_container, fragment, tag)
         ft.commit()

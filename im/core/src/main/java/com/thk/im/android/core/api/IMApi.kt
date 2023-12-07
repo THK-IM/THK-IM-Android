@@ -19,7 +19,7 @@ interface IMApi {
     /**
      * 创建会话
      */
-    fun createSession(uId: Long, sessionType: Int, entityId: Long, members: Set<Long>?): Flowable<Session>
+    fun createSession(uId: Long, sessionType: Int, name: String, remark: String, entityId: Long, members: Set<Long>?): Flowable<Session>
 
 
     /**

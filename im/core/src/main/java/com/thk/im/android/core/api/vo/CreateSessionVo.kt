@@ -1,8 +1,8 @@
-package com.thk.im.android.core.api.bean
+package com.thk.im.android.core.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class CreateSessionBean(
+data class CreateSessionVo(
     @SerializedName("u_id")
     var uId: Long,
     @SerializedName("type")
@@ -11,4 +11,8 @@ data class CreateSessionBean(
     val entityId: Long,
     @SerializedName("members")
     val members: Set<Long>?,
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("remark")
+    val remark: String,
 )

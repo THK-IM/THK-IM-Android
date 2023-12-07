@@ -10,7 +10,7 @@ public interface SignalModule {
 
     /**
      * 设置连接时间
-     * @param connId
+     * @param connId 连接id
      */
     void setConnId(String connId);
 

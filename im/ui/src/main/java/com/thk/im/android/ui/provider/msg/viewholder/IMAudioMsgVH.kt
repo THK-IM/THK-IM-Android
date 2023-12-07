@@ -57,7 +57,7 @@ class IMAudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
 
         render(duration, played)
         if (path == "") {
-            IMCoreManager.getMessageModule().getMsgProcessor(message.type)
+            IMCoreManager.messageModule.getMsgProcessor(message.type)
                 .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
         }
     }

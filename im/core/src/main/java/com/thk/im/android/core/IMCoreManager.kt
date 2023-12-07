@@ -9,15 +9,9 @@ import com.thk.im.android.core.db.IMDataBase
 import com.thk.im.android.core.db.internal.DefaultIMDataBase
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadModule
-import com.thk.im.android.core.module.BaseModule
-import com.thk.im.android.core.module.CommonModule
-import com.thk.im.android.core.module.ContactorModule
-import com.thk.im.android.core.module.CustomModule
-import com.thk.im.android.core.module.GroupModule
-import com.thk.im.android.core.module.MessageModule
-import com.thk.im.android.core.module.UserModule
 import com.thk.im.android.core.module.internal.DefaultCommonModule
 import com.thk.im.android.core.module.internal.DefaultContactorModule
+import com.thk.im.android.core.module.internal.DefaultCustomModule
 import com.thk.im.android.core.module.internal.DefaultGroupModule
 import com.thk.im.android.core.module.internal.DefaultMessageModule
 import com.thk.im.android.core.module.internal.DefaultUserModule
@@ -30,7 +24,12 @@ import com.thk.im.android.core.storage.internal.DefaultStorageModule
 
 object IMCoreManager {
 
-    private val moduleMap: MutableMap<Int, BaseModule> = HashMap()
+    var commonModule = DefaultCommonModule()
+    var messageModule = DefaultMessageModule()
+    var userModule = DefaultUserModule()
+    var contactorModule = DefaultContactorModule()
+    var groupModule = DefaultGroupModule()
+    var customModule = DefaultCustomModule()
 
     lateinit var signalModule: SignalModule
     lateinit var imApi: IMApi
@@ -53,13 +52,7 @@ object IMCoreManager {
         db = DefaultIMDataBase(app, uId, debug)
         storageModule = DefaultStorageModule(app, uId)
 
-        registerModule(SignalType.Common.value, DefaultCommonModule())
-        registerModule(SignalType.User.value, DefaultUserModule())
-        registerModule(SignalType.Contactor.value, DefaultContactorModule())
-        registerModule(SignalType.Group.value, DefaultGroupModule())
-        registerModule(SignalType.Message.value, DefaultMessageModule())
-
-        getMessageModule().registerMsgProcessor(IMReadMessageProcessor())
+        messageModule.registerMsgProcessor(IMReadMessageProcessor())
     }
 
     fun connect() {
@@ -69,9 +62,20 @@ object IMCoreManager {
                 XEventBus.post(IMEvent.OnlineStatusUpdate.value, status)
             }
 
-            override fun onNewSignal(type: Int, subType: Int, signal: String) {
-                val module = moduleMap[type]
-                module?.onSignalReceived(subType, signal)
+            override fun onNewSignal(type: Int, body: String) {
+                if (type == SignalType.SignalNewMessage.value) {
+                    messageModule.onSignalReceived(type, body)
+                } else if (type < 100) {
+                    commonModule.onSignalReceived(type, body)
+                } else if (type < 200) {
+                    userModule.onSignalReceived(type, body)
+                } else if (type < 300) {
+                    contactorModule.onSignalReceived(type, body)
+                } else if (type < 400) {
+                    groupModule.onSignalReceived(type, body)
+                } else {
+                    customModule.onSignalReceived(type, body)
+                }
             }
         })
         signalModule.connect()
@@ -80,43 +84,6 @@ object IMCoreManager {
     fun shutdown() {
         signalModule.disconnect("shutdown")
         db.close()
-    }
-
-    fun registerModule(type: Int, module: BaseModule) {
-        moduleMap[type] = module
-    }
-
-    fun getModule(type: Int): BaseModule {
-        return moduleMap[type]!!
-    }
-
-    fun getCommonModule(): CommonModule {
-        return getModule(SignalType.Common.value) as CommonModule
-    }
-
-    fun getUserModule(): UserModule {
-        return getModule(SignalType.User.value) as UserModule
-    }
-
-    fun getGroupModule(): GroupModule {
-        return getModule(SignalType.Group.value) as GroupModule
-    }
-
-    fun getMessageModule(): MessageModule {
-        return getModule(SignalType.Message.value) as MessageModule
-    }
-
-    fun getSelfDefineModule(): CustomModule {
-        return getModule(SignalType.SelfDefine.value) as CustomModule
-    }
-
-
-    fun getContactorModule(): ContactorModule {
-        return getModule(SignalType.Contactor.value) as ContactorModule
-    }
-
-    fun registerStorageModule(storageModule: StorageModule) {
-        this.storageModule = storageModule
     }
 
     fun getImDataBase(): IMDataBase {

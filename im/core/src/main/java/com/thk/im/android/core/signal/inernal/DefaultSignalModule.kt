@@ -23,8 +23,7 @@ import java.util.concurrent.TimeUnit
 class DefaultSignalModule(app: Application, wsUrl: String, token: String) : SignalModule, NetworkListener {
     private val mHandler = Handler(Looper.getMainLooper())
     private val heatBeatInterval = 10 * 1000L
-    private val reconnectInterval = 200L // 200ms
-    private var reconnectTimes = 0
+    private val reconnectInterval = 3000L // 1s 重连一次
     private val connectTimeout = 5L
     private var token: String
     private var wsUrl: String
@@ -62,12 +61,9 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         override fun onMessage(webSocket: WebSocket, text: String) {
             super.onMessage(webSocket, text)
             LLog.v("Receive Signal: $text")
-            if (reconnectTimes != 0) {
-                reconnectTimes = 0
-            }
             try {
                 val signal = Gson().fromJson(text, Signal::class.java)
-                signalListener?.onNewSignal(signal.type, signal.subType, signal.Body)
+                signalListener?.onNewSignal(signal.type, signal.body)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -81,10 +77,13 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
-            // 没有连成功，也会触发这个回调
             LLog.d("onOpen ${response.isSuccessful}, $response")
-            onStatusChange(SignalListener.StatusConnected)
-            heatBeat()
+            if (response.isSuccessful) {
+                onStatusChange(SignalListener.StatusConnected)
+                heatBeat()
+            } else {
+                reconnect()
+            }
         }
     }
 
@@ -110,6 +109,15 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         webSocket = null
         signalListener = null
         mHandler.removeCallbacksAndMessages(null)
+    }
+    private fun reconnect() {
+        if (status != SignalListener.StatusConnected
+            && NetworkUtils.isAvailable()
+        ) {
+            mHandler.postDelayed({
+                startConnect()
+            }, reconnectInterval)
+        }
     }
 
     private fun startConnect() {
@@ -157,23 +165,10 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         signalListener?.onSignalStatusChange(status)
     }
 
-    private fun reconnect() {
-        if (status != SignalListener.StatusConnected
-            && NetworkUtils.isAvailable()
-        ) {
-            mHandler.postDelayed({
-                startConnect()
-            }, reconnectInterval * reconnectTimes)
-            if (reconnectTimes < 100) {
-                reconnectTimes++ // 最多100x100ms=10s重连
-            }
-        }
-    }
-
     private fun heatBeat() {
         if (status == SignalListener.StatusConnected) {
             try {
-                sendMessage(Signal.heatBeat)
+                sendMessage(Signal.ping)
             } catch (e: RuntimeException) {
                 LLog.e("IMException: ${e.message}")
             }
@@ -188,7 +183,6 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             when (it) {
                 NetType.WIFI, NetType.Mobile, NetType.Unknown -> {
                     LLog.d("有网络")
-                    reconnectTimes = 0
                     reconnect()
                 }
                 NetType.NONE -> LLog.d("无网络")

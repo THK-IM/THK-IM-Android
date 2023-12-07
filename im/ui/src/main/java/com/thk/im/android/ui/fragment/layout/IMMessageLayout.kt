@@ -128,7 +128,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     private fun loadMessages() {
         if (!hasMore || isLoading) return
         if (msgAdapter.getMessageCount() == 0) {
-            cTime = IMCoreManager.getCommonModule().getSeverTime()
+            cTime = IMCoreManager.commonModule.getSeverTime()
         }
         isLoading = true
         val subscriber = object : BaseSubscriber<List<Message>>() {
@@ -151,7 +151,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                 isLoading = false
             }
         }
-        IMCoreManager.getMessageModule().queryLocalMessages(session.id, cTime, count)
+        IMCoreManager.messageModule.queryLocalMessages(session.id, cTime, count)
             .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
     }
@@ -202,7 +202,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgResendClick(message: Message) {
-        IMCoreManager.getMessageModule().resend(message)
+        IMCoreManager.messageModule.resend(message)
     }
 
     fun getMessages(): List<Message> {

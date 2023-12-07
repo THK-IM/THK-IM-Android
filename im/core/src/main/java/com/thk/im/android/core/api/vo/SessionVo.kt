@@ -1,4 +1,4 @@
-package com.thk.im.android.core.api.bean
+package com.thk.im.android.core.api.vo
 
 import android.os.Parcelable
 import androidx.annotation.Keep
@@ -8,9 +8,11 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-data class SessionBean(
+data class SessionVo(
     @SerializedName("s_id")
     var id: Long = 0,
+    @SerializedName("parent_id")
+    var parentId: Long = 0,
     @SerializedName("entity_id")
     var entityId: Long = 0,
     @SerializedName("type")
@@ -36,22 +38,9 @@ data class SessionBean(
 ) : Parcelable {
     fun toSession(): Session {
         return Session(
-            id, type, entityId, name, remark, mute, status, role, top, cTime,
+            id, parentId, type, entityId, name, remark, mute, status, role, top, cTime,
             mTime, 0, null, null, extData
         )
     }
 
-    companion object {
-        fun buildSessionBean(session: Session): SessionBean {
-            val sessionBean = SessionBean()
-            sessionBean.id = session.id
-            sessionBean.type = session.type
-            sessionBean.entityId = session.entityId
-            sessionBean.top = session.topTimestamp
-            sessionBean.status = session.status
-            sessionBean.cTime = session.cTime
-            sessionBean.mTime = session.mTime
-            return sessionBean
-        }
-    }
 }

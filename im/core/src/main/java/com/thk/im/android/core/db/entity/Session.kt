@@ -12,11 +12,17 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-@Entity(tableName = "session", indices = [Index(value = ["type", "entity_id"], unique = true)])
+@Entity(tableName = "session", indices = [
+    Index(value = ["type", "entity_id"], unique = true),
+    Index(value = ["parent_id"], unique = false)
+])
 data class Session(
     @SerializedName("id")
     @PrimaryKey @ColumnInfo(name = "id")
     var id: Long,
+    @SerializedName("parent_id")
+    @ColumnInfo(name = "parent_id")
+    var parentId: Long,
     @SerializedName("id")
     @ColumnInfo(name = "type")
     var type: Int,
@@ -63,20 +69,20 @@ data class Session(
 
     @Ignore
     constructor(id: Long) : this(
-        id, 0, 0, "", "", 0, 0, 0, 0, 0,
-        0, 0, null, null, null
+        id, 0, 0, 0, "", "", 0, 0, 0,
+        0, 0, 0, 0, null, null, null
     )
 
     @Ignore
     constructor() : this(
-        0, 0, 0, "", "", 0, 0, 0, 0, 0,
-        0, 0, null, null, null
+        0, 0, 0, 0, "", "", 0, 0, 0,
+        0, 0, 0, 0, null, null, null
     )
 
     @Ignore
     constructor(type: Int, entityId: Long) : this(
-        0, type, entityId, "", "", 0, 0, 0, 0, 0,
-        0, 0, null, null, null
+        0, 0, type, entityId, "", "", 0, 0, 0,
+        0, 0, 0, 0, null, null, null
     )
 
 }

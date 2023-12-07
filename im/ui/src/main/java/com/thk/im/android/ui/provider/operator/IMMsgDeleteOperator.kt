@@ -22,7 +22,7 @@ class IMMsgDeleteOperator : IMMessageOperator() {
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
-        IMCoreManager.getMessageModule()
+        IMCoreManager.messageModule
             .deleteMessages(message.id, listOf(message), true)
             .compose(RxTransform.flowableToMain())
             .subscribe(object : BaseSubscriber<Void>() {

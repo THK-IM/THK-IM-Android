@@ -42,7 +42,7 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                 try {
                     val content = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
                     if (content != null) {
-                        IMCoreManager.getMessageModule().getMsgProcessor(it.type)
+                        IMCoreManager.messageModule.getMsgProcessor(it.type)
                             .downloadMsgContent(it, IMMsgResourceType.Thumbnail.value)
                     }
                 } catch (e: Exception) {
@@ -177,7 +177,7 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                                             Gson().fromJson(it.data, IMVideoMsgData::class.java)
                                         data.path = path
                                         it.data = Gson().toJson(data)
-                                        IMCoreManager.getMessageModule()
+                                        IMCoreManager.messageModule
                                             .getMsgProcessor(t.type)
                                             .insertOrUpdateDb(
                                                 t,

@@ -5,8 +5,8 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.internal.room.IMRoomDataBase
 
 internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSessionDao {
-    override fun querySessions(count: Int, mTime: Long): List<Session> {
-        return roomDatabase.sessionDao().querySessions(count, mTime)
+    override fun querySessions(parentId: Long, count: Int, mTime: Long): List<Session> {
+        return roomDatabase.sessionDao().querySessions(parentId, count, mTime)
     }
 
     override fun querySessionsByMTime(): List<Session> {

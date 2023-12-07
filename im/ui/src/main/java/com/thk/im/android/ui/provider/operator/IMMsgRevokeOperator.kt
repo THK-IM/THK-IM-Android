@@ -31,7 +31,7 @@ class IMMsgRevokeOperator : IMMessageOperator() {
                 }
             }
         }
-        IMCoreManager.getMessageModule()
+        IMCoreManager.messageModule
             .getMsgProcessor(MsgType.Revoke.value)
             .send(message, false, callback)
     }

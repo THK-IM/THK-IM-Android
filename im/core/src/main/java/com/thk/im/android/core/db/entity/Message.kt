@@ -14,7 +14,10 @@ import kotlinx.parcelize.Parcelize
 @Entity(
     tableName = "message",
     primaryKeys = ["id", "from_u_id", "session_id"],
-    indices = [Index(value = ["session_id", "msg_id"], unique = true)]
+    indices = [
+        Index(value = ["session_id", "msg_id"], unique = true),
+        Index(value = ["session_id", "c_time"], unique = false)
+    ]
 )
 data class Message(
     @SerializedName("id")

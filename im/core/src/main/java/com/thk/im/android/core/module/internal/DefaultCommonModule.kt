@@ -38,7 +38,6 @@ open class DefaultCommonModule : CommonModule {
             }
         } else if (type == SignalType.SignalConnId.value) {
             IMCoreManager.signalModule.connId = body
-            IMCoreManager.messageModule.syncOfflineMessages()
         }
     }
 }

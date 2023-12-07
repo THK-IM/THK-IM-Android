@@ -10,7 +10,7 @@ import com.thk.im.android.core.db.internal.DefaultIMDataBase
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadModule
 import com.thk.im.android.core.module.internal.DefaultCommonModule
-import com.thk.im.android.core.module.internal.DefaultContactorModule
+import com.thk.im.android.core.module.internal.DefaultContactModule
 import com.thk.im.android.core.module.internal.DefaultCustomModule
 import com.thk.im.android.core.module.internal.DefaultGroupModule
 import com.thk.im.android.core.module.internal.DefaultMessageModule
@@ -27,7 +27,7 @@ object IMCoreManager {
     var commonModule = DefaultCommonModule()
     var messageModule = DefaultMessageModule()
     var userModule = DefaultUserModule()
-    var contactorModule = DefaultContactorModule()
+    var contactModule = DefaultContactModule()
     var groupModule = DefaultGroupModule()
     var customModule = DefaultCustomModule()
 
@@ -59,6 +59,9 @@ object IMCoreManager {
         db.open()
         signalModule.setSignalListener(object : SignalListener {
             override fun onSignalStatusChange(status: Int) {
+                if (status == SignalListener.StatusConnected) {
+                    messageModule.syncOfflineMessages()
+                }
                 XEventBus.post(IMEvent.OnlineStatusUpdate.value, status)
             }
 
@@ -70,7 +73,7 @@ object IMCoreManager {
                 } else if (type < 200) {
                     userModule.onSignalReceived(type, body)
                 } else if (type < 300) {
-                    contactorModule.onSignalReceived(type, body)
+                    contactModule.onSignalReceived(type, body)
                 } else if (type < 400) {
                     groupModule.onSignalReceived(type, body)
                 } else {

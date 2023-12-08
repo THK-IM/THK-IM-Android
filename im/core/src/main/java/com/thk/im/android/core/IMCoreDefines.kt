@@ -5,6 +5,25 @@ import com.thk.im.android.core.db.entity.Message
 
 
 /**
+ * 信令状态
+ */
+enum class SignalStatus(val value: Int) {
+    Init(0),
+    Connecting(1),
+    Connected(2),
+    Disconnected(3)
+}
+
+
+/**
+ * session状态
+ */
+enum class SessionStatus(val value: Int) {
+    Reject(1),
+    Silence(2),
+}
+
+/**
  * IM事件
  */
 enum class IMEvent(val value: String) {

@@ -11,7 +11,7 @@ data class Signal(
 ) {
     companion object {
         val ping: String =
-            Gson().toJson(Signal(SignalType.SignalPing.value, "ping"))
+            Gson().toJson(Signal(SignalType.SignalHeatBeat.value, "ping"))
     }
 }
 

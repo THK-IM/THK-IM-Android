@@ -59,7 +59,7 @@ object IMCoreManager {
         db.open()
         signalModule.setSignalListener(object : SignalListener {
             override fun onSignalStatusChange(status: Int) {
-                if (status == SignalListener.StatusConnected) {
+                if (status == SignalStatus.Connected.value) {
                     messageModule.syncOfflineMessages()
                 }
                 XEventBus.post(IMEvent.OnlineStatusUpdate.value, status)

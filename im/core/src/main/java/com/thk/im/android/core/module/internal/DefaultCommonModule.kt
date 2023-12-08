@@ -29,7 +29,7 @@ open class DefaultCommonModule : CommonModule {
     }
 
     override fun onSignalReceived(type: Int, body: String) {
-        if (type == SignalType.SignalPong.value) {
+        if (type == SignalType.SignalHeatBeat.value) {
             IMCoreManager.messageModule.ackMessagesToServer()
         } else if (type == SignalType.SignalSyncTime.value) {
             val time = body.toLong()

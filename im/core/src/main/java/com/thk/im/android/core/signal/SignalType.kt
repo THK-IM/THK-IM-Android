@@ -2,9 +2,8 @@ package com.thk.im.android.core.signal
 
 enum class SignalType(val value: Int) {
     SignalNewMessage(0),
-    SignalPing(1),
-    SignalPong(2),
-    SignalSyncTime(3),
-    SignalConnId(4),
+    SignalHeatBeat(1),
+    SignalSyncTime(2),
+    SignalConnId(3),
     SignalKickOffUser(5),
 }

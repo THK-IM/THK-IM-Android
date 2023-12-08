@@ -2,11 +2,6 @@ package com.thk.im.android.core.signal;
 
 public interface SignalListener {
 
-    int StatusInit = 0;
-    int StatusConnecting = 1;
-    int StatusConnected = 2;
-    int StatusDisConnected = 3;
-
 
     /**
      * 连接状态变更

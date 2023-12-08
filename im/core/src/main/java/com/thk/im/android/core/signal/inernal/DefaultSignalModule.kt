@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
+import com.thk.im.android.core.SignalStatus
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.signal.Signal
 import com.thk.im.android.core.signal.SignalListener
@@ -29,7 +30,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     private var wsUrl: String
     private var app: Application
     private var webSocket: WebSocket? = null
-    private var status: Int = SignalListener.StatusInit
+    private var status: Int = SignalStatus.Init.value
     private var signalListener: SignalListener? = null
 
     private var connId: String? = null
@@ -46,13 +47,13 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             LLog.d("onClosed, code: $code, reason: $reason")
             super.onClosed(webSocket, code, reason)
             mHandler.removeCallbacksAndMessages(null)
-            onStatusChange(SignalListener.StatusDisConnected)
+            onStatusChange(SignalStatus.Disconnected.value)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             super.onFailure(webSocket, t, response)
             LLog.d("onFailure, Throwable: ${if (t.message == null) "unknown" else t.message}")
-            onStatusChange(SignalListener.StatusDisConnected)
+            onStatusChange(SignalStatus.Disconnected.value)
             webSocket.close(1000, "onFailure")
             mHandler.removeCallbacksAndMessages(null)
             reconnect()
@@ -72,14 +73,14 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
             LLog.d("onClosing, code: $code, reason: $reason")
             super.onClosing(webSocket, code, reason)
-            onStatusChange(SignalListener.StatusDisConnected)
+            onStatusChange(SignalStatus.Disconnected.value)
         }
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
             LLog.d("onOpen ${response.isSuccessful}, $response")
             if (response.isSuccessful) {
-                onStatusChange(SignalListener.StatusConnected)
+                onStatusChange(SignalStatus.Connected.value)
                 heatBeat()
             } else {
                 reconnect()
@@ -111,9 +112,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         mHandler.removeCallbacksAndMessages(null)
     }
     private fun reconnect() {
-        if (status != SignalListener.StatusConnected
-            && NetworkUtils.isAvailable()
-        ) {
+        if (status != SignalStatus.Disconnected.value && NetworkUtils.isAvailable()) {
             mHandler.postDelayed({
                 startConnect()
             }, reconnectInterval)
@@ -122,10 +121,10 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
     private fun startConnect() {
         synchronized(this) {
-            if (status == SignalListener.StatusConnecting || status == SignalListener.StatusConnected) {
+            if (status == SignalStatus.Connecting.value || status == SignalStatus.Connected.value) {
                 return
             }
-            onStatusChange(SignalListener.StatusConnecting)
+            onStatusChange(SignalStatus.Connecting.value)
             val request = Request.Builder()
                 .header("token", token)
                 .header("platform", "android")
@@ -146,7 +145,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     override fun sendMessage(msg: String) {
-        if (status != SignalListener.StatusConnected) {
+        if (status != SignalStatus.Connected.value) {
             throw RuntimeException("disconnected")
         }
         LLog.v("Send Signal: $msg")
@@ -166,7 +165,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     private fun heatBeat() {
-        if (status == SignalListener.StatusConnected) {
+        if (status == SignalStatus.Connected.value) {
             try {
                 sendMessage(Signal.ping)
             } catch (e: RuntimeException) {

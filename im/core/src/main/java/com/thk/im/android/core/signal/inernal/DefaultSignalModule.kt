@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 class DefaultSignalModule(app: Application, wsUrl: String, token: String) : SignalModule, NetworkListener {
     private val mHandler = Handler(Looper.getMainLooper())
     private val heatBeatInterval = 10 * 1000L
-    private val reconnectInterval = 3000L // 1s 重连一次
+    private val reconnectInterval = 3000L // 3s 重连一次
     private val connectTimeout = 5L
     private var token: String
     private var wsUrl: String
@@ -78,8 +78,8 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
-            LLog.d("onOpen ${response.isSuccessful}, $response")
-            if (response.isSuccessful) {
+            LLog.d("onOpen ${response.code}, $response")
+            if (response.code == 101) {
                 onStatusChange(SignalStatus.Connected.value)
                 heatBeat()
             } else {
@@ -112,11 +112,13 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         mHandler.removeCallbacksAndMessages(null)
     }
     private fun reconnect() {
-        if (status != SignalStatus.Disconnected.value && NetworkUtils.isAvailable()) {
-            mHandler.postDelayed({
+        LLog.v("reconnect")
+        mHandler.postDelayed({
+            if (NetworkUtils.isAvailable()) {
                 startConnect()
-            }, reconnectInterval)
-        }
+            }
+        }, reconnectInterval)
+
     }
 
     private fun startConnect() {

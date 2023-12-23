@@ -8,36 +8,41 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-class ApiFactory(private var token: String, serverUrl: String) {
+object ApiFactory {
 
-    private val defaultTimeout: Long = 30
-    private val maxIdleConnection = 8
-    private val keepAliveDuration: Long = 60
+    private const val defaultTimeout: Long = 30
+    private const val maxIdleConnection = 8
+    private const val keepAliveDuration: Long = 60
 
-    private val interceptor = TokenInterceptor(token)
+    private lateinit var interceptor: TokenInterceptor
 
-    private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
-        .connectTimeout(defaultTimeout, TimeUnit.SECONDS)
-        .writeTimeout(defaultTimeout, TimeUnit.SECONDS)
-        .readTimeout(defaultTimeout, TimeUnit.SECONDS)
-        .retryOnConnectionFailure(true)
-        .addInterceptor(interceptor)
-        .connectionPool(ConnectionPool(maxIdleConnection, keepAliveDuration, TimeUnit.SECONDS))
-        .build()
+    private lateinit var okHttpClient: OkHttpClient
 
-    private val retrofit: Retrofit = Retrofit.Builder()
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .baseUrl(serverUrl)
-        .build()
+    private lateinit var retrofit: Retrofit
+    fun init(token: String) {
+        interceptor = TokenInterceptor(token)
+        okHttpClient = OkHttpClient.Builder()
+            .connectTimeout(defaultTimeout, TimeUnit.SECONDS)
+            .writeTimeout(defaultTimeout, TimeUnit.SECONDS)
+            .readTimeout(defaultTimeout, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
+            .addInterceptor(interceptor)
+            .connectionPool(ConnectionPool(maxIdleConnection, keepAliveDuration, TimeUnit.SECONDS))
+            .build()
+    }
 
     fun updateToken(token: String) {
-        this.token = token
         interceptor.updateToken(token)
     }
 
-    fun <T> createApi(cls: Class<T>): T {
+
+    fun <T> createApi(cls: Class<T>, serverUrl: String): T {
+        retrofit = Retrofit.Builder()
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .baseUrl(serverUrl)
+            .build()
         return retrofit.create(cls)
     }
 

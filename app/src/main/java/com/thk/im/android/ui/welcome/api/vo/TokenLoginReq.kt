@@ -2,9 +2,7 @@ package com.thk.im.android.ui.welcome.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class UserRegisterResp(
+data class TokenLoginReq(
     @SerializedName("token")
-    val token: String,
-    @SerializedName("user")
-    val user: User
+    val token: String? = null,
 )

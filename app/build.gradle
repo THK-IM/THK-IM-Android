@@ -62,6 +62,9 @@ dependencies {
     implementation rootProject.ext.dependencies["media3-exoplayer"]
     implementation rootProject.ext.dependencies["media3-exoplayer-ui"]
     implementation rootProject.ext.dependencies["videocache"]
+    implementation rootProject.ext.dependencies['immersionbar']
+    implementation rootProject.ext.dependencies["XPopup"]
+    implementation rootProject.ext.dependencies["SpinKit"]
 
 
     implementation project(":im:core")

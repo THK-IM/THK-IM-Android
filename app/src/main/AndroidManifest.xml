@@ -3,15 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name=".MyApplication"
+        android:name=".IMApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon_launcher"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/net_config"
         android:requestLegacyExternalStorage="true"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/icon_launcher"
         android:supportsRtl="true"
         android:theme="@style/ThemeDefault"
         android:usesCleartextTraffic="true"
@@ -23,7 +23,8 @@
 
         <activity android:name=".ui.welcome.WelcomeActivity"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:theme="@style/splash"
+            android:icon="@mipmap/icon_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
 
@@ -41,7 +42,7 @@
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/icon_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
         </activity>
@@ -49,39 +50,39 @@
         <activity
             android:name=".ui.main.MainTestActivity"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/icon_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
         </activity>
 
         <activity
             android:name=".SessionActivity"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/icon_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".MessageActivity"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/icon_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".WebRtcActivity"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/icon_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".MediaTestActivity"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/icon_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".VideoActivity"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/icon_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 

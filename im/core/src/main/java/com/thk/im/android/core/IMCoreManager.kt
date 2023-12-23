@@ -39,6 +39,7 @@ object IMCoreManager {
     lateinit var app: Application
     lateinit var storageModule: StorageModule
     var uId: Long = 0L
+    var inited = false
 
     fun init(app: Application, uId: Long, debug: Boolean) {
         this.app = app
@@ -51,11 +52,13 @@ object IMCoreManager {
         this.uId = uId
         db = DefaultIMDataBase(app, uId, debug)
         storageModule = DefaultStorageModule(app, uId)
-
         messageModule.registerMsgProcessor(IMReadMessageProcessor())
     }
 
     fun connect() {
+        if (inited) {
+            return
+        }
         db.open()
         signalModule.setSignalListener(object : SignalListener {
             override fun onSignalStatusChange(status: Int) {
@@ -82,11 +85,13 @@ object IMCoreManager {
             }
         })
         signalModule.connect()
+        inited = true
     }
 
     fun shutdown() {
         signalModule.disconnect("shutdown")
         db.close()
+        inited = false
     }
 
     fun getImDataBase(): IMDataBase {

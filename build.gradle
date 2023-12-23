@@ -75,7 +75,8 @@ ext {
                     "SwipeMenuRecyclerView"            : "com.github.aitsuki:SwipeMenuRecyclerView:2.1.5",
                     "XPopup"                           : "com.github.li-xiaojun:XPopup:2.9.19",
                     "flexbox"                          : "com.google.android.flexbox:flexbox:3.0.0",
-
+                    "immersionbar"                     : "com.geyifeng.immersionbar:immersionbar:3.2.2",
+                    "SpinKit"                          : "com.github.ybq:Android-SpinKit:1.4.0",
     ]
 }
 

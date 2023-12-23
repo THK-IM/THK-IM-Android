@@ -4,15 +4,15 @@ import com.google.gson.annotations.SerializedName
 
 data class UserRegisterReq(
     @SerializedName("account")
-    val account: String?,
+    val account: String? = null,
     @SerializedName("password")
-    val password: String?,
+    val password: String? = null,
     @SerializedName("nickname")
-    val nickname: String?,
+    val nickname: String? = null,
     @SerializedName("sex")
-    val sex: Int?,
+    val sex: Int? = null,
     @SerializedName("avatar")
-    val avatar: String?,
+    val avatar: String? = null,
     @SerializedName("birthday")
-    var birthday: Long?
+    var birthday: Long? = null
 )

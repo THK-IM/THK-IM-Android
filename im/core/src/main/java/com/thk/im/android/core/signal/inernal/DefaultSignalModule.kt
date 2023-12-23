@@ -78,13 +78,9 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
-            LLog.d("onOpen ${response.code}, $response")
-            if (response.code == 101) {
-                onStatusChange(SignalStatus.Connected.value)
-                heatBeat()
-            } else {
-                reconnect()
-            }
+            LLog.d("onOpen ${response.code}, ${response.isSuccessful}")
+            onStatusChange(SignalStatus.Connected.value)
+            heatBeat()
         }
     }
 
@@ -128,8 +124,8 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             }
             onStatusChange(SignalStatus.Connecting.value)
             val request = Request.Builder()
-                .header("token", token)
-                .header("platform", "android")
+                .header("Authorization", token)
+                .header("Client-Platform", "android")
                 .url(wsUrl)
                 .build()
             val client = OkHttpClient.Builder()

@@ -18,14 +18,11 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        int value = MsgType.valueOf("UnSupport").getValue();
-        LLog.v("value:" + value);
         LLog.v("onCreate MyApplication");
         new Thread() {
             public void run() {
                 Long uid = 4L;
-                String apiEndpoint = "http://api.thkim.com";
+                String apiEndpoint = "http://msg-api.thkim.com";
                 String wsEndpoint = "ws://ws.thkim.com/ws";
                 String token = uid.toString();
 

@@ -56,6 +56,8 @@ dependencies {
     implementation rootProject.ext.dependencies["gson"]
     implementation rootProject.ext.dependencies["okhttp"]
     implementation rootProject.ext.dependencies["retrofit"]
+    implementation rootProject.ext.dependencies["retrofit-converter-gson"]
+    implementation rootProject.ext.dependencies["retrofit-adapter-rxjava2"]
     implementation rootProject.ext.dependencies["permission"]
     implementation rootProject.ext.dependencies["media3-exoplayer"]
     implementation rootProject.ext.dependencies["media3-exoplayer-ui"]

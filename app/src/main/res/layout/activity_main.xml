@@ -1,42 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:ignore="MissingDefaultResource">
 
-    <Button
-        android:id="@+id/button_first"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tb_top"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:textAlignment="center"
-        android:text="创建/获取单人session"
-        android:height="50dp"
-        android:background="@color/purple_500"
-        android:layout_margin="15dp"
-        android:textColor="@color/white"/>
+        android:layout_height="wrap_content"/>
 
-    <Button
-        android:id="@+id/button_second"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bnv_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:textAlignment="center"
-        android:text="跳转到session列表"
-        android:layout_margin="15dp"
-        android:textColor="@color/white"
-        android:background="@color/purple_500"/>
+        android:layout_height="wrap_content"/>
 
-
-    <Button
-        android:id="@+id/button_audio"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vp_container"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:textAlignment="center"
-        android:layout_margin="15dp"
-        android:text="音视频测试"
-        android:background="@color/purple_500"
-        android:textColor="@color/white" />
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toTopOf="@id/bnv_bottom"
+        app:layout_constraintTop_toBottomOf="@id/tb_top"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
 
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

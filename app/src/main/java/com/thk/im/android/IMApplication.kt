@@ -19,7 +19,10 @@ class IMApplication : Application() {
         ApiFactory.init("")
     }
 
-    fun initIM(token: String, uId: Long) {
+    fun initIM(token: String, uId: Long): Boolean {
+        if (IMCoreManager.inited) {
+            return true
+        }
         Thread{
             kotlin.run {
                 val apiEndpoint = "http://msg-api.thkim.com"
@@ -39,5 +42,6 @@ class IMApplication : Application() {
                 IMCoreManager.connect()
             }
         }.start()
+        return false
     }
 }

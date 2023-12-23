@@ -7,7 +7,6 @@ import android.view.View
 import com.google.gson.Gson
 import com.thk.im.android.IMApplication
 import com.thk.im.android.api.ApiFactory
-import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SignalStatus
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
@@ -108,7 +107,7 @@ class WelcomeActivity : BaseActivity() {
 
         }
         welcomeApi.register(UserRegisterReq())
-            .compose(RxTransform.flowableToIo())
+            .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }
 
@@ -131,15 +130,14 @@ class WelcomeActivity : BaseActivity() {
 
         }
         welcomeApi.loginByToken(TokenLoginReq(token))
-            .compose(RxTransform.flowableToIo())
+            .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }
 
     private fun initIM(token: String, uId: Long) {
-        if (IMCoreManager.inited) {
+        val success = (application as IMApplication).initIM(token, uId)
+        if (success) {
             gotoMainActivity()
-        } else {
-            (application as IMApplication).initIM(token, uId)
         }
     }
 

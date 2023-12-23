@@ -61,6 +61,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             super.onMessage(webSocket, text)
+            onStatusChange(SignalStatus.Connected.value)
             LLog.v("Receive Signal: $text")
             try {
                 val signal = Gson().fromJson(text, Signal::class.java)
@@ -79,7 +80,6 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
             LLog.d("onOpen ${response.code}, ${response.isSuccessful}")
-            onStatusChange(SignalStatus.Connected.value)
             heatBeat()
         }
     }
@@ -102,7 +102,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
     override fun disconnect(reason: String) {
         NetworkManager.getInstance().unRegisterObserver(this)
-        webSocket?.close(0, reason)
+        webSocket?.close(3008, reason)
         webSocket = null
         signalListener = null
         mHandler.removeCallbacksAndMessages(null)
@@ -158,8 +158,10 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     private fun onStatusChange(status: Int) {
-        this.status = status
-        signalListener?.onSignalStatusChange(status)
+        if (this.status != status) {
+            this.status = status
+            signalListener?.onSignalStatusChange(status)
+        }
     }
 
     private fun heatBeat() {

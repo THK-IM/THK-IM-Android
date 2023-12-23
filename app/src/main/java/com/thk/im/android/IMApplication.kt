@@ -3,6 +3,7 @@ package com.thk.im.android
 import android.app.Application
 import com.thk.im.android.api.ApiFactory
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.SignalStatus
 import com.thk.im.android.core.api.internal.DefaultIMApi
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule
@@ -21,7 +22,7 @@ class IMApplication : Application() {
 
     fun initIM(token: String, uId: Long): Boolean {
         if (IMCoreManager.inited) {
-            return true
+            return IMCoreManager.signalModule.connectStatus == SignalStatus.Connected.value
         }
         Thread{
             kotlin.run {

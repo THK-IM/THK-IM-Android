@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.welcome.api.vo
+package com.thk.im.android.api.user.vo
 
 import com.google.gson.annotations.SerializedName
 

@@ -23,13 +23,5 @@ class SessionActivity : AppCompatActivity() {
         val ft = supportFragmentManager.beginTransaction()
         ft.add(R.id.fragment_container, fragment, tag)
         ft.commit()
-        fragment.setSessionClick(object : IMSessionFragment.OnSessionClick {
-            override fun onSessionClick(session: Session) {
-                val intent = Intent()
-                intent.setClass(this@SessionActivity, MessageActivity::class.java)
-                intent.putExtra("session", session)
-                startActivity(intent)
-            }
-        })
     }
 }

@@ -17,6 +17,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.adapter.SessionAdapter
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 import io.reactivex.disposables.CompositeDisposable
 
@@ -166,6 +167,14 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
     }
 
     override fun openSession(session: Session) {
-        sessionClick?.onSessionClick(session)
+        if (sessionClick == null) {
+            IMUIManager.sessionOperator?.let {
+                context?.let { ctx ->
+                    it.openSession(ctx, session)
+                }
+            }
+        } else {
+            sessionClick?.onSessionClick(session)
+        }
     }
 }

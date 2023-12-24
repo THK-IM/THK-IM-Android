@@ -1,12 +1,17 @@
 package com.thk.im.android.ui.base
 
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import com.gyf.immersionbar.ImmersionBar
 import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.core.BasePopupView
+import com.thk.im.android.R
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.SignalStatus
 import com.thk.im.android.core.base.utils.ToastUtils
@@ -30,14 +35,55 @@ open class BaseActivity : AppCompatActivity() {
             .hasShadowBg(false)
             .asCustom(popupLoading)
 
-
         XEventBus.observe(this, IMEvent.OnlineStatusUpdate.value, Observer<Int> {
             onConnectStatus(it)
         })
+
+        val tb = getToolbar()
+        tb?.let {
+            val backView: ImageView = tb.findViewById(R.id.tb_iv_back)
+            if (needBackIcon()) {
+                backView.visibility = View.VISIBLE
+                backView.setOnClickListener {
+                    finish()
+                }
+            } else {
+                backView.visibility = View.GONE
+            }
+
+            val oprView: ImageView = tb.findViewById(R.id.tb_opr)
+            oprView.setOnClickListener {
+                onToolBarMenuClick(it)
+            }
+            val moveView: ImageView = tb.findViewById(R.id.tb_more)
+            moveView.setOnClickListener {
+                onToolBarMenuClick(it)
+            }
+        }
+    }
+
+    open fun onToolBarMenuClick(view: View) {
+
     }
 
     open fun onConnectStatus(status: Int) {
 
+    }
+
+    open fun getToolbar() :Toolbar? {
+        return null
+    }
+
+    open fun setTitle(title: String) {
+        val tb = getToolbar()
+        tb?.let {
+            val titleView: TextView = it.findViewById(R.id.tb_title)
+            titleView.text = title
+        }
+    }
+
+    open fun needBackIcon(): Boolean {
+        return false
     }
 
     fun addDispose(disposable: Disposable) {

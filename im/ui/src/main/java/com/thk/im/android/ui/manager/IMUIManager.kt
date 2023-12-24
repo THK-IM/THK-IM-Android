@@ -15,6 +15,7 @@ import com.thk.im.android.ui.protocol.IMBaseSessionIVProvider
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.IMPreviewer
 import com.thk.im.android.ui.protocol.IMProvider
+import com.thk.im.android.ui.protocol.IMSessionOperator
 import com.thk.im.android.ui.provider.function.IMAlbumFunctionIVProvider
 import com.thk.im.android.ui.provider.function.IMCameraFunctionIVProvider
 import com.thk.im.android.ui.provider.msg.IMAudioMsgIVProvider
@@ -50,6 +51,7 @@ object IMUIManager {
     private val msgOperators = HashMap<String, IMMessageOperator>()
     var mediaProvider: IMProvider? = null
     var mediaPreviewer: IMPreviewer? = null
+    var sessionOperator: IMSessionOperator? = null
 
     fun registerMsgIVProvider(vararg providers: IMBaseMessageIVProvider) {
         for (p in providers) {

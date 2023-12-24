@@ -4,9 +4,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import com.google.gson.Gson
 import com.thk.im.android.IMApplication
 import com.thk.im.android.api.ApiFactory
+import com.thk.im.android.api.UserRepository
+import com.thk.im.android.api.user.vo.LoginResp
+import com.thk.im.android.api.user.vo.TokenLoginReq
+import com.thk.im.android.api.user.vo.User
+import com.thk.im.android.api.user.vo.UserRegisterReq
+import com.thk.im.android.api.user.vo.UserRegisterResp
 import com.thk.im.android.core.SignalStatus
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
@@ -14,22 +19,14 @@ import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.databinding.ActivityWelcomeBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.main.MainActivity
-import com.thk.im.android.ui.welcome.api.WelcomeApi
-import com.thk.im.android.ui.welcome.api.vo.LoginResp
-import com.thk.im.android.ui.welcome.api.vo.TokenLoginReq
-import com.thk.im.android.ui.welcome.api.vo.User
-import com.thk.im.android.ui.welcome.api.vo.UserRegisterReq
-import com.thk.im.android.ui.welcome.api.vo.UserRegisterResp
 
 class WelcomeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityWelcomeBinding
-    private val welcomeApi =
-        ApiFactory.createApi(WelcomeApi::class.java, "http://user-api.thkim.com")
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         binding = ActivityWelcomeBinding.inflate(layoutInflater)
+        super.onCreate(savedInstanceState)
         setContentView(binding.root)
         initUserInfo()
     }
@@ -41,34 +38,22 @@ class WelcomeActivity : BaseActivity() {
     }
 
     private fun initUserInfo() {
-        val sp = getSharedPreferences("UserInfo", MODE_PRIVATE)
-        val token = sp.getString("Token", "")
+        val token = UserRepository.getUserToken()
         if (token.isNullOrEmpty()) {
             showLogin()
         } else {
-            val userId = sp.getLong("UserId", 0)
-            if (userId == 0L) {
+            val user = UserRepository.getUser()
+            if (user == null) {
                 loginByToken(token)
             } else {
-                val userInfoJson = sp.getString("User:$userId", "")
-                if (userInfoJson.isNullOrEmpty()) {
-                    loginByToken(token)
-                } else {
-                    val user = Gson().fromJson(userInfoJson, User::class.java)
-                    initIM(token, user.id)
-                }
+                initIM(token, user.id)
             }
         }
     }
 
     private fun saveUserInfo(token: String, user: User) {
         ApiFactory.updateToken(token)
-        val sp = getSharedPreferences("UserInfo", MODE_PRIVATE)
-        val editor = sp.edit()
-        editor.putString("Token", token)
-        editor.putLong("UserId", user.id)
-        editor.putString("User:${user.id}", Gson().toJson(user))
-        editor.apply()
+        UserRepository.saveUserInfo(token, user)
         initIM(token, user.id)
     }
 
@@ -106,7 +91,7 @@ class WelcomeActivity : BaseActivity() {
             }
 
         }
-        welcomeApi.register(UserRegisterReq())
+        UserRepository.userApi.register(UserRegisterReq())
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }
@@ -129,7 +114,7 @@ class WelcomeActivity : BaseActivity() {
             }
 
         }
-        welcomeApi.loginByToken(TokenLoginReq(token))
+        UserRepository.userApi.loginByToken(TokenLoginReq(token))
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }

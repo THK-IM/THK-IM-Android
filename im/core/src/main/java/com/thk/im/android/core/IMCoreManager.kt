@@ -41,14 +41,16 @@ object IMCoreManager {
     var uId: Long = 0L
     var inited = false
 
-    fun init(app: Application, uId: Long, debug: Boolean) {
+    fun init(app: Application) {
         this.app = app
         AppUtils.instance().init(app)
         ToastUtils.init(app)
-        LiveEventBus.config()
-            .setContext(app)
+        LiveEventBus.config().setContext(IMCoreManager.app)
             .autoClear(true)
             .lifecycleObserverAlwaysActive(true)
+    }
+
+    fun initUser(uId: Long, debug: Boolean) {
         this.uId = uId
         db = DefaultIMDataBase(app, uId, debug)
         storageModule = DefaultStorageModule(app, uId)

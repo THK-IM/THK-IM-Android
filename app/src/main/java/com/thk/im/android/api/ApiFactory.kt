@@ -1,6 +1,8 @@
 package com.thk.im.android.api
 
+import android.app.Application
 import com.thk.im.android.core.api.internal.TokenInterceptor
+import com.thk.im.android.core.base.utils.AppUtils
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -15,11 +17,11 @@ object ApiFactory {
     private const val keepAliveDuration: Long = 60
 
     private lateinit var interceptor: TokenInterceptor
-
     private lateinit var okHttpClient: OkHttpClient
+    private lateinit var app: Application
 
-    private lateinit var retrofit: Retrofit
-    fun init(token: String) {
+    fun init(application: Application, token: String) {
+        app = application
         interceptor = TokenInterceptor(token)
         okHttpClient = OkHttpClient.Builder()
             .connectTimeout(defaultTimeout, TimeUnit.SECONDS)
@@ -37,7 +39,7 @@ object ApiFactory {
 
 
     fun <T> createApi(cls: Class<T>, serverUrl: String): T {
-        retrofit = Retrofit.Builder()
+        val retrofit = Retrofit.Builder()
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())

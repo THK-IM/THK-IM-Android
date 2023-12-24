@@ -1,14 +1,13 @@
-package com.thk.im.android.ui.welcome.api
+package com.thk.im.android.api.user
 
-import com.thk.im.android.ui.welcome.api.vo.LoginResp
-import com.thk.im.android.ui.welcome.api.vo.TokenLoginReq
-import com.thk.im.android.ui.welcome.api.vo.UserRegisterReq
-import com.thk.im.android.ui.welcome.api.vo.UserRegisterResp
+import com.thk.im.android.api.user.vo.LoginResp
+import com.thk.im.android.api.user.vo.TokenLoginReq
+import com.thk.im.android.api.user.vo.UserRegisterReq
+import com.thk.im.android.api.user.vo.UserRegisterResp
 import io.reactivex.Flowable
 import retrofit2.http.Body
 import retrofit2.http.POST
-
-interface WelcomeApi {
+interface UserApi {
 
     /**
      * 注册
@@ -19,7 +18,7 @@ interface WelcomeApi {
     ): Flowable<UserRegisterResp>
 
     /**
-     * 注册
+     * 通过token登录
      */
     @POST("/user/login/token")
     fun loginByToken(

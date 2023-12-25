@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.danikula.videocache.CacheListener
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.databinding.ActivityVideoBinding
+import com.thk.im.preview.VideoCache
 import java.io.File
 
 class VideoActivity : AppCompatActivity(), CacheListener {
@@ -16,7 +17,7 @@ class VideoActivity : AppCompatActivity(), CacheListener {
         binding = ActivityVideoBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initVideoView()
-        com.thk.im.preview.VideoCache.getProxy().registerCacheListener(this, videoUrl)
+        VideoCache.getProxy().registerCacheListener(this, videoUrl)
     }
 
     private fun initVideoView() {
@@ -26,7 +27,7 @@ class VideoActivity : AppCompatActivity(), CacheListener {
     override fun onDestroy() {
         super.onDestroy()
         binding.pvVideo.releasePlay()
-        com.thk.im.preview.VideoCache.getProxy().unregisterCacheListener(
+        VideoCache.getProxy().unregisterCacheListener(
             this, videoUrl
         )
     }

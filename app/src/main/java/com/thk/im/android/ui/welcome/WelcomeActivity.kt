@@ -121,25 +121,25 @@ class WelcomeActivity : BaseActivity() {
 
     private fun initIM(token: String, uId: Long) {
         val success = (application as IMApplication).initIM(token, uId)
-        if (success) {
+//        if (success) {
             gotoMainActivity()
-        }
+//        }
     }
 
     override fun onConnectStatus(status: Int) {
         super.onConnectStatus(status)
-        when (status) {
-            SignalStatus.Connected.value -> {
-                gotoMainActivity()
-            }
-
-            SignalStatus.Connecting.value -> {
-                showToast("连接中")
-            }
-
-            SignalStatus.Disconnected.value -> {
-                showToast("连接失败")
-            }
-        }
+//        when (status) {
+//            SignalStatus.Connected.value -> {
+//                gotoMainActivity()
+//            }
+//
+//            SignalStatus.Connecting.value -> {
+//                showToast("连接中")
+//            }
+//
+//            SignalStatus.Disconnected.value -> {
+//                showToast("连接失败")
+//            }
+//        }
     }
 }

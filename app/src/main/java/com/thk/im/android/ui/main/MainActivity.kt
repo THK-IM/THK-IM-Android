@@ -1,8 +1,8 @@
 package com.thk.im.android.ui.main
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.get
 import com.thk.im.android.R
@@ -35,12 +35,22 @@ class MainActivity : BaseActivity() {
         binding.vpContainer.isUserInputEnabled = false
 
         binding.bnvBottom.setOnItemSelectedListener {
-            binding.vpContainer.currentItem = bottomMenuTitles.indexOf(it.title)
-            setTitle(bottomMenuTitles.elementAt(chooseMenuIndex))
-            true
+            onBottomItemSelected(it)
         }
         binding.bnvBottom.selectedItemId = binding.bnvBottom[chooseMenuIndex].id
         setTitle(bottomMenuTitles.elementAt(chooseMenuIndex))
+    }
+
+    private fun onBottomItemSelected(it: MenuItem): Boolean {
+        val pos = bottomMenuTitles.indexOf(it.title)
+        binding.vpContainer.setCurrentItem(pos, false)
+        setTitle(bottomMenuTitles.elementAt(pos))
+        if (pos == 3) {
+            binding.tbTop.toolbar.visibility = View.GONE
+        } else {
+            binding.tbTop.toolbar.visibility = View.VISIBLE
+        }
+        return false
     }
 
     override fun getToolbar(): Toolbar {

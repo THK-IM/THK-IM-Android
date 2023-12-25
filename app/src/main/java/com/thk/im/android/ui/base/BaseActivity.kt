@@ -20,7 +20,7 @@ import com.thk.im.android.ui.base.loading.PopupLoading
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
-open class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
 
     private lateinit var loading: BasePopupView
     private lateinit var popupLoading: PopupLoading

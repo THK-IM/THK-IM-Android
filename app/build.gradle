@@ -65,7 +65,7 @@ dependencies {
     implementation rootProject.ext.dependencies['immersionbar']
     implementation rootProject.ext.dependencies["XPopup"]
     implementation rootProject.ext.dependencies["SpinKit"]
-
+    implementation rootProject.ext.dependencies["emoji2-views"]
 
     implementation project(":im:core")
     implementation project(":im:ui")

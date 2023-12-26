@@ -19,11 +19,10 @@ import io.reactivex.Flowable
 
 class MainActivity : BaseActivity() {
 
-
-    private lateinit var binding: ActivityMainBinding
-
     private var chooseMenuIndex = 0
     private var bottomMenuTitles = setOf("message", "contact", "daily", "mine")
+
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -35,7 +34,7 @@ class MainActivity : BaseActivity() {
         binding.vpContainer.isUserInputEnabled = false
 
         binding.bnvBottom.setOnItemSelectedListener {
-            onBottomItemSelected(it)
+            return@setOnItemSelectedListener onBottomItemSelected(it)
         }
         binding.bnvBottom.selectedItemId = binding.bnvBottom[chooseMenuIndex].id
         setTitle(bottomMenuTitles.elementAt(chooseMenuIndex))
@@ -50,7 +49,7 @@ class MainActivity : BaseActivity() {
         } else {
             binding.tbTop.toolbar.visibility = View.VISIBLE
         }
-        return false
+        return true
     }
 
     override fun getToolbar(): Toolbar {

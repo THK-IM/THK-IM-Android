@@ -3,6 +3,7 @@ package com.thk.im.android
 import android.content.Context
 import android.content.Intent
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.ui.chat.MessageActivity
 import com.thk.im.android.ui.protocol.IMSessionOperator
 
 class ExternalSessionOperator: IMSessionOperator {

@@ -101,6 +101,12 @@ public class AppUtils {
         return outMetrics.heightPixels;
     }
 
+
+    public static int dp2px(float dp) {
+        final float scale = Resources.getSystem().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5);
+    }
+
     /**
      * Value of px to value of dp.
      *
@@ -145,6 +151,4 @@ public class AppUtils {
             }
         }
     }
-
-
 }

@@ -35,7 +35,6 @@ class IMUnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int)
                         R.color.font_main
                     )
                 )
-                tvMsgContent.setBackgroundResource(R.drawable.chat_bg_1)
             }
 
             IMMsgPosType.Right.value -> {
@@ -45,7 +44,6 @@ class IMUnSupportMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int)
                         R.color.font_bg_main
                     )
                 )
-                tvMsgContent.setBackgroundResource(R.drawable.chat_bg_3)
             }
 
             else -> {

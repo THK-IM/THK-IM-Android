@@ -120,9 +120,9 @@ class WelcomeActivity : BaseActivity() {
     }
 
     private fun initIM(token: String, uId: Long) {
-        val success = (application as IMApplication).initIM(token, uId)
+        (application as IMApplication).initIM(token, uId)
+        gotoMainActivity()
 //        if (success) {
-            gotoMainActivity()
 //        }
     }
 

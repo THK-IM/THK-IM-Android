@@ -1,9 +1,11 @@
 package com.thk.im.android.ui.provider.msg.viewholder
 
+import android.graphics.Color
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
@@ -36,7 +38,6 @@ class IMTextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                         R.color.font_main
                     )
                 )
-                tvMsgContent.setBackgroundResource(R.drawable.chat_bg_1)
             }
 
             IMMsgPosType.Right.value -> {
@@ -46,7 +47,6 @@ class IMTextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                         R.color.font_bg_main
                     )
                 )
-                tvMsgContent.setBackgroundResource(R.drawable.chat_bg_3)
             }
 
             IMMsgPosType.Mid.value -> {

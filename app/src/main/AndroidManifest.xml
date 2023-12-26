@@ -62,7 +62,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".MessageActivity"
+            android:name=".ui.chat.MessageActivity"
             android:icon="@mipmap/icon_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait"

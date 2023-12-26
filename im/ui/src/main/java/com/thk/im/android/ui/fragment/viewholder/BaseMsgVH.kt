@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.fragment.viewholder
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
@@ -7,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.MsgOperateStatus
@@ -16,10 +18,12 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
+import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
 
@@ -111,6 +115,29 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         // 内容视图layout
         val flContent: LinearLayout = itemView.findViewById(R.id.fl_content)
         val contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
+        when (getPositionType()) {
+            IMMsgPosType.Left.value -> {
+                contentContainer.setShape(
+                    Color.parseColor("#ffffff"),
+                    Color.parseColor("#ffffff"),
+                    1,
+                    floatArrayOf(0f, 10f, 0f, 10f)
+                )
+            }
+
+            IMMsgPosType.Right.value -> {
+                contentContainer.setShape(
+                    Color.parseColor("#25c3fd"),
+                    Color.parseColor("#25c3fd"),
+                    1,
+                    floatArrayOf(10f, 0f, 10f, 0f)
+                )
+            }
+
+            else -> {
+            }
+        }
+
         flContent.addView(contentContainer)
         contentContainer.setOnClickListener(this)
         contentContainer.setOnLongClickListener(this)

@@ -6,13 +6,12 @@ import android.os.Bundle
 import android.view.View
 import com.thk.im.android.IMApplication
 import com.thk.im.android.api.ApiFactory
-import com.thk.im.android.api.UserRepository
+import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.user.vo.LoginResp
 import com.thk.im.android.api.user.vo.TokenLoginReq
 import com.thk.im.android.api.user.vo.User
 import com.thk.im.android.api.user.vo.UserRegisterReq
 import com.thk.im.android.api.user.vo.UserRegisterResp
-import com.thk.im.android.core.SignalStatus
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
@@ -38,11 +37,11 @@ class WelcomeActivity : BaseActivity() {
     }
 
     private fun initUserInfo() {
-        val token = UserRepository.getUserToken()
+        val token = DataRepository.getUserToken()
         if (token.isNullOrEmpty()) {
             showLogin()
         } else {
-            val user = UserRepository.getUser()
+            val user = DataRepository.getUser()
             if (user == null) {
                 loginByToken(token)
             } else {
@@ -53,7 +52,7 @@ class WelcomeActivity : BaseActivity() {
 
     private fun saveUserInfo(token: String, user: User) {
         ApiFactory.updateToken(token)
-        UserRepository.saveUserInfo(token, user)
+        DataRepository.saveUserInfo(token, user)
         initIM(token, user.id)
     }
 
@@ -91,7 +90,7 @@ class WelcomeActivity : BaseActivity() {
             }
 
         }
-        UserRepository.userApi.register(UserRegisterReq())
+        DataRepository.userApi.register(UserRegisterReq())
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }
@@ -114,7 +113,7 @@ class WelcomeActivity : BaseActivity() {
             }
 
         }
-        UserRepository.userApi.loginByToken(TokenLoginReq(token))
+        DataRepository.userApi.loginByToken(TokenLoginReq(token))
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }

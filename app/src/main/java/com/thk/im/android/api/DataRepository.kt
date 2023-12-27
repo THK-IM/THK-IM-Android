@@ -8,11 +8,12 @@ import com.thk.im.android.api.user.UserApi
 import com.thk.im.android.api.user.vo.User
 import com.thk.im.android.constant.Host
 
-object UserRepository {
+object DataRepository {
 
     lateinit var app: Application
 
     lateinit var userApi: UserApi
+
     lateinit var contactApi: ContactApi
 
     fun init(app: Application) {

@@ -6,9 +6,8 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.get
 import com.thk.im.android.R
-import com.thk.im.android.api.UserRepository
-import com.thk.im.android.core.IMCoreManager.getImDataBase
-import com.thk.im.android.core.IMCoreManager.messageModule
+import com.thk.im.android.api.DataRepository
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform.flowableToMain
 import com.thk.im.android.core.db.entity.Session
@@ -63,7 +62,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun createSession(contactId: Long) {
-        val uId = UserRepository.getUserId()
+        val uId = DataRepository.getUserId()
         if (uId <= 0L) {
             return
         }
@@ -77,10 +76,10 @@ class MainActivity : BaseActivity() {
                 removeDispose(this)
             }
         }
-        messageModule
+        IMCoreManager.messageModule
             .createSingleSession(contactId)
             .flatMap { session ->
-                getImDataBase().sessionDao()
+                IMCoreManager.getImDataBase().sessionDao()
                     .insertOrUpdateSessions(session)
                 Flowable.just(session)
             }

@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.thk.im.android.R
-import com.thk.im.android.api.UserRepository
+import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.user.vo.User
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.databinding.FragmentMineBinding
@@ -26,7 +26,7 @@ class MineFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val user = UserRepository.getUser()
+        val user = DataRepository.getUser()
         user?.let {
             initUserInfo(it)
         }

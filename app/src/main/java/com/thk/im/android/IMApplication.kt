@@ -1,13 +1,11 @@
 package com.thk.im.android
 
 import android.app.Application
-import com.thk.im.android.api.ApiFactory
+import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.ExternalIMApi
-import com.thk.im.android.api.UserRepository
 import com.thk.im.android.constant.Host
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SignalStatus
-import com.thk.im.android.core.api.internal.DefaultIMApi
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
@@ -23,7 +21,7 @@ class IMApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         LLog.v("onCreate IMApplication")
-        UserRepository.init(this)
+        DataRepository.init(this)
         IMCoreManager.init(this)
         IMUIManager.init(this)
     }

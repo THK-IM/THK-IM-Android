@@ -46,17 +46,18 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             LLog.d("onClosed, code: $code, reason: $reason")
             super.onClosed(webSocket, code, reason)
-            mHandler.removeCallbacksAndMessages(null)
-            onStatusChange(SignalStatus.Disconnected.value)
+            if (this@DefaultSignalModule.webSocket == webSocket) {
+                onStatusChange(SignalStatus.Disconnected.value)
+            }
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            super.onFailure(webSocket, t, response)
             LLog.d("onFailure, Throwable: ${if (t.message == null) "unknown" else t.message}")
-            onStatusChange(SignalStatus.Disconnected.value)
-            webSocket.close(1000, "onFailure")
-            mHandler.removeCallbacksAndMessages(null)
-            reconnect()
+            super.onFailure(webSocket, t, response)
+            if (this@DefaultSignalModule.webSocket == webSocket) {
+                webSocket.close(3001, "onFailure")
+                onStatusChange(SignalStatus.Disconnected.value)
+            }
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
@@ -80,7 +81,6 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
             LLog.d("onOpen ${response.code}, ${response.isSuccessful}")
-            heatBeat()
         }
     }
 
@@ -161,6 +161,13 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         if (this.status != status) {
             this.status = status
             signalListener?.onSignalStatusChange(status)
+            if (status == SignalStatus.Connected.value ) {
+                mHandler.removeCallbacksAndMessages(null)
+                heatBeat()
+            } else if (status == SignalStatus.Disconnected.value ) {
+                mHandler.removeCallbacksAndMessages(null)
+                reconnect()
+            }
         }
     }
 

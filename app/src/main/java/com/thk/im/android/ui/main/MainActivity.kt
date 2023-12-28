@@ -14,6 +14,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.databinding.ActivityMainBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.main.adpater.MainFragmentAdapter
+import com.thk.im.android.ui.search.SearchActivity
 import io.reactivex.Flowable
 
 class MainActivity : BaseActivity() {
@@ -55,9 +56,15 @@ class MainActivity : BaseActivity() {
         return binding.tbTop.toolbar
     }
 
+    override fun menuMoreVisibility(id: Int): Int {
+        return View.VISIBLE
+    }
+
     override fun onToolBarMenuClick(view: View) {
-        if (view.id == R.id.tb_more) {
+        if (view.id == R.id.tb_menu2) {
             createSession(4L)
+        } else if (view.id == R.id.tb_menu1) {
+            SearchActivity.startSearchActivity(this)
         }
     }
 

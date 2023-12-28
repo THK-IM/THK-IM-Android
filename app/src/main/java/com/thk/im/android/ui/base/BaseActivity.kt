@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.base
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -7,13 +8,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.gyf.immersionbar.ImmersionBar
 import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.core.BasePopupView
 import com.thk.im.android.R
 import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.SignalStatus
 import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.ui.base.loading.PopupLoading
@@ -51,15 +52,28 @@ abstract class BaseActivity : AppCompatActivity() {
                 backView.visibility = View.GONE
             }
 
-            val oprView: ImageView = tb.findViewById(R.id.tb_opr)
+            val oprView: ImageView = tb.findViewById(R.id.tb_menu1)
             oprView.setOnClickListener {
                 onToolBarMenuClick(it)
             }
-            val moveView: ImageView = tb.findViewById(R.id.tb_more)
+            oprView.visibility = menuMoreVisibility(R.id.tb_menu1)
+            oprView.setImageDrawable(menuIcon(R.id.tb_menu1))
+
+            val moveView: ImageView = tb.findViewById(R.id.tb_menu2)
             moveView.setOnClickListener {
                 onToolBarMenuClick(it)
             }
+            moveView.visibility = menuMoreVisibility(R.id.tb_menu2)
+            moveView.setImageDrawable(menuIcon(R.id.tb_menu2))
         }
+    }
+
+    open fun menuMoreVisibility(id: Int): Int {
+        return View.INVISIBLE
+    }
+
+    open fun menuIcon(id: Int): Drawable? {
+        return ContextCompat.getDrawable(this, com.thk.im.android.ui.R.drawable.chat_more)
     }
 
     open fun onToolBarMenuClick(view: View) {
@@ -70,7 +84,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     }
 
-    open fun getToolbar() :Toolbar? {
+    open fun getToolbar(): Toolbar? {
         return null
     }
 

@@ -2,6 +2,8 @@ package com.thk.im.android.core.fileloader.internal
 
 import com.google.gson.Gson
 import com.thk.im.android.core.exception.HttpStatusCodeException
+import com.thk.im.android.core.exception.StatusCode
+import com.thk.im.android.core.exception.UnknownException
 import com.thk.im.android.core.fileloader.FileLoadState
 import okhttp3.Call
 import okhttp3.Callback
@@ -44,14 +46,16 @@ class UploadTask(
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     if (response.body == null) {
-                        notify(0, FileLoadState.Failed.value, HttpStatusCodeException(400))
+                        notify(0, FileLoadState.Failed.value, UnknownException("http success but body is null"))
                     } else {
                         val json = response.body?.string()
                         val uploadParams = Gson().fromJson(json, UploadParams::class.java)
                         startUpload(uploadParams)
                     }
                 } else {
-                    notify(0, FileLoadState.Failed.value, HttpStatusCodeException(response.code))
+                    val msg = response.body?.string()?: "unknown"
+                    val statusCode = StatusCode(response.code, msg)
+                    notify(0, FileLoadState.Failed.value, HttpStatusCodeException(statusCode))
                 }
             }
         })
@@ -93,7 +97,9 @@ class UploadTask(
                     keyUrl = "${uploadParams.id}"
                     notify(100, FileLoadState.Success.value, null)
                 } else {
-                    notify(0, FileLoadState.Failed.value, HttpStatusCodeException(response.code))
+                    val msg = response.body?.string()?: "unknown"
+                    val statusCode = StatusCode(response.code, msg)
+                    notify(0, FileLoadState.Failed.value, HttpStatusCodeException(statusCode))
                 }
             }
         })

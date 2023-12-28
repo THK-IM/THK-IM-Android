@@ -24,7 +24,6 @@
             />
         <TextView
             android:id="@+id/tb_title"
-            android:text="消息"
             android:textSize="18sp"
             android:textColor="#333333"
             android:layout_width="wrap_content"
@@ -39,16 +38,14 @@
             android:layout_gravity="right|center_vertical"
             android:layout_marginRight="10dp">
             <ImageView
-                android:id="@+id/tb_opr"
-                android:src="@drawable/chat_more"
+                android:id="@+id/tb_menu1"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginRight="10dp"
                 android:visibility="gone"
                 />
             <ImageView
-                android:id="@+id/tb_more"
-                android:src="@drawable/chat_more"
+                android:id="@+id/tb_menu2"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginRight="10dp"

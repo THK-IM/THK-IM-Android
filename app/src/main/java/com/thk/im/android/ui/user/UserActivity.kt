@@ -7,7 +7,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import com.thk.im.android.api.DataRepository
+import com.thk.im.android.api.contact.vo.ApplyFriendVo
 import com.thk.im.android.api.contact.vo.ContactSessionCreateVo
+import com.thk.im.android.api.contact.vo.FollowVo
 import com.thk.im.android.api.user.vo.BasicUserVo
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
@@ -98,11 +100,41 @@ class UserActivity : BaseActivity() {
     }
 
     private fun followUser(userInfo: BasicUserVo) {
+        val subscriber = object: BaseSubscriber<Void>() {
+            override fun onNext(t: Void?) {
+                showToast("关注成功")
+            }
 
+            override fun onComplete() {
+                super.onComplete()
+                dismissLoading()
+            }
+        }
+
+        showLoading()
+        val vo = FollowVo(IMCoreManager.uId, userInfo.id)
+        DataRepository.contactApi.follow(vo)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
     }
 
     private fun applyFriend(userInfo: BasicUserVo) {
+        val subscriber = object: BaseSubscriber<Void>() {
+            override fun onNext(t: Void?) {
+                showToast("申请成功")
+            }
 
+            override fun onComplete() {
+                super.onComplete()
+                dismissLoading()
+            }
+        }
+
+        showLoading()
+        val vo = ApplyFriendVo(IMCoreManager.uId, userInfo.id, 1, "i am vizoss")
+        DataRepository.contactApi.applyFriend(vo)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
     }
 
     private fun startMessage(userInfo: BasicUserVo) {

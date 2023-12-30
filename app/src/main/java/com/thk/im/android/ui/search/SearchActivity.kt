@@ -28,6 +28,7 @@ class SearchActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        binding.etKeywords.setText("d86s51i3d582")
         binding.etKeywords.requestFocus()
 
         binding.etKeywords.setOnEditorActionListener { v, actionId, event ->

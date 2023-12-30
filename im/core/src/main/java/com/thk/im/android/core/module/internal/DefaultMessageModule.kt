@@ -330,6 +330,10 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun processSessionByMessage(msg: Message) {
+        // session为0的消息不直接显示给用户
+        if (msg.sid == 0L) {
+            return
+        }
         val messageDao = IMCoreManager.getImDataBase().messageDao()
         val sessionDao = IMCoreManager.getImDataBase().sessionDao()
         val dispose = object : BaseSubscriber<Session>() {
@@ -384,14 +388,14 @@ open class DefaultMessageModule : MessageModule {
         val app = IMCoreManager.app
         val sp = app.getSharedPreferences(spName, MODE_PRIVATE)
         val editor = sp.edit()
-        editor.putLong(lastSyncMsgTime, time)
+        editor.putLong("${lastSyncMsgTime}_${IMCoreManager.uId}", time)
         return editor.commit()
     }
 
     private fun getOfflineMsgLastSyncTime(): Long {
         val app = IMCoreManager.app
         val sp = app.getSharedPreferences(spName, MODE_PRIVATE)
-        return sp.getLong(lastSyncMsgTime, 0)
+        return sp.getLong("${lastSyncMsgTime}_${IMCoreManager.uId}", 0)
     }
 
     private fun updateSeverSession(session: Session): Flowable<Void> {

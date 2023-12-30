@@ -4,10 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.thk.im.android.api.DataRepository
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
+import com.thk.im.android.core.db.entity.Contact
 import com.thk.im.android.databinding.FragmentContactBinding
 import com.thk.im.android.ui.base.BaseFragment
+import com.thk.im.android.ui.main.fragment.adapter.ContactAdapter
 
 class ContactFragment : BaseFragment() {
+
     private lateinit var binding: FragmentContactBinding
 
     override fun onCreateView(
@@ -21,5 +29,36 @@ class ContactFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val adapter = ContactAdapter(this)
+        binding.rcvContact.layoutManager = LinearLayoutManager(context)
+        binding.rcvContact.adapter = adapter
+        queryAllContacts()
     }
+
+    private fun queryAllContacts() {
+        val subscriber = object :BaseSubscriber<List<Contact>>() {
+            override fun onNext(t: List<Contact>?) {
+                t?.let {
+                    setContactList(it)
+                }
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                removeDispose(this)
+            }
+        }
+        IMCoreManager.contactModule.queryAllContact()
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        addDispose(subscriber)
+    }
+
+    private fun setContactList(t: List<Contact>) {
+        val adapter = binding.rcvContact.adapter as ContactAdapter
+        adapter.setContactList(t)
+    }
+
+
+
 }

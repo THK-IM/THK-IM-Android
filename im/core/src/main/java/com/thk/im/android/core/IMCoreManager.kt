@@ -66,6 +66,7 @@ object IMCoreManager {
             override fun onSignalStatusChange(status: Int) {
                 if (status == SignalStatus.Connected.value) {
                     messageModule.syncOfflineMessages()
+                    contactModule.syncContacts()
                 }
                 XEventBus.post(IMEvent.OnlineStatusUpdate.value, status)
             }

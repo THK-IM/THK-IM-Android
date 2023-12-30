@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.thk.im.android.ui.fragment.IMSessionFragment
+import com.thk.im.android.ui.main.fragment.ContactFragment
 import com.thk.im.android.ui.main.fragment.MineFragment
 
 class MainFragmentAdapter(fragmentActivity: FragmentActivity) :
@@ -17,6 +18,9 @@ class MainFragmentAdapter(fragmentActivity: FragmentActivity) :
         return when (position) {
             0 -> {
                 IMSessionFragment()
+            }
+            1 -> {
+                ContactFragment()
             }
 
             3 -> {

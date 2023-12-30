@@ -17,7 +17,7 @@ data class Contact(
     val id: Long,
     @SerializedName("note_name")
     @ColumnInfo(name = "note_name")
-    var name: String,
+    var noteName: String?,
     @SerializedName("relation")
     @ColumnInfo(name = "relation")
     var relation: Int,

@@ -57,43 +57,48 @@ class MainActivity : BaseActivity() {
     }
 
     override fun menuMoreVisibility(id: Int): Int {
+        if (id == R.id.tb_menu2) {
+            return View.GONE
+        } else if (id == R.id.tb_menu1) {
+            return View.VISIBLE
+        }
         return View.VISIBLE
     }
 
     override fun onToolBarMenuClick(view: View) {
         if (view.id == R.id.tb_menu2) {
-            createSession(4L)
+//            createSession(4L)
         } else if (view.id == R.id.tb_menu1) {
             SearchActivity.startSearchActivity(this)
         }
     }
 
-    private fun createSession(contactId: Long) {
-        val uId = DataRepository.getUserId()
-        if (uId <= 0L) {
-            return
-        }
-        val subscriber: BaseSubscriber<Session> = object : BaseSubscriber<Session>() {
-            override fun onNext(t: Session?) {
-
-            }
-
-            override fun onComplete() {
-                super.onComplete()
-                removeDispose(this)
-            }
-        }
-        IMCoreManager.messageModule
-            .createSingleSession(contactId)
-            .flatMap { session ->
-                IMCoreManager.getImDataBase().sessionDao()
-                    .insertOrUpdateSessions(session)
-                Flowable.just(session)
-            }
-            .compose(flowableToMain<Session>())
-            .subscribe(subscriber)
-        addDispose(subscriber)
-    }
+//    private fun createSession(contactId: Long) {
+//        val uId = DataRepository.getUserId()
+//        if (uId <= 0L) {
+//            return
+//        }
+//        val subscriber: BaseSubscriber<Session> = object : BaseSubscriber<Session>() {
+//            override fun onNext(t: Session?) {
+//
+//            }
+//
+//            override fun onComplete() {
+//                super.onComplete()
+//                removeDispose(this)
+//            }
+//        }
+//        IMCoreManager.messageModule
+//            .createSingleSession(contactId)
+//            .flatMap { session ->
+//                IMCoreManager.getImDataBase().sessionDao()
+//                    .insertOrUpdateSessions(session)
+//                Flowable.just(session)
+//            }
+//            .compose(flowableToMain<Session>())
+//            .subscribe(subscriber)
+//        addDispose(subscriber)
+//    }
 
 
 }

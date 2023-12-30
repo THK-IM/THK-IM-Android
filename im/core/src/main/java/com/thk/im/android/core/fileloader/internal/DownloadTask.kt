@@ -44,7 +44,6 @@ class DownloadTask(
         if (url.startsWith("http", true)) {
             requestBuilder.url(url)
         } else {
-            requestBuilder.addHeader("Token", fileLoaderModule.token)
             requestBuilder.url("${fileLoaderModule.endpoint}/session/object/download_url?${downloadParam}")
         }
         call = fileLoaderModule.okHttpClient.newCall(requestBuilder.build())

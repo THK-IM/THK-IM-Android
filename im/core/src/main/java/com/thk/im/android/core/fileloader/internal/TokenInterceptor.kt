@@ -1,10 +1,15 @@
 package com.thk.im.android.core.fileloader.internal
 
+import com.thk.im.android.core.base.utils.AppUtils
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 
 class TokenInterceptor(private var token: String, private var endpoint: String) : Interceptor {
+
+    private val tokenKey = "Authorization"
+    private val clientVersionKey = "Client-Version"
+    private val platformKey = "Client-Platform"
 
     fun updateToken(token: String, endpoint: String) {
         this.token = token
@@ -31,16 +36,19 @@ class TokenInterceptor(private var token: String, private var endpoint: String) 
 
     private fun newRequest(origin: Request): Request {
         val builder = if (origin.url.toUrl().toExternalForm().startsWith(endpoint)) {
-            if (origin.header("Token") == null) {
-                origin.newBuilder().addHeader("Token", this.token)
+            if (origin.header(tokenKey) == null) {
+                val builder =  origin.newBuilder()
+                builder.addHeader(tokenKey, "Bearer ${this.token}")
+                builder.addHeader(clientVersionKey, AppUtils.instance().verName)
+                builder.addHeader(platformKey, "Android")
             } else {
                 origin.newBuilder()
             }
         } else {
-            if (origin.header("Token") == null) {
+            if (origin.header(tokenKey) == null) {
                 origin.newBuilder()
             } else {
-                origin.newBuilder().removeHeader("Token")
+                origin.newBuilder().removeHeader(tokenKey)
             }
         }
         return builder.build()

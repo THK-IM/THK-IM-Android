@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import com.danikula.videocache.CacheListener
 import com.danikula.videocache.HttpProxyCacheServer
+import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.base.utils.StringUtils
 import java.io.File
 
@@ -15,6 +16,10 @@ object VideoCache {
     private var endpoint: String = ""
     private var app: Application? = null
 
+    private val tokenKey = "Authorization"
+    private val clientVersionKey = "Client-Version"
+    private val platformKey = "Client-Platform"
+
     fun init(app: Application, token: String, endpoint: String) {
         this.app = app
         this.token = token
@@ -25,7 +30,9 @@ object VideoCache {
                 .cacheDirectory(getCacheDir())
                 .headerInjector { url ->
                     if (url.startsWith(endpoint)) {
-                        mutableMapOf("Token" to token)
+                        mutableMapOf(tokenKey to "Bearer $token",
+                            clientVersionKey to AppUtils.instance().verName,
+                            platformKey to "Android")
                     } else {
                         mutableMapOf()
                     }

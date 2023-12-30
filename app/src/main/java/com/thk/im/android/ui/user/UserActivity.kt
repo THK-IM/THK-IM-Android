@@ -59,6 +59,19 @@ class UserActivity : BaseActivity() {
         }
         binding.tvId.text = userInfo.displayId
 
+        binding.tvFollow.visibility = View.VISIBLE
+        binding.tvFollow.setShape(
+            Color.parseColor("#3282F6"),
+            Color.parseColor("#3282F6"),
+            1,
+            floatArrayOf(10f, 10f, 10f, 10f)
+        )
+
+        binding.tvFollow.setOnClickListener {
+            followUser(userInfo)
+        }
+
+
         binding.tvAddFriend.visibility = View.VISIBLE
         binding.tvAddFriend.setShape(
             Color.parseColor("#3282F6"),
@@ -68,6 +81,7 @@ class UserActivity : BaseActivity() {
         )
 
         binding.tvAddFriend.setOnClickListener {
+            applyFriend(userInfo)
         }
 
         binding.tvSendMsg.visibility = View.VISIBLE
@@ -81,6 +95,14 @@ class UserActivity : BaseActivity() {
         binding.tvSendMsg.setOnClickListener {
             startMessage(userInfo)
         }
+    }
+
+    private fun followUser(userInfo: BasicUserInfo) {
+
+    }
+
+    private fun applyFriend(userInfo: BasicUserInfo) {
+
     }
 
     private fun startMessage(userInfo: BasicUserInfo) {

@@ -7,9 +7,9 @@ interface IMSessionDao {
 
     fun querySessionsByMTime(): List<Session>
 
-    fun insertOrUpdateSessions(vararg sessions: Session)
+    fun insertOrUpdateSessions(sessions: List<Session>)
 
-    fun insertOrIgnoreSessions(vararg sessions: Session)
+    fun insertOrIgnoreSessions(sessions: List<Session>)
 
     fun findSessionByEntity(entityId: Long, type: Int): Session?
 

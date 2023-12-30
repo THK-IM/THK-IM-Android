@@ -6,7 +6,7 @@ data class CreateGroupVo(
     @SerializedName("u_id")
     val uId: Long,
     @SerializedName("members")
-    val members: Set<Long>,
+    val members: List<Long>,
     @SerializedName("group_name")
     val groupName: String,
     @SerializedName("group_announce")

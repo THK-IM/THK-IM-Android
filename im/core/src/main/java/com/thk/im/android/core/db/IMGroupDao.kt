@@ -9,5 +9,7 @@ interface IMGroupDao {
 
     fun insertOrIgnoreGroups(groups: List<Group>)
 
-    fun queryAllGroups() : List<Group>
+    fun queryAllGroups(): List<Group>
+
+    fun findOne(id: Long): Group?
 }

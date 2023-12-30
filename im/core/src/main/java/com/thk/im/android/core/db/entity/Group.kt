@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 @Keep
 @Parcelize
 @Entity(
-    tableName = "group",
+    tableName = "group_",
     primaryKeys = ["id"],
     indices = [
         Index(value = ["session_id"], unique = true)

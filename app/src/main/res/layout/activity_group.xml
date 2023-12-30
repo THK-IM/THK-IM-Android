@@ -11,7 +11,7 @@
 
     <RelativeLayout
         android:id="@+id/ly_group_name"
-        app:layout_constraintTop_toBottomOf="@+id/tb_top"
+        app:layout_constraintTop_toBottomOf="@id/tb_top"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_width="match_parent"
@@ -38,6 +38,7 @@
             android:maxLines="1"
             android:textSize="14sp"
             android:textColor="#222222"
+            android:hint="在这里输入名称"
             android:layout_centerInParent="true"
             android:layout_alignParentEnd="true"
             />
@@ -45,7 +46,7 @@
 
     <RelativeLayout
         android:id="@+id/ly_group_avatar"
-        app:layout_constraintTop_toBottomOf="@+id/ly_group_name"
+        app:layout_constraintTop_toBottomOf="@id/ly_group_name"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_width="match_parent"
@@ -76,7 +77,7 @@
 
     <RelativeLayout
         android:id="@+id/ly_group_announce"
-        app:layout_constraintTop_toBottomOf="@+id/ly_group_avatar"
+        app:layout_constraintTop_toBottomOf="@id/ly_group_avatar"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_width="match_parent"
@@ -87,7 +88,7 @@
             android:id="@+id/tv_group_announce"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:text="群公告"
+            android:text="群公告(0/100)"
             android:textAlignment="center"
             android:textSize="14sp"
             android:textColor="#444444"
@@ -96,40 +97,58 @@
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/et_announce_input"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:padding="4dp"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:scrollbars="vertical"
+            android:layout_height="80dp"
+            android:hint="在这里输入群公告"
             android:textSize="14sp"
             android:textColor="#222222"
+            android:textCursorDrawable="@drawable/cursor_color"
             android:layout_below="@id/tv_group_announce"
             />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/ly_group_member"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/ly_group_announce"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_width="match_parent"
-        android:padding="10dp"
-        android:layout_height="0dp">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_group_member"
+        >
+        <TextView
+            android:id="@+id/tv_choose_member"
+            android:text="选择成员"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="群成员"
+            android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textSize="14sp"
             android:textColor="#444444"
             />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcv_members"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/tv_group_member"
+        <ImageView
+            android:id="@+id/iv_navigation_arrow"
+            android:src="@drawable/ic_arrow_right"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
             />
     </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_members"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/ly_group_member"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 
 
 

@@ -71,6 +71,14 @@
             android:screenOrientation="portrait">
         </activity>
 
+        <activity
+            android:name=".ui.contact.ContactActivity"
+            android:exported="true"
+            android:icon="@mipmap/icon_launcher"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+        </activity>
+
 
         <activity
             android:name=".ui.main.MainTestActivity"

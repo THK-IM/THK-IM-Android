@@ -1,6 +1,5 @@
 package com.thk.im.android.core.api.internal
 
-import com.thk.im.android.core.api.vo.CreateSessionVo
 import com.thk.im.android.core.api.vo.ListVo
 import com.thk.im.android.core.api.vo.SessionVo
 import com.thk.im.android.core.api.vo.UpdateSessionVo
@@ -8,17 +7,11 @@ import io.reactivex.Flowable
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SessionApi {
-
-    @POST("/session")
-    fun createSession(
-        @Body bean: CreateSessionVo
-    ): Flowable<SessionVo>
 
     @GET("/user_session/{uid}/{sid}")
     fun querySession(

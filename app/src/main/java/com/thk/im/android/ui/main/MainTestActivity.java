@@ -4,24 +4,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.thk.im.android.MediaTestActivity;
 import com.thk.im.android.SessionActivity;
-import com.thk.im.android.core.base.BaseSubscriber;
-import com.thk.im.android.core.base.RxTransform;
-import com.thk.im.android.core.IMCoreManager;
-import com.thk.im.android.core.db.entity.Session;
 import com.thk.im.android.databinding.ActivityMainTestBinding;
 
 import java.util.Random;
 
-import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Function;
 
 public class MainTestActivity extends AppCompatActivity {
 
@@ -65,32 +57,7 @@ public class MainTestActivity extends AppCompatActivity {
     }
 
     private void createSingleSession(long uid) {
-        BaseSubscriber<Session> subscriber = new BaseSubscriber<Session>() {
-            @Override
-            public void onNext(Session session) {
-                if (session != null) {
-                    Toast.makeText(MainTestActivity.this, "id:" + session.getId() + ", 创建成功", Toast.LENGTH_SHORT).show();
-                }
-            }
 
-            @Override
-            public void onError(@Nullable Throwable t) {
-                super.onError(t);
-                Toast.makeText(MainTestActivity.this, "创建失败:" + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        };
-        IMCoreManager.INSTANCE.getMessageModule()
-                .createSingleSession(uid)
-                .flatMap(new Function<Session, Flowable<Session>>() {
-                    @Override
-                    public Flowable<Session> apply(Session session) throws Exception {
-                        IMCoreManager.INSTANCE.getImDataBase().sessionDao().insertOrUpdateSessions(session);
-                        return Flowable.just(session);
-                    }
-                })
-                .compose(RxTransform.INSTANCE.flowableToMain())
-                .subscribe(subscriber);
-        disposable.add(subscriber);
     }
 
     @Override

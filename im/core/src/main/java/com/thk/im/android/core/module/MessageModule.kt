@@ -29,11 +29,6 @@ interface MessageModule : BaseModule {
     fun syncLatestSessionsFromServer(lastSyncTime: Int, count: Int)
 
     /**
-     *  先查本地数据库后查服务端
-     */
-    fun createSingleSession(entityId: Long): Flowable<Session>
-
-    /**
      * 获取session, 先查本地数据库后查服务端
      */
     fun getSession(sessionId: Long): Flowable<Session>

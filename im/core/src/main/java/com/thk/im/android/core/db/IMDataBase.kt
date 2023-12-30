@@ -11,5 +11,8 @@ interface IMDataBase {
     fun messageDao(): IMMessageDao
 
     fun sessionDao(): IMSessionDao
+
     fun contactDao(): IMContactDao
+
+    fun groupDao(): IMGroupDao
 }

@@ -17,4 +17,8 @@ internal class IMGroupDaoImp(private val roomDatabase: IMRoomDataBase) : IMGroup
         return roomDatabase.groupDao().queryAllGroups()
     }
 
+    override fun findOne(id: Long): Group? {
+        return roomDatabase.groupDao().findOne(id)
+    }
+
 }

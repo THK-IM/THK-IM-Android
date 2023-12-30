@@ -1,6 +1,13 @@
 package com.thk.im.android.core.module
 
+import com.thk.im.android.core.db.entity.Group
+import io.reactivex.Flowable
+
 
 interface GroupModule : BaseModule {
+
+    fun findOne(id: Long): Flowable<Group>
+
+    fun queryAllGroups(): Flowable<List<Group>>
 
 }

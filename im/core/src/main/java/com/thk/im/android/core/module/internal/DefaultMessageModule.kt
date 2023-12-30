@@ -142,27 +142,6 @@ open class DefaultMessageModule : MessageModule {
 
     }
 
-    override fun createSingleSession(entityId: Long): Flowable<Session> {
-        LLog.v("createSingleSession $entityId")
-        val sessionType = SessionType.Single.value
-        return Flowable.create<Session>({
-            val session = IMCoreManager.getImDataBase().sessionDao()
-                .findSessionByEntity(entityId, sessionType)
-            if (session == null) {
-                it.onNext(Session(sessionType, entityId))
-            } else {
-                it.onNext(session)
-            }
-            it.onComplete()
-        }, BackpressureStrategy.LATEST).flatMap { session ->
-            if (session.id > 0) {
-                return@flatMap Flowable.just(session)
-            } else {
-                val uId = IMCoreManager.uId
-                return@flatMap IMCoreManager.imApi.createSession(uId, sessionType, "", "", entityId, null)
-            }
-        }
-    }
 
     override fun getSession(sessionId: Long): Flowable<Session> {
         return Flowable.create<Session>({
@@ -178,7 +157,10 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap Flowable.just(session)
             } else {
                 val uId = IMCoreManager.uId
-                return@flatMap IMCoreManager.imApi.querySession(uId, sessionId)
+                return@flatMap IMCoreManager.imApi.querySession(uId, sessionId).flatMap {
+                    IMCoreManager.db.sessionDao().insertOrUpdateSessions(listOf(it))
+                    Flowable.just(it)
+                }
             }
         }
     }
@@ -344,7 +326,7 @@ open class DefaultMessageModule : MessageModule {
                     t.lastMsg = processor.getSessionDesc(msg)
                     t.mTime = msg.mTime
                     t.unReadCount = unReadCount
-                    sessionDao.insertOrUpdateSessions(t)
+                    sessionDao.insertOrUpdateSessions(listOf(t))
                     XEventBus.post(IMEvent.SessionNew.value, t)
                     notifyNewMessage(t, msg)
                 }

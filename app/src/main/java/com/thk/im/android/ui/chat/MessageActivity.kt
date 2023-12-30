@@ -10,6 +10,7 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
+import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActivityMessageBinding
@@ -80,6 +81,17 @@ class MessageActivity : BaseActivity() {
                 }
             }
             IMCoreManager.userModule.queryUser(session.entityId)
+                .compose(RxTransform.flowableToMain()).subscribe(subscribe)
+            addDispose(subscribe)
+        } else {
+            val subscribe = object : BaseSubscriber<Group>() {
+                override fun onNext(t: Group?) {
+                    t?.let {
+                        setTitle(it.name)
+                    }
+                }
+            }
+            IMCoreManager.groupModule.findOne(session.entityId)
                 .compose(RxTransform.flowableToMain()).subscribe(subscribe)
             addDispose(subscribe)
         }

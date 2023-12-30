@@ -9,17 +9,12 @@ interface IMApi {
     /**
      * 获取修改时间为mTime之后的session列表
      */
-    fun getLatestModifiedSessions(uId: Long, count: Int, mTime: Long, types: Set<Int>): Flowable<List<Session>>
+    fun getLatestSessions(uId: Long, count: Int, mTime: Long, types: Set<Int>): Flowable<List<Session>>
 
     /**
      * 获取与用户的session
      */
     fun querySession(uId: Long, sessionId: Long): Flowable<Session>
-
-    /**
-     * 创建会话
-     */
-    fun createSession(uId: Long, sessionType: Int, name: String, remark: String, entityId: Long, members: Set<Long>?): Flowable<Session>
 
 
     /**

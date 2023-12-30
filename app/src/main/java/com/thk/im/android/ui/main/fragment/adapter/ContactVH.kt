@@ -28,45 +28,22 @@ class ContactVH(liftOwner: LifecycleOwner, itemView: View) :
     private val avatarView: AppCompatImageView = itemView.findViewById(R.id.iv_avatar)
     private val nickNameView: AppCompatTextView = itemView.findViewById(R.id.tv_nickname)
     private val relationView: AppCompatTextView = itemView.findViewById(R.id.tv_relation)
+    private val isSelectedView: AppCompatImageView = itemView.findViewById(R.id.iv_selected)
 
-    fun onBind(contact: Contact) {
+    fun onBind(contact: Contact, selected: Boolean, operator: ContactItemOperator) {
         showUserInfo(contact)
         contact.noteName?.let {
             nickNameView.text = it
         }
         setRelationText(contact.relation)
         itemView.setOnClickListener {
-            createSession(contact.id)
+            operator.onItemClick(contact.id)
         }
-    }
-
-    private fun createSession(contactId: Long) {
-        val uId = DataRepository.getUserId()
-        if (uId <= 0L) {
-            return
+        if (selected) {
+            isSelectedView.visibility = View.VISIBLE
+        } else {
+            isSelectedView.visibility = View.GONE
         }
-        val subscriber: BaseSubscriber<Session> = object : BaseSubscriber<Session>() {
-            override fun onNext(t: Session?) {
-                t?.let { session ->
-                    IMUIManager.sessionOperator?.openSession(itemView.context, session)
-                }
-            }
-
-            override fun onComplete() {
-                super.onComplete()
-                disposable.remove(this)
-            }
-        }
-        IMCoreManager.messageModule
-            .createSingleSession(contactId)
-            .flatMap { session ->
-                IMCoreManager.getImDataBase().sessionDao()
-                    .insertOrUpdateSessions(session)
-                Flowable.just(session)
-            }
-            .compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
-        disposable.add(subscriber)
     }
 
     private fun showUserInfo(contact: Contact) {

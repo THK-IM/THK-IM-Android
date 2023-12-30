@@ -15,7 +15,10 @@ internal interface GroupDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertOrIgnoreGroups(groups: List<Group>)
 
-    @Query("select * from 'group' ")
+    @Query("select * from group_ where id = :id ")
+    fun findOne(id: Long): Group?
+
+    @Query("select * from group_ ")
     fun queryAllGroups(): List<Group>
 
 }

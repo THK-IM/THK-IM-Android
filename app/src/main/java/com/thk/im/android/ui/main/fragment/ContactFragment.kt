@@ -17,6 +17,7 @@ import com.thk.im.android.ui.main.fragment.adapter.ContactAdapter
 class ContactFragment : BaseFragment() {
 
     private lateinit var binding: FragmentContactBinding
+    private var mode = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -29,7 +30,12 @@ class ContactFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = ContactAdapter(this)
+        mode = if (arguments == null) {
+            0
+        } else {
+            requireArguments().getInt("mode")
+        }
+        val adapter = ContactAdapter(requireContext(), this, mode)
         binding.rcvContact.layoutManager = LinearLayoutManager(context)
         binding.rcvContact.adapter = adapter
         queryAllContacts()
@@ -59,6 +65,9 @@ class ContactFragment : BaseFragment() {
         adapter.setContactList(t)
     }
 
-
+    fun getSelectedIds(): LongArray {
+        val adapter = binding.rcvContact.adapter as ContactAdapter
+        return adapter.selectedIds.toLongArray()
+    }
 
 }

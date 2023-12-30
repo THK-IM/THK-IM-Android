@@ -23,17 +23,8 @@
             android:layout_height="42dp" />
     </androidx.cardview.widget.CardView>
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/iv_selected"
-        android:visibility="invisible"
-        android:src="@drawable/ic_choose"
-        android:layout_centerInParent="true"
-        android:layout_alignParentEnd="true"
-        android:layout_width="30dp"
-        android:layout_height="30dp" />
-
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_nickname"
+        android:id="@+id/tv_name"
         android:layout_marginStart="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,21 +35,5 @@
         android:layout_centerInParent="true"
         android:layout_toEndOf="@id/avatar_container"
         />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_relation"
-        android:layout_marginStart="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="6dp"
-        android:paddingTop="2dp"
-        android:textAlignment="center"
-        android:textColor="#666666"
-        android:textSize="10sp"
-        android:layout_centerInParent="true"
-        android:layout_toEndOf="@id/tv_nickname"
-        android:layout_toStartOf="@id/iv_selected"
-        />
-
 
 </RelativeLayout>

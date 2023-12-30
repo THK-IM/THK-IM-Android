@@ -40,7 +40,9 @@ import com.thk.im.android.ui.provider.operator.IMMsgMultiSelectOperator
 import com.thk.im.android.ui.provider.operator.IMMsgReplyOperator
 import com.thk.im.android.ui.provider.operator.IMMsgRevokeOperator
 import com.thk.im.android.ui.provider.panel.IMUnicodeEmojiPanelProvider
+import com.thk.im.android.ui.provider.session.provider.GroupSessionIVProvider
 import com.thk.im.android.ui.provider.session.provider.SingleSessionIVProvider
+import com.thk.im.android.ui.provider.session.provider.SuperGroupSessionIVProvider
 
 object IMUIManager {
 
@@ -113,6 +115,8 @@ object IMUIManager {
         )
         registerMsgIVProvider(*providers)
         registerSessionIVProvider(SingleSessionIVProvider())
+        registerSessionIVProvider(GroupSessionIVProvider())
+        registerSessionIVProvider(SuperGroupSessionIVProvider())
 
         for (i in 0..10) {
             val unicodeEmojiProvider = IMUnicodeEmojiPanelProvider(i)

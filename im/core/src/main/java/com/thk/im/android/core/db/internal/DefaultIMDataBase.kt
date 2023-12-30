@@ -67,5 +67,9 @@ internal class DefaultIMDataBase(
         return contactDao
     }
 
+    override fun groupDao(): IMGroupDao {
+        return groupDao
+    }
+
 
 }

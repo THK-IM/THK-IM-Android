@@ -30,10 +30,7 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         statusBar()
         popupLoading = PopupLoading(this)
-        loading = XPopup.Builder(this)
-            .isViewMode(true)
-            .isDestroyOnDismiss(false)
-            .hasShadowBg(false)
+        loading = XPopup.Builder(this).isViewMode(true).isDestroyOnDismiss(false).hasShadowBg(false)
             .asCustom(popupLoading)
 
         XEventBus.observe(this, IMEvent.OnlineStatusUpdate.value, Observer<Int> {
@@ -77,7 +74,11 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     open fun menuIcon(id: Int): Drawable? {
-        return ContextCompat.getDrawable(this, com.thk.im.android.ui.R.drawable.chat_more)
+        return if (id == R.id.tb_menu2) {
+            ContextCompat.getDrawable(this, R.drawable.ic_add)
+        } else  {
+            ContextCompat.getDrawable(this, R.drawable.ic_search)
+        }
     }
 
     open fun onToolBarMenuClick(view: View) {
@@ -152,10 +153,8 @@ abstract class BaseActivity : AppCompatActivity() {
      * 是否允许截屏
      */
     fun screenshotSafe(yes: Boolean) {
-        if (!yes)
-            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        else
-            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        if (!yes) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
     }
 
 }

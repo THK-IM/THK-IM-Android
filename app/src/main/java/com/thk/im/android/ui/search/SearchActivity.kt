@@ -33,7 +33,7 @@ class SearchActivity : BaseActivity() {
         setContentView(binding.root)
         searchType = intent.getIntExtra("searchType", 0)
 
-        binding.etKeywords.setText("d86s51i3d582")
+        binding.etKeywords.setText("d86s4xa1jn3i")
         binding.etKeywords.requestFocus()
 
         binding.etKeywords.setOnEditorActionListener { v, actionId, event ->
@@ -57,7 +57,7 @@ class SearchActivity : BaseActivity() {
             val subscriber = object : BaseSubscriber<GroupVo>() {
                 override fun onNext(t: GroupVo?) {
                     t?.let {
-                        GroupActivity.startGroupActivity(this@SearchActivity, it)
+                        GroupActivity.startGroupActivity(this@SearchActivity, it.toGroup())
                     }
                 }
 

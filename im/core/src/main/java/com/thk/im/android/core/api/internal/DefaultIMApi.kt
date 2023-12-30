@@ -4,7 +4,6 @@ import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.api.IMApi
 import com.thk.im.android.core.api.vo.AckMsgVo
-import com.thk.im.android.core.api.vo.CreateSessionVo
 import com.thk.im.android.core.api.vo.DeleteMsgVo
 import com.thk.im.android.core.api.vo.ForwardMessageVo
 import com.thk.im.android.core.api.vo.MessageVo
@@ -53,7 +52,7 @@ open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     private val messageApi: MessageApi = getApi(MessageApi::class.java)
     private val sessionApi: SessionApi = getApi(SessionApi::class.java)
 
-    override fun getLatestModifiedSessions(
+    override fun getLatestSessions(
         uId: Long,
         count: Int,
         mTime: Long,
@@ -71,21 +70,6 @@ open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     override fun querySession(uId: Long, sessionId: Long): Flowable<Session> {
         return sessionApi.querySession(uId, sessionId).flatMap { bean ->
             Flowable.just(bean.toSession())
-        }
-    }
-
-
-    override fun createSession(
-        uId: Long,
-        sessionType: Int,
-        name: String,
-        remark: String,
-        entityId: Long,
-        members: Set<Long>?
-    ): Flowable<Session> {
-        val bean = CreateSessionVo(uId, sessionType, entityId, members, name, remark)
-        return sessionApi.createSession(bean).flatMap {
-            Flowable.just(it.toSession())
         }
     }
 

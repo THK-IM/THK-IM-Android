@@ -6,13 +6,17 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.R
+import com.thk.im.android.api.DataRepository
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Contact
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.fragment.viewholder.BaseVH
+import com.thk.im.android.ui.manager.IMUIManager
+import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import java.lang.StringBuilder
 
@@ -31,6 +35,38 @@ class ContactVH(liftOwner: LifecycleOwner, itemView: View) :
             nickNameView.text = it
         }
         setRelationText(contact.relation)
+        itemView.setOnClickListener {
+            createSession(contact.id)
+        }
+    }
+
+    private fun createSession(contactId: Long) {
+        val uId = DataRepository.getUserId()
+        if (uId <= 0L) {
+            return
+        }
+        val subscriber: BaseSubscriber<Session> = object : BaseSubscriber<Session>() {
+            override fun onNext(t: Session?) {
+                t?.let { session ->
+                    IMUIManager.sessionOperator?.openSession(itemView.context, session)
+                }
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                disposable.remove(this)
+            }
+        }
+        IMCoreManager.messageModule
+            .createSingleSession(contactId)
+            .flatMap { session ->
+                IMCoreManager.getImDataBase().sessionDao()
+                    .insertOrUpdateSessions(session)
+                Flowable.just(session)
+            }
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposable.add(subscriber)
     }
 
     private fun showUserInfo(contact: Contact) {

@@ -6,16 +6,10 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.get
 import com.thk.im.android.R
-import com.thk.im.android.api.DataRepository
-import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.RxTransform.flowableToMain
-import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.databinding.ActivityMainBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.main.adpater.MainFragmentAdapter
 import com.thk.im.android.ui.search.SearchActivity
-import io.reactivex.Flowable
 
 class MainActivity : BaseActivity() {
 
@@ -67,38 +61,10 @@ class MainActivity : BaseActivity() {
 
     override fun onToolBarMenuClick(view: View) {
         if (view.id == R.id.tb_menu2) {
-//            createSession(4L)
+
         } else if (view.id == R.id.tb_menu1) {
             SearchActivity.startSearchActivity(this)
         }
     }
-
-//    private fun createSession(contactId: Long) {
-//        val uId = DataRepository.getUserId()
-//        if (uId <= 0L) {
-//            return
-//        }
-//        val subscriber: BaseSubscriber<Session> = object : BaseSubscriber<Session>() {
-//            override fun onNext(t: Session?) {
-//
-//            }
-//
-//            override fun onComplete() {
-//                super.onComplete()
-//                removeDispose(this)
-//            }
-//        }
-//        IMCoreManager.messageModule
-//            .createSingleSession(contactId)
-//            .flatMap { session ->
-//                IMCoreManager.getImDataBase().sessionDao()
-//                    .insertOrUpdateSessions(session)
-//                Flowable.just(session)
-//            }
-//            .compose(flowableToMain<Session>())
-//            .subscribe(subscriber)
-//        addDispose(subscriber)
-//    }
-
 
 }

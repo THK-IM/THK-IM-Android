@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.thk.im.android.R
 import com.thk.im.android.api.DataRepository
-import com.thk.im.android.api.user.vo.User
+import com.thk.im.android.api.user.vo.UserVo
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.databinding.FragmentMineBinding
 import com.thk.im.android.ui.base.BaseFragment
@@ -35,18 +35,18 @@ class MineFragment: BaseFragment() {
         binding.navAbout.setIconTitle(R.drawable.selector_audio_muted, "关于")
     }
 
-    private fun initUserInfo(user: User) {
-        user.avatar?.let {
+    private fun initUserInfo(userVo: UserVo) {
+        userVo.avatar?.let {
             IMImageLoader.displayImageUrl(binding.ivAvatar, it)
         }
-        user.qrcode?.let {
+        userVo.qrcode?.let {
             IMImageLoader.displayImageUrl(binding.ivQrcode, it)
         }
-        binding.tvId.text = user.displayId
-        if (user.nickname.isNullOrEmpty()) {
+        binding.tvId.text = userVo.displayId
+        if (userVo.nickname.isNullOrEmpty()) {
             binding.tvNickname.text = "无名"
         } else {
-            binding.tvNickname.text = user.nickname
+            binding.tvNickname.text = userVo.nickname
         }
     }
 }

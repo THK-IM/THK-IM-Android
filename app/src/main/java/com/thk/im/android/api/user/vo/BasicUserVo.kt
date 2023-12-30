@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 // 基本用户信息
 @Parcelize
-data class BasicUserInfo(
+data class BasicUserVo(
     @SerializedName("id")
     val id: Long,
     @SerializedName("display_id")

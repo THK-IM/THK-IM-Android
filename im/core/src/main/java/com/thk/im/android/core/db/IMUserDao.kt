@@ -4,9 +4,9 @@ import com.thk.im.android.core.db.entity.User
 
 interface IMUserDao {
 
-    fun insertUsers(vararg users: User)
+    fun insertOrReplaceUsers(users: List<User>)
 
-    fun updateUser(vararg users: User)
+    fun insertOrIgnoreUsers(users: List<User>)
 
     fun queryUser(id: Long): User?
 

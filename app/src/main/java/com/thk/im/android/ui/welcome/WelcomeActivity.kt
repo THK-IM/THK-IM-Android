@@ -7,11 +7,11 @@ import android.view.View
 import com.thk.im.android.IMApplication
 import com.thk.im.android.api.ApiFactory
 import com.thk.im.android.api.DataRepository
-import com.thk.im.android.api.user.vo.LoginResp
+import com.thk.im.android.api.user.vo.LoginVo
 import com.thk.im.android.api.user.vo.TokenLoginReq
-import com.thk.im.android.api.user.vo.User
-import com.thk.im.android.api.user.vo.UserRegisterReq
-import com.thk.im.android.api.user.vo.UserRegisterResp
+import com.thk.im.android.api.user.vo.UserVo
+import com.thk.im.android.api.user.vo.RegisterReq
+import com.thk.im.android.api.user.vo.RegisterVo
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
@@ -50,10 +50,10 @@ class WelcomeActivity : BaseActivity() {
         }
     }
 
-    private fun saveUserInfo(token: String, user: User) {
+    private fun saveUserInfo(token: String, userVo: UserVo) {
         ApiFactory.updateToken(token)
-        DataRepository.saveUserInfo(token, user)
-        initIM(token, user.id)
+        DataRepository.saveUserInfo(token, userVo)
+        initIM(token, userVo.id)
     }
 
     private fun showLogin() {
@@ -76,10 +76,10 @@ class WelcomeActivity : BaseActivity() {
 
     private fun quickRegister() {
         showLoading()
-        val subscriber = object : BaseSubscriber<UserRegisterResp>() {
-            override fun onNext(t: UserRegisterResp?) {
+        val subscriber = object : BaseSubscriber<RegisterVo>() {
+            override fun onNext(t: RegisterVo?) {
                 t?.let {
-                    saveUserInfo(it.token, it.user)
+                    saveUserInfo(it.token, it.userVo)
                 }
             }
 
@@ -90,7 +90,7 @@ class WelcomeActivity : BaseActivity() {
             }
 
         }
-        DataRepository.userApi.register(UserRegisterReq())
+        DataRepository.userApi.register(RegisterReq())
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }
@@ -98,11 +98,11 @@ class WelcomeActivity : BaseActivity() {
     private fun loginByToken(token: String) {
         ApiFactory.updateToken(token)
         showLoading()
-        val subscriber = object : BaseSubscriber<LoginResp>() {
-            override fun onNext(t: LoginResp?) {
+        val subscriber = object : BaseSubscriber<LoginVo>() {
+            override fun onNext(t: LoginVo?) {
                 t?.let {
                     val newToken = it.token ?: token
-                    saveUserInfo(newToken, it.user)
+                    saveUserInfo(newToken, it.userVo)
                 }
             }
 

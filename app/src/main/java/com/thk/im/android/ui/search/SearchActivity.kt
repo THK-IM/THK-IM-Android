@@ -4,12 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
-import com.thk.android.im.live.base.LLog
 import com.thk.im.android.api.DataRepository
-import com.thk.im.android.api.user.vo.BasicUserInfo
+import com.thk.im.android.api.user.vo.BasicUserVo
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.exception.HttpStatusCodeException
 import com.thk.im.android.databinding.ActivitySearchBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.user.UserActivity
@@ -42,8 +40,8 @@ class SearchActivity : BaseActivity() {
 
     private fun search(keywords: String) {
         if (keywords.isNotEmpty()) {
-            val subscriber = object : BaseSubscriber<BasicUserInfo>() {
-                override fun onNext(t: BasicUserInfo?) {
+            val subscriber = object : BaseSubscriber<BasicUserVo>() {
+                override fun onNext(t: BasicUserVo?) {
                     t?.let {
                         UserActivity.startUserActivity(this@SearchActivity, it)
                     }
@@ -55,7 +53,7 @@ class SearchActivity : BaseActivity() {
                 }
             }
             showLoading(true)
-            DataRepository.userApi.searchUser(keywords)
+            DataRepository.userApi.searchUserByDisplayId(keywords)
                 .compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             addDispose(subscriber)

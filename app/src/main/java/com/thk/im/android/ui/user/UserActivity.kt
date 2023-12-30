@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.view.View
 import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.contact.vo.ContactSessionCreateVo
-import com.thk.im.android.api.user.vo.BasicUserInfo
+import com.thk.im.android.api.user.vo.BasicUserVo
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
@@ -23,7 +23,7 @@ import io.reactivex.Flowable
 class UserActivity : BaseActivity() {
 
     companion object {
-        fun startUserActivity(ctx: Context, basicInfo: BasicUserInfo) {
+        fun startUserActivity(ctx: Context, basicInfo: BasicUserVo) {
             val intent = Intent(ctx, UserActivity::class.java)
             intent.putExtra("user", basicInfo)
             ctx.startActivity(intent)
@@ -38,7 +38,7 @@ class UserActivity : BaseActivity() {
         setContentView(binding.root)
 
         val userInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("user", BasicUserInfo::class.java)
+            intent.getParcelableExtra("user", BasicUserVo::class.java)
         } else {
             intent.getParcelableExtra("user")
         }
@@ -48,7 +48,7 @@ class UserActivity : BaseActivity() {
         }
     }
 
-    private fun initView(userInfo: BasicUserInfo) {
+    private fun initView(userInfo: BasicUserVo) {
         userInfo.avatar?.let {
             IMImageLoader.displayImageUrl(binding.ivAvatar, it)
         }
@@ -97,15 +97,15 @@ class UserActivity : BaseActivity() {
         }
     }
 
-    private fun followUser(userInfo: BasicUserInfo) {
+    private fun followUser(userInfo: BasicUserVo) {
 
     }
 
-    private fun applyFriend(userInfo: BasicUserInfo) {
+    private fun applyFriend(userInfo: BasicUserVo) {
 
     }
 
-    private fun startMessage(userInfo: BasicUserInfo) {
+    private fun startMessage(userInfo: BasicUserVo) {
         val uId = DataRepository.getUserId()
         val req = ContactSessionCreateVo(uId, userInfo.id)
         val subscriber = object : BaseSubscriber<Session>() {

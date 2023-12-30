@@ -8,7 +8,6 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.MsgOperateStatus
@@ -163,7 +162,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                     }
                 }
             }
-            IMCoreManager.userModule.getUserInfo(message.fUid)
+            IMCoreManager.userModule.queryUser(message.fUid)
                 .compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             disposable.add(subscriber)

@@ -100,7 +100,7 @@ class IMSessionChoosePopup constructor(
         for (subMessage in messages) {
             uIds.add(subMessage.fUid)
         }
-        return IMCoreManager.userModule.getUserInfo(uIds).flatMap {
+        return IMCoreManager.userModule.queryUsers(uIds).flatMap {
             var content = ""
             var i = 0
             for (subMessage in messages) {
@@ -116,7 +116,7 @@ class IMSessionChoosePopup constructor(
             val recordMsgBody = IMRecordMsgBody("", messages.toList(), content)
             return@flatMap Flowable.just(recordMsgBody)
         }.flatMap {
-            return@flatMap IMCoreManager.userModule.getUserInfo(IMCoreManager.uId)
+            return@flatMap IMCoreManager.userModule.queryUser(IMCoreManager.uId)
                 .flatMap { user ->
                     it.title = user.name
                     return@flatMap Flowable.just(it)

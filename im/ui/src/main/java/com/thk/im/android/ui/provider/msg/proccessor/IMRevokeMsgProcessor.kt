@@ -95,7 +95,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
         if (msg.fUid == IMCoreManager.uId) {
             return Flowable.just("你")
         } else {
-            return IMCoreManager.userModule.getUserInfo(msg.fUid)
+            return IMCoreManager.userModule.queryUser(msg.fUid)
                 .flatMap {
                     return@flatMap Flowable.just(it.name)
                 }

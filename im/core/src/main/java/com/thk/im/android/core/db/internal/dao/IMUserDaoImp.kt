@@ -5,12 +5,13 @@ import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.db.internal.room.IMRoomDataBase
 
 internal class IMUserDaoImp(private val roomDatabase: IMRoomDataBase) : IMUserDao {
-    override fun insertUsers(vararg users: User) {
-        roomDatabase.userDao().insertUsers(*users)
+
+    override fun insertOrReplaceUsers(users: List<User>) {
+        roomDatabase.userDao().insertOrReplaceUsers(users)
     }
 
-    override fun updateUser(vararg users: User) {
-        roomDatabase.userDao().updateUser(*users)
+    override fun insertOrIgnoreUsers(users: List<User>) {
+        roomDatabase.userDao().insertOrIgnoreUsers(users)
     }
 
     override fun queryUser(id: Long): User? {

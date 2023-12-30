@@ -12,6 +12,7 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule
 import com.thk.im.android.media.Provider
+import com.thk.im.android.module.IMUserModule
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.preview.Previewer
 import io.reactivex.Flowable
@@ -22,6 +23,7 @@ class IMApplication : Application() {
         super.onCreate()
         LLog.v("onCreate IMApplication")
         DataRepository.init(this)
+        IMCoreManager.userModule = IMUserModule()
         IMCoreManager.init(this)
         IMUIManager.init(this)
     }

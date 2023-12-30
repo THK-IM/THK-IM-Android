@@ -1,11 +1,12 @@
 package com.thk.im.android.api.user
 
-import com.thk.im.android.api.user.vo.BasicUserInfo
-import com.thk.im.android.api.user.vo.LoginResp
+import com.thk.im.android.api.user.vo.BasicUserVo
+import com.thk.im.android.api.user.vo.LoginVo
 import com.thk.im.android.api.user.vo.TokenLoginReq
-import com.thk.im.android.api.user.vo.User
-import com.thk.im.android.api.user.vo.UserRegisterReq
-import com.thk.im.android.api.user.vo.UserRegisterResp
+import com.thk.im.android.api.user.vo.UserVo
+import com.thk.im.android.api.user.vo.RegisterReq
+import com.thk.im.android.api.user.vo.RegisterVo
+import com.thk.im.android.core.api.vo.ListVo
 import io.reactivex.Flowable
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -20,8 +21,8 @@ interface UserApi {
      */
     @POST("/user/register")
     fun register(
-        @Body body: UserRegisterReq
-    ): Flowable<UserRegisterResp>
+        @Body body: RegisterReq
+    ): Flowable<RegisterVo>
 
     /**
      * 通过token登录
@@ -29,18 +30,18 @@ interface UserApi {
     @POST("/user/login/token")
     fun loginByToken(
         @Body body: TokenLoginReq
-    ): Flowable<LoginResp>
+    ): Flowable<LoginVo>
 
     // 用户查询自己的信息
-    @GET("/user/query/:id")
+    @GET("/user/query/{id}")
     fun queryUser(
         @Path("id") id: Long
-    ): Flowable<User>
+    ): Flowable<UserVo>
 
     // 用户查询他人的信息
     @GET("/user/query")
-    fun searchUser(
-        @Query("id") displayId: String
-    ): Flowable<BasicUserInfo>
+    fun searchUserByDisplayId(
+        @Query("display_id") displayIds: String
+    ): Flowable<BasicUserVo>
 
 }

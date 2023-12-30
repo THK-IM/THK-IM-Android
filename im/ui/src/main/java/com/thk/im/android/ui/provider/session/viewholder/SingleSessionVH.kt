@@ -59,7 +59,7 @@ class SingleSessionVH(
                 }
             }
         }
-        getUserModule().getUserInfo(session.entityId)
+        getUserModule().queryUser(session.entityId)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         disposable.add(subscriber)

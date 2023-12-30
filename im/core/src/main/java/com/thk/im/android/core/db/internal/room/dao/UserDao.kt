@@ -6,10 +6,10 @@ import com.thk.im.android.core.db.entity.User
 @Dao
 internal interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertUsers(vararg users: User)
+    fun insertOrReplaceUsers(users: List<User>)
 
-    @Update
-    fun updateUser(vararg users: User)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertOrIgnoreUsers(users: List<User>)
 
     @Query("select * from user where id = :id")
     fun queryUser(id: Long): User?

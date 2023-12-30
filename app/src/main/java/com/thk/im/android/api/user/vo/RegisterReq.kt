@@ -2,7 +2,7 @@ package com.thk.im.android.api.user.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class UserRegisterReq(
+data class RegisterReq(
     @SerializedName("account")
     val account: String? = null,
     @SerializedName("password")

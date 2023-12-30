@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.thk.im.android.api.contact.ContactApi
 import com.thk.im.android.api.user.UserApi
-import com.thk.im.android.api.user.vo.User
+import com.thk.im.android.api.user.vo.UserVo
 import com.thk.im.android.constant.Host
 
 object DataRepository {
@@ -34,22 +34,22 @@ object DataRepository {
         return sp.getLong("UserId", 0)
     }
 
-    fun getUser(): User? {
+    fun getUser(): UserVo? {
         val sp = app.getSharedPreferences("UserInfo", AppCompatActivity.MODE_PRIVATE)
         val userId = sp.getLong("UserId", 0)
         if (userId == 0L) {
             return null
         }
         val userInfoJson = sp.getString("User:$userId", "")
-        return Gson().fromJson(userInfoJson, User::class.java)
+        return Gson().fromJson(userInfoJson, UserVo::class.java)
     }
 
-    fun saveUserInfo(token: String, user: User) {
+    fun saveUserInfo(token: String, userVo: UserVo) {
         val sp = app.getSharedPreferences("UserInfo", AppCompatActivity.MODE_PRIVATE)
         val editor = sp.edit()
         editor.putString("Token", token)
-        editor.putLong("UserId", user.id)
-        editor.putString("User:${user.id}", Gson().toJson(user))
+        editor.putLong("UserId", userVo.id)
+        editor.putString("User:${userVo.id}", Gson().toJson(userVo))
         editor.apply()
     }
 

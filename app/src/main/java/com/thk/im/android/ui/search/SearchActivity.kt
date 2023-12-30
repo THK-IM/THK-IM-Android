@@ -5,28 +5,33 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import com.thk.im.android.api.DataRepository
+import com.thk.im.android.api.group.vo.GroupVo
 import com.thk.im.android.api.user.vo.BasicUserVo
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.databinding.ActivitySearchBinding
 import com.thk.im.android.ui.base.BaseActivity
+import com.thk.im.android.ui.group.GroupActivity
 import com.thk.im.android.ui.user.UserActivity
 
 class SearchActivity : BaseActivity() {
 
     companion object {
-        fun startSearchActivity(ctx: Context) {
+        fun startSearchActivity(ctx: Context, searchType: Int) {
             val intent = Intent(ctx, SearchActivity::class.java)
+            intent.putExtra("searchType", searchType)
             ctx.startActivity(intent)
         }
     }
 
     private lateinit var binding: ActivitySearchBinding
+    private var searchType = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        searchType = intent.getIntExtra("searchType", 0)
 
         binding.etKeywords.setText("d86s51i3d582")
         binding.etKeywords.requestFocus()
@@ -40,6 +45,36 @@ class SearchActivity : BaseActivity() {
     }
 
     private fun search(keywords: String) {
+        if (searchType == 1) {
+            searchUser(keywords)
+        } else if (searchType == 2) {
+            searchGroup(keywords)
+        }
+    }
+
+    private fun searchGroup(keywords: String) {
+        if (keywords.isNotEmpty()) {
+            val subscriber = object : BaseSubscriber<GroupVo>() {
+                override fun onNext(t: GroupVo?) {
+                    t?.let {
+                        GroupActivity.startGroupActivity(this@SearchActivity, it)
+                    }
+                }
+
+                override fun onComplete() {
+                    super.onComplete()
+                    dismissLoading()
+                }
+            }
+            showLoading(true)
+            DataRepository.groupApi.queryGroup(keywords)
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            addDispose(subscriber)
+        }
+    }
+
+    private fun searchUser(keywords: String) {
         if (keywords.isNotEmpty()) {
             val subscriber = object : BaseSubscriber<BasicUserVo>() {
                 override fun onNext(t: BasicUserVo?) {

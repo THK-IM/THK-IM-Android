@@ -31,7 +31,8 @@ interface SessionApi {
         @Query("u_id") uid: Long,
         @Query("m_time") mTime: Long,
         @Query("offset") offset: Int,
-        @Query("count") count: Int
+        @Query("count") count: Int,
+        @Query("types") types: Set<Int>
     ): Flowable<ListVo<SessionVo>>
 
     @PUT("/user_session")

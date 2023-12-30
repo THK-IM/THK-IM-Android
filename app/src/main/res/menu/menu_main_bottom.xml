@@ -10,7 +10,7 @@
         android:icon="@drawable/abc_vector_test" />
     <item
         android:id="@+id/menu_daily"
-        android:title="daily"
+        android:title="group"
         android:icon="@drawable/abc_vector_test" />
     <item
         android:id="@+id/menu_mine"

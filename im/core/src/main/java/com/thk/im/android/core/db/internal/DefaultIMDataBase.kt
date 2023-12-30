@@ -4,10 +4,12 @@ import android.app.Application
 import androidx.room.Room
 import com.thk.im.android.core.db.IMContactDao
 import com.thk.im.android.core.db.IMDataBase
+import com.thk.im.android.core.db.IMGroupDao
 import com.thk.im.android.core.db.IMMessageDao
 import com.thk.im.android.core.db.IMSessionDao
 import com.thk.im.android.core.db.IMUserDao
 import com.thk.im.android.core.db.internal.dao.IMContactDaoImp
+import com.thk.im.android.core.db.internal.dao.IMGroupDaoImp
 import com.thk.im.android.core.db.internal.dao.IMMessageDaoImp
 import com.thk.im.android.core.db.internal.dao.IMSessionDaoImp
 import com.thk.im.android.core.db.internal.dao.IMUserDaoImp
@@ -25,6 +27,7 @@ internal class DefaultIMDataBase(
     private val messageDao: IMMessageDao
     private val sessionDao: IMSessionDao
     private val contactDao: IMContactDao
+    private val groupDao: IMGroupDao
 
     init {
         val dbname = if (debug) {
@@ -37,6 +40,7 @@ internal class DefaultIMDataBase(
         messageDao = IMMessageDaoImp(roomDataBase)
         sessionDao = IMSessionDaoImp(roomDataBase)
         contactDao = IMContactDaoImp(roomDataBase)
+        groupDao = IMGroupDaoImp(roomDataBase)
     }
 
     override fun open() {

@@ -40,6 +40,10 @@ abstract class BaseActivity : AppCompatActivity() {
             onConnectStatus(it)
         })
 
+        resetToolbar()
+    }
+
+    fun resetToolbar() {
         val tb = getToolbar()
         tb?.let {
             val backView: ImageView = tb.findViewById(R.id.tb_iv_back)

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.thk.im.android.api.contact.ContactApi
+import com.thk.im.android.api.group.GroupApi
 import com.thk.im.android.api.user.UserApi
 import com.thk.im.android.api.user.vo.UserVo
 import com.thk.im.android.constant.Host
@@ -13,8 +14,8 @@ object DataRepository {
     lateinit var app: Application
 
     lateinit var userApi: UserApi
-
     lateinit var contactApi: ContactApi
+    lateinit var groupApi: GroupApi
 
     fun init(app: Application) {
         this.app = app
@@ -22,6 +23,7 @@ object DataRepository {
         ApiFactory.init(app, token)
         userApi = ApiFactory.createApi(UserApi::class.java, Host.UserAPI)
         contactApi = ApiFactory.createApi(ContactApi::class.java, Host.ContactAPI)
+        groupApi = ApiFactory.createApi(GroupApi::class.java, Host.GroupAPI)
     }
 
     fun getUserToken(): String? {

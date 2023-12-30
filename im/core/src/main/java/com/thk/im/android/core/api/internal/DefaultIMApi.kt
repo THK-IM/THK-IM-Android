@@ -56,9 +56,10 @@ open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     override fun getLatestModifiedSessions(
         uId: Long,
         count: Int,
-        mTime: Long
+        mTime: Long,
+        types: Set<Int>
     ): Flowable<List<Session>> {
-        return sessionApi.queryLatestSession(uId, mTime, 0, count).flatMap { it ->
+        return sessionApi.queryLatestSession(uId, mTime, 0, count, types).flatMap { it ->
             val sessions = mutableListOf<Session>()
             it.data.forEach { bean ->
                 sessions.add(bean.toSession())

@@ -8,13 +8,15 @@ import androidx.core.view.get
 import com.thk.im.android.R
 import com.thk.im.android.databinding.ActivityMainBinding
 import com.thk.im.android.ui.base.BaseActivity
+import com.thk.im.android.ui.group.GroupActivity
 import com.thk.im.android.ui.main.adpater.MainFragmentAdapter
 import com.thk.im.android.ui.search.SearchActivity
 
 class MainActivity : BaseActivity() {
 
     private var chooseMenuIndex = 0
-    private var bottomMenuTitles = setOf("message", "contact", "daily", "mine")
+    private var bottomMenuTitles = setOf("message", "contact", "group", "mine")
+    private var currentNavigationPos = 0
 
     private lateinit var binding: ActivityMainBinding
 
@@ -38,10 +40,12 @@ class MainActivity : BaseActivity() {
         val pos = bottomMenuTitles.indexOf(it.title)
         binding.vpContainer.setCurrentItem(pos, false)
         setTitle(bottomMenuTitles.elementAt(pos))
+        currentNavigationPos = pos
         if (pos == 3) {
             binding.tbTop.toolbar.visibility = View.GONE
         } else {
             binding.tbTop.toolbar.visibility = View.VISIBLE
+            resetToolbar()
         }
         return true
     }
@@ -52,7 +56,11 @@ class MainActivity : BaseActivity() {
 
     override fun menuMoreVisibility(id: Int): Int {
         if (id == R.id.tb_menu2) {
-            return View.GONE
+            return if (currentNavigationPos != 2) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
         } else if (id == R.id.tb_menu1) {
             return View.VISIBLE
         }
@@ -61,10 +69,16 @@ class MainActivity : BaseActivity() {
 
     override fun onToolBarMenuClick(view: View) {
         if (view.id == R.id.tb_menu2) {
-
+            if (currentNavigationPos == 2) {
+                createGroup()
+            }
         } else if (view.id == R.id.tb_menu1) {
-            SearchActivity.startSearchActivity(this)
+            SearchActivity.startSearchActivity(this, currentNavigationPos)
         }
+    }
+
+    private fun createGroup() {
+        GroupActivity.startCreateGroupActivity(this)
     }
 
 }

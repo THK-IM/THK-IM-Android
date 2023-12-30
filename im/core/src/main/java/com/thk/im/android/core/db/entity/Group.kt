@@ -14,8 +14,7 @@ import kotlinx.parcelize.Parcelize
     tableName = "group",
     primaryKeys = ["id"],
     indices = [
-        Index(value = ["session_id"], unique = true),
-        Index(value = ["display_id"], unique = false)
+        Index(value = ["session_id"], unique = true)
     ]
 )
 data class Group(
@@ -24,7 +23,7 @@ data class Group(
     val id: Long,
     @SerializedName("display_id")
     @ColumnInfo(name = "display_id")
-    val displayId: Long,
+    val displayId: String,
     @SerializedName("name")
     @ColumnInfo(name = "name")
     var name: String,

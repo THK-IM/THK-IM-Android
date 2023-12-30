@@ -9,7 +9,7 @@ interface IMApi {
     /**
      * 获取修改时间为mTime之后的session列表
      */
-    fun getLatestModifiedSessions(uId: Long, count: Int, mTime: Long): Flowable<List<Session>>
+    fun getLatestModifiedSessions(uId: Long, count: Int, mTime: Long, types: Set<Int>): Flowable<List<Session>>
 
     /**
      * 获取与用户的session

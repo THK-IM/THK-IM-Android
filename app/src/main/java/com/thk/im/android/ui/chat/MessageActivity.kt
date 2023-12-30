@@ -1,9 +1,17 @@
 package com.thk.im.android.ui.chat
 
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import androidx.appcompat.widget.Toolbar
 import com.thk.im.android.R
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.SessionType
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActivityMessageBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.fragment.IMMessageFragment
@@ -32,6 +40,49 @@ class MessageActivity : BaseActivity() {
         val ft = supportFragmentManager.beginTransaction()
         ft.add(binding.fragmentContainer.id, fragment, tag)
         ft.commit()
+
+        session?.let {
+            initSessionTitle(it)
+        }
+    }
+
+    override fun getToolbar(): Toolbar {
+        return binding.tbTop.toolbar
+    }
+
+    override fun needBackIcon(): Boolean {
+        return true
+    }
+
+    override fun menuMoreVisibility(id: Int): Int {
+        if (id == R.id.tb_menu2) {
+            return View.GONE
+        } else if (id == R.id.tb_menu1) {
+            return View.VISIBLE
+        }
+        return View.VISIBLE
+    }
+
+    override fun menuIcon(id: Int): Drawable? {
+        return super.menuIcon(id)
+    }
+
+    override fun onToolBarMenuClick(view: View) {
+    }
+
+    private fun initSessionTitle(session: Session) {
+        if (session.type == SessionType.Single.value) {
+            val subscribe = object : BaseSubscriber<User>() {
+                override fun onNext(t: User?) {
+                    t?.let {
+                        setTitle(it.name)
+                    }
+                }
+            }
+            IMCoreManager.userModule.queryUser(session.entityId)
+                .compose(RxTransform.flowableToMain()).subscribe(subscribe)
+            addDispose(subscribe)
+        }
     }
 
 }

@@ -4,17 +4,27 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-@Entity(tableName = "contact")
+@Entity(
+    tableName = "contact",
+    primaryKeys = ["id"],
+    indices = [
+        Index(value = ["session_id"], unique = false)
+    ]
+)
 data class Contact(
     @SerializedName("id")
-    @PrimaryKey @ColumnInfo(name = "id")
+    @ColumnInfo(name = "id")
     val id: Long,
+    @SerializedName("session_id")
+    @ColumnInfo(name = "session_id")
+    var sessionId: Long?,
     @SerializedName("note_name")
     @ColumnInfo(name = "note_name")
     var noteName: String?,

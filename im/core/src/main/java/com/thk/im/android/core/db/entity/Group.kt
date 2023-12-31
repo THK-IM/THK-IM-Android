@@ -14,7 +14,7 @@ import kotlinx.parcelize.Parcelize
     tableName = "group_",
     primaryKeys = ["id"],
     indices = [
-        Index(value = ["session_id"], unique = true)
+        Index(value = ["session_id"], unique = false)
     ]
 )
 data class Group(

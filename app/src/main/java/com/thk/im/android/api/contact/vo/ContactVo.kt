@@ -9,6 +9,8 @@ import kotlinx.parcelize.Parcelize
 data class ContactVo(
     @SerializedName("id")
     val id: Long,
+    @SerializedName("session_id")
+    val sessionId: Long?,
     @SerializedName("relation")
     val relation: Int,
     @SerializedName("note_name")
@@ -26,7 +28,7 @@ data class ContactVo(
 ) : Parcelable {
 
     fun toContact(): Contact {
-        return Contact(id, noteName, relation, null, createTime, updateTime)
+        return Contact(id, sessionId, noteName, relation, null, createTime, updateTime)
     }
 
 }

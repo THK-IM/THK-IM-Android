@@ -37,7 +37,7 @@ class ContactVH(liftOwner: LifecycleOwner, itemView: View) :
         }
         setRelationText(contact.relation)
         itemView.setOnClickListener {
-            operator.onItemClick(contact.id)
+            operator.onItemClick(contact)
         }
         if (selected) {
             isSelectedView.visibility = View.VISIBLE

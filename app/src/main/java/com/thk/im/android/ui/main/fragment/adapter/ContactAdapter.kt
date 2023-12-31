@@ -52,7 +52,7 @@ class ContactAdapter(
         notifyItemRangeInserted(0, contactList.size)
     }
 
-    private fun openSession(contactId: Long) {
+    private fun openSession(contact: Contact) {
         val uId = DataRepository.getUserId()
         if (uId <= 0L) {
             return
@@ -64,15 +64,40 @@ class ContactAdapter(
                 }
             }
         }
-        IMCoreManager.messageModule.getSession(contactId, SessionType.Single.value)
+        IMCoreManager.messageModule.getSession(contact.id, SessionType.Single.value)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }
 
-    override fun onItemClick(id: Long) {
+    private fun createSession(contact: Contact) {
+        val req = ContactSessionCreateVo(IMCoreManager.uId, contact.id)
+
+
+        val subscriber: BaseSubscriber<Session> = object : BaseSubscriber<Session>() {
+            override fun onNext(t: Session?) {
+                t?.let { session ->
+                    IMUIManager.sessionOperator?.openSession(this@ContactAdapter.context, session)
+                }
+            }
+        }
+        DataRepository.contactApi.createContactSession(req)
+            .flatMap {
+                return@flatMap Flowable.just(it.toSession())
+            }
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+    }
+
+    override fun onItemClick(contact: Contact) {
         if (mode == 0) {
-            openSession(id)
+            val sessionId = contact.sessionId
+            if (sessionId != null) {
+                openSession(contact)
+            } else {
+                createSession(contact)
+            }
         } else {
+            val id = contact.id
             if (selectedIds.contains(id)) {
                 selectedIds.remove(id)
             } else {

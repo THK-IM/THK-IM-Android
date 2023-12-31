@@ -33,7 +33,7 @@ class SearchActivity : BaseActivity() {
         setContentView(binding.root)
         searchType = intent.getIntExtra("searchType", 0)
 
-        binding.etKeywords.setText("d86s4xa1jn3i")
+        binding.etKeywords.setText("d86s4l3scyn5")
         binding.etKeywords.requestFocus()
 
         binding.etKeywords.setOnEditorActionListener { v, actionId, event ->

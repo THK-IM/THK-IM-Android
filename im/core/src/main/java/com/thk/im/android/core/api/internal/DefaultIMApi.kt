@@ -27,7 +27,7 @@ open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
     private val maxIdleConnection = 8
     private val keepAliveDuration: Long = 60
 
-    private val interceptor = TokenInterceptor(token)
+    private val interceptor = APITokenInterceptor(token)
 
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(defaultTimeout, TimeUnit.SECONDS)

@@ -5,7 +5,7 @@ import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 
-class TokenInterceptor(private var token: String, private var endpoint: String) : Interceptor {
+class FileLoaderTokenInterceptor(private var token: String, private var endpoint: String) : Interceptor {
 
     private val tokenKey = "Authorization"
     private val clientVersionKey = "Client-Version"

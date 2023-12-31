@@ -28,7 +28,7 @@ class DefaultFileLoadModule(
     private val defaultTimeout: Long = 30
     private val maxIdleConnection = 4
     private val keepAliveDuration: Long = 60
-    private val tokenInterceptor = TokenInterceptor(token, endpoint)
+    private val fileLoaderTokenInterceptor = FileLoaderTokenInterceptor(token, endpoint)
 
     val okHttpClient = OkHttpClient.Builder().connectTimeout(defaultTimeout, TimeUnit.SECONDS)
         .writeTimeout(defaultTimeout, TimeUnit.SECONDS)
@@ -36,7 +36,7 @@ class DefaultFileLoadModule(
         .retryOnConnectionFailure(true)
         .followRedirects(false)
         .followSslRedirects(false)
-        .addInterceptor(tokenInterceptor)
+        .addInterceptor(fileLoaderTokenInterceptor)
         .connectionPool(ConnectionPool(maxIdleConnection, keepAliveDuration, TimeUnit.SECONDS))
         .build()
 

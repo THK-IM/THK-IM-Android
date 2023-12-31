@@ -1,8 +1,7 @@
 package com.thk.im.android.api
 
 import android.app.Application
-import com.thk.im.android.core.api.internal.TokenInterceptor
-import com.thk.im.android.core.base.utils.AppUtils
+import com.thk.im.android.core.api.internal.APITokenInterceptor
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -16,13 +15,13 @@ object ApiFactory {
     private const val maxIdleConnection = 8
     private const val keepAliveDuration: Long = 60
 
-    private lateinit var interceptor: TokenInterceptor
+    private lateinit var interceptor: APITokenInterceptor
     private lateinit var okHttpClient: OkHttpClient
     private lateinit var app: Application
 
     fun init(application: Application, token: String) {
         app = application
-        interceptor = TokenInterceptor(token)
+        interceptor = APITokenInterceptor(token)
         okHttpClient = OkHttpClient.Builder()
             .connectTimeout(defaultTimeout, TimeUnit.SECONDS)
             .writeTimeout(defaultTimeout, TimeUnit.SECONDS)

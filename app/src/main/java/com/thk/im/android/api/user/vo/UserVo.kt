@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName
 import com.thk.im.android.core.db.entity.User
 import kotlinx.parcelize.Parcelize
 
+
 @Parcelize
 data class UserVo(
     @SerializedName("id")
@@ -12,20 +13,20 @@ data class UserVo(
     @SerializedName("display_id")
     var displayId: String,
     @SerializedName("nickname")
-    var nickname: String,
+    var nickname: String?,
     @SerializedName("avatar")
     var avatar: String?,
+    @SerializedName("sex")
+    var sex: Int?,
     @SerializedName("qrcode")
     var qrcode: String?,
-    @SerializedName("sex")
-    var sex: Int,
     @SerializedName("birthday")
-    var birthday: Long,
+    var birthday: Int?
 ) : Parcelable {
 
     fun toUser(): User {
         val now = System.currentTimeMillis()
-        return User(id, displayId, nickname, avatar, sex, null, null, now, now)
+        return User(id, displayId, nickname ?: "", avatar, sex, null, null, now, now)
     }
 
 }

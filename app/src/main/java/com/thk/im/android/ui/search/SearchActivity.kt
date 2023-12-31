@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.group.vo.GroupVo
-import com.thk.im.android.api.user.vo.BasicUserVo
+import com.thk.im.android.api.user.vo.UserBasicInfoVo
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.databinding.ActivitySearchBinding
@@ -76,10 +76,10 @@ class SearchActivity : BaseActivity() {
 
     private fun searchUser(keywords: String) {
         if (keywords.isNotEmpty()) {
-            val subscriber = object : BaseSubscriber<BasicUserVo>() {
-                override fun onNext(t: BasicUserVo?) {
+            val subscriber = object : BaseSubscriber<UserBasicInfoVo>() {
+                override fun onNext(t: UserBasicInfoVo?) {
                     t?.let {
-                        UserActivity.startUserActivity(this@SearchActivity, it)
+                        UserActivity.startUserActivity(this@SearchActivity, it.toUser())
                     }
                 }
 

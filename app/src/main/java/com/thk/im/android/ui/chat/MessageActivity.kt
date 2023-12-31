@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import com.thk.im.android.R
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionType
@@ -16,11 +17,16 @@ import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActivityMessageBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.fragment.IMMessageFragment
+import com.thk.im.android.ui.group.GroupActivity
+import com.thk.im.android.ui.user.UserActivity
 
 class MessageActivity : BaseActivity() {
 
 
     private lateinit var binding: ActivityMessageBinding
+
+    private var user: User? = null
+    private var group: Group? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityMessageBinding.inflate(layoutInflater)
@@ -65,10 +71,21 @@ class MessageActivity : BaseActivity() {
     }
 
     override fun menuIcon(id: Int): Drawable? {
+        if (id == R.id.tb_menu1) {
+            return ContextCompat.getDrawable(this, R.drawable.ic_more)
+        }
         return super.menuIcon(id)
     }
 
     override fun onToolBarMenuClick(view: View) {
+        if (view.id == R.id.tb_menu1) {
+            user?.let {
+                UserActivity.startUserActivity(this, it)
+            }
+            group?.let {
+                GroupActivity.startGroupActivity(this, it)
+            }
+        }
     }
 
     private fun initSessionTitle(session: Session) {
@@ -77,6 +94,7 @@ class MessageActivity : BaseActivity() {
                 override fun onNext(t: User?) {
                     t?.let {
                         setTitle(it.name)
+                        user = it
                     }
                 }
             }
@@ -88,6 +106,7 @@ class MessageActivity : BaseActivity() {
                 override fun onNext(t: Group?) {
                     t?.let {
                         setTitle(it.name)
+                        group = it
                     }
                 }
             }

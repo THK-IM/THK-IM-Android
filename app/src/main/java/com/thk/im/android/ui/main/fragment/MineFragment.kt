@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.thk.im.android.R
 import com.thk.im.android.api.DataRepository
+import com.thk.im.android.api.user.vo.UserBasicInfoVo
 import com.thk.im.android.api.user.vo.UserVo
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.databinding.FragmentMineBinding

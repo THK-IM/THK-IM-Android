@@ -9,9 +9,10 @@ import com.thk.im.android.api.ApiFactory
 import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.user.vo.LoginVo
 import com.thk.im.android.api.user.vo.TokenLoginReq
-import com.thk.im.android.api.user.vo.UserVo
+import com.thk.im.android.api.user.vo.UserBasicInfoVo
 import com.thk.im.android.api.user.vo.RegisterReq
 import com.thk.im.android.api.user.vo.RegisterVo
+import com.thk.im.android.api.user.vo.UserVo
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape

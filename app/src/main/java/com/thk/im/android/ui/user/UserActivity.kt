@@ -10,13 +10,14 @@ import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.contact.vo.ApplyFriendVo
 import com.thk.im.android.api.contact.vo.ContactSessionCreateVo
 import com.thk.im.android.api.contact.vo.FollowVo
-import com.thk.im.android.api.user.vo.BasicUserVo
+import com.thk.im.android.api.user.vo.UserBasicInfoVo
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActivityUserBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.manager.IMUIManager
@@ -25,9 +26,9 @@ import io.reactivex.Flowable
 class UserActivity : BaseActivity() {
 
     companion object {
-        fun startUserActivity(ctx: Context, basicInfo: BasicUserVo) {
+        fun startUserActivity(ctx: Context, user: User) {
             val intent = Intent(ctx, UserActivity::class.java)
-            intent.putExtra("user", basicInfo)
+            intent.putExtra("user", user)
             ctx.startActivity(intent)
         }
     }
@@ -39,27 +40,23 @@ class UserActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val userInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("user", BasicUserVo::class.java)
+        val user = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("user", User::class.java)
         } else {
             intent.getParcelableExtra("user")
         }
 
-        userInfo?.let {
-            initView(it)
+        user?.let {
+            initUserInfoView(it)
         }
     }
 
-    private fun initView(userInfo: BasicUserVo) {
-        userInfo.avatar?.let {
+    private fun initUserInfoView(user: User) {
+        user.avatar?.let {
             IMImageLoader.displayImageUrl(binding.ivAvatar, it)
         }
-        if (userInfo.nickname.isNullOrEmpty()) {
-            binding.tvNickname.text = "无名"
-        } else {
-            binding.tvNickname.text = userInfo.nickname
-        }
-        binding.tvId.text = userInfo.displayId
+        binding.tvNickname.text = user.name
+        binding.tvId.text = user.displayId
 
         binding.tvFollow.visibility = View.VISIBLE
         binding.tvFollow.setShape(
@@ -70,7 +67,7 @@ class UserActivity : BaseActivity() {
         )
 
         binding.tvFollow.setOnClickListener {
-            followUser(userInfo)
+            followUser(user)
         }
 
 
@@ -83,7 +80,7 @@ class UserActivity : BaseActivity() {
         )
 
         binding.tvAddFriend.setOnClickListener {
-            applyFriend(userInfo)
+            applyFriend(user)
         }
 
         binding.tvSendMsg.visibility = View.VISIBLE
@@ -95,12 +92,12 @@ class UserActivity : BaseActivity() {
         )
 
         binding.tvSendMsg.setOnClickListener {
-            startMessage(userInfo)
+            startMessage(user)
         }
     }
 
-    private fun followUser(userInfo: BasicUserVo) {
-        val subscriber = object: BaseSubscriber<Void>() {
+    private fun followUser(user: User) {
+        val subscriber = object : BaseSubscriber<Void>() {
             override fun onNext(t: Void?) {
                 showToast("关注成功")
             }
@@ -112,14 +109,14 @@ class UserActivity : BaseActivity() {
         }
 
         showLoading()
-        val vo = FollowVo(IMCoreManager.uId, userInfo.id)
+        val vo = FollowVo(IMCoreManager.uId, user.id)
         DataRepository.contactApi.follow(vo)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }
 
-    private fun applyFriend(userInfo: BasicUserVo) {
-        val subscriber = object: BaseSubscriber<Void>() {
+    private fun applyFriend(user: User) {
+        val subscriber = object : BaseSubscriber<Void>() {
             override fun onNext(t: Void?) {
                 showToast("申请成功")
             }
@@ -131,15 +128,15 @@ class UserActivity : BaseActivity() {
         }
 
         showLoading()
-        val vo = ApplyFriendVo(IMCoreManager.uId, userInfo.id, 1, "i am vizoss")
+        val vo = ApplyFriendVo(IMCoreManager.uId, user.id, 1, "i am vizoss")
         DataRepository.contactApi.applyFriend(vo)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }
 
-    private fun startMessage(userInfo: BasicUserVo) {
+    private fun startMessage(user: User) {
         val uId = DataRepository.getUserId()
-        val req = ContactSessionCreateVo(uId, userInfo.id)
+        val req = ContactSessionCreateVo(uId, user.id)
         val subscriber = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {
                 IMUIManager.sessionOperator?.openSession(this@UserActivity, t)

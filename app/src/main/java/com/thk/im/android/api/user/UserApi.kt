@@ -1,11 +1,10 @@
 package com.thk.im.android.api.user
 
-import com.thk.im.android.api.user.vo.BasicUserVo
 import com.thk.im.android.api.user.vo.LoginVo
 import com.thk.im.android.api.user.vo.RegisterReq
 import com.thk.im.android.api.user.vo.RegisterVo
 import com.thk.im.android.api.user.vo.TokenLoginReq
-import com.thk.im.android.api.user.vo.UserVo
+import com.thk.im.android.api.user.vo.UserBasicInfoVo
 import io.reactivex.Flowable
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -35,12 +34,12 @@ interface UserApi {
     @GET("/user/query/{id}")
     fun queryUser(
         @Path("id") id: Long
-    ): Flowable<UserVo>
+    ): Flowable<UserBasicInfoVo>
 
     // 用户查询他人的信息
     @GET("/user/query")
     fun searchUserByDisplayId(
         @Query("display_id") displayId: String
-    ): Flowable<BasicUserVo>
+    ): Flowable<UserBasicInfoVo>
 
 }

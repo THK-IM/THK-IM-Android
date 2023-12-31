@@ -117,11 +117,10 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
                     sessionAdapter.addData(t)
                 }
                 hasMore = t.size >= count
-                isLoading = false
             }
 
-            override fun onError(t: Throwable?) {
-                super.onError(t)
+            override fun onComplete() {
+                super.onComplete()
                 isLoading = false
             }
         }

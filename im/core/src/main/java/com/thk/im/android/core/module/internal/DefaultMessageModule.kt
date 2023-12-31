@@ -142,6 +142,28 @@ open class DefaultMessageModule : MessageModule {
 
     }
 
+    override fun getSession(entityId: Long, type: Int): Flowable<Session> {
+        return Flowable.create<Session>({
+            val session = IMCoreManager.getImDataBase().sessionDao().findSessionByEntity(entityId, type)
+            if (session == null) {
+                it.onNext(Session(0))
+            } else {
+                it.onNext(session)
+            }
+            it.onComplete()
+        }, BackpressureStrategy.LATEST).flatMap { session ->
+            if (session.id > 0) {
+                return@flatMap Flowable.just(session)
+            } else {
+                val uId = IMCoreManager.uId
+                return@flatMap IMCoreManager.imApi.querySession(uId, entityId, type).flatMap {
+                    IMCoreManager.db.sessionDao().insertOrIgnoreSessions(listOf(it))
+                    Flowable.just(it)
+                }
+            }
+        }
+    }
+
 
     override fun getSession(sessionId: Long): Flowable<Session> {
         return Flowable.create<Session>({
@@ -158,7 +180,7 @@ open class DefaultMessageModule : MessageModule {
             } else {
                 val uId = IMCoreManager.uId
                 return@flatMap IMCoreManager.imApi.querySession(uId, sessionId).flatMap {
-                    IMCoreManager.db.sessionDao().insertOrUpdateSessions(listOf(it))
+                    IMCoreManager.db.sessionDao().insertOrIgnoreSessions(listOf(it))
                     Flowable.just(it)
                 }
             }

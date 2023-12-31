@@ -7,13 +7,16 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.R
 import com.thk.im.android.api.DataRepository
+import com.thk.im.android.api.contact.vo.ContactSessionCreateVo
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Contact
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.manager.IMUIManager
 import io.reactivex.Flowable
+import io.reactivex.internal.operators.flowable.FlowableWindow
 
 
 class ContactAdapter(
@@ -49,7 +52,7 @@ class ContactAdapter(
         notifyItemRangeInserted(0, contactList.size)
     }
 
-    private fun createSession(contactId: Long) {
+    private fun openSession(contactId: Long) {
         val uId = DataRepository.getUserId()
         if (uId <= 0L) {
             return
@@ -61,15 +64,14 @@ class ContactAdapter(
                 }
             }
         }
-        IMCoreManager.messageModule
-            .getSession(contactId)
+        IMCoreManager.messageModule.getSession(contactId, SessionType.Single.value)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
     }
 
     override fun onItemClick(id: Long) {
         if (mode == 0) {
-            createSession(id)
+            openSession(id)
         } else {
             if (selectedIds.contains(id)) {
                 selectedIds.remove(id)

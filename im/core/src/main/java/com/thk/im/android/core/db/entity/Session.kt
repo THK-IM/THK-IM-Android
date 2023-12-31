@@ -60,10 +60,10 @@ data class Session(
     @ColumnInfo(name = "draft")
     var draft: String?,
     @SerializedName("last_msg")
-    @ColumnInfo(name = "last_msg")
+    @ColumnInfo(name = "last_msg", typeAffinity = ColumnInfo.TEXT)
     var lastMsg: String?,
     @SerializedName("ext_data")
-    @ColumnInfo(name = "ext_data")
+    @ColumnInfo(name = "ext_data", typeAffinity = ColumnInfo.TEXT)
     var extData: String?,   // 扩展字段
 ) : Parcelable {
 

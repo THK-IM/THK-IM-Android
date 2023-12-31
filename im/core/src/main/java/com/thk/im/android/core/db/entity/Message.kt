@@ -36,10 +36,10 @@ data class Message(
     @ColumnInfo(name = "type")
     var type: Int = 0,
     @SerializedName("content")
-    @ColumnInfo(name = "content")
+    @ColumnInfo(name = "content", typeAffinity = ColumnInfo.TEXT)
     var content: String? = null,      // 消息原始内容
     @SerializedName("data")
-    @ColumnInfo(name = "data")
+    @ColumnInfo(name = "data", typeAffinity = ColumnInfo.TEXT)
     var data: String? = null,            // 消息本地内容
     @SerializedName("send_status")
     @ColumnInfo(name = "send_status")
@@ -48,16 +48,16 @@ data class Message(
     @ColumnInfo(name = "opr_status")
     var oprStatus: Int = 0,        // 消息操作状态
     @SerializedName("r_users")
-    @ColumnInfo(name = "r_users")
+    @ColumnInfo(name = "r_users", typeAffinity = ColumnInfo.TEXT)
     var rUsers: String? = null,       // 已读用户uid
     @SerializedName("r_msg_id")
     @ColumnInfo(name = "r_msg_id")
     var rMsgId: Long? = null,        // 引用消息id
     @SerializedName("at_users")
-    @ColumnInfo(name = "at_users")
+    @ColumnInfo(name = "at_users", typeAffinity = ColumnInfo.TEXT)
     var atUsers: String? = null,     // @用户uid1#uid2
     @SerializedName("ext_data")
-    @ColumnInfo(name = "ext_data")
+    @ColumnInfo(name = "ext_data", typeAffinity = ColumnInfo.TEXT)
     var extData: String?,   // 扩展字段
     @SerializedName("c_time")
     @ColumnInfo(name = "c_time")

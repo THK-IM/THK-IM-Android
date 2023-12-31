@@ -67,6 +67,12 @@ open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         }
     }
 
+    override fun querySession(uId: Long, entityId: Long, type: Int): Flowable<Session> {
+        return sessionApi.querySessionByEntityId(uId, entityId, type).flatMap { bean ->
+            Flowable.just(bean.toSession())
+        }
+    }
+
     override fun querySession(uId: Long, sessionId: Long): Flowable<Session> {
         return sessionApi.querySession(uId, sessionId).flatMap { bean ->
             Flowable.just(bean.toSession())

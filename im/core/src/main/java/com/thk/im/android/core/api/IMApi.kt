@@ -14,6 +14,11 @@ interface IMApi {
     /**
      * 获取与用户的session
      */
+    fun querySession(uId: Long, entityId: Long, type: Int): Flowable<Session>
+
+    /**
+     * 获取与用户的session
+     */
     fun querySession(uId: Long, sessionId: Long): Flowable<Session>
 
 

@@ -19,6 +19,13 @@ interface SessionApi {
         @Path("sid") sid: Long,
     ): Flowable<SessionVo>
 
+    @GET("/user_session")
+    fun querySessionByEntityId(
+        @Query("u_id") uid: Long,
+        @Query("entity_id") entityId: Long,
+        @Query("type") type: Int,
+    ): Flowable<SessionVo>
+
     @GET("/user_session/latest")
     fun queryLatestSession(
         @Query("u_id") uid: Long,

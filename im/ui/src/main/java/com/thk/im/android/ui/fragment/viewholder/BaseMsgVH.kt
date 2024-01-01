@@ -3,6 +3,7 @@ package com.thk.im.android.ui.fragment.viewholder
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnLongClickListener
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -27,7 +28,7 @@ import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
 
 abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val viewType: Int) :
-    BaseVH(liftOwner, itemView), View.OnClickListener, View.OnLongClickListener {
+    BaseVH(liftOwner, itemView) {
 
     open lateinit var message: Message
     open lateinit var session: Session
@@ -140,8 +141,33 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         }
 
         flContent.addView(contentContainer)
-        contentContainer.setOnClickListener(this)
-        contentContainer.setOnLongClickListener(this)
+
+        ivAvatarView?.setOnClickListener {
+            msgVHOperator?.onMsgSenderClick(message, pos, it)
+        }
+
+        tvNicknameView?.setOnClickListener {
+            msgVHOperator?.onMsgSenderClick(message, pos, it)
+        }
+
+        ivMsgFailedView?.setOnClickListener {
+            resend()
+        }
+
+        selectView.setOnClickListener {
+            msgVHOperator?.let {
+                selectView.isSelected = !selectView.isSelected
+                it.onSelected(message, selectView.isSelected)
+            }
+        }
+
+        contentContainer.setOnClickListener {
+            msgVHOperator?.onMsgCellClick(message, pos, it)
+        }
+        contentContainer.setOnLongClickListener {
+            msgVHOperator?.onMsgCellLongClick(message, pos, it)
+            true
+        }
     }
 
     open fun hasBubble(): Boolean {
@@ -192,17 +218,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 ivMsgFailedView?.visibility = View.GONE
             }
         }
-
-        ivMsgFailedView?.setOnClickListener {
-            resend()
-        }
-
-        selectView.setOnClickListener {
-            msgVHOperator?.let {
-                selectView.isSelected = !selectView.isSelected
-                it.onSelected(message, selectView.isSelected)
-            }
-        }
     }
 
     open fun resend() {
@@ -225,19 +240,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         IMImageLoader.displayImageUrl(imageView, url)
     }
 
-    override fun onClick(p0: View?) {
-        p0?.let {
-            msgVHOperator?.onMsgCellClick(message, pos, it)
-        }
-    }
-
-    override fun onLongClick(p0: View?): Boolean {
-        if (p0 != null && msgVHOperator != null) {
-            msgVHOperator!!.onMsgCellLongClick(message, pos, p0)
-            return true
-        }
-        return false
-    }
 
     override fun onViewRecycled() {
         super.onViewRecycled()

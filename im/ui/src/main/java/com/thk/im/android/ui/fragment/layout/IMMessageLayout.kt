@@ -15,7 +15,9 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.fragment.adapter.MessageAdapter
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
@@ -194,6 +196,29 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
 
     override fun onMsgCellClick(message: Message, position: Int, view: View) {
         msgPreviewer?.previewMessage(message, position, view)
+    }
+
+    override fun onMsgSenderClick(message: Message, position: Int, view: View) {
+        val fromUId = message.fUid
+        if (fromUId > 0 && fromUId != IMCoreManager.uId) {
+            val subscriber = object : BaseSubscriber<User>() {
+                override fun onNext(t: User?) {
+                    t?.let {
+                        IMUIManager.sessionOperator?.openUserPage(context, it)
+                    }
+                }
+
+                override fun onComplete() {
+                    super.onComplete()
+                    disposables.remove(this)
+                }
+
+            }
+            IMCoreManager.userModule.queryUser(fromUId)
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            disposables.add(subscriber)
+        }
     }
 
     override fun onMsgCellLongClick(message: Message, position: Int, view: View) {

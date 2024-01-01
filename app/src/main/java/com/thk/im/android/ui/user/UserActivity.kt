@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.Toolbar
 import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.contact.vo.ApplyFriendVo
 import com.thk.im.android.api.contact.vo.ContactSessionCreateVo
@@ -49,6 +50,18 @@ class UserActivity : BaseActivity() {
         user?.let {
             initUserInfoView(it)
         }
+    }
+
+    override fun getToolbar(): Toolbar {
+        return binding.tbTop.toolbar
+    }
+
+    override fun needBackIcon(): Boolean {
+        return true
+    }
+
+    override fun menuMoreVisibility(id: Int): Int {
+        return View.GONE
     }
 
     private fun initUserInfoView(user: User) {

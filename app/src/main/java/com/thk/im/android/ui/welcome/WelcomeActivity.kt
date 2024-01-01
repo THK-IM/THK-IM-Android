@@ -40,8 +40,9 @@ class WelcomeActivity : BaseActivity() {
     private fun initUserInfo() {
         val token = DataRepository.getUserToken()
         if (token.isNullOrEmpty()) {
-            loginByToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVzQXQiOjE3MDQxOTczNzAsImlkIjoiZDg3OWc2a2NzazB3IiwiaXNzdWVyIjoidXNlcl9zZXJ2ZXIifQ.c3phZZ0o7Hjunv9ceffqq4ghB2Fj0vQw443UFghWMSg")
-//            showLogin()
+//            loginByToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVzQXQiOjE3MDQxOTczNzAsImlkIjoiZDg3OWc2a2NzazB3IiwiaXNzdWVyIjoidXNlcl9zZXJ2ZXIifQ.c3phZZ0o7Hjunv9ceffqq4ghB2Fj0vQw443UFghWMSg")
+            loginByToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVzQXQiOjE3MDQzNDkzNDIsImlkIjoiZDg2czUxZ2FmcmJwIiwiaXNzdWVyIjoic2VydmVyIn0.IHmw7GUwDQ7BpYiy06XUkHraq4bjxYTQPVfpqhb3rjg")
+            showLogin()
         } else {
             val user = DataRepository.getUser()
             if (user == null) {

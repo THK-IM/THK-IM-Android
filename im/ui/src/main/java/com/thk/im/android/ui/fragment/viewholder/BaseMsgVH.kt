@@ -114,32 +114,38 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         // 内容视图layout
         val flContent: LinearLayout = itemView.findViewById(R.id.fl_content)
         val contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
-        when (getPositionType()) {
-            IMMsgPosType.Left.value -> {
-                contentContainer.setShape(
-                    Color.parseColor("#ffffff"),
-                    Color.parseColor("#ffffff"),
-                    1,
-                    floatArrayOf(0f, 10f, 0f, 10f)
-                )
-            }
+        if (hasBubble()) {
+            when (getPositionType()) {
+                IMMsgPosType.Left.value -> {
+                    contentContainer.setShape(
+                        Color.parseColor("#ffffff"),
+                        Color.parseColor("#ffffff"),
+                        1,
+                        floatArrayOf(0f, 10f, 0f, 10f)
+                    )
+                }
 
-            IMMsgPosType.Right.value -> {
-                contentContainer.setShape(
-                    Color.parseColor("#25c3fd"),
-                    Color.parseColor("#25c3fd"),
-                    1,
-                    floatArrayOf(10f, 0f, 10f, 0f)
-                )
-            }
+                IMMsgPosType.Right.value -> {
+                    contentContainer.setShape(
+                        Color.parseColor("#25c3fd"),
+                        Color.parseColor("#25c3fd"),
+                        1,
+                        floatArrayOf(10f, 0f, 10f, 0f)
+                    )
+                }
 
-            else -> {
+                else -> {
+                }
             }
         }
 
         flContent.addView(contentContainer)
         contentContainer.setOnClickListener(this)
         contentContainer.setOnLongClickListener(this)
+    }
+
+    open fun hasBubble(): Boolean {
+        return true
     }
 
     open fun renderUserInfo() {
@@ -236,7 +242,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     override fun onViewRecycled() {
         super.onViewRecycled()
         msgVHOperator = null
-
     }
 
 }

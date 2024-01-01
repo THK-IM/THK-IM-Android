@@ -97,6 +97,10 @@ class IMImageMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         IMImageLoader.displayImageByPath(imageView, path)
     }
 
+    override fun hasBubble(): Boolean {
+        return false
+    }
+
     override fun onViewDetached() {
         super.onViewDetached()
     }

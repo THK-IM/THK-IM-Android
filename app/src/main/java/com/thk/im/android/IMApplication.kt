@@ -13,6 +13,7 @@ import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule
 import com.thk.im.android.media.Provider
 import com.thk.im.android.module.IMContactModule
+import com.thk.im.android.module.IMGroupModule
 import com.thk.im.android.module.IMUserModule
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.preview.Previewer
@@ -26,6 +27,7 @@ class IMApplication : Application() {
         DataRepository.init(this)
         IMCoreManager.userModule = IMUserModule()
         IMCoreManager.contactModule = IMContactModule()
+        IMCoreManager.groupModule = IMGroupModule()
         IMCoreManager.init(this)
         IMUIManager.init(this)
     }

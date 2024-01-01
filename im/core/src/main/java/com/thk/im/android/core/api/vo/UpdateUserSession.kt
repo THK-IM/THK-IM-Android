@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-data class UpdateSessionVo(
+data class UpdateUserSession(
     @SerializedName("u_id")
     var uId: Long,
     @SerializedName("s_id")

@@ -13,7 +13,6 @@ import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.SessionStatus
-import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.event.XEventBus
@@ -133,7 +132,7 @@ open class DefaultMessageModule : MessageModule {
                 t?.printStackTrace()
             }
         }
-        IMCoreManager.imApi.getLatestMessages(IMCoreManager.uId, lastTime, count)
+        IMCoreManager.imApi.queryUserLatestMessages(IMCoreManager.uId, lastTime, count)
             .compose(RxTransform.flowableToIo()).subscribe(disposable)
         this.disposes.add(disposable)
     }
@@ -156,7 +155,7 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap Flowable.just(session)
             } else {
                 val uId = IMCoreManager.uId
-                return@flatMap IMCoreManager.imApi.querySession(uId, entityId, type).flatMap {
+                return@flatMap IMCoreManager.imApi.queryUserSession(uId, entityId, type).flatMap {
                     IMCoreManager.db.sessionDao().insertOrIgnoreSessions(listOf(it))
                     Flowable.just(it)
                 }
@@ -179,7 +178,7 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap Flowable.just(session)
             } else {
                 val uId = IMCoreManager.uId
-                return@flatMap IMCoreManager.imApi.querySession(uId, sessionId).flatMap {
+                return@flatMap IMCoreManager.imApi.queryUserSession(uId, sessionId).flatMap {
                     IMCoreManager.db.sessionDao().insertOrIgnoreSessions(listOf(it))
                     Flowable.just(it)
                 }
@@ -403,7 +402,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     private fun updateSeverSession(session: Session): Flowable<Void> {
-        return IMCoreManager.imApi.updateSession(IMCoreManager.uId, session)
+        return IMCoreManager.imApi.updateUserSession(IMCoreManager.uId, session)
     }
 
     private fun updateLocalSession(session: Session): Flowable<Void> {
@@ -420,7 +419,7 @@ open class DefaultMessageModule : MessageModule {
 
 
     private fun deleteSeverSession(session: Session): Flowable<Void> {
-        return IMCoreManager.imApi.deleteSession(IMCoreManager.uId, session)
+        return IMCoreManager.imApi.deleteUserSession(IMCoreManager.uId, session)
     }
 
     private fun deleteLocalSession(session: Session): Flowable<Void> {

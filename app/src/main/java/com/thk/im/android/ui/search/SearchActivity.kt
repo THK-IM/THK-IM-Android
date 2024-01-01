@@ -67,7 +67,7 @@ class SearchActivity : BaseActivity() {
                 }
             }
             showLoading(true)
-            DataRepository.groupApi.queryGroup(keywords)
+            DataRepository.groupApi.searchGroup(keywords)
                 .compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             addDispose(subscriber)

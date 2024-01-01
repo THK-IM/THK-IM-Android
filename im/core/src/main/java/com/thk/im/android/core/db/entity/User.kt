@@ -41,7 +41,7 @@ data class User(
     @ColumnInfo(name = "status")
     var status: Int?,
     @SerializedName("ext_data")
-    @ColumnInfo(name = "ext_data")
+    @ColumnInfo(name = "ext_data", typeAffinity = ColumnInfo.TEXT)
     var extData: String?,   //扩展字段
     @SerializedName("c_time")
     @ColumnInfo(name = "c_time")

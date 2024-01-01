@@ -1,8 +1,9 @@
 package com.thk.im.android.core.api.internal
 
 import com.thk.im.android.core.api.vo.ListVo
+import com.thk.im.android.core.api.vo.SessionMemberVo
 import com.thk.im.android.core.api.vo.SessionVo
-import com.thk.im.android.core.api.vo.UpdateSessionVo
+import com.thk.im.android.core.api.vo.UpdateUserSession
 import io.reactivex.Flowable
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -12,6 +13,14 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SessionApi {
+
+    @GET("/session/{id}/user/latest")
+    fun queryLatestSessionMembers(
+        @Path("id") id: Long,
+        @Query("m_time") mTime: Long,
+        @Query("role") role: Int?,
+        @Query("count") count: Int
+    ): Flowable<ListVo<SessionMemberVo>>
 
     @GET("/user_session/{uid}/{sid}")
     fun querySession(
@@ -37,7 +46,7 @@ interface SessionApi {
 
     @PUT("/user_session")
     fun updateSession(
-        @Body bean: UpdateSessionVo
+        @Body bean: UpdateUserSession
     ): Flowable<Void>
 
     @DELETE("/user_session/{uid}/{sid}")

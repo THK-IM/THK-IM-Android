@@ -18,9 +18,11 @@ import com.thk.im.android.api.group.vo.CreateGroupVo
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Group
+import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.databinding.ActivityGroupBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.contact.ContactActivity
@@ -45,22 +47,25 @@ class GroupActivity : BaseActivity() {
     }
 
     private lateinit var binding: ActivityGroupBinding
-    private var mode = 0 // 0创建/1查看/2编辑
+    private var mode = 0 // 0创建/1查看或编辑
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityGroupBinding.inflate(layoutInflater)
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
         val group = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("group", Group::class.java)
         } else {
             intent.getParcelableExtra("group")
         }
+        mode = if (group == null) {
+            0
+        } else {
+            1
+        }
+        super.onCreate(savedInstanceState)
+        setContentView(binding.root)
         if (group == null) {
-            mode = 0
             initCreateGroupUI()
         } else {
-            mode = 1
             initShowGroupUI(group)
         }
     }
@@ -75,12 +80,14 @@ class GroupActivity : BaseActivity() {
 
 
     override fun menuMoreVisibility(id: Int): Int {
-        if (id == R.id.tb_menu2) {
-            return View.GONE
-        } else if (id == R.id.tb_menu1) {
-            return View.VISIBLE
+        if (id == R.id.tb_menu1) {
+            return if (mode == 0) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
         }
-        return View.VISIBLE
+        return View.GONE
     }
 
     override fun menuIcon(id: Int): Drawable? {
@@ -92,8 +99,7 @@ class GroupActivity : BaseActivity() {
     }
 
     override fun onToolBarMenuClick(view: View) {
-        if (view.id == R.id.tb_menu2) {
-        } else if (view.id == R.id.tb_menu1) {
+        if (view.id == R.id.tb_menu1) {
             if (mode == 0) {
                 // 创建群
                 createGroup()
@@ -164,6 +170,48 @@ class GroupActivity : BaseActivity() {
 
     private fun initShowGroupUI(group: Group) {
         setTitle(group.name)
+        val groupName = group.name
+        binding.etNameInput.setText(groupName)
+
+        binding.lyGroupAvatar.visibility = View.VISIBLE
+        IMImageLoader.displayImageUrl(binding.ivAvatarInput, group.avatar)
+
+        binding.etAnnounceInput.setShape(
+            Color.parseColor("#333333"),
+            Color.parseColor("#ffffff"),
+            1,
+            floatArrayOf(5f, 5f, 5f, 5f)
+        )
+        binding.etAnnounceInput.setText(group.announce)
+
+        binding.lyGroupMember.setOnClickListener {
+        }
+
+        val adapter = GroupMemberAdapter(this)
+        val layoutManager = GridLayoutManager(this, 5)
+        binding.rcvMembers.adapter = adapter
+        binding.rcvMembers.layoutManager = layoutManager
+
+        val subscriber = object :BaseSubscriber<List<SessionMember>>() {
+            override fun onNext(t: List<SessionMember>?) {
+                t?.let {
+                    val ids = mutableListOf<Long>()
+                    for (member in it) {
+                        ids.add(member.userId)
+                    }
+                    showMembers(ids.toLongArray())
+                }
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                removeDispose(this)
+            }
+        }
+        IMCoreManager.imApi.queryLatestSessionMembers(group.sessionId, 0L, null, 100)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        addDispose(subscriber)
     }
 
     private fun showMembers(ids: LongArray) {

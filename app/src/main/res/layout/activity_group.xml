@@ -32,15 +32,16 @@
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/et_name_input"
             android:layout_width="wrap_content"
-            android:minWidth="80dp"
             android:background="@null"
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:textSize="14sp"
             android:textColor="#222222"
+            android:textAlignment="textEnd"
             android:hint="在这里输入名称"
             android:layout_centerInParent="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"
             />
     </RelativeLayout>
 

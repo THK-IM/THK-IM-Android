@@ -10,9 +10,10 @@ import com.thk.im.android.core.api.vo.MessageVo
 import com.thk.im.android.core.api.vo.ReadMsgVo
 import com.thk.im.android.core.api.vo.ReeditMsgVo
 import com.thk.im.android.core.api.vo.RevokeMsgVo
-import com.thk.im.android.core.api.vo.UpdateSessionVo
+import com.thk.im.android.core.api.vo.UpdateUserSession
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.SessionMember
 import io.reactivex.Flowable
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
@@ -51,8 +52,22 @@ open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
 
     private val messageApi: MessageApi = getApi(MessageApi::class.java)
     private val sessionApi: SessionApi = getApi(SessionApi::class.java)
+    override fun queryLatestSessionMembers(
+        sessionId: Long,
+        mTime: Long,
+        role: Int?,
+        count: Int
+    ): Flowable<List<SessionMember>> {
+        return sessionApi.queryLatestSessionMembers(sessionId, mTime, role, count).flatMap { it ->
+            val members = mutableListOf<SessionMember>()
+            it.data.forEach { bean ->
+                members.add(bean.toSessionMember())
+            }
+            Flowable.just(members)
+        }
+    }
 
-    override fun getLatestSessions(
+    override fun queryUserLatestSessions(
         uId: Long,
         count: Int,
         mTime: Long,
@@ -67,31 +82,31 @@ open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         }
     }
 
-    override fun querySession(uId: Long, entityId: Long, type: Int): Flowable<Session> {
+    override fun queryUserSession(uId: Long, entityId: Long, type: Int): Flowable<Session> {
         return sessionApi.querySessionByEntityId(uId, entityId, type).flatMap { bean ->
             Flowable.just(bean.toSession())
         }
     }
 
-    override fun querySession(uId: Long, sessionId: Long): Flowable<Session> {
+    override fun queryUserSession(uId: Long, sessionId: Long): Flowable<Session> {
         return sessionApi.querySession(uId, sessionId).flatMap { bean ->
             Flowable.just(bean.toSession())
         }
     }
 
-    override fun deleteSession(uId: Long, session: Session): Flowable<Void> {
+    override fun deleteUserSession(uId: Long, session: Session): Flowable<Void> {
         return sessionApi.deleteSession(uId, session.id)
     }
 
-    override fun updateSession(uId: Long, session: Session): Flowable<Void> {
-        val updateSessionVo = UpdateSessionVo(
+    override fun updateUserSession(uId: Long, session: Session): Flowable<Void> {
+        val updateUserSession = UpdateUserSession(
             uId,
             session.id,
             session.topTimestamp,
             session.status,
             session.parentId
         )
-        return sessionApi.updateSession(updateSessionVo)
+        return sessionApi.updateSession(updateUserSession)
     }
 
     override fun sendMessageToServer(msg: Message): Flowable<Message> {
@@ -162,7 +177,7 @@ open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         }
     }
 
-    override fun getLatestMessages(uId: Long, cTime: Long, count: Int): Flowable<List<Message>> {
+    override fun queryUserLatestMessages(uId: Long, cTime: Long, count: Int): Flowable<List<Message>> {
         return messageApi.queryLatestMsg(uId, cTime, 0, count).flatMap {
             val messages = mutableListOf<Message>()
             it.data.forEach { bean ->

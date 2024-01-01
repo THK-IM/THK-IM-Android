@@ -27,16 +27,23 @@ interface GroupApi {
 
 
     /**
-     * 查询群
+     * 搜索群
      */
-    @GET("/group/{id}")
-    fun queryGroup(
-        @Path("id") displayId: String,
-        @Query("id") groupId: Long? = null
+    @GET("/group")
+    fun searchGroup(
+        @Query("display_id") displayId: String,
     ): Flowable<GroupVo>
 
     /**
      * 查询群
+     */
+    @GET("/group/{id}")
+    fun queryGroup(
+        @Path("id") id: Long,
+    ): Flowable<GroupVo>
+
+    /**
+     * 更新群
      */
     @PUT("/group/{id}")
     fun updateGroup(

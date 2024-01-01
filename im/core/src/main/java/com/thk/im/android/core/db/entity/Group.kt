@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Index
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
@@ -49,7 +50,7 @@ data class Group(
     @ColumnInfo(name = "member_count")
     var memberCount: Int,
     @SerializedName("ext_data")
-    @ColumnInfo(name = "ext_data")
+    @ColumnInfo(name = "ext_data", typeAffinity = ColumnInfo.TEXT)
     var extData: String?,   //扩展字段
     @SerializedName("c_time")
     @ColumnInfo(name = "c_time")
@@ -57,4 +58,10 @@ data class Group(
     @SerializedName("m_time")
     @ColumnInfo(name = "m_time")
     var mTime: Long,
-) : Parcelable
+) : Parcelable {
+
+    @Ignore
+    constructor(id: Long): this(id, "", "", 0L, 0L ,"",
+        "", "", 0, 0, "", 0L, 0L
+    )
+}

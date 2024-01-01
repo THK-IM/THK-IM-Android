@@ -11,26 +11,28 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-@Entity(
-    tableName = "contact",
-    primaryKeys = ["id"],
-    indices = [
-        Index(value = ["session_id"], unique = false)
-    ]
+@Entity(tableName = "session_member",
+    primaryKeys= ["session_id", "user_id"],
 )
-data class Contact(
-    @SerializedName("id")
-    @ColumnInfo(name = "id")
-    val id: Long,
+data class SessionMember(
     @SerializedName("session_id")
     @ColumnInfo(name = "session_id")
-    var sessionId: Long?,
+    var sessionId: Long,
+    @SerializedName("user_id")
+    @ColumnInfo(name = "user_id")
+    var userId: Long,
+    @SerializedName("role")
+    @ColumnInfo(name = "role")
+    var role: Int,
+    @SerializedName("status")
+    @ColumnInfo(name = "status")
+    var status: Int,
+    @SerializedName("mute")
+    @ColumnInfo(name = "mute")
+    var mute: Int,
     @SerializedName("note_name")
     @ColumnInfo(name = "note_name")
     var noteName: String?,
-    @SerializedName("relation")
-    @ColumnInfo(name = "relation")
-    var relation: Int,
     @SerializedName("ext_data")
     @ColumnInfo(name = "ext_data", typeAffinity = ColumnInfo.TEXT)
     var extData: String?,   //扩展字段

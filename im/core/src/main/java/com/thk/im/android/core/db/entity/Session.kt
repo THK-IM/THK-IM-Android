@@ -47,12 +47,6 @@ data class Session(
     @SerializedName("top_timestamp")
     @ColumnInfo(name = "top_timestamp")
     var topTimestamp: Long,
-    @SerializedName("c_time")
-    @ColumnInfo(name = "c_time")
-    val cTime: Long,
-    @SerializedName("m_time")
-    @ColumnInfo(name = "m_time")
-    var mTime: Long,
     @SerializedName("unread_count")
     @ColumnInfo(name = "unread_count")
     var unReadCount: Int,
@@ -65,24 +59,36 @@ data class Session(
     @SerializedName("ext_data")
     @ColumnInfo(name = "ext_data", typeAffinity = ColumnInfo.TEXT)
     var extData: String?,   // 扩展字段
+    @SerializedName("member_sync_time")
+    @ColumnInfo(name = "member_sync_time")
+    var memberSyncTime: Long = 0,
+    @SerializedName("member_count")
+    @ColumnInfo(name = "member_count")
+    var memberCount: Int,
+    @SerializedName("c_time")
+    @ColumnInfo(name = "c_time")
+    val cTime: Long,
+    @SerializedName("m_time")
+    @ColumnInfo(name = "m_time")
+    var mTime: Long,
 ) : Parcelable {
 
     @Ignore
     constructor(id: Long) : this(
         id, 0, 0, 0, "", "", 0, 0, 0,
-        0, 0, 0, 0, null, null, null
+        0, 0, null, null, null, 0, 0, 0, 0,
     )
 
     @Ignore
     constructor() : this(
         0, 0, 0, 0, "", "", 0, 0, 0,
-        0, 0, 0, 0, null, null, null
+        0, 0, null, null, null , 0, 0, 0, 0
     )
 
     @Ignore
     constructor(type: Int, entityId: Long) : this(
         0, 0, type, entityId, "", "", 0, 0, 0,
-        0, 0, 0, 0, null, null, null
+        0, 0, null, null, null, 0, 0, 0, 0
     )
 
 }

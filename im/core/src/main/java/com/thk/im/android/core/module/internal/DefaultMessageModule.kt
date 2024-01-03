@@ -15,6 +15,7 @@ import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.SessionStatus
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.module.MessageModule
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
@@ -377,6 +378,56 @@ open class DefaultMessageModule : MessageModule {
         AppUtils.instance().notifyNewMessage()
     }
 
+    override fun querySessionMembers(sessionId: Long): Flowable<List<SessionMember>> {
+        return Flowable.create({
+            val sessionMembers = IMCoreManager.db.sessionMemberDao().querySessionMembers(sessionId)
+            it.onNext(sessionMembers)
+            it.onComplete()
+        }, BackpressureStrategy.LATEST)
+    }
+
+    override fun syncSessionMembers(sessionId: Long) {
+        val count = 100
+        val subscriber = object : BaseSubscriber<List<SessionMember>>() {
+            override fun onNext(t: List<SessionMember>?) {
+                t?.let {
+                    val inserts = mutableListOf<SessionMember>()
+                    val deletes = mutableListOf<SessionMember>()
+                    for (sm in it) {
+                        if (sm.deleted == 0) {
+                            inserts.add(sm)
+                        } else {
+                            deletes.add(sm)
+                        }
+                    }
+                    IMCoreManager.db.sessionMemberDao().insertOrUpdateSessionMembers(inserts)
+                    IMCoreManager.db.sessionMemberDao().deleteSessionMembers(deletes)
+                    if (it.isNotEmpty()) {
+                        val mTime = it.last().mTime
+                        IMCoreManager.db.sessionDao().setMemberSyncTime(sessionId, mTime)
+                    }
+                    if (it.size >= count) {
+                        syncSessionMembers(sessionId)
+                    }
+                }
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                disposes.remove(this)
+            }
+        }
+        Flowable.just(sessionId).flatMap {
+            val mTime = IMCoreManager.db.sessionDao().getMemberSyncTime(sessionId)
+            return@flatMap Flowable.just(mTime)
+        }.flatMap {
+            return@flatMap IMCoreManager.imApi.queryLatestSessionMembers(sessionId, it, null, count)
+        }.compose(RxTransform.flowableToIo())
+            .subscribe(subscriber)
+        disposes.add(subscriber)
+
+    }
+
     override fun onSignalReceived(type: Int, body: String) {
         try {
             val bean = Gson().fromJson(body, MessageVo::class.java)
@@ -460,13 +511,8 @@ open class DefaultMessageModule : MessageModule {
 
             override fun onComplete() {
                 super.onComplete()
-                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
-                    sessionId, msgIds, MsgOperateStatus.Ack.value
-                )
-                ackMessagesSuccess(sessionId, msgIds)
                 disposes.remove(this)
             }
-
             override fun onNext(t: Void?) {}
 
             override fun onError(t: Throwable?) {
@@ -474,7 +520,15 @@ open class DefaultMessageModule : MessageModule {
                 t?.message?.let { LLog.e(it) }
             }
         }
-        IMCoreManager.imApi.ackMessages(uId, sessionId, msgIds).compose(RxTransform.flowableToIo())
+        IMCoreManager.imApi.ackMessages(uId, sessionId, msgIds)
+            .flatMap {
+                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
+                    sessionId, msgIds, MsgOperateStatus.Ack.value
+                )
+                ackMessagesSuccess(sessionId, msgIds)
+                Flowable.just(it)
+            }
+            .compose(RxTransform.flowableToIo())
             .subscribe(disposable)
         this.disposes.add(disposable)
     }

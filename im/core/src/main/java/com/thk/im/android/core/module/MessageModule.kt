@@ -3,6 +3,7 @@ package com.thk.im.android.core.module
 import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import io.reactivex.Flowable
 
@@ -120,5 +121,15 @@ interface MessageModule : BaseModule {
      * session下有新消息，发出提示音/震动等通知
      */
     fun notifyNewMessage(session: Session, message: Message)
+
+    /**
+     * 查询session下的成员列表（本地数据库）
+     */
+    fun querySessionMembers(sessionId: Long): Flowable<List<SessionMember>>
+
+    /**
+     * 同步session成员列表
+     */
+    fun syncSessionMembers(sessionId: Long)
 
 }

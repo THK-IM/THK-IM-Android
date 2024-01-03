@@ -206,9 +206,10 @@ class GroupActivity : BaseActivity() {
             override fun onComplete() {
                 super.onComplete()
                 removeDispose(this)
+                IMCoreManager.messageModule.syncSessionMembers(group.sessionId)
             }
         }
-        IMCoreManager.imApi.queryLatestSessionMembers(group.sessionId, 0L, null, 100)
+        IMCoreManager.messageModule.querySessionMembers(group.sessionId)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         addDispose(subscriber)

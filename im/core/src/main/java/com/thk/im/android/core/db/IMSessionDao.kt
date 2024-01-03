@@ -13,22 +13,28 @@ interface IMSessionDao {
 
     fun findSessionByEntity(entityId: Long, type: Int): Session?
 
-    fun findSession(sid: Long): Session?
+    fun findSession(sId: Long): Session?
 
     fun updateSession(session: Session)
 
-    fun deleteSessionById(sid: Long)
+    fun deleteSessionById(sId: Long)
 
     /**
      * 批量删除session
      */
     fun deleteSessions(vararg session: Session): Int
 
-    fun updateTop(sid: Long, top: Long)
+    fun updateTop(sId: Long, top: Long)
 
-    fun updateStatus(sid: Long, status: Int)
+    fun updateStatus(sId: Long, status: Int)
 
-    fun updateDraft(sid: Long, draft: String)
+    fun updateDraft(sId: Long, draft: String)
 
-    fun updateUnread(sid: Long, unread: Int)
+    fun updateUnread(sId: Long, unread: Int)
+
+    fun setMemberSyncTime(sId: Long, time: Long)
+
+    fun getMemberSyncTime(sId: Long): Long
+
+    fun updateMemberCount(sId: Long, count: Int)
 }

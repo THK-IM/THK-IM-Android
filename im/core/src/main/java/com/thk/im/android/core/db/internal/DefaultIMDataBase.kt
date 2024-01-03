@@ -7,11 +7,13 @@ import com.thk.im.android.core.db.IMDataBase
 import com.thk.im.android.core.db.IMGroupDao
 import com.thk.im.android.core.db.IMMessageDao
 import com.thk.im.android.core.db.IMSessionDao
+import com.thk.im.android.core.db.IMSessionMemberDao
 import com.thk.im.android.core.db.IMUserDao
 import com.thk.im.android.core.db.internal.dao.IMContactDaoImp
 import com.thk.im.android.core.db.internal.dao.IMGroupDaoImp
 import com.thk.im.android.core.db.internal.dao.IMMessageDaoImp
 import com.thk.im.android.core.db.internal.dao.IMSessionDaoImp
+import com.thk.im.android.core.db.internal.dao.IMSessionMemberDaoImp
 import com.thk.im.android.core.db.internal.dao.IMUserDaoImp
 import com.thk.im.android.core.db.internal.room.IMRoomDataBase
 
@@ -28,6 +30,7 @@ internal class DefaultIMDataBase(
     private val sessionDao: IMSessionDao
     private val contactDao: IMContactDao
     private val groupDao: IMGroupDao
+    private val sessionMemberDao: IMSessionMemberDao
 
     init {
         val dbname = if (debug) {
@@ -39,6 +42,7 @@ internal class DefaultIMDataBase(
         userDao = IMUserDaoImp(roomDataBase)
         messageDao = IMMessageDaoImp(roomDataBase)
         sessionDao = IMSessionDaoImp(roomDataBase)
+        sessionMemberDao = IMSessionMemberDaoImp(roomDataBase)
         contactDao = IMContactDaoImp(roomDataBase)
         groupDao = IMGroupDaoImp(roomDataBase)
     }
@@ -57,6 +61,10 @@ internal class DefaultIMDataBase(
 
     override fun messageDao(): IMMessageDao {
         return messageDao
+    }
+
+    override fun sessionMemberDao(): IMSessionMemberDao {
+        return sessionMemberDao
     }
 
     override fun sessionDao(): IMSessionDao {

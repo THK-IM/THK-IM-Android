@@ -30,7 +30,7 @@ data class SessionMemberVo(
     var mTime: Long = 0,
 ) : Parcelable {
     fun toSessionMember(): SessionMember {
-        return SessionMember(sId, uId, role, status, mute, noteName, null, cTime, mTime)
+        return SessionMember(sId, uId, role, status, mute, noteName, null, cTime, mTime, deleted)
     }
 
 }

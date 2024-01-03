@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
@@ -42,4 +43,7 @@ data class SessionMember(
     @SerializedName("m_time")
     @ColumnInfo(name = "m_time")
     var mTime: Long,
+    @ColumnInfo(name = "deleted")
+    @SerializedName("deleted")
+    var deleted: Int,
 ) : Parcelable

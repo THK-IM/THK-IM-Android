@@ -25,36 +25,49 @@ internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSes
         return roomDatabase.sessionDao().findSessionByEntity(entityId, type)
     }
 
-    override fun findSession(sid: Long): Session? {
-        return roomDatabase.sessionDao().findSession(sid)
+    override fun findSession(sId: Long): Session? {
+        return roomDatabase.sessionDao().findSession(sId)
     }
 
     override fun updateSession(session: Session) {
         return roomDatabase.sessionDao().updateSession(session)
     }
 
-    override fun deleteSessionById(sid: Long) {
-        return roomDatabase.sessionDao().deleteSessionById(sid)
+    override fun deleteSessionById(sId: Long) {
+        return roomDatabase.sessionDao().deleteSessionById(sId)
     }
 
     override fun deleteSessions(vararg session: Session): Int {
         return roomDatabase.sessionDao().deleteSessions(*session)
     }
 
-    override fun updateTop(sid: Long, top: Long) {
-        return roomDatabase.sessionDao().updateTop(sid, top)
+    override fun updateTop(sId: Long, top: Long) {
+        return roomDatabase.sessionDao().updateTop(sId, top)
     }
 
-    override fun updateStatus(sid: Long, status: Int) {
-        return roomDatabase.sessionDao().updateStatus(sid, status)
+    override fun updateStatus(sId: Long, status: Int) {
+        return roomDatabase.sessionDao().updateStatus(sId, status)
     }
 
-    override fun updateDraft(sid: Long, draft: String) {
-        return roomDatabase.sessionDao().updateDraft(sid, draft)
+    override fun updateDraft(sId: Long, draft: String) {
+        return roomDatabase.sessionDao().updateDraft(sId, draft)
     }
 
-    override fun updateUnread(sid: Long, unread: Int) {
-        return roomDatabase.sessionDao().updateUnread(sid, unread)
+    override fun updateUnread(sId: Long, unread: Int) {
+        return roomDatabase.sessionDao().updateUnread(sId, unread)
     }
+
+    override fun setMemberSyncTime(sId: Long, time: Long) {
+        return roomDatabase.sessionDao().setMemberSyncTime(sId, time)
+    }
+
+    override fun getMemberSyncTime(sId: Long): Long {
+        return roomDatabase.sessionDao().getMemberSyncTime(sId)
+    }
+
+    override fun updateMemberCount(sId: Long, count: Int) {
+        return roomDatabase.sessionDao().updateMemberCount(sId, count)
+    }
+
 
 }

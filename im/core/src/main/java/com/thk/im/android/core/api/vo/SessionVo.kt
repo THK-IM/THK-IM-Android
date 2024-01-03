@@ -38,8 +38,8 @@ data class SessionVo(
 ) : Parcelable {
     fun toSession(): Session {
         return Session(
-            id, parentId, type, entityId, name, remark, mute, status, role, top, cTime,
-            mTime, 0, null, null, extData
+            id, parentId, type, entityId, name, remark, mute, status, role, top,
+            0, null, null, extData , 0, 0, cTime, mTime
         )
     }
 

@@ -10,6 +10,8 @@ interface IMDataBase {
 
     fun messageDao(): IMMessageDao
 
+    fun sessionMemberDao(): IMSessionMemberDao
+
     fun sessionDao(): IMSessionDao
 
     fun contactDao(): IMContactDao

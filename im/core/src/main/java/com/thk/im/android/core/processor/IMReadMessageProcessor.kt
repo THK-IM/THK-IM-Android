@@ -188,8 +188,8 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
             override fun onNext(t: Void?) {}
 
             override fun onError(t: Throwable?) {
-                super.onError(t)
                 t?.message?.let { LLog.e(it) }
+                disposables.remove(this)
             }
         }
         IMCoreManager.imApi.readMessages(uId, sessionId, msgIds)

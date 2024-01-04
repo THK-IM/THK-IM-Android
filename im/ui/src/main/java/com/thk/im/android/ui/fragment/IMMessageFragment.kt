@@ -255,7 +255,17 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         session?.let {
             IMCoreManager.messageModule.deleteMessages(it.id, messages.toList(), true)
                 .compose(RxTransform.flowableToMain()).subscribe(object : BaseSubscriber<Void>() {
+                    override fun onComplete() {
+                        super.onComplete()
+                    }
+
                     override fun onNext(t: Void?) {}
+
+                    override fun onError(t: Throwable?) {
+                        t?.message?.let { error ->
+                            LLog.e(error)
+                        }
+                    }
                 })
         }
     }
@@ -264,7 +274,8 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         // 对于不是自己发的消息才能发送已读消息
         if (message.fUid != IMCoreManager.uId && message.msgId > 0) {
             IMCoreManager.messageModule
-                .sendMessage(message.sid, MsgType.READ.value, null, null, null, message.msgId)
+                .sendMessage(message.sid, MsgType.READ.value,
+                    null, null, null, message.msgId)
         }
     }
 

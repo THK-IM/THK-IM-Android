@@ -196,6 +196,10 @@ open class DefaultMessageModule : MessageModule {
                     IMCoreManager.db.sessionDao().insertOrIgnoreSessions(needUpdateSessions)
                 }
 
+                if (sessions.isNotEmpty()) {
+                    setSessionSyncTime(sessions.last().mTime)
+                }
+
                 if (sessions.size > count) {
                     syncLatestSessionsFromServer()
                 }
@@ -601,24 +605,21 @@ open class DefaultMessageModule : MessageModule {
 
             override fun onComplete() {
                 super.onComplete()
+                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
+                    sessionId, msgIds, MsgOperateStatus.Ack.value
+                )
+                ackMessagesSuccess(sessionId, msgIds)
                 disposes.remove(this)
             }
 
             override fun onNext(t: Void?) {}
 
             override fun onError(t: Throwable?) {
-                super.onError(t)
                 t?.message?.let { LLog.e(it) }
+                disposes.remove(this)
             }
         }
         IMCoreManager.imApi.ackMessages(uId, sessionId, msgIds)
-            .flatMap {
-                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
-                    sessionId, msgIds, MsgOperateStatus.Ack.value
-                )
-                ackMessagesSuccess(sessionId, msgIds)
-                Flowable.just(it)
-            }
             .compose(RxTransform.flowableToIo())
             .subscribe(disposable)
         this.disposes.add(disposable)

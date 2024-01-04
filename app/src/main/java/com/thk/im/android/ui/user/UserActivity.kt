@@ -15,6 +15,7 @@ import com.thk.im.android.api.user.vo.UserBasicInfoVo
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Session
@@ -111,14 +112,21 @@ class UserActivity : BaseActivity() {
 
     private fun followUser(user: User) {
         val subscriber = object : BaseSubscriber<Void>() {
-            override fun onNext(t: Void?) {
-                showToast("关注成功")
+            override fun onError(t: Throwable?) {
+                t?.message?.let {
+                    LLog.e(it)
+                }
+                removeDispose(this)
             }
 
             override fun onComplete() {
                 super.onComplete()
+                removeDispose(this)
                 dismissLoading()
+                showToast("关注成功")
             }
+
+            override fun onNext(t: Void?) {}
         }
 
         showLoading()
@@ -126,19 +134,29 @@ class UserActivity : BaseActivity() {
         DataRepository.contactApi.follow(vo)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
+        addDispose(subscriber)
     }
 
     private fun applyFriend(user: User) {
         val subscriber = object : BaseSubscriber<Void>() {
             override fun onNext(t: Void?) {
-                showToast("申请成功")
+            }
+
+            override fun onError(t: Throwable?) {
+                t?.message?.let {
+                    LLog.e(it)
+                }
+                removeDispose(this)
             }
 
             override fun onComplete() {
                 super.onComplete()
+                removeDispose(this)
                 dismissLoading()
+                showToast("申请成功")
             }
         }
+        addDispose(subscriber)
 
         showLoading()
         val vo = ApplyFriendVo(IMCoreManager.uId, user.id, 1, "i am vizoss")

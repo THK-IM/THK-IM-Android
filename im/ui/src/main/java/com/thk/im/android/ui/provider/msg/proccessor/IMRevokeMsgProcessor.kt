@@ -31,6 +31,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
 
             override fun onError(t: Throwable?) {
                 callback?.onResult(msg, Exception(t))
+                disposables.remove(this)
             }
 
             override fun onComplete() {

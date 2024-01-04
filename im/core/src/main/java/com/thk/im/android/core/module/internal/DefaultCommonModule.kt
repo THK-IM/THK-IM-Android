@@ -28,6 +28,10 @@ open class DefaultCommonModule : CommonModule {
         }
     }
 
+    override fun beKickOff() {
+        IMCoreManager.signalModule.disconnect("be kick off")
+    }
+
     override fun onSignalReceived(type: Int, body: String) {
         if (type == SignalType.SignalHeatBeat.value) {
             IMCoreManager.messageModule.ackMessagesToServer()
@@ -38,6 +42,8 @@ open class DefaultCommonModule : CommonModule {
             }
         } else if (type == SignalType.SignalConnId.value) {
             IMCoreManager.signalModule.connId = body
+        } else if (type == SignalType.SignalKickOffUser.value) {
+            beKickOff()
         }
     }
 }

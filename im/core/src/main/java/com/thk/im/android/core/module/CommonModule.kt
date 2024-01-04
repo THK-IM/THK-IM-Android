@@ -14,4 +14,9 @@ interface CommonModule: BaseModule {
      */
     fun getSeverTime(): Long
 
+    /**
+     * 被踢下线
+     */
+    fun beKickOff()
+
 }

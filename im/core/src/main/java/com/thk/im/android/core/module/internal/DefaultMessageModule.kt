@@ -425,9 +425,9 @@ open class DefaultMessageModule : MessageModule {
                 val unReadCount = messageDao.getUnReadCount(t.id)
                 if (t.mTime < msg.mTime || t.unReadCount != unReadCount) {
                     val processor = getMsgProcessor(msg.type)
-                    var statusText = "✔️"
+                    var statusText = ""
                     if (msg.sendStatus == MsgSendStatus.Sending.value) {
-                        statusText = "\uD83D\uDCE4"
+                        statusText = "⬆️ "
                     } else if (msg.sendStatus == MsgSendStatus.SendFailed.value) {
                         statusText = "❗"
                     }

@@ -19,6 +19,6 @@ class IMUnicodeEmojiPanelProvider(private val position: Int) : IMBasePanelFragme
     }
 
     override fun newFragment(): IMBasePanelFragment {
-        return IMUnicodeEmojiFragmentIM()
+        return IMUnicodeEmojiFragment()
     }
 }

@@ -425,7 +425,13 @@ open class DefaultMessageModule : MessageModule {
                 val unReadCount = messageDao.getUnReadCount(t.id)
                 if (t.mTime < msg.mTime || t.unReadCount != unReadCount) {
                     val processor = getMsgProcessor(msg.type)
-                    t.lastMsg = processor.getSessionDesc(msg)
+                    var statusText = "✔️"
+                    if (msg.sendStatus == MsgSendStatus.Sending.value) {
+                        statusText = "\uD83D\uDCE4"
+                    } else if (msg.sendStatus == MsgSendStatus.SendFailed.value) {
+                        statusText = "❗"
+                    }
+                    t.lastMsg = "$statusText${processor.getSessionDesc(msg)}"
                     t.mTime = msg.mTime
                     t.unReadCount = unReadCount
                     sessionDao.insertOrUpdateSessions(listOf(t))

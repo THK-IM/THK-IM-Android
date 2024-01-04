@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.thk.im.android.ui.databinding.FragmentPanelUnicodeEmojiBinding
 import com.thk.im.android.ui.fragment.panel.IMBasePanelFragment
 
-class IMUnicodeEmojiFragmentIM : IMBasePanelFragment() {
+class IMUnicodeEmojiFragment : IMBasePanelFragment() {
 
     private lateinit var binding: FragmentPanelUnicodeEmojiBinding
 

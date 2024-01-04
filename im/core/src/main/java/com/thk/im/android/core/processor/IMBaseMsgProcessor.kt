@@ -166,8 +166,9 @@ abstract class IMBaseMsgProcessor {
             override fun onError(t: Throwable?) {
                 super.onError(t)
                 LLog.e("Message Send err $t")
+                originMsg.mTime = IMCoreManager.commonModule.getSeverTime()
                 originMsg.sendStatus = MsgSendStatus.SendFailed.value
-                updateFailedMsgStatus(originMsg)
+                insertOrUpdateDb(originMsg)
                 callback?.onResult(originMsg, Exception(t))
             }
 
@@ -210,11 +211,20 @@ abstract class IMBaseMsgProcessor {
             originMsg = it
             // 消息发送到服务器
             it.sendStatus = MsgSendStatus.Sending.value
-            insertOrUpdateDb(
-                msg,
-                notify = false,
-                notifySession = false,
-            )
+            if (resend) {
+                it.mTime = IMCoreManager.commonModule.getSeverTime()
+                insertOrUpdateDb(
+                    msg,
+                    notify = true,
+                    notifySession = true,
+                )
+            } else {
+                insertOrUpdateDb(
+                    msg,
+                    notify = false,
+                    notifySession = false,
+                )
+            }
             return@flatMap sendToServer(it)
         }.compose(RxTransform.flowableToIo()).subscribe(subscriber)
         disposables.add(subscriber)
@@ -276,23 +286,7 @@ abstract class IMBaseMsgProcessor {
             XEventBus.post(IMEvent.MsgNew.value, msg)
         }
         if (notify && notifySession) {
-            if (msg.sendStatus == MsgSendStatus.Sending.value || msg.sendStatus == MsgSendStatus.SendFailed.value || msg.sendStatus == MsgSendStatus.Success.value) {
-                IMCoreManager.messageModule.processSessionByMessage(msg)
-            }
-        }
-    }
-
-    /**
-     * 【更新消息状态】用于在调用api发送消息失败时更新本地数据库消息状态
-     */
-    open fun updateFailedMsgStatus(msg: Message, notify: Boolean = true) {
-        val msgDao = IMCoreManager.getImDataBase().messageDao()
-        msgDao.updateSendStatus(msg.sid, msg.id, MsgSendStatus.SendFailed.value, msg.fUid)
-        if (notify) {
-            XEventBus.post(IMEvent.MsgNew.value, msg)
-            if (msg.sendStatus == MsgSendStatus.Sending.value || msg.sendStatus == MsgSendStatus.SendFailed.value || msg.sendStatus == MsgSendStatus.Success.value) {
-                IMCoreManager.messageModule.processSessionByMessage(msg)
-            }
+            IMCoreManager.messageModule.processSessionByMessage(msg)
         }
     }
 

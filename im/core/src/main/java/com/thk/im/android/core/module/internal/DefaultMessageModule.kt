@@ -459,37 +459,54 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun querySessionMembers(sessionId: Long): Flowable<List<SessionMember>> {
-        return Flowable.create({
+        return Flowable.create<List<SessionMember>?>({
             val sessionMembers = IMCoreManager.db.sessionMemberDao().querySessionMembers(sessionId)
             it.onNext(sessionMembers)
             it.onComplete()
-        }, BackpressureStrategy.LATEST)
+        }, BackpressureStrategy.LATEST).flatMap {
+            if (it.isEmpty()) {
+                return@flatMap queryLastSessionMember(sessionId, 100)
+            } else {
+                return@flatMap Flowable.just(it)
+            }
+        }
+    }
+
+    private fun queryLastSessionMember(sessionId: Long, count: Int): Flowable<List<SessionMember>> {
+        return Flowable.just(sessionId).flatMap {
+            val mTime = IMCoreManager.db.sessionDao().getMemberSyncTime(sessionId)
+            return@flatMap Flowable.just(mTime)
+        }.flatMap {
+            return@flatMap IMCoreManager.imApi.queryLatestSessionMembers(sessionId, it, null, count)
+        }.flatMap {
+            val inserts = mutableListOf<SessionMember>()
+            val deletes = mutableListOf<SessionMember>()
+            for (sm in it) {
+                if (sm.deleted == 0) {
+                    inserts.add(sm)
+                } else {
+                    deletes.add(sm)
+                }
+            }
+            IMCoreManager.db.sessionMemberDao().insertOrUpdateSessionMembers(inserts)
+            IMCoreManager.db.sessionMemberDao().deleteSessionMembers(deletes)
+            if (it.isNotEmpty()) {
+                val mTime = it.last().mTime
+                IMCoreManager.db.sessionDao().setMemberSyncTime(sessionId, mTime)
+            }
+            if (it.size >= count) {
+                return@flatMap queryLastSessionMember(sessionId, count)
+            } else {
+                val sessionMembers = IMCoreManager.db.sessionMemberDao().querySessionMembers(sessionId)
+                return@flatMap Flowable.just(sessionMembers)
+            }
+        }
     }
 
     override fun syncSessionMembers(sessionId: Long) {
-        val count = 100
         val subscriber = object : BaseSubscriber<List<SessionMember>>() {
             override fun onNext(t: List<SessionMember>?) {
-                t?.let {
-                    val inserts = mutableListOf<SessionMember>()
-                    val deletes = mutableListOf<SessionMember>()
-                    for (sm in it) {
-                        if (sm.deleted == 0) {
-                            inserts.add(sm)
-                        } else {
-                            deletes.add(sm)
-                        }
-                    }
-                    IMCoreManager.db.sessionMemberDao().insertOrUpdateSessionMembers(inserts)
-                    IMCoreManager.db.sessionMemberDao().deleteSessionMembers(deletes)
-                    if (it.isNotEmpty()) {
-                        val mTime = it.last().mTime
-                        IMCoreManager.db.sessionDao().setMemberSyncTime(sessionId, mTime)
-                    }
-                    if (it.size >= count) {
-                        syncSessionMembers(sessionId)
-                    }
-                }
+
             }
 
             override fun onComplete() {
@@ -497,12 +514,7 @@ open class DefaultMessageModule : MessageModule {
                 disposes.remove(this)
             }
         }
-        Flowable.just(sessionId).flatMap {
-            val mTime = IMCoreManager.db.sessionDao().getMemberSyncTime(sessionId)
-            return@flatMap Flowable.just(mTime)
-        }.flatMap {
-            return@flatMap IMCoreManager.imApi.queryLatestSessionMembers(sessionId, it, null, count)
-        }.compose(RxTransform.flowableToIo())
+        queryLastSessionMember(sessionId, 100).compose(RxTransform.flowableToIo())
             .subscribe(subscriber)
         disposes.add(subscriber)
 

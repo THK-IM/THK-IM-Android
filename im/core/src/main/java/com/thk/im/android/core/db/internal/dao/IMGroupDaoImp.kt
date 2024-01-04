@@ -21,4 +21,8 @@ internal class IMGroupDaoImp(private val roomDatabase: IMRoomDataBase) : IMGroup
         return roomDatabase.groupDao().findOne(id)
     }
 
+    override fun deleteGroupByIds(ids: Set<Long>) {
+        return roomDatabase.groupDao().deleteByIds(ids)
+    }
+
 }

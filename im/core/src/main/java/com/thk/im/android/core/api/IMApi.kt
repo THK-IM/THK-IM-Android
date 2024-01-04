@@ -24,7 +24,7 @@ interface IMApi {
         uId: Long,
         count: Int,
         mTime: Long,
-        types: Set<Int>
+        types: Set<Int>?
     ): Flowable<List<Session>>
 
     /**

@@ -20,6 +20,8 @@ interface IMMessageDao {
 
     fun deleteSessionMessages(sid: Long)
 
+    fun deleteSessionsMessages(sids: Set<Long>)
+
     fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
 
     fun resetSendingMsg(

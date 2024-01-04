@@ -21,4 +21,7 @@ internal interface GroupDao {
     @Query("select * from group_ ")
     fun queryAllGroups(): List<Group>
 
+    @Query("delete from group_ where id in (:ids)")
+    fun deleteByIds(ids: Set<Long>)
+
 }

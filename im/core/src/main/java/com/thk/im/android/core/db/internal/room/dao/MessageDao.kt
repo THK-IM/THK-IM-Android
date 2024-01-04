@@ -29,6 +29,9 @@ internal interface MessageDao {
     @Query("delete from message where session_id = :sid")
     fun deleteSessionMessages(sid: Long)
 
+    @Query("delete from message where session_id in (:sids)")
+    fun deleteSessionsMessages(sids : Set<Long>)
+
     @Query("select * from message where session_id = :sid and type >= 0 and c_time < :cTime order by c_time desc limit :count")
     fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
 

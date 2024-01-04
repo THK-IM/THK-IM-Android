@@ -37,8 +37,8 @@ internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSes
         return roomDatabase.sessionDao().deleteSessionById(sId)
     }
 
-    override fun deleteSessions(vararg session: Session): Int {
-        return roomDatabase.sessionDao().deleteSessions(*session)
+    override fun deleteSessions(sessions: List<Session>): Int {
+        return roomDatabase.sessionDao().deleteSessions(sessions)
     }
 
     override fun updateTop(sId: Long, top: Long) {

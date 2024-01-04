@@ -34,7 +34,7 @@ internal interface SessionDao {
      * 批量删除session
      */
     @Delete
-    fun deleteSessions(vararg session: Session): Int
+    fun deleteSessions(sessions: List<Session>): Int
 
     @Query("update session set top_timestamp = :top where id = :sId")
     fun updateTop(sId: Long, top: Long)

@@ -27,7 +27,7 @@ interface MessageModule : BaseModule {
     /**
      * 同步最近session
      */
-    fun syncLatestSessionsFromServer(lastSyncTime: Int, count: Int)
+    fun syncLatestSessionsFromServer()
 
     /**
      * 获取session, 先查本地数据库后查服务端

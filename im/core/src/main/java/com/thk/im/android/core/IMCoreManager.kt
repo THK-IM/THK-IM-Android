@@ -67,7 +67,9 @@ object IMCoreManager {
         signalModule.setSignalListener(object : SignalListener {
             override fun onSignalStatusChange(status: Int) {
                 if (status == SignalStatus.Connected.value) {
+                    // 同步离线消息、session、联系人
                     messageModule.syncOfflineMessages()
+                    messageModule.syncLatestSessionsFromServer()
                     contactModule.syncContacts()
                 }
                 XEventBus.post(IMEvent.OnlineStatusUpdate.value, status)

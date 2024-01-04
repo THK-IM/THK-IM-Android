@@ -22,7 +22,7 @@ interface IMSessionDao {
     /**
      * 批量删除session
      */
-    fun deleteSessions(vararg session: Session): Int
+    fun deleteSessions(sessions: List<Session>): Int
 
     fun updateTop(sId: Long, top: Long)
 

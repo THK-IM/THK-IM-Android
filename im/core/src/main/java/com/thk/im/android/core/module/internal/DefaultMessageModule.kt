@@ -5,14 +5,15 @@ import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
+import com.thk.im.android.core.MsgOperateStatus
+import com.thk.im.android.core.MsgSendStatus
+import com.thk.im.android.core.SessionStatus
+import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.api.vo.MessageVo
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.utils.AppUtils
-import com.thk.im.android.core.MsgOperateStatus
-import com.thk.im.android.core.MsgSendStatus
-import com.thk.im.android.core.SessionStatus
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
@@ -35,6 +36,7 @@ open class DefaultMessageModule : MessageModule {
     private val startSequence = 0
     private val spName = "THK_IM"
     private val lastSyncMsgTime = "Last_Sync_Message_Time"
+    private val lastSyncSessionTime = "Last_Sync_Session_Time"
     private val processorMap: MutableMap<Int, IMBaseMsgProcessor> = HashMap()
     private var lastTimestamp: Long = 0
     private var lastSequence: Int = 0
@@ -46,6 +48,10 @@ open class DefaultMessageModule : MessageModule {
     private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 Ios:1 Android:2
 
     open fun getOfflineMsgCountPerRequest(): Int {
+        return 200
+    }
+
+    open fun getSessionCountPerRequest(): Int {
         return 200
     }
 
@@ -138,13 +144,78 @@ open class DefaultMessageModule : MessageModule {
         this.disposes.add(disposable)
     }
 
-    override fun syncLatestSessionsFromServer(lastSyncTime: Int, count: Int) {
+    override fun syncLatestSessionsFromServer() {
+        val lastTime = this.getSessionLastSyncTime()
+        val count = this.getSessionCountPerRequest()
+        LLog.v("syncLatestSessionsFromServer $lastTime")
+        val disposable = object : BaseSubscriber<List<Session>>() {
+            override fun onNext(sessions: List<Session>) {
+                val needDelGroups = mutableListOf<Long>()
+                val needDelSIds = mutableSetOf<Long>()
+                val needDelSessions = mutableListOf<Session>()
+                val needUpdateSessions = mutableListOf<Session>()
+                for (s in sessions) {
+                    if (s.deleted == 1) {
+                        needDelSIds.add(s.id)
+                        needDelSessions.add(s)
+                        if (s.type == SessionType.Group.value ||
+                            s.type == SessionType.SuperGroup.value) {
+                            needDelGroups.add(s.entityId)
+                        }
+                    } else {
+                        needUpdateSessions.add(s)
+                    }
+                }
+                // 删除掉该删除的session
+                if (needDelSessions.isNotEmpty()) {
+                    IMCoreManager.db.sessionDao().deleteSessions(needUpdateSessions)
+                    IMCoreManager.db.messageDao().deleteSessionsMessages(needDelSIds)
+                }
+                if (needDelGroups.isNotEmpty()) {
+                    IMCoreManager.db.groupDao().deleteGroupByIds(needDelGroups.toSet())
+                }
+                if (needUpdateSessions.isNotEmpty()) {
+                    for (new in needUpdateSessions) {
+                        val dbSession = IMCoreManager.db.sessionDao().findSession(new.id)
+                        // 更新session中的在线数据信息
+                        if (dbSession != null) {
+                            dbSession.parentId = new.parentId
+                            dbSession.entityId = new.entityId
+                            dbSession.name = new.name
+                            dbSession.noteName = new.noteName
+                            dbSession.type = new.type
+                            dbSession.remark = new.remark
+                            dbSession.role = new.role
+                            dbSession.status = new.status
+                            dbSession.mute = new.mute
+                            dbSession.extData = new.extData
+                            dbSession.topTimestamp = new.topTimestamp
+                            IMCoreManager.db.sessionDao().updateSession(dbSession)
+                        }
+                    }
+                    IMCoreManager.db.sessionDao().insertOrIgnoreSessions(needUpdateSessions)
+                }
 
+                if (sessions.size > count) {
+                    syncLatestSessionsFromServer()
+                }
+
+            }
+
+            override fun onError(t: Throwable?) {
+                super.onError(t)
+                t?.printStackTrace()
+            }
+        }
+        IMCoreManager.imApi.queryUserLatestSessions(IMCoreManager.uId, count, lastTime, null)
+            .compose(RxTransform.flowableToIo()).subscribe(disposable)
+        this.disposes.add(disposable)
     }
 
     override fun getSession(entityId: Long, type: Int): Flowable<Session> {
         return Flowable.create<Session>({
-            val session = IMCoreManager.getImDataBase().sessionDao().findSessionByEntity(entityId, type)
+            val session =
+                IMCoreManager.getImDataBase().sessionDao().findSessionByEntity(entityId, type)
             if (session == null) {
                 it.onNext(Session(0))
             } else {
@@ -187,9 +258,14 @@ open class DefaultMessageModule : MessageModule {
         }
     }
 
-    override fun queryLocalSessions(parentId: Long, count: Int, mTime: Long): Flowable<List<Session>> {
+    override fun queryLocalSessions(
+        parentId: Long,
+        count: Int,
+        mTime: Long
+    ): Flowable<List<Session>> {
         return Flowable.create({
-            val sessions = IMCoreManager.getImDataBase().sessionDao().querySessions(parentId, count, mTime)
+            val sessions =
+                IMCoreManager.getImDataBase().sessionDao().querySessions(parentId, count, mTime)
             it.onNext(sessions)
             it.onComplete()
         }, BackpressureStrategy.LATEST)
@@ -369,7 +445,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun notifyNewMessage(session: Session, message: Message) {
-        if (message.type < 0  || message.fUid == IMCoreManager.uId) {
+        if (message.type < 0 || message.fUid == IMCoreManager.uId) {
             return
         }
         if (session.status.and(SessionStatus.Silence.value) > 0) {
@@ -438,6 +514,20 @@ open class DefaultMessageModule : MessageModule {
         }
     }
 
+    private fun setSessionSyncTime(time: Long): Boolean {
+        val app = IMCoreManager.app
+        val sp = app.getSharedPreferences(spName, MODE_PRIVATE)
+        val editor = sp.edit()
+        editor.putLong("${lastSyncSessionTime}_${IMCoreManager.uId}", time)
+        return editor.commit()
+    }
+
+    private fun getSessionLastSyncTime(): Long {
+        val app = IMCoreManager.app
+        val sp = app.getSharedPreferences(spName, MODE_PRIVATE)
+        return sp.getLong("${lastSyncSessionTime}_${IMCoreManager.uId}", 0)
+    }
+
     private fun setOfflineMsgSyncTime(time: Long): Boolean {
         val app = IMCoreManager.app
         val sp = app.getSharedPreferences(spName, MODE_PRIVATE)
@@ -477,7 +567,7 @@ open class DefaultMessageModule : MessageModule {
         return Flowable.create({
             try {
                 IMCoreManager.getImDataBase().messageDao().deleteSessionMessages(session.id)
-                IMCoreManager.getImDataBase().sessionDao().deleteSessions(session)
+                IMCoreManager.getImDataBase().sessionDao().deleteSessions(listOf(session))
             } catch (e: Exception) {
                 it.onError(e)
             }
@@ -513,6 +603,7 @@ open class DefaultMessageModule : MessageModule {
                 super.onComplete()
                 disposes.remove(this)
             }
+
             override fun onNext(t: Void?) {}
 
             override fun onError(t: Throwable?) {

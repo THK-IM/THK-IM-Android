@@ -8,6 +8,7 @@ import io.reactivex.Flowable
 import java.io.FileNotFoundException
 
 open class DefaultGroupModule : GroupModule {
+
     override fun findOne(id: Long): Flowable<Group> {
         return Flowable.create({
             val group = IMCoreManager.getImDataBase().groupDao().findOne(id)

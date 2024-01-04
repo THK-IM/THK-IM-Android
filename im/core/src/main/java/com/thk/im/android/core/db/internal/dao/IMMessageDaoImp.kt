@@ -33,6 +33,10 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         roomDatabase.messageDao().deleteSessionMessages(sid)
     }
 
+    override fun deleteSessionsMessages(sids: Set<Long>) {
+        roomDatabase.messageDao().deleteSessionsMessages(sids)
+    }
+
     override fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message> {
         return roomDatabase.messageDao().queryMessagesBySidAndCTime(sid, cTime, count)
     }

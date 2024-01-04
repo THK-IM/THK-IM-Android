@@ -71,7 +71,7 @@ open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         uId: Long,
         count: Int,
         mTime: Long,
-        types: Set<Int>
+        types: Set<Int>?
     ): Flowable<List<Session>> {
         return sessionApi.queryLatestSession(uId, mTime, 0, count, types).flatMap { it ->
             val sessions = mutableListOf<Session>()

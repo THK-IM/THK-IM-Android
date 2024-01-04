@@ -12,10 +12,12 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-@Entity(tableName = "session", indices = [
-    Index(value = ["type", "entity_id"], unique = true),
-    Index(value = ["parent_id"], unique = false)
-])
+@Entity(
+    tableName = "session", indices = [
+        Index(value = ["type", "entity_id"], unique = true),
+        Index(value = ["parent_id"], unique = false)
+    ]
+)
 data class Session(
     @SerializedName("id")
     @PrimaryKey @ColumnInfo(name = "id")
@@ -23,7 +25,7 @@ data class Session(
     @SerializedName("parent_id")
     @ColumnInfo(name = "parent_id")
     var parentId: Long,
-    @SerializedName("id")
+    @SerializedName("type")
     @ColumnInfo(name = "type")
     var type: Int,
     @SerializedName("entity_id")
@@ -32,6 +34,9 @@ data class Session(
     @SerializedName("name")
     @ColumnInfo(name = "name")
     var name: String,
+    @SerializedName("note_name")
+    @ColumnInfo(name = "note_name")
+    var noteName: String?,
     @SerializedName("remark")
     @ColumnInfo(name = "remark")
     var remark: String,
@@ -47,6 +52,9 @@ data class Session(
     @SerializedName("top_timestamp")
     @ColumnInfo(name = "top_timestamp")
     var topTimestamp: Long,
+    @SerializedName("ext_data")
+    @ColumnInfo(name = "ext_data", typeAffinity = ColumnInfo.TEXT)
+    var extData: String?,   // 扩展字段
     @SerializedName("unread_count")
     @ColumnInfo(name = "unread_count")
     var unReadCount: Int,
@@ -56,15 +64,15 @@ data class Session(
     @SerializedName("last_msg")
     @ColumnInfo(name = "last_msg", typeAffinity = ColumnInfo.TEXT)
     var lastMsg: String?,
-    @SerializedName("ext_data")
-    @ColumnInfo(name = "ext_data", typeAffinity = ColumnInfo.TEXT)
-    var extData: String?,   // 扩展字段
     @SerializedName("member_sync_time")
     @ColumnInfo(name = "member_sync_time")
     var memberSyncTime: Long = 0,
     @SerializedName("member_count")
     @ColumnInfo(name = "member_count")
     var memberCount: Int,
+    @SerializedName("deleted")
+    @ColumnInfo(name = "deleted")
+    var deleted: Int = 0,
     @SerializedName("c_time")
     @ColumnInfo(name = "c_time")
     val cTime: Long,
@@ -75,20 +83,20 @@ data class Session(
 
     @Ignore
     constructor(id: Long) : this(
-        id, 0, 0, 0, "", "", 0, 0, 0,
-        0, 0, null, null, null, 0, 0, 0, 0,
+        id, 0, 0, 0, "", null, "", 0, 0, 0,
+        0, null, 0, null, null, 0, 0, 0, 0, 0
     )
 
     @Ignore
     constructor() : this(
-        0, 0, 0, 0, "", "", 0, 0, 0,
-        0, 0, null, null, null , 0, 0, 0, 0
+        0, 0, 0, 0, "", null,  "", 0, 0, 0,
+        0, null, 0, null, null, 0, 0, 0, 0, 0
     )
 
     @Ignore
     constructor(type: Int, entityId: Long) : this(
-        0, 0, type, entityId, "", "", 0, 0, 0,
-        0, 0, null, null, null, 0, 0, 0, 0
+        0, 0, type, entityId, "", null, "", 0, 0, 0,
+        0, null, 0, null, null, 0, 0, 0, 0, 0
     )
 
 }

@@ -281,7 +281,7 @@ abstract class IMBaseMsgProcessor {
     open fun insertOrUpdateDb(msg: Message, notify: Boolean = true, notifySession: Boolean = true) {
         LLog.i("insertOrUpdateMessages ${msg.id} ${msg.sendStatus}, ${notify}, $notifySession")
         val msgDao = IMCoreManager.getImDataBase().messageDao()
-        msgDao.insertOrUpdateMessages(mutableListOf(msg))
+        msgDao.insertOrReplaceMessages(mutableListOf(msg))
         if (notify) {
             XEventBus.post(IMEvent.MsgNew.value, msg)
         }

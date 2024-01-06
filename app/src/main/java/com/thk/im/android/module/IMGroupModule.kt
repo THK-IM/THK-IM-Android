@@ -23,7 +23,7 @@ class IMGroupModule : DefaultGroupModule() {
                 return@flatMap DataRepository.groupApi.queryGroup(it.id)
                     .flatMap { vo ->
                         val group = vo.toGroup()
-                        IMCoreManager.db.groupDao().insertOrUpdateGroups(listOf(group))
+                        IMCoreManager.db.groupDao().insertOrReplaceGroups(listOf(group))
                         Flowable.just(group)
                     }
 

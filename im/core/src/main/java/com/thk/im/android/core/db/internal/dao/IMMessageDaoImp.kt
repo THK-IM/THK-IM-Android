@@ -5,16 +5,12 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.internal.room.IMRoomDataBase
 
 internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMessageDao {
-    override fun insertOrUpdateMessages(messages: List<Message>) {
-        roomDatabase.messageDao().insertOrUpdateMessages(messages)
+    override fun insertOrReplaceMessages(messages: List<Message>) {
+        roomDatabase.messageDao().insertOrReplaceMessages(messages)
     }
 
     override fun insertOrIgnoreMessages(messages: List<Message>) {
         roomDatabase.messageDao().insertOrIgnoreMessages(messages)
-    }
-
-    override fun updateMessages(messages: List<Message>) {
-        roomDatabase.messageDao().updateMessages(messages)
     }
 
     override fun deleteMessages(messages: List<Message>) {
@@ -37,12 +33,39 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         roomDatabase.messageDao().deleteSessionsMessages(sids)
     }
 
-    override fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message> {
-        return roomDatabase.messageDao().queryMessagesBySidAndCTime(sid, cTime, count)
+
+    override fun updateMessages(messages: List<Message>) {
+        roomDatabase.messageDao().updateMessages(messages)
     }
 
     override fun resetSendingMsg(status: Int, successStatus: Int) {
         roomDatabase.messageDao().resetSendingMsg(status, successStatus)
+    }
+
+
+    override fun updateSendStatus(sId: Long, id: Long, sendStatus: Int, fUId: Long) {
+        roomDatabase.messageDao().updateSendStatus(sId, id, sendStatus, fUId)
+    }
+
+    override fun updateMessageContent(id: Long, content: String) {
+        roomDatabase.messageDao().updateMessageContent(id, content)
+    }
+
+    override fun updateSessionMessageStatus(sid: Long, oprStatus: Int) {
+        roomDatabase.messageDao().updateSessionMessageStatus(sid, oprStatus)
+    }
+
+    override fun resetSendStatusFailed(sendStatus: Int) {
+        roomDatabase.messageDao().resetSendStatusFailed(sendStatus)
+    }
+
+    override fun updateMessageOperationStatus(sid: Long, msgIds: Set<Long>, oprStatus: Int) {
+        roomDatabase.messageDao().updateMessageOperationStatus(sid, msgIds, oprStatus)
+    }
+
+
+    override fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message> {
+        return roomDatabase.messageDao().queryMessagesBySidAndCTime(sid, cTime, count)
     }
 
     override fun getUnReadCount(id: Long, oprStatus: Int): Int {
@@ -80,27 +103,6 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
     override fun findUnReadMessage(myId: Long, sid: Long, msgIds: List<Long>): List<Long> {
         return roomDatabase.messageDao().findUnReadMessage(myId, sid, msgIds)
     }
-
-    override fun updateSendStatus(sId: Long, id: Long, sendStatus: Int, fUId: Long) {
-        roomDatabase.messageDao().updateSendStatus(sId, id, sendStatus, fUId)
-    }
-
-    override fun updateMessageContent(id: Long, content: String) {
-        roomDatabase.messageDao().updateMessageContent(id, content)
-    }
-
-    override fun updateSessionMessageStatus(sid: Long, oprStatus: Int) {
-        roomDatabase.messageDao().updateSessionMessageStatus(sid, oprStatus)
-    }
-
-    override fun resetSendStatusFailed(sendStatus: Int) {
-        roomDatabase.messageDao().resetSendStatusFailed(sendStatus)
-    }
-
-    override fun updateMessageOperationStatus(sid: Long, msgIds: Set<Long>, oprStatus: Int) {
-        roomDatabase.messageDao().updateMessageOperationStatus(sid, msgIds, oprStatus)
-    }
-
     override fun findLastMessageBySessionId(sid: Long): Message? {
         return roomDatabase.messageDao().findLastMessageBySessionId(sid)
     }

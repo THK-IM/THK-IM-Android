@@ -11,7 +11,6 @@ import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.contact.vo.ApplyFriendVo
 import com.thk.im.android.api.contact.vo.ContactSessionCreateVo
 import com.thk.im.android.api.contact.vo.FollowVo
-import com.thk.im.android.api.user.vo.UserBasicInfoVo
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
@@ -182,7 +181,7 @@ class UserActivity : BaseActivity() {
             .flatMap { vo ->
                 val session = vo.toSession()
                 IMCoreManager.getImDataBase().sessionDao()
-                    .insertOrUpdateSessions(listOf(session))
+                    .insertOrReplaceSessions(listOf(session))
                 return@flatMap Flowable.just(session)
             }
             .compose(RxTransform.flowableToMain())

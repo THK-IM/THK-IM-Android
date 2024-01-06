@@ -13,8 +13,8 @@ internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSes
         return roomDatabase.sessionDao().querySessionsByMTime()
     }
 
-    override fun insertOrUpdateSessions(sessions: List<Session>) {
-        return roomDatabase.sessionDao().insertOrUpdateSessions(sessions)
+    override fun insertOrReplaceSessions(sessions: List<Session>) {
+        return roomDatabase.sessionDao().insertOrReplaceSessions(sessions)
     }
 
     override fun insertOrIgnoreSessions(sessions: List<Session>) {

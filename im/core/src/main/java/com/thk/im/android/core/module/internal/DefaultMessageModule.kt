@@ -434,7 +434,7 @@ open class DefaultMessageModule : MessageModule {
                     t.lastMsg = "$statusText${processor.getSessionDesc(msg)}"
                     t.mTime = msg.mTime
                     t.unReadCount = unReadCount
-                    sessionDao.insertOrUpdateSessions(listOf(t))
+                    sessionDao.insertOrReplaceSessions(listOf(t))
                     XEventBus.post(IMEvent.SessionNew.value, t)
                     notifyNewMessage(t, msg)
                 }
@@ -494,7 +494,7 @@ open class DefaultMessageModule : MessageModule {
                     deletes.add(sm)
                 }
             }
-            IMCoreManager.db.sessionMemberDao().insertOrUpdateSessionMembers(inserts)
+            IMCoreManager.db.sessionMemberDao().insertOrReplaceSessionMembers(inserts)
             IMCoreManager.db.sessionMemberDao().deleteSessionMembers(deletes)
             if (it.isNotEmpty()) {
                 val mTime = it.last().mTime

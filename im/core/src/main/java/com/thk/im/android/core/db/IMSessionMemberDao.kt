@@ -8,7 +8,7 @@ interface IMSessionMemberDao {
 
     fun querySessionMembers(sessionId: Long): List<SessionMember>
 
-    fun insertOrUpdateSessionMembers(members: List<SessionMember>)
+    fun insertOrReplaceSessionMembers(members: List<SessionMember>)
 
     fun insertOrIgnoreSessionMembers(members: List<SessionMember>)
 

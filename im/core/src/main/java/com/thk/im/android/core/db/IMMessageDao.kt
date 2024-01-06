@@ -6,13 +6,9 @@ import com.thk.im.android.core.db.entity.Message
 
 interface IMMessageDao {
 
-    fun insertOrUpdateMessages(messages: List<Message>)
+    fun insertOrReplaceMessages(messages: List<Message>)
 
     fun insertOrIgnoreMessages(messages: List<Message>)
-
-    fun updateMessages(messages: List<Message>)
-
-    fun deleteMessages(messages: List<Message>)
 
     fun deleteMessageByCTimeExclude(sid: Long, startTime: Long, endTime: Long)
 
@@ -22,37 +18,9 @@ interface IMMessageDao {
 
     fun deleteSessionsMessages(sids: Set<Long>)
 
-    fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
+    fun deleteMessages(messages: List<Message>)
 
-    fun resetSendingMsg(
-        status: Int = MsgSendStatus.SendFailed.value,
-        successStatus: Int = MsgSendStatus.Success.value
-    )
-
-    fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
-
-    fun findMessageById(id: Long, fUId: Long, sid: Long): Message?
-
-    fun findMessageByMsgId(msgId: Long, sid: Long): Message?
-
-    fun findOlderMessage(
-        sId: Long,
-        msgId: Long,
-        types: Array<Int>,
-        cTime: Long,
-        count: Int
-    ): List<Message>
-
-    fun findNewerMessage(
-        sId: Long,
-        msgId: Long,
-        types: Array<Int>,
-        cTime: Long,
-        count: Int
-    ): List<Message>
-
-    fun findUnReadMessage(myId: Long, sid: Long, msgIds: List<Long>): List<Long>
-
+    fun updateMessages(messages: List<Message>)
 
     /**
      * 更新消息的发送壮体啊
@@ -84,6 +52,38 @@ interface IMMessageDao {
         msgIds: Set<Long>,
         oprStatus: Int
     )
+
+
+    fun resetSendingMsg(
+        status: Int = MsgSendStatus.SendFailed.value,
+        successStatus: Int = MsgSendStatus.Success.value
+    )
+
+    fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
+
+    fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
+    fun findMessageById(id: Long, fUId: Long, sid: Long): Message?
+
+    fun findMessageByMsgId(msgId: Long, sid: Long): Message?
+
+    fun findOlderMessage(
+        sId: Long,
+        msgId: Long,
+        types: Array<Int>,
+        cTime: Long,
+        count: Int
+    ): List<Message>
+
+    fun findNewerMessage(
+        sId: Long,
+        msgId: Long,
+        types: Array<Int>,
+        cTime: Long,
+        count: Int
+    ): List<Message>
+
+    fun findUnReadMessage(myId: Long, sid: Long, msgIds: List<Long>): List<Long>
+
 
     /**
      * 查询session的最后一条消息

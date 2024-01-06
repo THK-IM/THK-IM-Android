@@ -1,8 +1,8 @@
 package com.thk.im.android.core.fileloader.internal
 
 import com.google.gson.Gson
-import com.thk.im.android.core.exception.HttpStatusCodeException
-import com.thk.im.android.core.exception.StatusCode
+import com.thk.im.android.core.exception.HttpCodeMessageException
+import com.thk.im.android.core.exception.CodeMessage
 import com.thk.im.android.core.exception.UnknownException
 import com.thk.im.android.core.fileloader.FileLoadState
 import okhttp3.Call
@@ -54,8 +54,8 @@ class UploadTask(
                     }
                 } else {
                     val msg = response.body?.string()?: "unknown"
-                    val statusCode = StatusCode(response.code, msg)
-                    notify(0, FileLoadState.Failed.value, HttpStatusCodeException(statusCode))
+                    val codeMessage = CodeMessage(response.code, msg)
+                    notify(0, FileLoadState.Failed.value, HttpCodeMessageException(codeMessage))
                 }
             }
         })
@@ -98,8 +98,8 @@ class UploadTask(
                     notify(100, FileLoadState.Success.value, null)
                 } else {
                     val msg = response.body?.string()?: "unknown"
-                    val statusCode = StatusCode(response.code, msg)
-                    notify(0, FileLoadState.Failed.value, HttpStatusCodeException(statusCode))
+                    val codeMessage = CodeMessage(response.code, msg)
+                    notify(0, FileLoadState.Failed.value, HttpCodeMessageException(codeMessage))
                 }
             }
         })

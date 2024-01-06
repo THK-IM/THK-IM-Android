@@ -14,8 +14,8 @@ internal class IMSessionMemberDaoImp(private val roomDatabase: IMRoomDataBase) :
         return roomDatabase.sessionMemberDao().querySessionMembers(sessionId)
     }
 
-    override fun insertOrUpdateSessionMembers(members: List<SessionMember>) {
-        return roomDatabase.sessionMemberDao().insertOrUpdateSessionMembers(members)
+    override fun insertOrReplaceSessionMembers(members: List<SessionMember>) {
+        return roomDatabase.sessionMemberDao().insertOrReplaceSessionMembers(members)
     }
 
     override fun insertOrIgnoreSessionMembers(members: List<SessionMember>) {

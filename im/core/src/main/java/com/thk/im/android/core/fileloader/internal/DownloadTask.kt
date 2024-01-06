@@ -2,7 +2,6 @@ package com.thk.im.android.core.fileloader.internal
 
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.StringUtils
-import com.thk.im.android.core.exception.HttpStatusCodeException
 import com.thk.im.android.core.exception.UnknownException
 import com.thk.im.android.core.fileloader.FileLoadState
 import okhttp3.Call

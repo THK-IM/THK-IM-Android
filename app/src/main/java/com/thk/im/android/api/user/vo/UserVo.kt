@@ -21,7 +21,7 @@ data class UserVo(
     @SerializedName("qrcode")
     var qrcode: String?,
     @SerializedName("birthday")
-    var birthday: Int?
+    var birthday: Long?
 ) : Parcelable {
 
     fun toUser(): User {

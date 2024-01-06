@@ -5,13 +5,13 @@ import com.thk.im.android.core.db.entity.Group
 
 interface IMGroupDao {
 
-    fun insertOrUpdateGroups(groups: List<Group>)
+    fun insertOrReplaceGroups(groups: List<Group>)
 
     fun insertOrIgnoreGroups(groups: List<Group>)
+
+    fun deleteGroupByIds(ids: Set<Long>)
 
     fun queryAllGroups(): List<Group>
 
     fun findOne(id: Long): Group?
-
-    fun deleteGroupByIds(ids: Set<Long>)
 }

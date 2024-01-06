@@ -10,7 +10,7 @@ import com.thk.im.android.core.db.entity.Contact
 internal interface ContactDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrUpdateContacts(contacts: List<Contact>)
+    fun insertOrReplaceContacts(contacts: List<Contact>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertOrIgnoreContacts(contacts: List<Contact>)

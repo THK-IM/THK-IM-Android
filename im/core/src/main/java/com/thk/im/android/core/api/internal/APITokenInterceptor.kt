@@ -3,8 +3,8 @@ package com.thk.im.android.core.api.internal
 
 import com.google.gson.Gson
 import com.thk.im.android.core.base.utils.AppUtils
-import com.thk.im.android.core.exception.HttpStatusCodeException
-import com.thk.im.android.core.exception.StatusCode
+import com.thk.im.android.core.exception.HttpCodeMessageException
+import com.thk.im.android.core.exception.CodeMessage
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -35,23 +35,23 @@ class APITokenInterceptor(private var token: String) : Interceptor {
                 if (content != null) {
                     val contentType = response.body?.contentType()
                     if (contentType == null) {
-                        val statusCode = StatusCode(response.code, content)
-                        throw HttpStatusCodeException(statusCode)
+                        val codeMessage = CodeMessage(response.code, content)
+                        throw HttpCodeMessageException(codeMessage)
                     }
                     if (contentType.toString().contains("application/json", true)) {
-                        val statusCode = gson.fromJson(content, StatusCode::class.java)
-                        throw HttpStatusCodeException(statusCode)
+                        val codeMessage = gson.fromJson(content, CodeMessage::class.java)
+                        throw HttpCodeMessageException(codeMessage)
                     } else {
-                        val statusCode = StatusCode(response.code, content)
-                        throw HttpStatusCodeException(statusCode)
+                        val codeMessage = CodeMessage(response.code, content)
+                        throw HttpCodeMessageException(codeMessage)
                     }
                 } else {
-                    val statusCode = StatusCode(response.code, "empty")
-                    throw HttpStatusCodeException(statusCode)
+                    val codeMessage = CodeMessage(response.code, "empty")
+                    throw HttpCodeMessageException(codeMessage)
                 }
             } else {
-                val statusCode = StatusCode(response.code, "empty")
-                throw HttpStatusCodeException(statusCode)
+                val codeMessage = CodeMessage(response.code, "empty")
+                throw HttpCodeMessageException(codeMessage)
             }
         }
     }

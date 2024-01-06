@@ -27,7 +27,6 @@ import com.thk.im.android.databinding.ActivityGroupBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.contact.ContactActivity
 import com.thk.im.android.ui.group.adapter.GroupMemberAdapter
-import com.thk.im.android.ui.main.fragment.ContactFragment
 import io.reactivex.Flowable
 
 
@@ -128,7 +127,7 @@ class GroupActivity : BaseActivity() {
         DataRepository.groupApi.createGroup(createGroupVo)
             .flatMap {
                 val group = it.toGroup()
-                IMCoreManager.db.groupDao().insertOrUpdateGroups(listOf(group))
+                IMCoreManager.db.groupDao().insertOrReplaceGroups(listOf(group))
                 return@flatMap Flowable.just(group)
             }
             .compose(RxTransform.flowableToMain())

@@ -9,13 +9,10 @@ import com.thk.im.android.core.db.entity.Message
 internal interface MessageDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrUpdateMessages(messages: List<Message>)
+    fun insertOrReplaceMessages(messages: List<Message>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertOrIgnoreMessages(messages: List<Message>)
-
-    @Update
-    fun updateMessages(messages: List<Message>)
 
     @Delete
     fun deleteMessages(messages: List<Message>)
@@ -31,46 +28,6 @@ internal interface MessageDao {
 
     @Query("delete from message where session_id in (:sids)")
     fun deleteSessionsMessages(sids : Set<Long>)
-
-    @Query("select * from message where session_id = :sid and type >= 0 and c_time < :cTime order by c_time desc limit :count")
-    fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
-
-    @Query("update message set send_status = :status where send_status < :successStatus")
-    fun resetSendingMsg(
-        status: Int = MsgSendStatus.SendFailed.value,
-        successStatus: Int = MsgSendStatus.Success.value
-    )
-
-    @Query("select count(id) from message where session_id = :id and type >= 0 and opr_status & :oprStatus = 0")
-    fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
-
-    @Query("select * from message where id = :id and from_u_id = :fUId and session_id = :sid")
-    fun findMessageById(id: Long, fUId: Long, sid: Long): Message?
-
-    @Query("select * from message where msg_id = :msgId and session_id = :sid")
-    fun findMessageByMsgId(msgId: Long, sid: Long): Message?
-
-    @Query("select * from message where session_id = :sId and msg_id != :msgId and type in (:types) and c_time <= :cTime order by c_time desc limit :count")
-    fun findOlderMessage(
-        sId: Long,
-        msgId: Long,
-        types: Array<Int>,
-        cTime: Long,
-        count: Int
-    ): List<Message>
-
-    @Query("select * from message where session_id = :sId and msg_id != :msgId and type in (:types) and c_time >= :cTime order by c_time asc limit :count")
-    fun findNewerMessage(
-        sId: Long,
-        msgId: Long,
-        types: Array<Int>,
-        cTime: Long,
-        count: Int
-    ): List<Message>
-
-    @Query("select msg_id from message where session_id = :sid and from_u_id != :myId and msg_id in (:msgIds)")
-    fun findUnReadMessage(myId: Long, sid: Long, msgIds: List<Long>): List<Long>
-
 
     /**
      * 更新消息的发送壮体啊
@@ -107,6 +64,48 @@ internal interface MessageDao {
         msgIds: Set<Long>,
         oprStatus: Int
     )
+
+    @Update
+    fun updateMessages(messages: List<Message>)
+
+    @Query("update message set send_status = :status where send_status < :successStatus")
+    fun resetSendingMsg(
+        status: Int = MsgSendStatus.SendFailed.value,
+        successStatus: Int = MsgSendStatus.Success.value
+    )
+
+    @Query("select * from message where session_id = :sid and type >= 0 and c_time < :cTime order by c_time desc limit :count")
+    fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
+    @Query("select count(id) from message where session_id = :id and type >= 0 and opr_status & :oprStatus = 0")
+    fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
+
+    @Query("select * from message where id = :id and from_u_id = :fUId and session_id = :sid")
+    fun findMessageById(id: Long, fUId: Long, sid: Long): Message?
+
+    @Query("select * from message where msg_id = :msgId and session_id = :sid")
+    fun findMessageByMsgId(msgId: Long, sid: Long): Message?
+
+    @Query("select * from message where session_id = :sId and msg_id != :msgId and type in (:types) and c_time <= :cTime order by c_time desc limit :count")
+    fun findOlderMessage(
+        sId: Long,
+        msgId: Long,
+        types: Array<Int>,
+        cTime: Long,
+        count: Int
+    ): List<Message>
+
+    @Query("select * from message where session_id = :sId and msg_id != :msgId and type in (:types) and c_time >= :cTime order by c_time asc limit :count")
+    fun findNewerMessage(
+        sId: Long,
+        msgId: Long,
+        types: Array<Int>,
+        cTime: Long,
+        count: Int
+    ): List<Message>
+
+    @Query("select msg_id from message where session_id = :sid and from_u_id != :myId and msg_id in (:msgIds)")
+    fun findUnReadMessage(myId: Long, sid: Long, msgIds: List<Long>): List<Long>
+
 
     /**
      * 查询session的最后一条消息

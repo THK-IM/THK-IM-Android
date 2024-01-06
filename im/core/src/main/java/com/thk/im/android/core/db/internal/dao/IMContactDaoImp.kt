@@ -13,7 +13,7 @@ internal class IMContactDaoImp(private val roomDatabase: IMRoomDataBase) : IMCon
         roomDatabase.contactDao().insertOrIgnore(contacts)
     }
 
-    override fun queryAll(): List<Contact> {
-        return roomDatabase.contactDao().queryAll()
+    override fun findAll(): List<Contact> {
+        return roomDatabase.contactDao().findAll()
     }
 }

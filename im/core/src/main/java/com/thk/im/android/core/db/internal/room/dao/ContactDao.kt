@@ -16,6 +16,6 @@ internal interface ContactDao {
     fun insertOrIgnore(contacts: List<Contact>)
 
     @Query("select * from contact")
-    fun queryAll(): List<Contact>
+    fun findAll(): List<Contact>
 
 }

@@ -8,5 +8,5 @@ interface IMContactDao {
 
     fun insertOrIgnore(contacts: List<Contact>)
 
-    fun queryAll() : List<Contact>
+    fun findAll() : List<Contact>
 }

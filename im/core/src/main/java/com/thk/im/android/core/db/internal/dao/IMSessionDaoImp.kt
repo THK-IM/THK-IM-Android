@@ -55,7 +55,7 @@ internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSes
     }
 
     override fun findMemberSyncTimeById(id: Long): Long {
-        return roomDatabase.sessionDao().getMemberSyncTime(id)
+        return roomDatabase.sessionDao().findMemberSyncTime(id)
     }
 
     override fun updateMemberCount(id: Long, count: Int) {

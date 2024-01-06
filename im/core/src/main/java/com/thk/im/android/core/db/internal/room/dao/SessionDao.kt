@@ -44,7 +44,7 @@ internal interface SessionDao {
     fun updateMemberCount(id: Long, count: Int)
 
     @Query("select member_sync_time from session where id= :id ")
-    fun getMemberSyncTime(id: Long): Long
+    fun findMemberSyncTime(id: Long): Long
 
     @Query("select * from session where parent_id = :parentId and id != :parentId and m_time <= :mTime order by top_timestamp desc, m_time desc limit 0, :count")
     fun findByParentId(parentId: Long, count: Int, mTime: Long): List<Session>

@@ -23,7 +23,7 @@ open class DefaultGroupModule : GroupModule {
 
     override fun queryAllGroups(): Flowable<List<Group>> {
         return Flowable.create({
-            val groups = IMCoreManager.getImDataBase().groupDao().queryAll()
+            val groups = IMCoreManager.getImDataBase().groupDao().findAll()
             it.onNext(groups)
             it.onComplete()
         }, BackpressureStrategy.LATEST)

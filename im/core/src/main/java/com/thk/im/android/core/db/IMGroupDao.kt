@@ -11,7 +11,7 @@ interface IMGroupDao {
 
     fun deleteByIds(ids: Set<Long>)
 
-    fun queryAll(): List<Group>
+    fun findAll(): List<Group>
 
     fun findById(id: Long): Group?
 }

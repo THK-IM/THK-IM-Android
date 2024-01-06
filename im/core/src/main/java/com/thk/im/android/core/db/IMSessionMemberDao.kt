@@ -10,7 +10,5 @@ interface IMSessionMemberDao {
 
     fun delete(members: List<SessionMember>)
 
-    fun findLatestSyncTimeBySessionId(sessionId: Long): Long
-
-    fun querySessionMembers(sessionId: Long): List<SessionMember>
+    fun findBySessionId(sessionId: Long): List<SessionMember>
 }

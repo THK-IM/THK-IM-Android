@@ -22,6 +22,6 @@ internal interface GroupDao {
     fun findById(id: Long): Group?
 
     @Query("select * from group_ ")
-    fun queryAll(): List<Group>
+    fun findAll(): List<Group>
 
 }

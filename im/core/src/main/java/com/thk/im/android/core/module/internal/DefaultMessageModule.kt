@@ -466,7 +466,7 @@ open class DefaultMessageModule : MessageModule {
 
     override fun querySessionMembers(sessionId: Long): Flowable<List<SessionMember>> {
         return Flowable.create<List<SessionMember>?>({
-            val sessionMembers = IMCoreManager.db.sessionMemberDao().querySessionMembers(sessionId)
+            val sessionMembers = IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
             it.onNext(sessionMembers)
             it.onComplete()
         }, BackpressureStrategy.LATEST).flatMap {
@@ -503,7 +503,7 @@ open class DefaultMessageModule : MessageModule {
             if (it.size >= count) {
                 return@flatMap queryLastSessionMember(sessionId, count)
             } else {
-                val sessionMembers = IMCoreManager.db.sessionMemberDao().querySessionMembers(sessionId)
+                val sessionMembers = IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
                 return@flatMap Flowable.just(sessionMembers)
             }
         }

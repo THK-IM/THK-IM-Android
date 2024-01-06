@@ -18,9 +18,6 @@ interface SessionMemberDao {
     @Query("delete from session_member where session_id = :sId and user_id in (:uIds)")
     fun deleteBySIdAndUIds(sId: Long, uIds: Set<Long>)
 
-    @Query("select max(m_time) from session_member where session_id = :sessionId")
-    fun findLatestSyncTimeBySessionId(sessionId: Long): Long
-
     @Query("select * from session_member where session_id = :sessionId order by c_time asc")
     fun findBySessionId(sessionId: Long): List<SessionMember>
 

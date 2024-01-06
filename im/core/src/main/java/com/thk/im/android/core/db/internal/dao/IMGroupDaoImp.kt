@@ -17,8 +17,8 @@ internal class IMGroupDaoImp(private val roomDatabase: IMRoomDataBase) : IMGroup
         return roomDatabase.groupDao().deleteByIds(ids)
     }
 
-    override fun queryAll(): List<Group> {
-        return roomDatabase.groupDao().queryAll()
+    override fun findAll(): List<Group> {
+        return roomDatabase.groupDao().findAll()
     }
 
     override fun findById(id: Long): Group? {

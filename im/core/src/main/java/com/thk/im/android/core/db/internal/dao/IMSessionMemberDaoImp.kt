@@ -26,11 +26,7 @@ internal class IMSessionMemberDaoImp(private val roomDatabase: IMRoomDataBase) :
         }
     }
 
-    override fun findLatestSyncTimeBySessionId(sessionId: Long): Long {
-        return roomDatabase.sessionMemberDao().findLatestSyncTimeBySessionId(sessionId)
-    }
-
-    override fun querySessionMembers(sessionId: Long): List<SessionMember> {
+    override fun findBySessionId(sessionId: Long): List<SessionMember> {
         return roomDatabase.sessionMemberDao().findBySessionId(sessionId)
     }
 }

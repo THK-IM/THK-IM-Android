@@ -13,7 +13,7 @@ open class DefaultContactModule : ContactModule {
 
     override fun queryAllContact(): Flowable<List<Contact>> {
         return Flowable.create({
-            val contacts = IMCoreManager.getImDataBase().contactDao().queryAll()
+            val contacts = IMCoreManager.getImDataBase().contactDao().findAll()
             it.onNext(contacts)
             it.onComplete()
         }, BackpressureStrategy.LATEST)

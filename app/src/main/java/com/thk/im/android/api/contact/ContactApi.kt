@@ -22,7 +22,7 @@ interface ContactApi {
     /**
      * 设置备注名
      */
-    @POST("/note_name")
+    @POST("/contact/note_name")
     fun updateNoteName(
         @Body body: UpdateNoteNameVo
     ): Flowable<Void>

@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.api.internal.APITokenInterceptor
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.fileloader.FileLoadModule
 import com.thk.im.android.core.fileloader.FileLoadState
@@ -28,7 +29,7 @@ class DefaultFileLoadModule(
     private val defaultTimeout: Long = 30
     private val maxIdleConnection = 4
     private val keepAliveDuration: Long = 60
-    private val fileLoaderTokenInterceptor = FileLoaderTokenInterceptor(token, endpoint)
+    private val apiTokenInterceptor = APITokenInterceptor(token)
 
     val okHttpClient = OkHttpClient.Builder().connectTimeout(defaultTimeout, TimeUnit.SECONDS)
         .writeTimeout(defaultTimeout, TimeUnit.SECONDS)
@@ -36,7 +37,7 @@ class DefaultFileLoadModule(
         .retryOnConnectionFailure(true)
         .followRedirects(false)
         .followSslRedirects(false)
-        .addInterceptor(fileLoaderTokenInterceptor)
+        .addInterceptor(apiTokenInterceptor)
         .connectionPool(ConnectionPool(maxIdleConnection, keepAliveDuration, TimeUnit.SECONDS))
         .build()
 
@@ -46,6 +47,7 @@ class DefaultFileLoadModule(
         ConcurrentHashMap<String, Pair<LoadTask, MutableList<LoadListener>>>()
 
     init {
+        apiTokenInterceptor.addValidEndpoint(endpoint)
         okHttpClient.dispatcher.maxRequests = 32
         okHttpClient.dispatcher.maxRequestsPerHost = 16
         if (cacheDir.exists()) {

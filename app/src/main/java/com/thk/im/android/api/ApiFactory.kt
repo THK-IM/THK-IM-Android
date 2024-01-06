@@ -38,6 +38,7 @@ object ApiFactory {
 
 
     fun <T> createApi(cls: Class<T>, serverUrl: String): T {
+        interceptor.addValidEndpoint(serverUrl)
         val retrofit = Retrofit.Builder()
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())

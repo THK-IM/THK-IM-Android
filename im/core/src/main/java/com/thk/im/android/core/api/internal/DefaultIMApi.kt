@@ -46,6 +46,10 @@ open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
         .baseUrl(serverUrl)
         .build()
 
+    init {
+        interceptor.addValidEndpoint(serverUrl)
+    }
+
     private fun <T> getApi(cls: Class<T>): T {
         return retrofit.create(cls)
     }

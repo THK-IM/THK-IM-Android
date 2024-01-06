@@ -5,7 +5,9 @@ import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
 import com.thk.im.android.core.SignalStatus
+import com.thk.im.android.core.api.internal.APITokenInterceptor
 import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.signal.Signal
 import com.thk.im.android.core.signal.SignalListener
 import com.thk.im.android.core.signal.SignalModule
@@ -124,8 +126,9 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             }
             onStatusChange(SignalStatus.Connecting.value)
             val request = Request.Builder()
-                .header("Authorization", token)
-                .header("Client-Platform", "android")
+                .header(APITokenInterceptor.clientVersionKey, AppUtils.instance().verName)
+                .header(APITokenInterceptor.tokenKey, token)
+                .header(APITokenInterceptor.clientVersionKey, "Android")
                 .url(wsUrl)
                 .build()
             val client = OkHttpClient.Builder()

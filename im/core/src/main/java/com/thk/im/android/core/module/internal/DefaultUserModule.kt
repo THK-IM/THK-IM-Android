@@ -14,14 +14,14 @@ open class DefaultUserModule : UserModule {
             id, "$id", "user$id", "https://picsum.photos/300/300", (id % 2).toInt(),
             null, null, now, now
         )
-        IMCoreManager.getImDataBase().userDao().insertOrReplaceUsers(listOf(user))
+        IMCoreManager.getImDataBase().userDao().insertOrReplace(listOf(user))
         return Flowable.just(user)
     }
 
 
     override fun queryUser(id: Long): Flowable<User> {
         return Flowable.create<User>({
-            val user = IMCoreManager.getImDataBase().userDao().queryUser(id)
+            val user = IMCoreManager.getImDataBase().userDao().findById(id)
             if (user != null) {
                 it.onNext(user)
             } else {
@@ -41,7 +41,7 @@ open class DefaultUserModule : UserModule {
 
     override fun queryUsers(ids: Set<Long>): Flowable<Map<Long, User>> {
         return Flowable.create<Map<Long, User>?>({
-            val users = IMCoreManager.getImDataBase().userDao().queryUsers(ids)
+            val users = IMCoreManager.getImDataBase().userDao().findByIds(ids)
             val userMap = mutableMapOf<Long, User>()
             for (u in users) {
                 userMap[u.id] = u
@@ -52,7 +52,7 @@ open class DefaultUserModule : UserModule {
     }
 
     override fun onUserInfoUpdate(user: User) {
-        IMCoreManager.getImDataBase().userDao().insertOrReplaceUsers(listOf(user))
+        IMCoreManager.getImDataBase().userDao().insertOrReplace(listOf(user))
     }
 
     override fun onSignalReceived(type: Int, body: String) {

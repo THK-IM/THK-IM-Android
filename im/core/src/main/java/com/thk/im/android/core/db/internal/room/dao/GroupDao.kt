@@ -10,18 +10,18 @@ import com.thk.im.android.core.db.entity.Group
 internal interface GroupDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrReplaceGroups(groups: List<Group>)
+    fun insertOrReplace(groups: List<Group>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertOrIgnoreGroups(groups: List<Group>)
+    fun insertOrIgnore(groups: List<Group>)
 
     @Query("delete from group_ where id in (:ids)")
     fun deleteByIds(ids: Set<Long>)
 
     @Query("select * from group_ where id = :id ")
-    fun findOne(id: Long): Group?
+    fun findById(id: Long): Group?
 
     @Query("select * from group_ ")
-    fun queryAllGroups(): List<Group>
+    fun queryAll(): List<Group>
 
 }

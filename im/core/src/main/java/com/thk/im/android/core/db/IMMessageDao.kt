@@ -6,21 +6,21 @@ import com.thk.im.android.core.db.entity.Message
 
 interface IMMessageDao {
 
-    fun insertOrReplaceMessages(messages: List<Message>)
+    fun insertOrReplace(messages: List<Message>)
 
-    fun insertOrIgnoreMessages(messages: List<Message>)
+    fun insertOrIgnore(messages: List<Message>)
 
-    fun deleteMessageByCTimeExclude(sid: Long, startTime: Long, endTime: Long)
+    fun deleteByCTimeExclude(sid: Long, startTime: Long, endTime: Long)
 
-    fun deleteMessageByCTimeInclude(sid: Long, startTime: Long, endTime: Long)
+    fun deleteByCTimeInclude(sid: Long, startTime: Long, endTime: Long)
 
-    fun deleteSessionMessages(sid: Long)
+    fun deleteBySessionId(sid: Long)
 
-    fun deleteSessionsMessages(sids: Set<Long>)
+    fun deleteBySessionIds(sids: Set<Long>)
 
-    fun deleteMessages(messages: List<Message>)
+    fun delete(messages: List<Message>)
 
-    fun updateMessages(messages: List<Message>)
+    fun update(messages: List<Message>)
 
     /**
      * 更新消息的发送壮体啊
@@ -32,12 +32,12 @@ interface IMMessageDao {
         fUId: Long
     )
 
-    fun updateMessageContent(id: Long, content: String)
+    fun updateContent(id: Long, content: String)
 
     /**
      * 更新会话的所有消息为已读
      */
-    fun updateSessionMessageStatus(sid: Long, oprStatus: Int)
+    fun updateStatusBySessionId(sid: Long, oprStatus: Int)
 
     /**
      * 更新所有消息的发送状态
@@ -47,7 +47,7 @@ interface IMMessageDao {
     /**
      * 更新消息的操作状态
      */
-    fun updateMessageOperationStatus(
+    fun updateOperationStatus(
         sid: Long,
         msgIds: Set<Long>,
         oprStatus: Int
@@ -61,10 +61,10 @@ interface IMMessageDao {
 
     fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
 
-    fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
-    fun findMessageById(id: Long, fUId: Long, sid: Long): Message?
+    fun findBySidBeforeCTime(sid: Long, cTime: Long, count: Int): List<Message>
+    fun findById(id: Long, fUId: Long, sid: Long): Message?
 
-    fun findMessageByMsgId(msgId: Long, sid: Long): Message?
+    fun findByMsgId(msgId: Long, sid: Long): Message?
 
     fun findOlderMessage(
         sId: Long,
@@ -81,8 +81,6 @@ interface IMMessageDao {
         cTime: Long,
         count: Int
     ): List<Message>
-
-    fun findUnReadMessage(myId: Long, sid: Long, msgIds: List<Long>): List<Long>
 
 
     /**

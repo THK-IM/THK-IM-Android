@@ -6,24 +6,24 @@ import com.thk.im.android.core.db.internal.room.IMRoomDataBase
 
 internal class IMUserDaoImp(private val roomDatabase: IMRoomDataBase) : IMUserDao {
 
-    override fun insertOrReplaceUsers(users: List<User>) {
-        roomDatabase.userDao().insertOrReplaceUsers(users)
+    override fun insertOrReplace(users: List<User>) {
+        roomDatabase.userDao().insertOrReplace(users)
     }
 
-    override fun insertOrIgnoreUsers(users: List<User>) {
-        roomDatabase.userDao().insertOrIgnoreUsers(users)
+    override fun insertOrIgnore(users: List<User>) {
+        roomDatabase.userDao().insertOrIgnore(users)
     }
 
-    override fun queryUser(id: Long): User? {
-        return roomDatabase.userDao().queryUser(id)
+    override fun delete(user: User) {
+        roomDatabase.userDao().delete(user)
     }
 
-    override fun queryUsers(ids: Set<Long>): List<User> {
-        return roomDatabase.userDao().queryUsers(ids)
+    override fun findById(id: Long): User? {
+        return roomDatabase.userDao().findById(id)
     }
 
-    override fun deleteUser(user: User) {
-        roomDatabase.userDao().deleteUser(user)
+    override fun findByIds(ids: Set<Long>): List<User> {
+        return roomDatabase.userDao().findByIds(ids)
     }
 
 }

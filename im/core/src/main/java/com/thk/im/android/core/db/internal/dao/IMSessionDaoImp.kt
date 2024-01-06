@@ -5,68 +5,69 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.internal.room.IMRoomDataBase
 
 internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSessionDao {
-    override fun querySessions(parentId: Long, count: Int, mTime: Long): List<Session> {
-        return roomDatabase.sessionDao().querySessions(parentId, count, mTime)
+
+    override fun insertOrReplace(sessions: List<Session>) {
+        return roomDatabase.sessionDao().insertOrReplace(sessions)
     }
 
-    override fun querySessionsByMTime(): List<Session> {
-        return roomDatabase.sessionDao().querySessionsByMTime()
+    override fun insertOrIgnore(sessions: List<Session>) {
+        return roomDatabase.sessionDao().insertOrIgnore(sessions)
     }
 
-    override fun insertOrReplaceSessions(sessions: List<Session>) {
-        return roomDatabase.sessionDao().insertOrReplaceSessions(sessions)
+    override fun findByEntityId(entityId: Long, type: Int): Session? {
+        return roomDatabase.sessionDao().findByEntityId(entityId, type)
     }
 
-    override fun insertOrIgnoreSessions(sessions: List<Session>) {
-        return roomDatabase.sessionDao().insertOrIgnoreSessions(sessions)
+    override fun findById(id: Long): Session? {
+        return roomDatabase.sessionDao().findById(id)
     }
 
-    override fun findSessionByEntity(entityId: Long, type: Int): Session? {
-        return roomDatabase.sessionDao().findSessionByEntity(entityId, type)
+    override fun update(session: Session) {
+        return roomDatabase.sessionDao().update(session)
     }
 
-    override fun findSession(sId: Long): Session? {
-        return roomDatabase.sessionDao().findSession(sId)
+    override fun deleteById(id: Long) {
+        return roomDatabase.sessionDao().deleteById(id)
     }
 
-    override fun updateSession(session: Session) {
-        return roomDatabase.sessionDao().updateSession(session)
+    override fun delete(sessions: List<Session>): Int {
+        return roomDatabase.sessionDao().delete(sessions)
     }
 
-    override fun deleteSessionById(sId: Long) {
-        return roomDatabase.sessionDao().deleteSessionById(sId)
+    override fun updateTop(id: Long, top: Long) {
+        return roomDatabase.sessionDao().updateTop(id, top)
     }
 
-    override fun deleteSessions(sessions: List<Session>): Int {
-        return roomDatabase.sessionDao().deleteSessions(sessions)
+    override fun updateStatus(id: Long, status: Int) {
+        return roomDatabase.sessionDao().updateStatus(id, status)
     }
 
-    override fun updateTop(sId: Long, top: Long) {
-        return roomDatabase.sessionDao().updateTop(sId, top)
+    override fun updateDraft(id: Long, draft: String) {
+        return roomDatabase.sessionDao().updateDraft(id, draft)
     }
 
-    override fun updateStatus(sId: Long, status: Int) {
-        return roomDatabase.sessionDao().updateStatus(sId, status)
+    override fun updateUnread(id: Long, unread: Int) {
+        return roomDatabase.sessionDao().updateUnread(id, unread)
     }
 
-    override fun updateDraft(sId: Long, draft: String) {
-        return roomDatabase.sessionDao().updateDraft(sId, draft)
+    override fun updateMemberSyncTime(id: Long, time: Long) {
+        return roomDatabase.sessionDao().updateMemberSyncTime(id, time)
     }
 
-    override fun updateUnread(sId: Long, unread: Int) {
-        return roomDatabase.sessionDao().updateUnread(sId, unread)
+    override fun findMemberSyncTimeById(id: Long): Long {
+        return roomDatabase.sessionDao().getMemberSyncTime(id)
     }
 
-    override fun setMemberSyncTime(sId: Long, time: Long) {
-        return roomDatabase.sessionDao().setMemberSyncTime(sId, time)
+    override fun updateMemberCount(id: Long, count: Int) {
+        return roomDatabase.sessionDao().updateMemberCount(id, count)
     }
 
-    override fun getMemberSyncTime(sId: Long): Long {
-        return roomDatabase.sessionDao().getMemberSyncTime(sId)
+    override fun findByParentId(parentId: Long, count: Int, mTime: Long): List<Session> {
+        return roomDatabase.sessionDao().findByParentId(parentId, count, mTime)
     }
 
-    override fun updateMemberCount(sId: Long, count: Int) {
-        return roomDatabase.sessionDao().updateMemberCount(sId, count)
+    override fun findAll(): List<Session> {
+        return roomDatabase.sessionDao().findAll()
     }
 
 

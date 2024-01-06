@@ -65,17 +65,17 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
         }
         Flowable.create<Message>({
             try {
-                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
+                IMCoreManager.getImDataBase().messageDao().updateOperationStatus(
                     msg.sid, mutableSetOf(msg.rMsgId!!), MsgOperateStatus.ClientRead.value
                 )
-                val session = IMCoreManager.getImDataBase().sessionDao().findSession(msg.sid)
+                val session = IMCoreManager.getImDataBase().sessionDao().findById(msg.sid)
                 if (session != null) {
                     val count =
                         IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
                     if (session.unReadCount != count || session.mTime < msg.mTime) {
                         session.unReadCount = count
                         session.mTime = msg.mTime
-                        IMCoreManager.getImDataBase().sessionDao().updateSession(session)
+                        IMCoreManager.getImDataBase().sessionDao().update(session)
                         XEventBus.post(IMEvent.SessionUpdate.value, session)
                     }
                 }
@@ -92,14 +92,14 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
 
     override fun received(msg: Message) {
         val dbMsg =
-            IMCoreManager.getImDataBase().messageDao().findMessageById(msg.id, msg.fUid, msg.sid)
+            IMCoreManager.getImDataBase().messageDao().findById(msg.id, msg.fUid, msg.sid)
         if (dbMsg != null) {
             return
         }
         msg.rMsgId?.let {
             // 别人发给自己的已读消息
             val referMsg =
-                IMCoreManager.getImDataBase().messageDao().findMessageByMsgId(it, msg.sid)
+                IMCoreManager.getImDataBase().messageDao().findByMsgId(it, msg.sid)
             if (referMsg != null) {
                 if (msg.fUid == IMCoreManager.uId) {
                     // 自己发的已读消息不插入数据库，更新rMsgId的消息状态为服务端已读
@@ -108,14 +108,14 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
                             .or(MsgOperateStatus.Ack.value)
                     referMsg.mTime = msg.cTime
                     insertOrUpdateDb(referMsg, notify = true, notifySession = false)
-                    val session = IMCoreManager.getImDataBase().sessionDao().findSession(msg.sid)
+                    val session = IMCoreManager.getImDataBase().sessionDao().findById(msg.sid)
                     if (session != null) {
                         val count =
                             IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
                         if (session.unReadCount != count || session.mTime < msg.mTime) {
                             session.unReadCount = count
                             session.mTime = msg.mTime
-                            IMCoreManager.getImDataBase().sessionDao().updateSession(session)
+                            IMCoreManager.getImDataBase().sessionDao().update(session)
                             XEventBus.post(IMEvent.SessionUpdate.value, session)
                         }
                     }
@@ -178,7 +178,7 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
 
             override fun onComplete() {
                 super.onComplete()
-                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
+                IMCoreManager.getImDataBase().messageDao().updateOperationStatus(
                     sessionId, msgIds, MsgOperateStatus.ServerRead.value
                 )
                 readMessageToServerSuccess(sessionId, msgIds)

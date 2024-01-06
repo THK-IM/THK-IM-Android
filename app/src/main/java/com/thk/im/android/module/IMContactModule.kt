@@ -40,7 +40,7 @@ class IMContactModule : DefaultContactModule() {
                     val contactList = vo.data.map {
                         it.toContact()
                     }
-                    IMCoreManager.db.contactDao().insertOrReplaceContacts(contactList)
+                    IMCoreManager.db.contactDao().insertOrReplace(contactList)
                     if (t.data.isNotEmpty()) {
                         setOfflineMsgSyncTime(t.data.last().updateTime)
                     }

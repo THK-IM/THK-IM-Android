@@ -27,7 +27,7 @@ abstract class IMBaseMsgProcessor {
     open fun received(msg: Message) {
         // 默认插入数据库
         val dbMsg =
-            IMCoreManager.getImDataBase().messageDao().findMessageById(msg.id, msg.fUid, msg.sid)
+            IMCoreManager.getImDataBase().messageDao().findById(msg.id, msg.fUid, msg.sid)
         if (dbMsg == null) {
             if (msg.fUid == IMCoreManager.uId) {
                 // 如果发件人为自己，插入前补充消息状态为已接受并已读
@@ -281,7 +281,7 @@ abstract class IMBaseMsgProcessor {
     open fun insertOrUpdateDb(msg: Message, notify: Boolean = true, notifySession: Boolean = true) {
         LLog.i("insertOrUpdateMessages ${msg.id} ${msg.sendStatus}, ${notify}, $notifySession")
         val msgDao = IMCoreManager.getImDataBase().messageDao()
-        msgDao.insertOrReplaceMessages(mutableListOf(msg))
+        msgDao.insertOrReplace(mutableListOf(msg))
         if (notify) {
             XEventBus.post(IMEvent.MsgNew.value, msg)
         }

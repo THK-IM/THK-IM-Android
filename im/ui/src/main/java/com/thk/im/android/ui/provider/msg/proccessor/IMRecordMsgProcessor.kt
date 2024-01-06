@@ -17,14 +17,14 @@ class IMRecordMsgProcessor : IMBaseMsgProcessor() {
         super.received(msg)
         if (msg.content != null) {
             val recordBody = Gson().fromJson(msg.content, IMRecordMsgBody::class.java)
-            IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(recordBody.messages)
+            IMCoreManager.getImDataBase().messageDao().insertOrIgnore(recordBody.messages)
         }
     }
 
     override fun reprocessingFlowable(message: Message): Flowable<Message>? {
         if (message.content != null) {
             val recordBody = Gson().fromJson(message.content, IMRecordMsgBody::class.java)
-            IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(recordBody.messages)
+            IMCoreManager.getImDataBase().messageDao().insertOrIgnore(recordBody.messages)
         }
         return Flowable.just(message)
     }

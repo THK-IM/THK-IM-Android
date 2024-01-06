@@ -11,7 +11,7 @@ class IMGroupModule : DefaultGroupModule() {
 
     override fun findOne(id: Long): Flowable<Group> {
         return Flowable.create<Group?>({
-            val group = IMCoreManager.getImDataBase().groupDao().findOne(id)
+            val group = IMCoreManager.getImDataBase().groupDao().findById(id)
             if (group != null) {
                 it.onNext(group)
             } else {
@@ -23,7 +23,7 @@ class IMGroupModule : DefaultGroupModule() {
                 return@flatMap DataRepository.groupApi.queryGroup(it.id)
                     .flatMap { vo ->
                         val group = vo.toGroup()
-                        IMCoreManager.db.groupDao().insertOrReplaceGroups(listOf(group))
+                        IMCoreManager.db.groupDao().insertOrReplace(listOf(group))
                         Flowable.just(group)
                     }
 
@@ -35,7 +35,7 @@ class IMGroupModule : DefaultGroupModule() {
 
     override fun queryAllGroups(): Flowable<List<Group>> {
         return Flowable.create({
-            val groups = IMCoreManager.getImDataBase().groupDao().queryAllGroups()
+            val groups = IMCoreManager.getImDataBase().groupDao().queryAll()
             it.onNext(groups)
             it.onComplete()
         }, BackpressureStrategy.LATEST)

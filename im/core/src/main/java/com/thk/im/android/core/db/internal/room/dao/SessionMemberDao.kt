@@ -10,18 +10,18 @@ import com.thk.im.android.core.db.entity.SessionMember
 interface SessionMemberDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrReplaceSessionMembers(members: List<SessionMember>)
+    fun insertOrReplace(members: List<SessionMember>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertOrIgnoreSessionMembers(members: List<SessionMember>)
+    fun insertOrIgnore(members: List<SessionMember>)
 
     @Query("delete from session_member where session_id = :sId and user_id in (:uIds)")
-    fun deleteSessionMembers(sId: Long, uIds: Set<Long>)
+    fun deleteBySIdAndUIds(sId: Long, uIds: Set<Long>)
 
     @Query("select max(m_time) from session_member where session_id = :sessionId")
-    fun querySessionMemberLatestTime(sessionId: Long): Long
+    fun findLatestSyncTimeBySessionId(sessionId: Long): Long
 
     @Query("select * from session_member where session_id = :sessionId order by c_time asc")
-    fun querySessionMembers(sessionId: Long): List<SessionMember>
+    fun findBySessionId(sessionId: Long): List<SessionMember>
 
 }

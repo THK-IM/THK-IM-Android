@@ -4,35 +4,35 @@ import com.thk.im.android.core.db.entity.Session
 
 interface IMSessionDao {
 
-    fun insertOrReplaceSessions(sessions: List<Session>)
+    fun insertOrReplace(sessions: List<Session>)
 
-    fun insertOrIgnoreSessions(sessions: List<Session>)
+    fun insertOrIgnore(sessions: List<Session>)
 
-    fun updateSession(session: Session)
+    fun update(session: Session)
 
-    fun deleteSessionById(sId: Long)
+    fun deleteById(id: Long)
 
-    fun deleteSessions(sessions: List<Session>): Int
+    fun delete(sessions: List<Session>): Int
 
-    fun updateTop(sId: Long, top: Long)
+    fun updateTop(id: Long, top: Long)
 
-    fun updateStatus(sId: Long, status: Int)
+    fun updateStatus(id: Long, status: Int)
 
-    fun updateDraft(sId: Long, draft: String)
+    fun updateDraft(id: Long, draft: String)
 
-    fun updateUnread(sId: Long, unread: Int)
+    fun updateUnread(id: Long, unread: Int)
 
-    fun setMemberSyncTime(sId: Long, time: Long)
+    fun updateMemberSyncTime(id: Long, time: Long)
 
-    fun updateMemberCount(sId: Long, count: Int)
+    fun updateMemberCount(id: Long, count: Int)
 
-    fun findSessionByEntity(entityId: Long, type: Int): Session?
+    fun findByEntityId(entityId: Long, type: Int): Session?
 
-    fun findSession(sId: Long): Session?
+    fun findById(id: Long): Session?
 
-    fun getMemberSyncTime(sId: Long): Long
+    fun findMemberSyncTimeById(id: Long): Long
 
-    fun querySessions(parentId: Long, count: Int, mTime: Long): List<Session>
+    fun findByParentId(parentId: Long, count: Int, mTime: Long): List<Session>
 
-    fun querySessionsByMTime(): List<Session>
+    fun findAll(): List<Session>
 }

@@ -11,7 +11,7 @@ class IMUserModule: DefaultUserModule() {
     override fun queryServerUser(id: Long): Flowable<User> {
         return DataRepository.userApi.queryUser(id).flatMap {
             val user = it.toUser()
-            IMCoreManager.getImDataBase().userDao().insertOrReplaceUsers(listOf(user))
+            IMCoreManager.getImDataBase().userDao().insertOrReplace(listOf(user))
             return@flatMap Flowable.just(user)
         }
     }

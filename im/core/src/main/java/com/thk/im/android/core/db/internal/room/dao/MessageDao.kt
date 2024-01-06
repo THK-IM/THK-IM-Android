@@ -9,25 +9,25 @@ import com.thk.im.android.core.db.entity.Message
 internal interface MessageDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrReplaceMessages(messages: List<Message>)
+    fun insertOrReplace(messages: List<Message>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertOrIgnoreMessages(messages: List<Message>)
+    fun insertOrIgnore(messages: List<Message>)
 
     @Delete
-    fun deleteMessages(messages: List<Message>)
+    fun delete(messages: List<Message>)
 
     @Query("delete from message where session_id= :sid and c_time > :startTime and c_time < :endTime")
-    fun deleteMessageByCTimeExclude(sid: Long, startTime: Long, endTime: Long)
+    fun deleteByCTimeExclude(sid: Long, startTime: Long, endTime: Long)
 
     @Query("delete from message where session_id= :sid and c_time >= :startTime and c_time <= :endTime")
-    fun deleteMessageByCTimeInclude(sid: Long, startTime: Long, endTime: Long)
+    fun deleteByCTimeInclude(sid: Long, startTime: Long, endTime: Long)
 
     @Query("delete from message where session_id = :sid")
-    fun deleteSessionMessages(sid: Long)
+    fun deleteBySessionId(sid: Long)
 
     @Query("delete from message where session_id in (:sids)")
-    fun deleteSessionsMessages(sids : Set<Long>)
+    fun deleteBySessionIds(sids : Set<Long>)
 
     /**
      * 更新消息的发送壮体啊
@@ -41,13 +41,13 @@ internal interface MessageDao {
     )
 
     @Query("update message set content = :content where id = :id")
-    fun updateMessageContent(id: Long, content: String)
+    fun updateContent(id: Long, content: String)
 
     /**
      * 更新会话的所有消息为已读
      */
     @Query("update message set opr_status = opr_status | :oprStatus where session_id = :sid")
-    fun updateSessionMessageStatus(sid: Long, oprStatus: Int)
+    fun updateStatusBySessionId(sid: Long, oprStatus: Int)
 
     /**
      * 更新所有消息的发送状态
@@ -59,14 +59,14 @@ internal interface MessageDao {
      * 更新消息的操作状态
      */
     @Query("update message set opr_status = opr_status | :oprStatus where session_id = :sid and msg_id in (:msgIds)")
-    fun updateMessageOperationStatus(
+    fun updateOperationStatus(
         sid: Long,
         msgIds: Set<Long>,
         oprStatus: Int
     )
 
     @Update
-    fun updateMessages(messages: List<Message>)
+    fun update(messages: List<Message>)
 
     @Query("update message set send_status = :status where send_status < :successStatus")
     fun resetSendingMsg(
@@ -75,15 +75,15 @@ internal interface MessageDao {
     )
 
     @Query("select * from message where session_id = :sid and type >= 0 and c_time < :cTime order by c_time desc limit :count")
-    fun queryMessagesBySidAndCTime(sid: Long, cTime: Long, count: Int): List<Message>
+    fun findBySidBeforeCTime(sid: Long, cTime: Long, count: Int): List<Message>
     @Query("select count(id) from message where session_id = :id and type >= 0 and opr_status & :oprStatus = 0")
     fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
 
     @Query("select * from message where id = :id and from_u_id = :fUId and session_id = :sid")
-    fun findMessageById(id: Long, fUId: Long, sid: Long): Message?
+    fun findById(id: Long, fUId: Long, sid: Long): Message?
 
     @Query("select * from message where msg_id = :msgId and session_id = :sid")
-    fun findMessageByMsgId(msgId: Long, sid: Long): Message?
+    fun findByMsgId(msgId: Long, sid: Long): Message?
 
     @Query("select * from message where session_id = :sId and msg_id != :msgId and type in (:types) and c_time <= :cTime order by c_time desc limit :count")
     fun findOlderMessage(
@@ -102,9 +102,6 @@ internal interface MessageDao {
         cTime: Long,
         count: Int
     ): List<Message>
-
-    @Query("select msg_id from message where session_id = :sid and from_u_id != :myId and msg_id in (:msgIds)")
-    fun findUnReadMessage(myId: Long, sid: Long, msgIds: List<Long>): List<Long>
 
 
     /**

@@ -5,24 +5,24 @@ import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.internal.room.IMRoomDataBase
 
 internal class IMGroupDaoImp(private val roomDatabase: IMRoomDataBase) : IMGroupDao {
-    override fun insertOrReplaceGroups(groups: List<Group>) {
-        roomDatabase.groupDao().insertOrReplaceGroups(groups)
+    override fun insertOrReplace(groups: List<Group>) {
+        roomDatabase.groupDao().insertOrReplace(groups)
     }
 
-    override fun insertOrIgnoreGroups(groups: List<Group>) {
-        roomDatabase.groupDao().insertOrIgnoreGroups(groups)
+    override fun insertOrIgnore(groups: List<Group>) {
+        roomDatabase.groupDao().insertOrIgnore(groups)
     }
 
-    override fun deleteGroupByIds(ids: Set<Long>) {
+    override fun deleteByIds(ids: Set<Long>) {
         return roomDatabase.groupDao().deleteByIds(ids)
     }
 
-    override fun queryAllGroups(): List<Group> {
-        return roomDatabase.groupDao().queryAllGroups()
+    override fun queryAll(): List<Group> {
+        return roomDatabase.groupDao().queryAll()
     }
 
-    override fun findOne(id: Long): Group? {
-        return roomDatabase.groupDao().findOne(id)
+    override fun findById(id: Long): Group? {
+        return roomDatabase.groupDao().findById(id)
     }
 
 }

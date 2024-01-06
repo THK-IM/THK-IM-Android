@@ -1,6 +1,5 @@
 package com.thk.im.android.core.module.internal
 
-import android.content.Context
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.Contact
 import com.thk.im.android.core.module.ContactModule
@@ -14,7 +13,7 @@ open class DefaultContactModule : ContactModule {
 
     override fun queryAllContact(): Flowable<List<Contact>> {
         return Flowable.create({
-            val contacts = IMCoreManager.getImDataBase().contactDao().queryAllContacts()
+            val contacts = IMCoreManager.getImDataBase().contactDao().queryAll()
             it.onNext(contacts)
             it.onComplete()
         }, BackpressureStrategy.LATEST)

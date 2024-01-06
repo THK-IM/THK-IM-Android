@@ -5,15 +5,15 @@ import com.thk.im.android.core.db.entity.Contact
 import com.thk.im.android.core.db.internal.room.IMRoomDataBase
 
 internal class IMContactDaoImp(private val roomDatabase: IMRoomDataBase) : IMContactDao {
-    override fun insertOrReplaceContacts(contacts: List<Contact>) {
-        roomDatabase.contactDao().insertOrReplaceContacts(contacts)
+    override fun insertOrReplace(contacts: List<Contact>) {
+        roomDatabase.contactDao().insertOrReplace(contacts)
     }
 
-    override fun insertOrIgnoreContacts(contacts: List<Contact>) {
-        roomDatabase.contactDao().insertOrIgnoreContacts(contacts)
+    override fun insertOrIgnore(contacts: List<Contact>) {
+        roomDatabase.contactDao().insertOrIgnore(contacts)
     }
 
-    override fun queryAllContacts(): List<Contact> {
-        return roomDatabase.contactDao().queryAllContacts()
+    override fun queryAll(): List<Contact> {
+        return roomDatabase.contactDao().queryAll()
     }
 }

@@ -97,7 +97,7 @@ open class DefaultMessageModule : MessageModule {
                     if (unProcessorMessages.isNotEmpty()) {
                         // 插入数据库
                         IMCoreManager.getImDataBase().messageDao()
-                            .insertOrIgnoreMessages(unProcessorMessages)
+                            .insertOrIgnore(unProcessorMessages)
                         for (m in unProcessorMessages) {
                             if (m.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
                                 ackMessageToCache(m)
@@ -168,15 +168,15 @@ open class DefaultMessageModule : MessageModule {
                 }
                 // 删除掉该删除的session
                 if (needDelSessions.isNotEmpty()) {
-                    IMCoreManager.db.sessionDao().deleteSessions(needUpdateSessions)
-                    IMCoreManager.db.messageDao().deleteSessionsMessages(needDelSIds)
+                    IMCoreManager.db.sessionDao().delete(needUpdateSessions)
+                    IMCoreManager.db.messageDao().deleteBySessionIds(needDelSIds)
                 }
                 if (needDelGroups.isNotEmpty()) {
-                    IMCoreManager.db.groupDao().deleteGroupByIds(needDelGroups.toSet())
+                    IMCoreManager.db.groupDao().deleteByIds(needDelGroups.toSet())
                 }
                 if (needUpdateSessions.isNotEmpty()) {
                     for (new in needUpdateSessions) {
-                        val dbSession = IMCoreManager.db.sessionDao().findSession(new.id)
+                        val dbSession = IMCoreManager.db.sessionDao().findById(new.id)
                         // 更新session中的在线数据信息
                         if (dbSession != null) {
                             dbSession.parentId = new.parentId
@@ -190,10 +190,10 @@ open class DefaultMessageModule : MessageModule {
                             dbSession.mute = new.mute
                             dbSession.extData = new.extData
                             dbSession.topTimestamp = new.topTimestamp
-                            IMCoreManager.db.sessionDao().updateSession(dbSession)
+                            IMCoreManager.db.sessionDao().update(dbSession)
                         }
                     }
-                    IMCoreManager.db.sessionDao().insertOrIgnoreSessions(needUpdateSessions)
+                    IMCoreManager.db.sessionDao().insertOrIgnore(needUpdateSessions)
                 }
 
                 if (sessions.isNotEmpty()) {
@@ -219,7 +219,7 @@ open class DefaultMessageModule : MessageModule {
     override fun getSession(entityId: Long, type: Int): Flowable<Session> {
         return Flowable.create<Session>({
             val session =
-                IMCoreManager.getImDataBase().sessionDao().findSessionByEntity(entityId, type)
+                IMCoreManager.getImDataBase().sessionDao().findByEntityId(entityId, type)
             if (session == null) {
                 it.onNext(Session(0))
             } else {
@@ -232,7 +232,7 @@ open class DefaultMessageModule : MessageModule {
             } else {
                 val uId = IMCoreManager.uId
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, entityId, type).flatMap {
-                    IMCoreManager.db.sessionDao().insertOrIgnoreSessions(listOf(it))
+                    IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
                     Flowable.just(it)
                 }
             }
@@ -242,7 +242,7 @@ open class DefaultMessageModule : MessageModule {
 
     override fun getSession(sessionId: Long): Flowable<Session> {
         return Flowable.create<Session>({
-            val session = IMCoreManager.getImDataBase().sessionDao().findSession(sessionId)
+            val session = IMCoreManager.getImDataBase().sessionDao().findById(sessionId)
             if (session == null) {
                 it.onNext(Session(0))
             } else {
@@ -255,7 +255,7 @@ open class DefaultMessageModule : MessageModule {
             } else {
                 val uId = IMCoreManager.uId
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, sessionId).flatMap {
-                    IMCoreManager.db.sessionDao().insertOrIgnoreSessions(listOf(it))
+                    IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
                     Flowable.just(it)
                 }
             }
@@ -269,7 +269,7 @@ open class DefaultMessageModule : MessageModule {
     ): Flowable<List<Session>> {
         return Flowable.create({
             val sessions =
-                IMCoreManager.getImDataBase().sessionDao().querySessions(parentId, count, mTime)
+                IMCoreManager.getImDataBase().sessionDao().findByParentId(parentId, count, mTime)
             it.onNext(sessions)
             it.onComplete()
         }, BackpressureStrategy.LATEST)
@@ -280,7 +280,7 @@ open class DefaultMessageModule : MessageModule {
     ): Flowable<List<Message>> {
         return Flowable.create({
             val sessions = IMCoreManager.getImDataBase().messageDao()
-                .queryMessagesBySidAndCTime(sessionId, cTime, count)
+                .findBySidBeforeCTime(sessionId, cTime, count)
             it.onNext(sessions)
             it.onComplete()
         }, BackpressureStrategy.LATEST)
@@ -434,7 +434,7 @@ open class DefaultMessageModule : MessageModule {
                     t.lastMsg = "$statusText${processor.getSessionDesc(msg)}"
                     t.mTime = msg.mTime
                     t.unReadCount = unReadCount
-                    sessionDao.insertOrReplaceSessions(listOf(t))
+                    sessionDao.insertOrReplace(listOf(t))
                     XEventBus.post(IMEvent.SessionNew.value, t)
                     notifyNewMessage(t, msg)
                 }
@@ -480,7 +480,7 @@ open class DefaultMessageModule : MessageModule {
 
     private fun queryLastSessionMember(sessionId: Long, count: Int): Flowable<List<SessionMember>> {
         return Flowable.just(sessionId).flatMap {
-            val mTime = IMCoreManager.db.sessionDao().getMemberSyncTime(sessionId)
+            val mTime = IMCoreManager.db.sessionDao().findMemberSyncTimeById(sessionId)
             return@flatMap Flowable.just(mTime)
         }.flatMap {
             return@flatMap IMCoreManager.imApi.queryLatestSessionMembers(sessionId, it, null, count)
@@ -494,11 +494,11 @@ open class DefaultMessageModule : MessageModule {
                     deletes.add(sm)
                 }
             }
-            IMCoreManager.db.sessionMemberDao().insertOrReplaceSessionMembers(inserts)
-            IMCoreManager.db.sessionMemberDao().deleteSessionMembers(deletes)
+            IMCoreManager.db.sessionMemberDao().insertOrReplace(inserts)
+            IMCoreManager.db.sessionMemberDao().delete(deletes)
             if (it.isNotEmpty()) {
                 val mTime = it.last().mTime
-                IMCoreManager.db.sessionDao().setMemberSyncTime(sessionId, mTime)
+                IMCoreManager.db.sessionDao().updateMemberSyncTime(sessionId, mTime)
             }
             if (it.size >= count) {
                 return@flatMap queryLastSessionMember(sessionId, count)
@@ -571,7 +571,7 @@ open class DefaultMessageModule : MessageModule {
     private fun updateLocalSession(session: Session): Flowable<Void> {
         return Flowable.create({
             try {
-                IMCoreManager.getImDataBase().sessionDao().updateSession(session)
+                IMCoreManager.getImDataBase().sessionDao().update(session)
             } catch (e: Exception) {
                 it.onError(e)
             }
@@ -588,8 +588,8 @@ open class DefaultMessageModule : MessageModule {
     private fun deleteLocalSession(session: Session): Flowable<Void> {
         return Flowable.create({
             try {
-                IMCoreManager.getImDataBase().messageDao().deleteSessionMessages(session.id)
-                IMCoreManager.getImDataBase().sessionDao().deleteSessions(listOf(session))
+                IMCoreManager.getImDataBase().messageDao().deleteBySessionId(session.id)
+                IMCoreManager.getImDataBase().sessionDao().delete(listOf(session))
             } catch (e: Exception) {
                 it.onError(e)
             }
@@ -607,7 +607,7 @@ open class DefaultMessageModule : MessageModule {
     private fun deleteLocalMessages(messages: List<Message>): Flowable<Void> {
         return Flowable.create({
             try {
-                IMCoreManager.getImDataBase().messageDao().deleteMessages(messages)
+                IMCoreManager.getImDataBase().messageDao().delete(messages)
             } catch (e: Exception) {
                 it.onError(e)
             }
@@ -623,7 +623,7 @@ open class DefaultMessageModule : MessageModule {
 
             override fun onComplete() {
                 super.onComplete()
-                IMCoreManager.getImDataBase().messageDao().updateMessageOperationStatus(
+                IMCoreManager.getImDataBase().messageDao().updateOperationStatus(
                     sessionId, msgIds, MsgOperateStatus.Ack.value
                 )
                 ackMessagesSuccess(sessionId, msgIds)

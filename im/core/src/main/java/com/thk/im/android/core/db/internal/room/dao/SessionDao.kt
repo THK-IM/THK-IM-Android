@@ -8,53 +8,53 @@ internal interface SessionDao {
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrReplaceSessions(sessions: List<Session>)
+    fun insertOrReplace(sessions: List<Session>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertOrIgnoreSessions(sessions: List<Session>)
+    fun insertOrIgnore(sessions: List<Session>)
 
     @Query("delete from session where id = :sId")
-    fun deleteSessionById(sId: Long)
+    fun deleteById(sId: Long)
 
     /**
      * 批量删除session
      */
     @Delete
-    fun deleteSessions(sessions: List<Session>): Int
+    fun delete(sessions: List<Session>): Int
 
     @Update
-    fun updateSession(session: Session)
+    fun update(session: Session)
 
-    @Query("update session set top_timestamp = :top where id = :sId")
-    fun updateTop(sId: Long, top: Long)
+    @Query("update session set top_timestamp = :top where id = :id")
+    fun updateTop(id: Long, top: Long)
 
-    @Query("update session set status = :status where id = :sId")
-    fun updateStatus(sId: Long, status: Int)
+    @Query("update session set status = :status where id = :id")
+    fun updateStatus(id: Long, status: Int)
 
-    @Query("update session set draft = :draft where id = :sId")
-    fun updateDraft(sId: Long, draft: String)
+    @Query("update session set draft = :draft where id = :id")
+    fun updateDraft(id: Long, draft: String)
 
-    @Query("update session set unread_count = :unread where id = :sId")
-    fun updateUnread(sId: Long, unread: Int)
+    @Query("update session set unread_count = :unread where id = :id")
+    fun updateUnread(id: Long, unread: Int)
 
-    @Query("update session set member_sync_time = :time where id = :sId")
-    fun setMemberSyncTime(sId: Long, time: Long)
+    @Query("update session set member_sync_time = :time where id = :id")
+    fun updateMemberSyncTime(id: Long, time: Long)
 
-    @Query("update session set member_count = :count where id = :sId")
-    fun updateMemberCount(sId: Long, count: Int)
+    @Query("update session set member_count = :count where id = :id")
+    fun updateMemberCount(id: Long, count: Int)
 
-    @Query("select member_sync_time from session where id= :sId ")
-    fun getMemberSyncTime(sId: Long): Long
+    @Query("select member_sync_time from session where id= :id ")
+    fun getMemberSyncTime(id: Long): Long
 
     @Query("select * from session where parent_id = :parentId and id != :parentId and m_time <= :mTime order by top_timestamp desc, m_time desc limit 0, :count")
-    fun querySessions(parentId: Long, count: Int, mTime: Long): List<Session>
+    fun findByParentId(parentId: Long, count: Int, mTime: Long): List<Session>
 
     @Query("select * from session order by m_time desc")
-    fun querySessionsByMTime(): List<Session>
+    fun findAll(): List<Session>
 
     @Query("select * from session where entity_id = :entityId and type = :type")
-    fun findSessionByEntity(entityId: Long, type: Int): Session?
+    fun findByEntityId(entityId: Long, type: Int): Session?
 
     @Query("select * from session where id = :sId")
-    fun findSession(sId: Long): Session?
+    fun findById(sId: Long): Session?
 }

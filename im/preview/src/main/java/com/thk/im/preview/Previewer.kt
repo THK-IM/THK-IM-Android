@@ -72,12 +72,12 @@ class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer
             Flowable.just(recordBody.messages).flatMap {
                 val dbMessages = mutableListOf<Message>()
                 for (m in it) {
-                    val dbMsg = IMCoreManager.getImDataBase().messageDao().findMessageByMsgId(
+                    val dbMsg = IMCoreManager.getImDataBase().messageDao().findByMsgId(
                         m.msgId,
                         m.sid
                     )
                     if (dbMsg == null) {
-                        IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(listOf(m))
+                        IMCoreManager.getImDataBase().messageDao().insertOrIgnore(listOf(m))
                         dbMessages.add(m)
                     } else {
                         dbMessages.add(dbMsg)

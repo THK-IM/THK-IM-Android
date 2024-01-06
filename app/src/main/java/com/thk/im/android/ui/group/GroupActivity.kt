@@ -127,7 +127,7 @@ class GroupActivity : BaseActivity() {
         DataRepository.groupApi.createGroup(createGroupVo)
             .flatMap {
                 val group = it.toGroup()
-                IMCoreManager.db.groupDao().insertOrReplaceGroups(listOf(group))
+                IMCoreManager.db.groupDao().insertOrReplace(listOf(group))
                 return@flatMap Flowable.just(group)
             }
             .compose(RxTransform.flowableToMain())

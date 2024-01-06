@@ -4,13 +4,13 @@ import com.thk.im.android.core.db.entity.User
 
 interface IMUserDao {
 
-    fun insertOrReplaceUsers(users: List<User>)
+    fun insertOrReplace(users: List<User>)
 
-    fun insertOrIgnoreUsers(users: List<User>)
+    fun insertOrIgnore(users: List<User>)
 
-    fun queryUser(id: Long): User?
+    fun delete(user: User)
 
-    fun queryUsers(ids: Set<Long>): List<User>
+    fun findById(id: Long): User?
 
-    fun deleteUser(user: User)
+    fun findByIds(ids: Set<Long>): List<User>
 }

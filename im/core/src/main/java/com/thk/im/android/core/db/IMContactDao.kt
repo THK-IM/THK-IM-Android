@@ -4,9 +4,9 @@ import com.thk.im.android.core.db.entity.Contact
 
 interface IMContactDao {
 
-    fun insertOrReplaceContacts(contacts: List<Contact>)
+    fun insertOrReplace(contacts: List<Contact>)
 
-    fun insertOrIgnoreContacts(contacts: List<Contact>)
+    fun insertOrIgnore(contacts: List<Contact>)
 
-    fun queryAllContacts() : List<Contact>
+    fun queryAll() : List<Contact>
 }

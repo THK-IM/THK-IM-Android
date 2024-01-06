@@ -10,12 +10,12 @@ import com.thk.im.android.core.db.entity.Contact
 internal interface ContactDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrReplaceContacts(contacts: List<Contact>)
+    fun insertOrReplace(contacts: List<Contact>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertOrIgnoreContacts(contacts: List<Contact>)
+    fun insertOrIgnore(contacts: List<Contact>)
 
     @Query("select * from contact")
-    fun queryAllContacts(): List<Contact>
+    fun queryAll(): List<Contact>
 
 }

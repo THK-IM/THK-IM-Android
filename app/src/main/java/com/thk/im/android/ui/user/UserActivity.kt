@@ -181,7 +181,7 @@ class UserActivity : BaseActivity() {
             .flatMap { vo ->
                 val session = vo.toSession()
                 IMCoreManager.getImDataBase().sessionDao()
-                    .insertOrReplaceSessions(listOf(session))
+                    .insertOrReplace(listOf(session))
                 return@flatMap Flowable.just(session)
             }
             .compose(RxTransform.flowableToMain())

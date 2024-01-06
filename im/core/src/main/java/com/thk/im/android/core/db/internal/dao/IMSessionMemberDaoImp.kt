@@ -6,30 +6,31 @@ import com.thk.im.android.core.db.internal.room.IMRoomDataBase
 
 internal class IMSessionMemberDaoImp(private val roomDatabase: IMRoomDataBase) :
     IMSessionMemberDao {
-    override fun querySessionMemberLatestTime(sessionId: Long): Long {
-        return roomDatabase.sessionMemberDao().querySessionMemberLatestTime(sessionId)
+
+    override fun insertOrReplace(members: List<SessionMember>) {
+        return roomDatabase.sessionMemberDao().insertOrReplace(members)
     }
 
-    override fun querySessionMembers(sessionId: Long): List<SessionMember> {
-        return roomDatabase.sessionMemberDao().querySessionMembers(sessionId)
+    override fun insertOrIgnore(members: List<SessionMember>) {
+        return roomDatabase.sessionMemberDao().insertOrIgnore(members)
     }
 
-    override fun insertOrReplaceSessionMembers(members: List<SessionMember>) {
-        return roomDatabase.sessionMemberDao().insertOrReplaceSessionMembers(members)
-    }
-
-    override fun insertOrIgnoreSessionMembers(members: List<SessionMember>) {
-        return roomDatabase.sessionMemberDao().insertOrIgnoreSessionMembers(members)
-    }
-
-    override fun deleteSessionMembers(members: List<SessionMember>) {
+    override fun delete(members: List<SessionMember>) {
         if (members.isNotEmpty()) {
             val sId = members.last().sessionId
             val uIds = mutableSetOf<Long>()
             for (m in members) {
                 uIds.add(m.userId)
             }
-            return roomDatabase.sessionMemberDao().deleteSessionMembers(sId, uIds)
+            return roomDatabase.sessionMemberDao().deleteBySIdAndUIds(sId, uIds)
         }
+    }
+
+    override fun findLatestSyncTimeBySessionId(sessionId: Long): Long {
+        return roomDatabase.sessionMemberDao().findLatestSyncTimeBySessionId(sessionId)
+    }
+
+    override fun querySessionMembers(sessionId: Long): List<SessionMember> {
+        return roomDatabase.sessionMemberDao().findBySessionId(sessionId)
     }
 }

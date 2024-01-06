@@ -70,9 +70,9 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
             var existed = false
             if (msg.rMsgId != null) {
                 val dbMsg = IMCoreManager.getImDataBase().messageDao()
-                    .findMessageByMsgId(msg.rMsgId!!, msg.sid)
+                    .findByMsgId(msg.rMsgId!!, msg.sid)
                 if (dbMsg != null) {
-                    IMCoreManager.getImDataBase().messageDao().deleteMessages(listOf(dbMsg))
+                    IMCoreManager.getImDataBase().messageDao().delete(listOf(dbMsg))
                     XEventBus.post(IMEvent.MsgDelete.value, dbMsg)
                     if (dbMsg.fUid == IMCoreManager.uId) {
                         data.content = dbMsg.content
@@ -84,7 +84,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
             }
             msg.data = Gson().toJson(data)
             if (existed) {
-                IMCoreManager.getImDataBase().messageDao().insertOrIgnoreMessages(listOf(msg))
+                IMCoreManager.getImDataBase().messageDao().insertOrIgnore(listOf(msg))
                 XEventBus.post(IMEvent.MsgNew.value, msg)
                 IMCoreManager.messageModule.processSessionByMessage(msg)
             }

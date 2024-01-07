@@ -9,7 +9,7 @@ import io.reactivex.Flowable
 
 class IMGroupModule : DefaultGroupModule() {
 
-    override fun findOne(id: Long): Flowable<Group> {
+    override fun findById(id: Long): Flowable<Group> {
         return Flowable.create<Group?>({
             val group = IMCoreManager.getImDataBase().groupDao().findById(id)
             if (group != null) {

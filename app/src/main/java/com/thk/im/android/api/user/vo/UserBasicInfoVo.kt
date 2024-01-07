@@ -2,6 +2,7 @@ package com.thk.im.android.api.user.vo
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.User
 import kotlinx.parcelize.Parcelize
 
@@ -20,7 +21,7 @@ data class UserBasicInfoVo(
 ) : Parcelable {
 
     fun toUser(): User {
-        val now = System.currentTimeMillis()
+        val now = IMCoreManager.commonModule.getSeverTime()
         return User(id, displayId, nickname?:"", avatar, sex, null, null, now, now)
     }
 

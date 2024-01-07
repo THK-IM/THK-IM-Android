@@ -110,7 +110,7 @@ class MessageActivity : BaseActivity() {
                     }
                 }
             }
-            IMCoreManager.groupModule.findOne(session.entityId)
+            IMCoreManager.groupModule.findById(session.entityId)
                 .compose(RxTransform.flowableToMain()).subscribe(subscribe)
             addDispose(subscribe)
         }

@@ -9,13 +9,11 @@ import java.io.FileNotFoundException
 
 open class DefaultGroupModule : GroupModule {
 
-    override fun findOne(id: Long): Flowable<Group> {
+    override fun findById(id: Long): Flowable<Group?> {
         return Flowable.create({
             val group = IMCoreManager.getImDataBase().groupDao().findById(id)
             if (group != null) {
                 it.onNext(group)
-            } else {
-                it.onError(FileNotFoundException())
             }
             it.onComplete()
         }, BackpressureStrategy.LATEST)

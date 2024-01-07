@@ -6,7 +6,7 @@ import io.reactivex.Flowable
 
 interface GroupModule : BaseModule {
 
-    fun findOne(id: Long): Flowable<Group>
+    fun findById(id: Long): Flowable<Group?>
 
     fun queryAllGroups(): Flowable<List<Group>>
 

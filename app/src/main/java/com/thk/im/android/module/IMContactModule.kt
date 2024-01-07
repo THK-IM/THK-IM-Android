@@ -14,7 +14,7 @@ class IMContactModule : DefaultContactModule() {
     private val spName = "THK_IM"
     private val lastSyncContactTime = "Last_Sync_Contact_Time"
 
-    private fun setOfflineMsgSyncTime(time: Long): Boolean {
+    private fun setContactSyncTime(time: Long): Boolean {
         val app = IMCoreManager.app
         val sp = app.getSharedPreferences(spName, Context.MODE_PRIVATE)
         val editor = sp.edit()
@@ -22,7 +22,7 @@ class IMContactModule : DefaultContactModule() {
         return editor.commit()
     }
 
-    private fun getOfflineMsgLastSyncTime(): Long {
+    private fun getContactLastSyncTime(): Long {
         val app = IMCoreManager.app
         val sp = app.getSharedPreferences(spName, Context.MODE_PRIVATE)
         return sp.getLong("${lastSyncContactTime}_${IMCoreManager.uId}", 0)
@@ -30,7 +30,7 @@ class IMContactModule : DefaultContactModule() {
 
     override fun syncContacts() {
         val uId = IMCoreManager.uId
-        val mTime = getOfflineMsgLastSyncTime()
+        val mTime = getContactLastSyncTime()
         val count = 100
         val offset = 0
 
@@ -42,11 +42,12 @@ class IMContactModule : DefaultContactModule() {
                     }
                     IMCoreManager.db.contactDao().insertOrReplace(contactList)
                     if (t.data.isNotEmpty()) {
-                        setOfflineMsgSyncTime(t.data.last().updateTime)
+                        val success = setContactSyncTime(t.data.last().updateTime)
+                        if (success && t.data.size >= count) {
+                            syncContacts() // 递归调用
+                        }
                     }
-                    if (t.data.size >= count) {
-                        syncContacts() // 递归调用
-                    }
+
 
                 }
             }

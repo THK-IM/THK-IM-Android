@@ -13,7 +13,6 @@ import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.base.utils.StringUtils
 import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
@@ -60,7 +59,7 @@ class GroupSessionVH(
                 }
             }
         }
-        IMCoreManager.groupModule.findOne(session.entityId)
+        IMCoreManager.groupModule.findById(session.entityId)
             .compose(RxTransform.flowableToMain()).subscribe(subscribe)
         disposable.add(subscribe)
     }

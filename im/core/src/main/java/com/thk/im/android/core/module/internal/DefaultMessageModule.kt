@@ -126,10 +126,8 @@ open class DefaultMessageModule : MessageModule {
                 if (messages.isNotEmpty()) {
                     val severTime = messages.last().cTime
                     val success = setOfflineMsgSyncTime(severTime)
-                    if (success) {
-                        if (messages.count() >= count) {
-                            syncOfflineMessages()
-                        }
+                    if (success && messages.count() >= count) {
+                        syncOfflineMessages()
                     }
                 }
             }
@@ -159,7 +157,8 @@ open class DefaultMessageModule : MessageModule {
                         needDelSIds.add(s.id)
                         needDelSessions.add(s)
                         if (s.type == SessionType.Group.value ||
-                            s.type == SessionType.SuperGroup.value) {
+                            s.type == SessionType.SuperGroup.value
+                        ) {
                             needDelGroups.add(s.entityId)
                         }
                     } else {
@@ -197,13 +196,11 @@ open class DefaultMessageModule : MessageModule {
                 }
 
                 if (sessions.isNotEmpty()) {
-                    setSessionSyncTime(sessions.last().mTime)
+                    val success = setSessionSyncTime(sessions.last().mTime)
+                    if (success && sessions.size >= count) {
+                        syncLatestSessionsFromServer()
+                    }
                 }
-
-                if (sessions.size > count) {
-                    syncLatestSessionsFromServer()
-                }
-
             }
 
             override fun onError(t: Throwable?) {

@@ -128,7 +128,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             val request = Request.Builder()
                 .header(APITokenInterceptor.clientVersionKey, AppUtils.instance().verName)
                 .header(APITokenInterceptor.tokenKey, token)
-                .header(APITokenInterceptor.clientVersionKey, "Android")
+                .header(APITokenInterceptor.platformKey, "Android")
                 .url(wsUrl)
                 .build()
             val client = OkHttpClient.Builder()

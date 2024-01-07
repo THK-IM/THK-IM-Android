@@ -32,8 +32,8 @@ class MineFragment: BaseFragment() {
             initUserInfo(it)
         }
 
-        binding.navSetting.setIconTitle(R.drawable.selector_audio_muted, "设置")
-        binding.navAbout.setIconTitle(R.drawable.selector_audio_muted, "关于")
+        binding.navSetting.setIconTitle(R.drawable.ic_setting, "设置")
+        binding.navAbout.setIconTitle(R.drawable.ic_about, "关于")
     }
 
     private fun initUserInfo(userVo: UserVo) {

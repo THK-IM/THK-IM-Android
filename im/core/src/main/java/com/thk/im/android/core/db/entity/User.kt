@@ -1,13 +1,11 @@
 package com.thk.im.android.core.db.entity
 
 import android.os.Parcelable
-import androidx.annotation.IdRes
 import androidx.annotation.Keep
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
@@ -28,9 +26,9 @@ data class User(
     @SerializedName("display_id")
     @ColumnInfo(name = "display_id")
     val displayId: String,
-    @SerializedName("name")
-    @ColumnInfo(name = "name")
-    var name: String,
+    @SerializedName("nickname")
+    @ColumnInfo(name = "nickname")
+    var nickname: String,
     @SerializedName("avatar")
     @ColumnInfo(name = "avatar")
     var avatar: String?,

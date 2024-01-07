@@ -6,17 +6,13 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.R
-import com.thk.im.android.api.DataRepository
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Contact
-import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.fragment.viewholder.BaseVH
-import com.thk.im.android.ui.manager.IMUIManager
-import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import java.lang.StringBuilder
 
@@ -53,7 +49,7 @@ class ContactVH(liftOwner: LifecycleOwner, itemView: View) :
                     displayAvatar(avatarView, it)
                 }
                 if (contact.noteName == null) {
-                    nickNameView.text = t.name
+                    nickNameView.text = t.nickname
                 }
             }
 

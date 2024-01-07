@@ -3,7 +3,6 @@ package com.thk.im.android.ui.fragment.viewholder
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnLongClickListener
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -186,7 +185,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         if (message.fUid != 0L) {
             val subscriber = object : BaseSubscriber<User>() {
                 override fun onNext(t: User) {
-                    tvNicknameView?.text = t.name
+                    tvNicknameView?.text = t.nickname
                     ivAvatarView?.let { iv ->
                         t.avatar?.let {
                             displayAvatar(iv, it)

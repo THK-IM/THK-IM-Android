@@ -93,7 +93,7 @@ class MessageActivity : BaseActivity() {
             val subscribe = object : BaseSubscriber<User>() {
                 override fun onNext(t: User?) {
                     t?.let {
-                        setTitle(it.name)
+                        setTitle(it.nickname)
                         user = it
                     }
                 }

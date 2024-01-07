@@ -53,7 +53,7 @@ class SingleSessionVH(
     private fun showUserInfo(session: Session) {
         val subscriber = object : BaseSubscriber<User>() {
             override fun onNext(t: User) {
-                nickView.text = t.name
+                nickView.text = t.nickname
                 t.avatar?.let {
                     displayAvatar(avatarView, it)
                 }

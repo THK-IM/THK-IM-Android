@@ -31,7 +31,7 @@ class GroupMemberVH(liftOwner: LifecycleOwner, itemView: View) :
                 t.avatar?.let {
                     displayAvatar(avatarView, it)
                 }
-                nickNameView.text = t.name
+                nickNameView.text = t.nickname
             }
 
             override fun onComplete() {

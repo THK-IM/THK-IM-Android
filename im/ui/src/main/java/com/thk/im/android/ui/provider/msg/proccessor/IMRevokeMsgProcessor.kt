@@ -98,7 +98,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
         } else {
             return IMCoreManager.userModule.queryUser(msg.fUid)
                 .flatMap {
-                    return@flatMap Flowable.just(it.name)
+                    return@flatMap Flowable.just(it.nickname)
                 }
         }
     }

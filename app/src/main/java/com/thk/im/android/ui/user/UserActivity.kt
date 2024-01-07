@@ -68,7 +68,7 @@ class UserActivity : BaseActivity() {
         user.avatar?.let {
             IMImageLoader.displayImageUrl(binding.ivAvatar, it)
         }
-        binding.tvNickname.text = user.name
+        binding.tvNickname.text = user.nickname
         binding.tvId.text = user.displayId
 
         binding.tvFollow.visibility = View.VISIBLE

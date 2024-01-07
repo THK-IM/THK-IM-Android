@@ -4,7 +4,7 @@
     android:id="@+id/ll_bottom_panel"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/bg_operation"
+    android:background="@color/bg_main"
     >
     <View
         android:id="@+id/line"

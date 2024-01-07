@@ -167,7 +167,7 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
 
     override fun openSession(session: Session) {
         if (sessionClick == null) {
-            IMUIManager.sessionOperator?.let {
+            IMUIManager.pageRouter?.let {
                 context?.let { ctx ->
                     it.openSession(ctx, session)
                 }

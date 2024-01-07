@@ -4,7 +4,7 @@ import android.content.Context
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 
-interface IMSessionOperator {
+interface IMPageRouter {
 
     fun openSession(ctx: Context, session: Session)
 

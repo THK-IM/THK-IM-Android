@@ -16,7 +16,6 @@ import com.thk.im.android.core.db.entity.Contact
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.manager.IMUIManager
 import io.reactivex.Flowable
-import io.reactivex.internal.operators.flowable.FlowableWindow
 
 
 class ContactAdapter(
@@ -60,7 +59,7 @@ class ContactAdapter(
         val subscriber: BaseSubscriber<Session> = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session?) {
                 t?.let { session ->
-                    IMUIManager.sessionOperator?.openSession(this@ContactAdapter.context, session)
+                    IMUIManager.pageRouter?.openSession(this@ContactAdapter.context, session)
                 }
             }
         }
@@ -76,7 +75,7 @@ class ContactAdapter(
         val subscriber: BaseSubscriber<Session> = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session?) {
                 t?.let { session ->
-                    IMUIManager.sessionOperator?.openSession(this@ContactAdapter.context, session)
+                    IMUIManager.pageRouter?.openSession(this@ContactAdapter.context, session)
                 }
             }
         }

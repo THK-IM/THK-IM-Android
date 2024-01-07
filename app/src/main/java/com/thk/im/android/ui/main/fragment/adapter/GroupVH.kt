@@ -38,7 +38,7 @@ class GroupVH(liftOwner: LifecycleOwner, itemView: View) :
         val subscriber = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session?) {
                 t?.let {
-                    IMUIManager.sessionOperator?.openSession(itemView.context, it)
+                    IMUIManager.pageRouter?.openSession(itemView.context, it)
                 }
             }
 

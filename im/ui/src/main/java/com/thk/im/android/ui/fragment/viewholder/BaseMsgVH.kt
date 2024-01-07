@@ -135,6 +135,12 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 }
 
                 else -> {
+                    contentContainer.setShape(
+                        Color.parseColor("#20000000"),
+                        Color.parseColor("#20000000"),
+                        0,
+                        floatArrayOf(10f, 10f, 10f, 10f)
+                    )
                 }
             }
         }

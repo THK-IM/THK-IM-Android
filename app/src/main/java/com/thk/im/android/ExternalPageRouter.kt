@@ -5,10 +5,10 @@ import android.content.Intent
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.chat.MessageActivity
-import com.thk.im.android.ui.protocol.IMSessionOperator
+import com.thk.im.android.ui.protocol.IMPageRouter
 import com.thk.im.android.ui.user.UserActivity
 
-class ExternalSessionOperator: IMSessionOperator {
+class ExternalPageRouter: IMPageRouter {
     override fun openSession(ctx: Context, session: Session) {
         val intent = Intent(ctx, MessageActivity::class.java)
         intent.putExtra("session", session)

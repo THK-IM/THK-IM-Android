@@ -48,7 +48,7 @@ class IMApplication : Application() {
         val mediaPreviewer = Previewer(this, token, Host.MsgAPI)
         IMUIManager.mediaProvider = mediaProvider
         IMUIManager.mediaPreviewer = mediaPreviewer
-        IMUIManager.sessionOperator = ExternalSessionOperator()
+        IMUIManager.pageRouter = ExternalPageRouter()
 
         val subscribe = object : BaseSubscriber<Long>() {
             override fun onNext(t: Long?) {

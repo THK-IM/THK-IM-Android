@@ -169,7 +169,7 @@ class UserActivity : BaseActivity() {
         val req = ContactSessionCreateVo(uId, user.id)
         val subscriber = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {
-                IMUIManager.sessionOperator?.openSession(this@UserActivity, t)
+                IMUIManager.pageRouter?.openSession(this@UserActivity, t)
             }
 
             override fun onComplete() {

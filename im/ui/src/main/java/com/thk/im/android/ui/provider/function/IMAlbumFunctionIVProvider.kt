@@ -10,7 +10,7 @@ class IMAlbumFunctionIVProvider : IMBaseFunctionIVProvider() {
     }
 
     override fun iconResId(): Int {
-        return R.drawable.chat_album
+        return R.drawable.ic_msg_media
     }
 
     override fun title(): String {

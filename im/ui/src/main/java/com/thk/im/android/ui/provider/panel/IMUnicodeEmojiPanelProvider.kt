@@ -15,7 +15,7 @@ class IMUnicodeEmojiPanelProvider(private val position: Int) : IMBasePanelFragme
     }
 
     override fun iconResId(): Int {
-        return R.drawable.icon_chat_emoji
+        return R.drawable.ic_msg_emoji
     }
 
     override fun newFragment(): IMBasePanelFragment {

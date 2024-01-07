@@ -10,7 +10,7 @@ class IMCameraFunctionIVProvider: IMBaseFunctionIVProvider() {
     }
 
     override fun iconResId(): Int {
-        return R.drawable.chat_camera
+        return R.drawable.ic_msg_camera
     }
 
     override fun title(): String {

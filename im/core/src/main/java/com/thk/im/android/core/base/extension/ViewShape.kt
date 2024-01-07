@@ -17,8 +17,6 @@ fun View.setShape(strokeColor: Int, color: Int, strokeWidth: Int, radius: FloatA
         color, strokeColor, (strokeWidth * scale).toInt(), scalePx
     )
 
-    val cc = (color * 0.5).toInt()
-
     val selected = ShapeUtils.createRectangleDrawable(
         (color * 0.5).toInt(), (strokeColor * 0.5).toInt(), (strokeWidth * scale).toInt(), scalePx
     )

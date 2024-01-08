@@ -320,14 +320,6 @@ abstract class IMBaseMsgProcessor {
         return true
     }
 
-
-    /**
-     * 消息是否在界面上显示，撤回/已读/已接受等状态消息不显示
-     */
-    open fun isShow(msg: Message): Boolean {
-        return msg.type >= 0
-    }
-
     /**
      * 消息是否需要二次处理，用于拉取同步消息时，不需要二次处理的消息批量入库，需要二次处理的消息单独处理
      */
@@ -340,5 +332,12 @@ abstract class IMBaseMsgProcessor {
      * 消息类型, ex: 文本(1)
      */
     abstract fun messageType(): Int
+
+    /**
+     * 重置
+     */
+    open fun reset() {
+        disposables.clear()
+    }
 
 }

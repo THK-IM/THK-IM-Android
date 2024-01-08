@@ -41,6 +41,9 @@ open class DefaultGroupModule : GroupModule {
         }, BackpressureStrategy.LATEST)
     }
 
+    override fun reset() {
+    }
+
     override fun onSignalReceived(type: Int, body: String) {
 
     }

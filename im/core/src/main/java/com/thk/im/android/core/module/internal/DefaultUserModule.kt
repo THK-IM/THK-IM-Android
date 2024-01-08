@@ -55,6 +55,9 @@ open class DefaultUserModule : UserModule {
         IMCoreManager.getImDataBase().userDao().insertOrReplace(listOf(user))
     }
 
+    override fun reset() {
+    }
+
     override fun onSignalReceived(type: Int, body: String) {
 
     }

@@ -32,9 +32,12 @@ open class DefaultCommonModule : CommonModule {
         IMCoreManager.signalModule.disconnect("be kick off")
     }
 
+    override fun reset() {
+    }
+
     override fun onSignalReceived(type: Int, body: String) {
         if (type == SignalType.SignalHeatBeat.value) {
-            IMCoreManager.messageModule.ackMessagesToServer()
+
         } else if (type == SignalType.SignalSyncTime.value) {
             val time = body.toLong()
             if (time != 0L) {

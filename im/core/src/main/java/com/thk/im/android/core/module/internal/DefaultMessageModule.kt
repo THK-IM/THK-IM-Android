@@ -23,6 +23,9 @@ import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -41,11 +44,28 @@ open class DefaultMessageModule : MessageModule {
     private var lastTimestamp: Long = 0
     private var lastSequence: Int = 0
     private val epoch = 1288834974657L
-    private val needAckMap = HashMap<Long, MutableSet<Long>>()
     private val disposes = CompositeDisposable()
     private val idLock = ReentrantLock()
     private val ackLock = ReentrantReadWriteLock()
     private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 Ios:1 Android:2
+    private val needAckMap = HashMap<Long, MutableSet<Long>>()
+    private val ackMessagePublishSubject = PublishSubject.create<Int>()
+
+    init {
+        initAckMessagePublishSubject()
+    }
+
+    private fun initAckMessagePublishSubject() {
+        val consumer = Consumer<Int> { ackMessagesToServer() }
+        val subscriber = ackMessagePublishSubject.debounce(this.ackInterval(), TimeUnit.SECONDS)
+            .observeOn(Schedulers.io())
+            .subscribe(consumer)
+        disposes.add(subscriber)
+    }
+
+    open fun ackInterval(): Long {
+        return 5
+    }
 
     open fun getOfflineMsgCountPerRequest(): Int {
         return 200
@@ -363,6 +383,7 @@ open class DefaultMessageModule : MessageModule {
         } finally {
             ackLock.writeLock().unlock()
         }
+        ackMessagePublishSubject.onNext(0)
     }
 
     private fun ackMessagesSuccess(sessionId: Long, msgIds: Set<Long>) {
@@ -521,6 +542,14 @@ open class DefaultMessageModule : MessageModule {
             .subscribe(subscriber)
         disposes.add(subscriber)
 
+    }
+
+    override fun reset() {
+        disposes.clear()
+        for ((_, v) in processorMap) {
+            v.reset()
+        }
+        initAckMessagePublishSubject()
     }
 
     override fun onSignalReceived(type: Int, body: String) {

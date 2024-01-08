@@ -19,6 +19,9 @@ open class DefaultContactModule : ContactModule {
         }, BackpressureStrategy.LATEST)
     }
 
+    override fun reset() {
+    }
+
     override fun onSignalReceived(type: Int, body: String) {
     }
 }

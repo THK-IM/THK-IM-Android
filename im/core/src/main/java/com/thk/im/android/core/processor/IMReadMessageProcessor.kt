@@ -12,25 +12,32 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
-class IMReadMessageProcessor : IMBaseMsgProcessor() {
+open class IMReadMessageProcessor : IMBaseMsgProcessor() {
 
     private val needReadMap = HashMap<Long, MutableSet<Long>>()
     private val readLock = ReentrantReadWriteLock()
+    private val readMessagePublishSubject = PublishSubject.create<Int>()
 
     init {
-        val subscriber = object : BaseSubscriber<Long>() {
-            override fun onNext(t: Long?) {
-                LLog.v("ReadMessageProcessor ${disposables.size()}")
-                sendCacheReadMessagesToServer()
-            }
-        }
-        Flowable.interval(2, 2, TimeUnit.SECONDS)
-            .compose(RxTransform.flowableToIo())
-            .subscribe(subscriber)
+        initMessagePublishSubject()
+    }
+
+    private fun initMessagePublishSubject() {
+        val consumer = Consumer<Int> { sendCacheReadMessagesToServer() }
+        val subscriber = readMessagePublishSubject.debounce(this.sendInterval(), TimeUnit.SECONDS)
+            .observeOn(Schedulers.io())
+            .subscribe(consumer)
         disposables.add(subscriber)
+    }
+
+    open fun sendInterval(): Long {
+        return 2
     }
 
     override fun messageType(): Int {
@@ -153,6 +160,7 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
         } finally {
             readLock.writeLock().unlock()
         }
+        readMessagePublishSubject.onNext(0)
     }
 
     private fun readMessageToServerSuccess(sessionId: Long, msgIds: Set<Long>) {
@@ -216,5 +224,10 @@ class IMReadMessageProcessor : IMBaseMsgProcessor() {
 
     override fun needReprocess(msg: Message): Boolean {
         return true
+    }
+
+    override fun reset() {
+        super.reset()
+        initMessagePublishSubject()
     }
 }

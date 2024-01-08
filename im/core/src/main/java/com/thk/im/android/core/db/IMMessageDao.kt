@@ -87,4 +87,10 @@ interface IMMessageDao {
      * 查询session的最后一条消息
      */
     fun findLastMessageBySessionId(sid: Long): Message?
+
+    fun search(sid: Long, type: Int, keyword: String, count: Int, offset: Int): List<Message>
+    fun search(sid: Long, keyword: String, count: Int, offset: Int): List<Message>
+    fun search(type: Int, keyword: String, count: Int, offset: Int): List<Message>
+    fun search(keyword: String, count: Int, offset: Int): List<Message>
+
 }

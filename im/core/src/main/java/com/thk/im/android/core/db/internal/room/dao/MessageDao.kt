@@ -109,4 +109,16 @@ internal interface MessageDao {
      */
     @Query("select * from message where session_id = :sid and type >= 0 order by m_time desc limit 0, 1")
     fun findLastMessageBySessionId(sid: Long): Message?
+
+    @Query("select * from message where session_id = :sid and type = :type and content like :keyword order by m_time desc limit :offset, :count")
+    fun search(sid: Long, type: Int, keyword: String, count: Int, offset: Int): List<Message>
+
+    @Query("select * from message where session_id = :sid and content like :keyword order by m_time desc limit :offset, :count")
+    fun search(sid: Long, keyword: String, count: Int, offset: Int): List<Message>
+
+    @Query("select * from message where type = :type and content like :keyword order by m_time desc limit :offset, :count")
+    fun search(type: Int, keyword: String, count: Int, offset: Int): List<Message>
+
+    @Query("select * from message where content like :keyword order by m_time desc limit :offset, :count")
+    fun search(keyword: String, count: Int, offset: Int): List<Message>
 }

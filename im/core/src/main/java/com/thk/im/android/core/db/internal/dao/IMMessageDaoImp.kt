@@ -104,4 +104,20 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         return roomDatabase.messageDao().findLastMessageBySessionId(sid)
     }
 
+    override fun search(sid: Long, type: Int, keyword: String, count: Int, offset: Int): List<Message> {
+        return roomDatabase.messageDao().search(sid, type, keyword, count, offset)
+    }
+
+    override fun search(sid: Long, keyword: String, count: Int, offset: Int): List<Message> {
+        return roomDatabase.messageDao().search(sid, keyword, count, offset)
+    }
+
+    override fun search(type: Int, keyword: String, count: Int, offset: Int): List<Message> {
+        return roomDatabase.messageDao().search(type, keyword, count, offset)
+    }
+
+    override fun search(keyword: String, count: Int, offset: Int): List<Message> {
+        return roomDatabase.messageDao().search(keyword, count, offset)
+    }
+
 }

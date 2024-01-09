@@ -86,18 +86,6 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         }
     }
 
-    override fun setConnId(id: String) {
-        connId = id
-    }
-
-    override fun getConnId(): String? {
-        return connId
-    }
-
-    override fun updateToken(token: String) {
-        this.token = token
-    }
-
     override fun connect() {
         NetworkManager.getInstance().registerObserver(this)
         startConnect()
@@ -141,23 +129,23 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         }
     }
 
-    override fun getConnectStatus(): Int {
+    override fun getSignalStatus(): Int {
         return status
     }
 
-    override fun sendMessage(msg: String) {
+    override fun sendSignal(signal: String) {
         if (status != SignalStatus.Connected.value) {
             throw RuntimeException("disconnected")
         }
-        LLog.v("Send Signal: $msg")
-        val success = webSocket?.send(msg)
+        LLog.v("Send Signal: $signal")
+        val success = webSocket?.send(signal)
         if (success == false) {
             LLog.e("send result false")
         }
     }
 
-    override fun setSignalListener(listener: SignalListener) {
-        signalListener = listener
+    override fun setSignalListener(signalListener: SignalListener) {
+        this.signalListener = signalListener
     }
 
     private fun onStatusChange(status: Int) {
@@ -177,7 +165,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     private fun heatBeat() {
         if (status == SignalStatus.Connected.value) {
             try {
-                sendMessage(Signal.ping)
+                sendSignal(Signal.ping)
             } catch (e: RuntimeException) {
                 LLog.e("IMException: ${e.message}")
             }

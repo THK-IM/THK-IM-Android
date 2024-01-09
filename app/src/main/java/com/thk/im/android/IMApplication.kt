@@ -43,17 +43,17 @@ class IMApplication : Application() {
     }
 
     private fun initIMConfig() {
+        val debug = true
+        IMCoreManager.init(this, debug)
         IMCoreManager.userModule = IMUserModule()
         IMCoreManager.contactModule = IMContactModule()
         IMCoreManager.groupModule = IMGroupModule()
-        IMCoreManager.init(this)
         IMUIManager.init(this)
         IMUIManager.pageRouter = ExternalPageRouter()
     }
 
     fun initIMUser(token: String, uId: Long): Flowable<Boolean> {
         return Flowable.create({
-
             val signalModule = DefaultSignalModule(this, Host.Websocket, token)
             val fileLoaderModule = DefaultFileLoadModule(this, Host.MsgAPI, token)
             val imApi = DefaultIMApi(token, Host.MsgAPI)
@@ -65,7 +65,7 @@ class IMApplication : Application() {
             IMUIManager.mediaProvider = mediaProvider
             IMUIManager.mediaPreviewer = mediaPreviewer
 
-            IMCoreManager.initUser(uId, true)
+            IMCoreManager.initUser(uId)
 
             it.onNext(true)
             it.onComplete()

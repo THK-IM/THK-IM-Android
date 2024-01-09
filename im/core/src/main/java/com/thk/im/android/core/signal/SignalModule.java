@@ -3,25 +3,6 @@ package com.thk.im.android.core.signal;
 public interface SignalModule {
 
     /**
-     * 获取连接id
-     * @return nullable
-     */
-    String getConnId();
-
-    /**
-     * 设置连接时间
-     * @param connId 连接id
-     */
-    void setConnId(String connId);
-
-    /**
-     * 更新token
-     *
-     * @param token 连接令牌
-     */
-    void updateToken(String token);
-
-    /**
      * 连接
      */
     void connect();
@@ -31,22 +12,22 @@ public interface SignalModule {
      *
      * @return 连接状态
      */
-    int getConnectStatus();
+    int getSignalStatus();
 
     /**
      * 发送消息
      *
-     * @param msg 消息内容
+     * @param signal 消息内容
      * @throws RuntimeException 发送失败，抛出异常
      */
-    void sendMessage(String msg) throws RuntimeException;
+    void sendSignal(String signal) throws RuntimeException;
 
     /**
      * 设置信令接收器
      *
-     * @param signal 信令接收器
+     * @param signalListener 信令接收器
      */
-    void setSignalListener(SignalListener signal);
+    void setSignalListener(SignalListener signalListener);
 
     /**
      * 断开连接

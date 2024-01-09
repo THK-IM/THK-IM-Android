@@ -4,11 +4,8 @@ import android.app.Application
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.thk.im.android.core.api.IMApi
 import com.thk.im.android.core.base.LLog
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.utils.AppUtils
-import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.IMDataBase
-import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.internal.DefaultIMDataBase
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadModule
@@ -27,6 +24,7 @@ import com.thk.im.android.core.storage.internal.DefaultStorageModule
 
 object IMCoreManager {
 
+    private var debug: Boolean = false
     var commonModule = DefaultCommonModule()
     var messageModule = DefaultMessageModule()
     var userModule = DefaultUserModule()
@@ -41,30 +39,34 @@ object IMCoreManager {
     lateinit var db: IMDataBase
     lateinit var app: Application
     lateinit var storageModule: StorageModule
-    var uId: Long = 0L
 
-    fun init(app: Application) {
+    var uId: Long = 0L
+    fun init(app: Application, debug: Boolean = true) {
         this.app = app
+        this.debug = debug
+        LLog.init("THK-IM", if (debug) LLog.DEBUG else LLog.INFO)
         AppUtils.instance().init(app)
-        ToastUtils.init(app)
         LiveEventBus.config().setContext(IMCoreManager.app)
             .autoClear(true)
             .lifecycleObserverAlwaysActive(true)
+        messageModule.registerMsgProcessor(IMReadMessageProcessor())
     }
 
-    fun initUser(uId: Long, debug: Boolean) {
+    fun initUser(uId: Long) {
         if (uId <= 0) {
             return
         }
         if (this.uId == uId) {
             return
         }
-        shutdown()
+
+        if (this.uId != 0L) {
+            shutdown()
+        }
 
         this.uId = uId
         db = DefaultIMDataBase(app, uId, debug)
         storageModule = DefaultStorageModule(app, uId)
-        messageModule.registerMsgProcessor(IMReadMessageProcessor())
         db.open()
         connect()
     }

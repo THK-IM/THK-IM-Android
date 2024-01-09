@@ -42,4 +42,7 @@ interface FileLoadModule {
      */
     fun cancelUploadListener(path: String)
 
+
+    fun reset()
+
 }

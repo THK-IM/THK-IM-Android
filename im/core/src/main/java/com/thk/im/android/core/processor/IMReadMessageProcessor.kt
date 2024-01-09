@@ -222,12 +222,24 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
         }
     }
 
+    private fun clearReadMessageCache() {
+        try {
+            readLock.readLock().tryLock(1, TimeUnit.SECONDS)
+            this.needReadMap.clear()
+        } catch (e: Exception) {
+            LLog.e("clearReadMessageCache $e")
+        } finally {
+            readLock.readLock().unlock()
+        }
+    }
+
     override fun needReprocess(msg: Message): Boolean {
         return true
     }
 
     override fun reset() {
         super.reset()
+        clearReadMessageCache()
         initMessagePublishSubject()
     }
 }

@@ -14,6 +14,7 @@ import com.thk.im.android.api.user.vo.RegisterReq
 import com.thk.im.android.api.user.vo.RegisterVo
 import com.thk.im.android.api.user.vo.UserVo
 import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.databinding.ActivityWelcomeBinding
@@ -122,10 +123,17 @@ class WelcomeActivity : BaseActivity() {
     }
 
     private fun initIM(token: String, uId: Long) {
-        (application as IMApplication).initIM(token, uId)
-        gotoMainActivity()
-//        if (success) {
-//        }
+        val subscribe = object : BaseSubscriber<Boolean>() {
+            override fun onNext(t: Boolean?) {
+                t?.let {
+                    LLog.v("init: $it" )
+                    gotoMainActivity()
+                }
+            }
+        }
+        (application as IMApplication).initIMUser(token, uId)
+            .compose(RxTransform.flowableToIo())
+            .subscribe(subscribe)
     }
 
     override fun onConnectStatus(status: Int) {

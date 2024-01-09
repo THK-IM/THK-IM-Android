@@ -193,4 +193,17 @@ class DefaultFileLoadModule(
         val p = uploadTaskMap[path]
         p?.second?.clear()
     }
+
+    override fun reset() {
+        for ((_, v) in downloadTaskMap ) {
+            v.first.cancel()
+            v.second.clear()
+        }
+        downloadTaskMap.clear()
+        for ((_, v) in uploadTaskMap ) {
+            v.first.cancel()
+            v.second.clear()
+        }
+        uploadTaskMap.clear()
+    }
 }

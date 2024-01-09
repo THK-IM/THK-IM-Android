@@ -1,5 +1,6 @@
 package com.thk.im.android.core.db.internal.dao
 
+import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.db.IMMessageDao
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.internal.room.IMRoomDataBase
@@ -38,11 +39,6 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         roomDatabase.messageDao().update(messages)
     }
 
-    override fun resetSendingMsg(status: Int, successStatus: Int) {
-        roomDatabase.messageDao().resetSendingMsg(status, successStatus)
-    }
-
-
     override fun updateSendStatus(sId: Long, id: Long, sendStatus: Int, fUId: Long) {
         roomDatabase.messageDao().updateSendStatus(sId, id, sendStatus, fUId)
     }
@@ -55,12 +51,16 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         roomDatabase.messageDao().updateStatusBySessionId(sid, oprStatus)
     }
 
-    override fun resetSendStatusFailed(sendStatus: Int) {
-        roomDatabase.messageDao().resetSendStatusFailed(sendStatus)
-    }
-
     override fun updateOperationStatus(sid: Long, msgIds: Set<Long>, oprStatus: Int) {
         roomDatabase.messageDao().updateOperationStatus(sid, msgIds, oprStatus)
+    }
+
+    override fun resetSendingMessage(status: Int, successStatus: Int) {
+        roomDatabase.messageDao().resetSendingMsg(status, successStatus)
+    }
+
+    override fun findSendingMessages(successStatus: Int): List<Message> {
+        return roomDatabase.messageDao().findSendingMessages(successStatus)
     }
 
 

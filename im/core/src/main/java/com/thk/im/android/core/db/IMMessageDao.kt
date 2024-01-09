@@ -40,11 +40,6 @@ interface IMMessageDao {
     fun updateStatusBySessionId(sid: Long, oprStatus: Int)
 
     /**
-     * 更新所有消息的发送状态
-     */
-    fun resetSendStatusFailed(sendStatus: Int = MsgSendStatus.SendFailed.value)
-
-    /**
      * 更新消息的操作状态
      */
     fun updateOperationStatus(
@@ -53,11 +48,9 @@ interface IMMessageDao {
         oprStatus: Int
     )
 
+    fun resetSendingMessage(status: Int = MsgSendStatus.SendFailed.value, successStatus: Int = MsgSendStatus.Success.value)
 
-    fun resetSendingMsg(
-        status: Int = MsgSendStatus.SendFailed.value,
-        successStatus: Int = MsgSendStatus.Success.value
-    )
+    fun findSendingMessages(successStatus: Int = MsgSendStatus.Success.value): List<Message>
 
     fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
 

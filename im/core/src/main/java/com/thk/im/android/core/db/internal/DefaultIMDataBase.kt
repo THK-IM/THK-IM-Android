@@ -2,6 +2,8 @@ package com.thk.im.android.core.db.internal
 
 import android.app.Application
 import androidx.room.Room
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.db.IMContactDao
 import com.thk.im.android.core.db.IMDataBase
 import com.thk.im.android.core.db.IMGroupDao
@@ -48,11 +50,20 @@ internal class DefaultIMDataBase(
     }
 
     override fun open() {
-        roomDataBase.messageDao().resetSendingMsg()
+        val sendingMessage = messageDao.findSendingMessages()
+        if (sendingMessage.isNotEmpty()) {
+            messageDao.resetSendingMessage()
+            for (msg in sendingMessage) {
+                msg.sendStatus = MsgSendStatus.SendFailed.value
+                IMCoreManager.messageModule.processSessionByMessage(msg)
+            }
+        }
     }
 
     override fun close() {
-        roomDataBase.close()
+        if (roomDataBase.isOpen) {
+            roomDataBase.close()
+        }
     }
 
     override fun userDao(): IMUserDao {

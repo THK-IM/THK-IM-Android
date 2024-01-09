@@ -22,7 +22,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-open class DefaultIMApi(serverUrl: String, token: String) : IMApi {
+open class DefaultIMApi(token: String, serverUrl: String) : IMApi {
 
     private val defaultTimeout: Long = 30
     private val maxIdleConnection = 8

@@ -386,6 +386,17 @@ open class DefaultMessageModule : MessageModule {
         ackMessagePublishSubject.onNext(0)
     }
 
+    private fun clearAckCache() {
+        try {
+            ackLock.writeLock().tryLock(1, TimeUnit.SECONDS)
+            needAckMap.clear()
+        } catch (e: Exception) {
+            LLog.e("ackMessageToCache $e")
+        } finally {
+            ackLock.writeLock().unlock()
+        }
+    }
+
     private fun ackMessagesSuccess(sessionId: Long, msgIds: Set<Long>) {
         try {
             ackLock.writeLock().tryLock(1, TimeUnit.SECONDS)
@@ -545,6 +556,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun reset() {
+        clearAckCache()
         disposes.clear()
         for ((_, v) in processorMap) {
             v.reset()

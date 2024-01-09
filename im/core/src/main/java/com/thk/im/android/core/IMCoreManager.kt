@@ -8,6 +8,7 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.IMDataBase
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.internal.DefaultIMDataBase
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadModule
@@ -41,7 +42,6 @@ object IMCoreManager {
     lateinit var app: Application
     lateinit var storageModule: StorageModule
     var uId: Long = 0L
-    var inited = false
 
     fun init(app: Application) {
         this.app = app
@@ -53,17 +53,23 @@ object IMCoreManager {
     }
 
     fun initUser(uId: Long, debug: Boolean) {
+        if (uId <= 0) {
+            return
+        }
+        if (this.uId == uId) {
+            return
+        }
+        shutdown()
+
         this.uId = uId
         db = DefaultIMDataBase(app, uId, debug)
         storageModule = DefaultStorageModule(app, uId)
         messageModule.registerMsgProcessor(IMReadMessageProcessor())
+        db.open()
+        connect()
     }
 
-    fun connect() {
-        if (inited) {
-            return
-        }
-        db.open()
+    private fun connect() {
         signalModule.setSignalListener(object : SignalListener {
             override fun onSignalStatusChange(status: Int) {
                 if (status == SignalStatus.Connected.value) {
@@ -92,13 +98,14 @@ object IMCoreManager {
             }
         })
         signalModule.connect()
-        inited = true
     }
 
     fun shutdown() {
+        fileLoadModule.reset()
+        messageModule.reset()
         signalModule.disconnect("shutdown")
         db.close()
-        inited = false
+        this.uId = 0L
     }
 
     fun getImDataBase(): IMDataBase {

@@ -50,12 +50,6 @@ internal interface MessageDao {
     fun updateStatusBySessionId(sid: Long, oprStatus: Int)
 
     /**
-     * 更新所有消息的发送状态
-     */
-    @Query("update message set send_status = :sendStatus where send_status < :sendStatus")
-    fun resetSendStatusFailed(sendStatus: Int = MsgSendStatus.SendFailed.value)
-
-    /**
      * 更新消息的操作状态
      */
     @Query("update message set opr_status = opr_status | :oprStatus where session_id = :sid and msg_id in (:msgIds)")
@@ -73,6 +67,9 @@ internal interface MessageDao {
         status: Int = MsgSendStatus.SendFailed.value,
         successStatus: Int = MsgSendStatus.Success.value
     )
+
+    @Query("select * from message where send_status < :successStatus order by m_time asc")
+    fun findSendingMessages(successStatus: Int): List<Message>
 
     @Query("select * from message where session_id = :sid and type >= 0 and c_time < :cTime order by c_time desc limit :count")
     fun findBySidBeforeCTime(sid: Long, cTime: Long, count: Int): List<Message>

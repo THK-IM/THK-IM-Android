@@ -456,9 +456,9 @@ open class DefaultMessageModule : MessageModule {
                     val processor = getMsgProcessor(msg.type)
                     var statusText = ""
                     if (msg.sendStatus == MsgSendStatus.Sending.value) {
-                        statusText = "⬆️ "
+                        statusText = "[⬆️] "
                     } else if (msg.sendStatus == MsgSendStatus.SendFailed.value) {
-                        statusText = "❗"
+                        statusText = "[❗]"
                     }
                     t.lastMsg = "$statusText${processor.getSessionDesc(msg)}"
                     t.mTime = msg.mTime

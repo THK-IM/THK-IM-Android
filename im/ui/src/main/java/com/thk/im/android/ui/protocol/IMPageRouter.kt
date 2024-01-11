@@ -8,5 +8,5 @@ interface IMPageRouter {
 
     fun openSession(ctx: Context, session: Session)
 
-    fun openUserPage(ctx: Context, user: User)
+    fun openContactUserPage(ctx: Context, user: User)
 }

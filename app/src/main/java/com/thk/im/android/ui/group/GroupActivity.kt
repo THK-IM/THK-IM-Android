@@ -25,7 +25,7 @@ import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.databinding.ActivityGroupBinding
 import com.thk.im.android.ui.base.BaseActivity
-import com.thk.im.android.ui.contact.ContactActivity
+import com.thk.im.android.ui.contact.ContactListActivity
 import com.thk.im.android.ui.group.adapter.GroupMemberAdapter
 import io.reactivex.Flowable
 
@@ -158,7 +158,7 @@ class GroupActivity : BaseActivity() {
         )
 
         binding.lyGroupMember.setOnClickListener {
-            ContactActivity.openContactActivity(this@GroupActivity, 1, launcher)
+            ContactListActivity.openContactListActivity(this@GroupActivity, 1, launcher)
         }
 
         val adapter = GroupMemberAdapter(this)

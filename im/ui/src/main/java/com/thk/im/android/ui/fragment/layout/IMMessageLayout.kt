@@ -204,7 +204,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
             val subscriber = object : BaseSubscriber<User>() {
                 override fun onNext(t: User?) {
                     t?.let {
-                        IMUIManager.pageRouter?.openUserPage(context, it)
+                        IMUIManager.pageRouter?.openContactUserPage(context, it)
                     }
                 }
 

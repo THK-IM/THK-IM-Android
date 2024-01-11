@@ -18,7 +18,7 @@ import com.thk.im.android.databinding.ActivityMessageBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.fragment.IMMessageFragment
 import com.thk.im.android.ui.group.GroupActivity
-import com.thk.im.android.ui.user.UserActivity
+import com.thk.im.android.ui.contact.ContactUserActivity
 
 class MessageActivity : BaseActivity() {
 
@@ -80,7 +80,7 @@ class MessageActivity : BaseActivity() {
     override fun onToolBarMenuClick(view: View) {
         if (view.id == R.id.tb_menu1) {
             user?.let {
-                UserActivity.startUserActivity(this, it)
+                ContactUserActivity.startContactUserActivity(this, it)
             }
             group?.let {
                 GroupActivity.startGroupActivity(this, it)

@@ -13,15 +13,15 @@ import com.thk.im.android.databinding.ActivityContactBinding
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.main.fragment.ContactFragment
 
-class ContactActivity : BaseActivity() {
+class ContactListActivity : BaseActivity() {
 
     companion object {
-        fun openContactActivity(
+        fun openContactListActivity(
             ctx: Context,
             mode: Int,
             launcher: ActivityResultLauncher<Intent>?
         ) {
-            val intent = Intent(ctx, ContactActivity::class.java)
+            val intent = Intent(ctx, ContactListActivity::class.java)
             intent.putExtra("mode", mode)
             if (launcher != null) {
                 launcher.launch(intent)

@@ -123,7 +123,7 @@ interface MessageModule : BaseModule {
     fun notifyNewMessage(session: Session, message: Message)
 
     /**
-     * 查询session下的成员列表（本地数据库）
+     * 查询session下的成员列表
      */
     fun querySessionMembers(sessionId: Long): Flowable<List<SessionMember>>
 

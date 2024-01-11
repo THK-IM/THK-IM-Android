@@ -9,6 +9,7 @@ open class DefaultCommonModule : CommonModule {
     private val timeMap: MutableMap<String, Long> = HashMap()
     private val client = "client"
     private val server = "server"
+    private var connId = ""
 
     override fun setSeverTime(time: Long) {
         synchronized(this) {
@@ -44,7 +45,7 @@ open class DefaultCommonModule : CommonModule {
                 setSeverTime(time)
             }
         } else if (type == SignalType.SignalConnId.value) {
-            IMCoreManager.signalModule.connId = body
+            connId = body
         } else if (type == SignalType.SignalKickOffUser.value) {
             beKickOff()
         }

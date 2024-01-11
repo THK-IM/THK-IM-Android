@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.user
+package com.thk.im.android.ui.contact
 
 import android.content.Context
 import android.content.Intent
@@ -24,11 +24,11 @@ import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.manager.IMUIManager
 import io.reactivex.Flowable
 
-class UserActivity : BaseActivity() {
+class ContactUserActivity : BaseActivity() {
 
     companion object {
-        fun startUserActivity(ctx: Context, user: User) {
-            val intent = Intent(ctx, UserActivity::class.java)
+        fun startContactUserActivity(ctx: Context, user: User) {
+            val intent = Intent(ctx, ContactUserActivity::class.java)
             intent.putExtra("user", user)
             ctx.startActivity(intent)
         }
@@ -169,7 +169,7 @@ class UserActivity : BaseActivity() {
         val req = ContactSessionCreateVo(uId, user.id)
         val subscriber = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {
-                IMUIManager.pageRouter?.openSession(this@UserActivity, t)
+                IMUIManager.pageRouter?.openSession(this@ContactUserActivity, t)
             }
 
             override fun onComplete() {

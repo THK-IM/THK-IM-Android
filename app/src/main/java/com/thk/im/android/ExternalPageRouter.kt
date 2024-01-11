@@ -6,7 +6,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.chat.MessageActivity
 import com.thk.im.android.ui.protocol.IMPageRouter
-import com.thk.im.android.ui.user.UserActivity
+import com.thk.im.android.ui.contact.ContactUserActivity
 
 class ExternalPageRouter: IMPageRouter {
     override fun openSession(ctx: Context, session: Session) {
@@ -15,8 +15,8 @@ class ExternalPageRouter: IMPageRouter {
         ctx.startActivity(intent)
     }
 
-    override fun openUserPage(ctx: Context, user: User) {
-        UserActivity.startUserActivity(ctx, user)
+    override fun openContactUserPage(ctx: Context, user: User) {
+        ContactUserActivity.startContactUserActivity(ctx, user)
     }
 
 }

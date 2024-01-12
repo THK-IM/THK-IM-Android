@@ -165,7 +165,7 @@ class ContactUserActivity : BaseActivity() {
     }
 
     private fun startMessage(user: User) {
-        val uId = DataRepository.getUserId()
+        val uId = DataRepository.getUserId() ?: return
         val req = ContactSessionCreateVo(uId, user.id)
         val subscriber = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {

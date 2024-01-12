@@ -23,7 +23,8 @@ import okhttp3.WebSocketListener
 import java.util.concurrent.TimeUnit
 
 
-class DefaultSignalModule(app: Application, wsUrl: String, token: String) : SignalModule, NetworkListener {
+class DefaultSignalModule(app: Application, wsUrl: String, token: String) : SignalModule,
+    NetworkListener {
     private val mHandler = Handler(Looper.getMainLooper())
     private val heatBeatInterval = 10 * 1000L
     private val reconnectInterval = 3000L // 3s 重连一次
@@ -32,10 +33,8 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     private var wsUrl: String
     private var app: Application
     private var webSocket: WebSocket? = null
-    private var status: Int = SignalStatus.Init.value
+    private var status: SignalStatus = SignalStatus.Init
     private var signalListener: SignalListener? = null
-
-    private var connId: String? = null
 
     init {
         this.app = app
@@ -46,26 +45,29 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
     private val webSocketListener = object : WebSocketListener() {
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            LLog.d("onClosed, code: $code, reason: $reason")
+            LLog.d("DefaultSignalModule", "onClosed, code: $code, reason: $reason")
             super.onClosed(webSocket, code, reason)
             if (this@DefaultSignalModule.webSocket == webSocket) {
-                onStatusChange(SignalStatus.Disconnected.value)
+                onStatusChange(SignalStatus.Disconnected)
             }
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            LLog.d("onFailure, Throwable: ${if (t.message == null) "unknown" else t.message}")
+            LLog.d(
+                "DefaultSignalModule",
+                "onFailure, Throwable: ${if (t.message == null) "unknown" else t.message}"
+            )
             super.onFailure(webSocket, t, response)
             if (this@DefaultSignalModule.webSocket == webSocket) {
                 webSocket.close(3001, "onFailure")
-                onStatusChange(SignalStatus.Disconnected.value)
+                onStatusChange(SignalStatus.Disconnected)
             }
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             super.onMessage(webSocket, text)
-            onStatusChange(SignalStatus.Connected.value)
-            LLog.v("Receive Signal: $text")
+            onStatusChange(SignalStatus.Connected)
+            LLog.v("DefaultSignalModule", "Receive Signal: $text")
             try {
                 val signal = Gson().fromJson(text, Signal::class.java)
                 signalListener?.onNewSignal(signal.type, signal.body)
@@ -75,30 +77,34 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            LLog.d("onClosing, code: $code, reason: $reason")
+            LLog.d("DefaultSignalModule", "onClosing, code: $code, reason: $reason")
             super.onClosing(webSocket, code, reason)
-            onStatusChange(SignalStatus.Disconnected.value)
+            onStatusChange(SignalStatus.Disconnected)
         }
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
-            LLog.d("onOpen ${response.code}, ${response.isSuccessful}")
+            LLog.d("DefaultSignalModule", "onOpen ${response.code}, ${response.isSuccessful}")
         }
     }
 
     override fun connect() {
+        LLog.d("DefaultSignalModule", "connect")
         NetworkManager.getInstance().registerObserver(this)
         startConnect()
     }
+
     override fun disconnect(reason: String) {
+        LLog.d("DefaultSignalModule", "disconnect true $webSocket ${Thread.currentThread().name}" )
+        mHandler.removeCallbacksAndMessages(null)
         NetworkManager.getInstance().unRegisterObserver(this)
         webSocket?.close(3008, reason)
-        webSocket = null
+        status = SignalStatus.Disconnected
         signalListener = null
-        mHandler.removeCallbacksAndMessages(null)
     }
+
     private fun reconnect() {
-        LLog.v("reconnect")
+        LLog.d("DefaultSignalModule", "reconnect")
         mHandler.postDelayed({
             if (NetworkUtils.isAvailable()) {
                 startConnect()
@@ -109,10 +115,10 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
     private fun startConnect() {
         synchronized(this) {
-            if (status == SignalStatus.Connecting.value || status == SignalStatus.Connected.value) {
+            if (status == SignalStatus.Connecting || status == SignalStatus.Connected) {
                 return
             }
-            onStatusChange(SignalStatus.Connecting.value)
+            onStatusChange(SignalStatus.Connecting)
             val request = Request.Builder()
                 .header(APITokenInterceptor.clientVersionKey, AppUtils.instance().verName)
                 .header(APITokenInterceptor.tokenKey, token)
@@ -129,15 +135,15 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         }
     }
 
-    override fun getSignalStatus(): Int {
+    override fun getSignalStatus(): SignalStatus {
         return status
     }
 
     override fun sendSignal(signal: String) {
-        if (status != SignalStatus.Connected.value) {
+        LLog.d("DefaultSignalModule", "Send Signal $webSocket $status ${Thread.currentThread().name}")
+        if (status != SignalStatus.Connected) {
             throw RuntimeException("disconnected")
         }
-        LLog.v("Send Signal: $signal")
         val success = webSocket?.send(signal)
         if (success == false) {
             LLog.e("send result false")
@@ -148,14 +154,15 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         this.signalListener = signalListener
     }
 
-    private fun onStatusChange(status: Int) {
+    private fun onStatusChange(status: SignalStatus) {
+        LLog.d("DefaultSignalModule", "status: ${this.status} $status")
         if (this.status != status) {
             this.status = status
-            signalListener?.onSignalStatusChange(status)
-            if (status == SignalStatus.Connected.value ) {
+            signalListener?.onSignalStatusChange(status.value)
+            if (status == SignalStatus.Connected) {
                 mHandler.removeCallbacksAndMessages(null)
                 heatBeat()
-            } else if (status == SignalStatus.Disconnected.value ) {
+            } else if (status == SignalStatus.Disconnected) {
                 mHandler.removeCallbacksAndMessages(null)
                 reconnect()
             }
@@ -163,7 +170,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     private fun heatBeat() {
-        if (status == SignalStatus.Connected.value) {
+        if (status == SignalStatus.Connected) {
             try {
                 sendSignal(Signal.ping)
             } catch (e: RuntimeException) {
@@ -179,10 +186,11 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         type?.let {
             when (it) {
                 NetType.WIFI, NetType.Mobile, NetType.Unknown -> {
-                    LLog.d("有网络")
+                    LLog.d("DefaultSignalModule", "有网络")
                     reconnect()
                 }
-                NetType.NONE -> LLog.d("无网络")
+
+                NetType.NONE -> LLog.d("DefaultSignalModule", "无网络")
             }
         }
     }

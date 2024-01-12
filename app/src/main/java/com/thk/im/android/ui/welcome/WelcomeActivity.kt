@@ -49,7 +49,7 @@ class WelcomeActivity : BaseActivity() {
             if (user == null) {
                 loginByToken(token)
             } else {
-                initIM(token, user.id)
+                gotoMainActivity()
             }
         }
     }

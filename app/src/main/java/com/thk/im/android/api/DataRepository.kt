@@ -31,9 +31,10 @@ object DataRepository {
         return sp.getString("Token", "")
     }
 
-    fun getUserId(): Long {
+    fun getUserId(): Long? {
         val sp = app.getSharedPreferences("UserInfo", AppCompatActivity.MODE_PRIVATE)
-        return sp.getLong("UserId", 0)
+        val id = sp.getLong("UserId", 0)
+        return if (id == 0L) return null else return id
     }
 
     fun getUser(): UserVo? {

@@ -52,10 +52,6 @@ class ContactAdapter(
     }
 
     private fun openSession(contact: Contact) {
-        val uId = DataRepository.getUserId()
-        if (uId <= 0L) {
-            return
-        }
         val subscriber: BaseSubscriber<Session> = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session?) {
                 t?.let { session ->

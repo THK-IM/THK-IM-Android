@@ -1,5 +1,7 @@
 package com.thk.im.android.core.signal;
 
+import com.thk.im.android.core.SignalStatus;
+
 public interface SignalModule {
 
     /**
@@ -12,7 +14,7 @@ public interface SignalModule {
      *
      * @return 连接状态
      */
-    int getSignalStatus();
+    SignalStatus getSignalStatus();
 
     /**
      * 发送消息

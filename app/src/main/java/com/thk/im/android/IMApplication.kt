@@ -20,7 +20,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 
 class IMApplication : Application() {
-
     override fun onCreate() {
         super.onCreate()
         LLog.v("onCreate IMApplication")
@@ -28,7 +27,7 @@ class IMApplication : Application() {
         initIMConfig()
         val token = DataRepository.getUserToken()
         val uId = DataRepository.getUserId()
-        if (token != null && uId > 0) {
+        if (token != null && uId != null) {
             val subscribe = object : BaseSubscriber<Boolean>() {
                 override fun onNext(t: Boolean?) {
                     t?.let {
@@ -53,6 +52,7 @@ class IMApplication : Application() {
     }
 
     fun initIMUser(token: String, uId: Long): Flowable<Boolean> {
+
         return Flowable.create({
             val signalModule = DefaultSignalModule(this, Host.Websocket, token)
             val fileLoaderModule = DefaultFileLoadModule(this, Host.MsgAPI, token)

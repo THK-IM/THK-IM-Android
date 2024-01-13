@@ -4,19 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.thk.android.im.live.base.BaseSubscriber
 import com.thk.im.android.R
 import com.thk.im.android.api.DataRepository
-import com.thk.im.android.api.user.vo.UserBasicInfoVo
 import com.thk.im.android.api.user.vo.UserVo
-import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.IMImageLoader
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.databinding.FragmentMineBinding
 import com.thk.im.android.ui.base.BaseFragment
-import io.reactivex.Flowable
 
-class MineFragment: BaseFragment() {
+class MineFragment : BaseFragment() {
 
     private lateinit var binding: FragmentMineBinding
 
@@ -38,35 +33,6 @@ class MineFragment: BaseFragment() {
 
         binding.navSetting.setIconTitle(R.drawable.ic_setting, "设置")
         binding.navAbout.setIconTitle(R.drawable.ic_about, "关于")
-
-        binding.navSetting.setOnClickListener {
-
-            val uId = DataRepository.getUserId() ?: return@setOnClickListener
-            Flowable.just(0)
-                .flatMap {
-                    IMCoreManager.initUser(uId)
-                    return@flatMap Flowable.just(it)
-                }.compose(RxTransform.flowableToIo())
-                .subscribe(object : BaseSubscriber<Int>() {
-                    override fun onNext(t: Int?) {
-                    }
-
-                })
-        }
-        binding.navAbout.setOnClickListener {
-//            Flowable.just(0)
-//                .flatMap {
-//                    return@flatMap Flowable.just(it)
-//                }.compose(RxTransform.flowableToIo())
-//                .subscribe(object : BaseSubscriber<Int>() {
-//                    override fun onNext(t: Int?) {
-//                    }
-//
-//                })
-
-            IMCoreManager.shutdown()
-        }
-
 
     }
 

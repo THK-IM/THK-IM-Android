@@ -95,16 +95,19 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     override fun disconnect(reason: String) {
-        LLog.d("DefaultSignalModule", "disconnect true $webSocket ${Thread.currentThread().name}" )
+        LLog.d("DefaultSignalModule", "disconnect true" )
         mHandler.removeCallbacksAndMessages(null)
+        signalListener = null
         NetworkManager.getInstance().unRegisterObserver(this)
         webSocket?.close(3008, reason)
         status = SignalStatus.Disconnected
-        signalListener = null
     }
 
     private fun reconnect() {
         LLog.d("DefaultSignalModule", "reconnect")
+        if (signalListener == null) {
+            return
+        }
         mHandler.postDelayed({
             if (NetworkUtils.isAvailable()) {
                 startConnect()

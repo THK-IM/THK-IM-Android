@@ -8,7 +8,7 @@ data class ApplyFriendVo(
     @SerializedName("contact_id")
     val contactId: Long,
     @SerializedName("channel")
-    val channel: Int,
+    val channel: Int?,
     @SerializedName("msg")
-    val msg: String
+    val msg: String?
 )

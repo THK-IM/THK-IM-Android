@@ -98,8 +98,8 @@ class ContactAdapter(
             } else {
                 selectedIds.add(id)
             }
-            for ((position, contact) in contactList.withIndex()) {
-                if (contact.id == id) {
+            for ((position, c) in contactList.withIndex()) {
+                if (c.id == id) {
                     notifyItemChanged(position)
                 }
             }

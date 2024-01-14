@@ -83,7 +83,10 @@ class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer
                         dbMessages.add(dbMsg)
                     }
                 }
-                return@flatMap Flowable.just(dbMessages.toList())
+                dbMessages.sortBy { msg ->
+                    msg.cTime
+                }
+                return@flatMap Flowable.just(dbMessages)
             }.compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
         }

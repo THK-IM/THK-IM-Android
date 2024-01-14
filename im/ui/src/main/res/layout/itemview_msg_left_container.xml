@@ -42,13 +42,13 @@
         android:layout_marginRight="40dp"
         android:layout_toRightOf="@id/avatar_container"
         android:minHeight="60dp"
+        android:paddingLeft="6dp"
         android:orientation="vertical">
 
         <androidx.emoji2.widget.EmojiTextView
             android:id="@+id/tv_nickname"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
+            android:layout_height="16dp"
             android:ellipsize="end"
             android:lines="1"
             android:textColor="#999999"
@@ -58,8 +58,6 @@
             android:id="@+id/fl_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:layout_marginTop="10dp"
             android:orientation="vertical" />
 
         <TextView
@@ -72,10 +70,6 @@
             android:layout_marginEnd="10dp"
             android:background="@drawable/bg_tv_msg_tips"
             android:gravity="center"
-            android:paddingStart="12dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="12dp"
-            android:paddingBottom="8dp"
             android:textColor="#999999"
             android:textSize="12sp"
             android:visibility="gone" />

@@ -184,7 +184,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             if (session.type != SessionType.Single.value) {
                 it.visibility = View.VISIBLE
             } else {
-                it.visibility = View.GONE
+                it.visibility = View.INVISIBLE
             }
         }
 

@@ -13,7 +13,7 @@
     </style>
 
     <style name="Common" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowBackground">#dcdcdc</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 </resources>

@@ -4,6 +4,7 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
+import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
@@ -134,6 +135,7 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
                     }
                     referMsg.mTime = msg.cTime
                     insertOrUpdateDb(referMsg, notify = true, notifySession = false)
+                    msg.sendStatus = MsgSendStatus.Success.value
                     // 状态操作消息对用户不可见，默认状态即位本身已读
                     msg.oprStatus =
                         MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value

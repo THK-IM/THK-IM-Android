@@ -7,6 +7,7 @@ import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.MsgOperateStatus
+import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
@@ -83,6 +84,8 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
                 }
             }
             msg.data = Gson().toJson(data)
+            msg.oprStatus = MsgOperateStatus.ClientRead.value or MsgOperateStatus.ClientRead.value
+            msg.sendStatus = MsgSendStatus.Success.value
             if (existed) {
                 IMCoreManager.getImDataBase().messageDao().insertOrIgnore(listOf(msg))
                 XEventBus.post(IMEvent.MsgNew.value, msg)

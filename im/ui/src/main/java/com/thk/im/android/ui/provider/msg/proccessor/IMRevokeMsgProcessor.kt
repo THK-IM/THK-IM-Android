@@ -84,7 +84,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
                 }
             }
             msg.data = Gson().toJson(data)
-            msg.oprStatus = MsgOperateStatus.ClientRead.value or MsgOperateStatus.ClientRead.value
+            msg.oprStatus = MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
             msg.sendStatus = MsgSendStatus.Success.value
             if (existed) {
                 IMCoreManager.getImDataBase().messageDao().insertOrIgnore(listOf(msg))

@@ -370,7 +370,7 @@ open class DefaultMessageModule : MessageModule {
     override fun ackMessageToCache(message: Message) {
         try {
             ackLock.writeLock().tryLock(1, TimeUnit.SECONDS)
-            if (message.sid >= 0 && message.msgId > 0) {
+            if (message.msgId > 0) {
                 if (message.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
                     if (needAckMap[message.sid] == null) {
                         needAckMap[message.sid] = mutableSetOf()

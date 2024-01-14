@@ -1,6 +1,7 @@
 package com.thk.im.android.core.base.utils;
 
 import android.app.Application;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import java.util.Arrays;
@@ -35,6 +36,7 @@ public class ToastUtils {
         if (null != mToast)
             mToast.cancel();
         mToast = Toast.makeText(mApp, text, Toast.LENGTH_SHORT);
+        mToast.setGravity(Gravity.TOP, 0, 0);
         mToast.show();
     }
 

@@ -71,7 +71,9 @@ class IMInputLayout : ConstraintLayout {
         binding.etMessage.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
 
             override fun afterTextChanged(p0: Editable?) {
                 if ((p0?.length ?: 0) > 0) {
@@ -230,8 +232,8 @@ class IMInputLayout : ConstraintLayout {
     }
 
     fun addInputContent(text: String) {
-        val index: Int = binding.etMessage.selectionStart
         if (binding.etMessage.text != null) {
+            val index: Int = binding.etMessage.selectionStart
             binding.etMessage.text!!.insert(index, text)
         } else {
             val newText = binding.etMessage.text.toString() + text
@@ -333,7 +335,7 @@ class IMInputLayout : ConstraintLayout {
                         return
                     }
                 }
-                com.thk.im.android.core.base.utils.ToastUtils.show("录音失败")
+                ToastUtils.show("录音失败")
             }
         }
     }

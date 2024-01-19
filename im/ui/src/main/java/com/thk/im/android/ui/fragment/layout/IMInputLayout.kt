@@ -6,7 +6,10 @@ import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.text.Editable
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.TextWatcher
+import android.text.style.ImageSpan
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -236,8 +239,7 @@ class IMInputLayout : ConstraintLayout {
             val index: Int = binding.etMessage.selectionStart
             binding.etMessage.text!!.insert(index, text)
         } else {
-            val newText = binding.etMessage.text.toString() + text
-            binding.etMessage.setText(newText.toCharArray(), 0, newText.toCharArray().size)
+            binding.etMessage.setText(text.toCharArray(), 0, text.toCharArray().size)
         }
     }
 

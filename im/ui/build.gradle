@@ -70,7 +70,7 @@ dependencies {
     implementation rootProject.ext.dependencies["flexbox"]
 
     implementation project(":im:core")
-    implementation "io.github.thk-im:core:${core_version}"
+//    implementation "io.github.thk-im:core:${core_version}"
 }
 
 
@@ -149,7 +149,7 @@ afterEvaluate {
                         implementation rootProject.ext.dependencies["SwipeMenuRecyclerView"]
                         implementation rootProject.ext.dependencies["XPopup"]
                         implementation rootProject.ext.dependencies["flexbox"]
-                        implementation "io.github.thk-im:core:${core_version}"
+//                        implementation "io.github.thk-im:core:${core_version}"
                     }
                 }
             }
@@ -200,7 +200,7 @@ afterEvaluate {
                         implementation rootProject.ext.dependencies["SwipeMenuRecyclerView"]
                         implementation rootProject.ext.dependencies["XPopup"]
                         implementation rootProject.ext.dependencies["flexbox"]
-                        implementation "io.github.thk-im:core:${core_version}"
+//                        implementation "io.github.thk-im:core:${core_version}"
                     }
                 }
             }

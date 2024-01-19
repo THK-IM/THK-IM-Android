@@ -154,9 +154,6 @@ afterEvaluate {
                         implementation rootProject.ext.dependencies["media3-exoplayer"]
                         implementation rootProject.ext.dependencies["media3-exoplayer-ui"]
                         implementation rootProject.ext.dependencies["videocache"]
-
-                        implementation "io.github.thk-im:core:${core_version}"
-                        implementation "io.github.thk-im:ui:${ui_version}"
                     }
                 }
             }
@@ -207,9 +204,6 @@ afterEvaluate {
                         implementation rootProject.ext.dependencies["media3-exoplayer"]
                         implementation rootProject.ext.dependencies["media3-exoplayer-ui"]
                         implementation rootProject.ext.dependencies["videocache"]
-
-                        implementation "io.github.thk-im:core:${core_version}"
-                        implementation "io.github.thk-im:ui:${ui_version}"
                     }
                 }
             }

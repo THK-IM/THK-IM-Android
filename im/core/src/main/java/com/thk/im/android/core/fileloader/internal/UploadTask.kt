@@ -48,9 +48,14 @@ class UploadTask(
                     if (response.body == null) {
                         notify(0, FileLoadState.Failed.value, UnknownException("http success but body is null"))
                     } else {
-                        val json = response.body?.string()
-                        val uploadParams = Gson().fromJson(json, UploadParams::class.java)
-                        startUpload(uploadParams)
+                        try {
+                            val json = response.body?.string()
+                            val uploadParams = Gson().fromJson(json, UploadParams::class.java)
+                            startUpload(uploadParams)
+                        } catch (e: Exception) {
+                            val codeMessage = CodeMessage(500, if (e.message == null) "internal server error" else e.message!! )
+                            notify(0, FileLoadState.Failed.value, HttpCodeMessageException(codeMessage))
+                        }
                     }
                 } else {
                     val msg = response.body?.string()?: "unknown"

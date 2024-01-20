@@ -40,8 +40,8 @@ internal interface MessageDao {
         fUId: Long
     )
 
-    @Query("update message set content = :content where msg_id = :msgId and session_id = :sId")
-    fun updateContent(msgId: Long, sId: Long,content: String)
+    @Query("update message set data = :data where session_id = :sId and id = :id and from_u_id = :fromUId")
+    fun updateMsgData(sId: Long, id: Long, fromUId: Long, data: String)
 
     /**
      * 更新会话的所有消息为已读

@@ -85,7 +85,7 @@ class IMTextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                             userMap[result.value]!!.nickname
                         }
                     }
-                    IMCoreManager.db.messageDao().updateMsgData(message.msgId, message.sid, body)
+                    IMCoreManager.db.messageDao().updateMsgData(message.sid, message.id, message.fUid, body)
                     return@flatMap Flowable.just(body)
                 }
                 .subscribe(subscriber)

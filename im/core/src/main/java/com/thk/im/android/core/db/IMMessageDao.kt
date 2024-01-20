@@ -32,7 +32,7 @@ interface IMMessageDao {
         fUId: Long
     )
 
-    fun updateMsgData(msgId: Long, sId: Long, data: String)
+    fun updateMsgData(sId: Long, id: Long, fromId: Long, data: String)
 
     /**
      * 更新会话的所有消息为已读

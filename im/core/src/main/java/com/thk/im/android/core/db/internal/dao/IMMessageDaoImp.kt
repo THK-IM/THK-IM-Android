@@ -43,8 +43,8 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         roomDatabase.messageDao().updateSendStatus(sId, id, sendStatus, fUId)
     }
 
-    override fun updateContent(id: Long, content: String) {
-        roomDatabase.messageDao().updateContent(id, content)
+    override fun updateMsgData(msgId: Long, sId: Long, data: String) {
+        roomDatabase.messageDao().updateContent(msgId, sId, data)
     }
 
     override fun updateStatusBySessionId(sid: Long, oprStatus: Int) {

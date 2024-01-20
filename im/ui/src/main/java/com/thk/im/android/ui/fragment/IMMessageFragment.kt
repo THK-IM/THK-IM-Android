@@ -418,7 +418,6 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         referMsgId: Long?
     ) {
         val callback = object : IMSendMsgCallback {
-
             override fun onResult(message: Message, e: Exception?) {}
         }
         IMCoreManager.messageModule

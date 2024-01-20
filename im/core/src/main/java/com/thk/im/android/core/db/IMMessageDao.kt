@@ -32,7 +32,7 @@ interface IMMessageDao {
         fUId: Long
     )
 
-    fun updateContent(id: Long, content: String)
+    fun updateMsgData(msgId: Long, sId: Long, data: String)
 
     /**
      * 更新会话的所有消息为已读
@@ -55,6 +55,7 @@ interface IMMessageDao {
     fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
 
     fun findBySidBeforeCTime(sid: Long, cTime: Long, count: Int): List<Message>
+
     fun findById(id: Long, fUId: Long, sid: Long): Message?
 
     fun findByMsgId(msgId: Long, sid: Long): Message?

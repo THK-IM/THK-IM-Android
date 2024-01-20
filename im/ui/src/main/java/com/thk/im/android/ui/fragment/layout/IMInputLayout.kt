@@ -3,31 +3,40 @@ package com.thk.im.android.ui.fragment.layout
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
+import android.graphics.Color
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.text.Editable
-import android.text.Spannable
-import android.text.SpannableString
+import android.text.Spanned
 import android.text.TextWatcher
-import android.text.style.ImageSpan
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.text.getSpans
 import androidx.emoji2.widget.EmojiEditText
 import androidx.lifecycle.LifecycleOwner
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
+import com.lxj.xpopup.XPopup
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.SessionMember
+import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
+import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
+import com.thk.im.android.ui.fragment.popup.IMInputOperator
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.AudioCallback
@@ -35,10 +44,11 @@ import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import java.io.File
+import java.util.regex.Pattern
 import kotlin.math.abs
 
 @SuppressLint("ClickableViewAccessibility")
-class IMInputLayout : ConstraintLayout {
+class IMInputLayout : ConstraintLayout, IMInputOperator {
 
     private var binding: LayoutMessageInputBinding
 
@@ -49,6 +59,7 @@ class IMInputLayout : ConstraintLayout {
 
     private var audioEventY = 0f
     private var audioCancel = false
+    private var nicknameMap = mutableMapOf<String, String>()
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -66,19 +77,59 @@ class IMInputLayout : ConstraintLayout {
         binding.etMessage.requestFocus()
         binding.tvSendMsg.setOnClickListener {
             binding.etMessage.text?.let {
-                msgSender?.sendMessage(MsgType.TEXT.value, it.toString(), null)
+                val data = it.toString()
+                val regex = "(?<=@)(.+?)(?=\\s)".toRegex()
+                var atUsers = ""
+                val body = regex.replace(data) { result ->
+                    return@replace if (nicknameMap[result.value] == null) {
+                        ""
+                    } else {
+                        if (atUsers.isNotEmpty()) {
+                            atUsers += "#"
+                        }
+                        atUsers += "${nicknameMap[result.value]!!}"
+                        nicknameMap[result.value]!!
+                    }
+                }
+                msgSender?.sendMessage(MsgType.TEXT.value, body, data, atUsers.ifEmpty { null })
+                nicknameMap.clear()
+                binding.etMessage.text.clearSpans()
+                binding.etMessage.text.clear()
+                binding.etMessage.text = null
             }
-            binding.etMessage.text = null
         }
 
+        binding.etMessage.setOnKeyListener(object : View.OnKeyListener {
+            override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
+                if (event?.action == KeyEvent.ACTION_DOWN) {
+                    if (keyCode == KeyEvent.KEYCODE_DEL ) {
+                        deleteContent(1)
+                        return true
+                    }
+                }
+
+                return false
+            }
+
+        })
         binding.etMessage.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
+                if (p0 != null) {
+                    LLog.d(p0.toString())
+                }
             }
 
             override fun afterTextChanged(p0: Editable?) {
+                p0?.let {
+                    val selectionStart = binding.etMessage.selectionStart
+                    if (selectionStart > 0 && it.length > selectionStart - 1) {
+                        if (it[selectionStart - 1] == '@') {
+                            showAtSessionMemberPopup()
+                        }
+                    }
+                }
                 if ((p0?.length ?: 0) > 0) {
                     binding.tvSendMsg.visibility = View.VISIBLE
                     binding.ivAddMore.visibility = View.GONE
@@ -248,6 +299,23 @@ class IMInputLayout : ConstraintLayout {
     }
 
     fun deleteContent(count: Int) {
+        val atSpans = binding.etMessage.text.getSpans<ForegroundColorSpan>()
+        val selectionStart = binding.etMessage.selectionStart
+        val selectionEnd = binding.etMessage.selectionEnd
+        var deleted = false
+        for (span in atSpans) {
+            val spanStart = binding.etMessage.text.getSpanStart(span)
+            val spanEnd = binding.etMessage.text.getSpanEnd(span)
+            LLog.d("$spanStart $spanEnd $selectionStart $selectionEnd")
+            if (selectionStart + 1 in spanStart..spanEnd || selectionEnd - 1 in spanStart..spanEnd) {
+                deleted = true
+                binding.etMessage.text.removeSpan(span)
+                binding.etMessage.text.delete(spanStart, spanEnd)
+            }
+        }
+        if (deleted) {
+            return
+        }
         val index: Int = binding.etMessage.selectionStart
         if (!binding.etMessage.text.isNullOrEmpty()) {
             if (binding.etMessage.selectionEnd != index) {
@@ -355,6 +423,37 @@ class IMInputLayout : ConstraintLayout {
         } else {
             binding.llMessageInput.visibility = View.VISIBLE
             binding.llMessageOperator.visibility = View.GONE
+        }
+    }
+
+    private fun showAtSessionMemberPopup() {
+        closeKeyboard()
+        XPopup.Builder(context).isDestroyOnDismiss(true)
+            .hasShadowBg(false)
+            .isViewMode(true)
+            .maxHeight((AppUtils.instance().screenHeight * 0.6).toInt())
+            .moveUpToKeyboard(true)
+            .enableDrag(false)
+            .asCustom(IMAtSessionMemberPopup(context, session, this))
+            .show()
+    }
+
+    override fun insertAtSessionMember(sessionMember: SessionMember, user: User) {
+        nicknameMap[user.nickname] = "${user.id}"
+        LLog.d("insertAtSessionMember $sessionMember, $user")
+        val selectionStart = binding.etMessage.selectionStart
+        val content = binding.etMessage.text
+        if (selectionStart > 0 && content.length > selectionStart - 1) {
+            if (content[selectionStart - 1] == '@') {
+                binding.etMessage.text.insert(selectionStart, "${user.nickname} ")
+                val atSpan = ForegroundColorSpan(Color.parseColor("#1b7ae8"))
+                binding.etMessage.text.setSpan(
+                    atSpan,
+                    selectionStart - 1,
+                    selectionStart + user.nickname.length,
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+                )
+            }
         }
     }
 

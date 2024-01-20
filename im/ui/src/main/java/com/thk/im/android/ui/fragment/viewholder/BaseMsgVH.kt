@@ -127,8 +127,8 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
 
                 IMMsgPosType.Right.value -> {
                     contentContainer.setShape(
-                        Color.parseColor("#25c3fd"),
-                        Color.parseColor("#25c3fd"),
+                        Color.parseColor("#d1e3fe"),
+                        Color.parseColor("#d1e3fe"),
                         1,
                         floatArrayOf(10f, 0f, 10f, 0f)
                     )

@@ -221,6 +221,29 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         }
     }
 
+    override fun onMsgSenderLongClick(message: Message, pos: Int, it: View) {
+        val fromUId = message.fUid
+        if (fromUId > 0 && fromUId != IMCoreManager.uId) {
+            val subscriber = object : BaseSubscriber<User>() {
+                override fun onNext(t: User?) {
+                    t?.let {
+                        msgSender?.addAtUser(it, null)
+                    }
+                }
+
+                override fun onComplete() {
+                    super.onComplete()
+                    disposables.remove(this)
+                }
+
+            }
+            IMCoreManager.userModule.queryUser(fromUId)
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            disposables.add(subscriber)
+        }
+    }
+
     override fun onMsgCellLongClick(message: Message, position: Int, view: View) {
 //        msgSender.setSelectMode(true, message)
         msgSender?.popupMessageOperatorPanel(view, message)

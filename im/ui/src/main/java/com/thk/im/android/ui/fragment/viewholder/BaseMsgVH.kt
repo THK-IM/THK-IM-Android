@@ -150,6 +150,10 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         ivAvatarView?.setOnClickListener {
             msgVHOperator?.onMsgSenderClick(message, pos, it)
         }
+        ivAvatarView?.setOnLongClickListener {
+            msgVHOperator?.onMsgSenderLongClick(message, pos, it)
+            true
+        }
 
         tvNicknameView?.setOnClickListener {
             msgVHOperator?.onMsgSenderClick(message, pos, it)

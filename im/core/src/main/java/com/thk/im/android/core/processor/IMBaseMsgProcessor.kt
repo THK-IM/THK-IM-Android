@@ -292,11 +292,20 @@ abstract class IMBaseMsgProcessor {
 
 
     open fun getSessionDesc(msg: Message): String {
-        return if (msg.content == null) {
-            ""
-        } else {
-            msg.content!!
+        var desc = ""
+        if (msg.atUsers.isNullOrBlank()) {
+            return desc
         }
+        val uIds = msg.atUsers!!.split("#")
+        for (id in uIds) {
+            if (id == "${IMCoreManager.uId}")  {
+                if (msg.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) {
+                    desc += "[有人@我]"
+                }
+                break
+            }
+        }
+        return desc
     }
 
     /**

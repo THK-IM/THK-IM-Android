@@ -5,8 +5,9 @@ import com.thk.im.android.core.db.entity.Message
 
 interface IMMsgVHOperator {
     fun onMsgCellClick(message: Message, position: Int, view: View)
-    fun onMsgSenderClick(message: Message, position: Int, view: View)
     fun onMsgCellLongClick(message: Message, position: Int, view: View)
+    fun onMsgSenderClick(message: Message, position: Int, view: View)
+    fun onMsgSenderLongClick(message: Message, pos: Int, it: View)
     fun onMsgResendClick(message: Message)
     fun isSelectMode(): Boolean
     fun isItemSelected(message: Message): Boolean

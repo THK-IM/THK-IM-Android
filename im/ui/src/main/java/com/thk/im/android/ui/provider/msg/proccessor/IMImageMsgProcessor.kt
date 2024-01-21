@@ -29,7 +29,7 @@ class IMImageMsgProcessor : IMBaseMsgProcessor() {
     }
 
     override fun getSessionDesc(msg: Message): String {
-        return "[图片]"
+        return super.getSessionDesc(msg) + "[图片]"
     }
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {

@@ -16,27 +16,22 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.getSpans
 import androidx.emoji2.widget.EmojiEditText
 import androidx.lifecycle.LifecycleOwner
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import com.lxj.xpopup.XPopup
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.base.LLog
-import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
-import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
-import com.thk.im.android.ui.fragment.popup.IMInputOperator
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.AudioCallback
@@ -44,11 +39,10 @@ import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import java.io.File
-import java.util.regex.Pattern
 import kotlin.math.abs
 
 @SuppressLint("ClickableViewAccessibility")
-class IMInputLayout : ConstraintLayout, IMInputOperator {
+class IMInputLayout : ConstraintLayout {
 
     private var binding: LayoutMessageInputBinding
 
@@ -59,7 +53,7 @@ class IMInputLayout : ConstraintLayout, IMInputOperator {
 
     private var audioEventY = 0f
     private var audioCancel = false
-    private var nicknameMap = mutableMapOf<String, String>()
+    private var atMap = mutableMapOf<String, String>()
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -81,18 +75,20 @@ class IMInputLayout : ConstraintLayout, IMInputOperator {
                 val regex = "(?<=@)(.+?)(?=\\s)".toRegex()
                 var atUsers = ""
                 val body = regex.replace(data) { result ->
-                    return@replace if (nicknameMap[result.value] == null) {
-                        ""
-                    } else {
-                        if (atUsers.isNotEmpty()) {
-                            atUsers += "#"
+                    var replacement = result.value
+                    for ((k, v) in atMap) {
+                        if (v == result.value) {
+                            replacement = k
+                            if (atUsers.isNotEmpty()) {
+                                atUsers += "#"
+                            }
+                            atUsers += k
                         }
-                        atUsers += "${nicknameMap[result.value]!!}"
-                        nicknameMap[result.value]!!
                     }
+                    replacement
                 }
                 msgSender?.sendMessage(MsgType.TEXT.value, body, data, atUsers.ifEmpty { null })
-                nicknameMap.clear()
+                atMap.clear()
                 binding.etMessage.text.clearSpans()
                 binding.etMessage.text.clear()
                 binding.etMessage.text = null
@@ -102,7 +98,7 @@ class IMInputLayout : ConstraintLayout, IMInputOperator {
         binding.etMessage.setOnKeyListener(object : View.OnKeyListener {
             override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
                 if (event?.action == KeyEvent.ACTION_DOWN) {
-                    if (keyCode == KeyEvent.KEYCODE_DEL ) {
+                    if (keyCode == KeyEvent.KEYCODE_DEL) {
                         deleteContent(1)
                         return true
                     }
@@ -427,19 +423,11 @@ class IMInputLayout : ConstraintLayout, IMInputOperator {
     }
 
     private fun showAtSessionMemberPopup() {
-        closeKeyboard()
-        XPopup.Builder(context).isDestroyOnDismiss(true)
-            .hasShadowBg(false)
-            .isViewMode(true)
-            .maxHeight((AppUtils.instance().screenHeight * 0.6).toInt())
-            .moveUpToKeyboard(true)
-            .enableDrag(false)
-            .asCustom(IMAtSessionMemberPopup(context, session, this))
-            .show()
+        msgSender?.openAtPopupView()
     }
 
-    override fun insertAtSessionMember(sessionMember: SessionMember, user: User) {
-        nicknameMap[user.nickname] = "${user.id}"
+    fun addAtSessionMember(user: User, sessionMember: SessionMember?) {
+        atMap["${user.id}"] = user.nickname
         LLog.d("insertAtSessionMember $sessionMember, $user")
         val selectionStart = binding.etMessage.selectionStart
         val content = binding.etMessage.text
@@ -453,8 +441,18 @@ class IMInputLayout : ConstraintLayout, IMInputOperator {
                     selectionStart + user.nickname.length,
                     Spanned.SPAN_INCLUSIVE_INCLUSIVE
                 )
+                return
             }
         }
+
+        binding.etMessage.text.insert(selectionStart, "@${user.nickname} ")
+        val atSpan = ForegroundColorSpan(Color.parseColor("#1b7ae8"))
+        binding.etMessage.text.setSpan(
+            atSpan,
+            selectionStart,
+            selectionStart + user.nickname.length + 1,
+            Spanned.SPAN_INCLUSIVE_INCLUSIVE
+        )
     }
 
 

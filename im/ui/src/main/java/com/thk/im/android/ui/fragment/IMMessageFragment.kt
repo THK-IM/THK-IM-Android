@@ -24,18 +24,24 @@ import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.dp2px
 import com.thk.im.android.core.base.popup.KeyboardPopupWindow
+import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.SessionMember
+import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
+import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
 import com.thk.im.android.ui.fragment.popup.IMMessageOperatorPopup
 import com.thk.im.android.ui.fragment.popup.IMSessionChoosePopup
+import com.thk.im.android.ui.fragment.popup.IMSessionMemberAtDelegate
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.IMImageMsgData
@@ -47,7 +53,7 @@ import com.thk.im.android.ui.protocol.IMContentResult
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
+class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow
     private var keyboardShowing = false
     private var session: Session? = null
@@ -360,6 +366,30 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
         }
     }
 
+    override fun openAtPopupView() {
+        context?.let {
+            session?.let { session ->
+                if (session.type != SessionType.SuperGroup.value &&
+                    session.type != SessionType.Group.value) {
+                    return
+                }
+                closeKeyboard()
+                XPopup.Builder(it).isDestroyOnDismiss(true)
+                    .hasShadowBg(false)
+                    .isViewMode(true)
+                    .maxHeight((AppUtils.instance().screenHeight * 0.6).toInt())
+                    .moveUpToKeyboard(true)
+                    .enableDrag(false)
+                    .asCustom(IMAtSessionMemberPopup(it, session, this))
+                    .show()
+            }
+        }
+    }
+
+    override fun addAtUser(user: User, sessionMember: SessionMember?) {
+        binding.llInputLayout.addAtSessionMember(user, sessionMember)
+    }
+
 
     private fun previewImageAndVideo(msg: Message, position: Int, originView: View) {
         val messages = binding.rcvMessage.getMessages()
@@ -489,6 +519,10 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender {
 
     override fun closeKeyboard(): Boolean {
         return binding.llInputLayout.closeKeyboard()
+    }
+
+    override fun addAtSessionMember(sessionMember: SessionMember, user: User) {
+        binding.llInputLayout.addAtSessionMember(user, sessionMember)
     }
 
 }

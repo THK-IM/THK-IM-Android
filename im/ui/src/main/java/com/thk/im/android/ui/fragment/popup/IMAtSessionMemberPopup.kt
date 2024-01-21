@@ -19,7 +19,7 @@ import io.reactivex.disposables.CompositeDisposable
 class IMAtSessionMemberPopup constructor(
     context: Context,
     private val session: Session,
-    private val inputOperator: IMInputOperator,
+    private val sessionMemberAtDelegate: IMSessionMemberAtDelegate,
 ) : BottomPopupView(context) {
 
     private val compositeDisposable = CompositeDisposable()
@@ -41,7 +41,7 @@ class IMAtSessionMemberPopup constructor(
         sessionMemberAdapter.onSessionMemberClick = object : IMOnSessionMemberClick {
             override fun onSessionMemberClick(sessionMember: SessionMember, user: User) {
                 dismiss()
-                inputOperator.insertAtSessionMember(sessionMember, user)
+                sessionMemberAtDelegate.addAtSessionMember(sessionMember, user)
             }
         }
         rcvSessionMember.adapter = sessionMemberAdapter

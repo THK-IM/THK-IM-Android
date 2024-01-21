@@ -4,6 +4,8 @@ import android.view.View
 import androidx.emoji2.widget.EmojiEditText
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.SessionMember
+import com.thk.im.android.core.db.entity.User
 
 interface IMMsgSender {
 
@@ -84,5 +86,10 @@ interface IMMsgSender {
 
     /// 转发选定的消息 forwardType 0单条转发, 1合并转发
     fun forwardSelectedMessages(forwardType: Int)
+
+    ///  打开at会话成员控制器
+    fun openAtPopupView()
+
+    fun addAtUser(user: User, sessionMember: SessionMember?)
 
 }

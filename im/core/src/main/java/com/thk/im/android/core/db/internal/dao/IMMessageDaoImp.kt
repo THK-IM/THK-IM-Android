@@ -1,6 +1,5 @@
 package com.thk.im.android.core.db.internal.dao
 
-import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.db.IMMessageDao
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.internal.room.IMRoomDataBase
@@ -104,7 +103,13 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         return roomDatabase.messageDao().findLastMessageBySessionId(sid)
     }
 
-    override fun search(sid: Long, type: Int, keyword: String, count: Int, offset: Int): List<Message> {
+    override fun search(
+        sid: Long,
+        type: Int,
+        keyword: String,
+        count: Int,
+        offset: Int
+    ): List<Message> {
         return roomDatabase.messageDao().search(sid, type, keyword, count, offset)
     }
 

@@ -30,7 +30,7 @@ open class IMVideoMsgProcessor : IMBaseMsgProcessor() {
     }
 
     override fun getSessionDesc(msg: Message): String {
-        return "[视频]"
+        return super.getSessionDesc(msg) + "[视频]"
     }
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {

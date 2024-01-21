@@ -14,7 +14,7 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
 
     override fun getSessionDesc(msg: Message): String {
         return if (msg.data != null) {
-            msg.data!!
+            super.getSessionDesc(msg) + msg.data!!
         } else {
             if (msg.content != null) {
                 val regex = "(?<=@)(.+?)(?=\\s)".toRegex()
@@ -32,9 +32,9 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
                         return@replace ""
                     }
                 }
-                return body
+                return super.getSessionDesc(msg) + body
             } else {
-                return ""
+                return super.getSessionDesc(msg) + ""
             }
         }
     }

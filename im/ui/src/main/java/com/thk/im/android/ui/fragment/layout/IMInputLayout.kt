@@ -431,28 +431,26 @@ class IMInputLayout : ConstraintLayout {
         LLog.d("insertAtSessionMember $sessionMember, $user")
         val selectionStart = binding.etMessage.selectionStart
         val content = binding.etMessage.text
-        if (selectionStart > 0 && content.length > selectionStart - 1) {
-            if (content[selectionStart - 1] == '@') {
-                binding.etMessage.text.insert(selectionStart, "${user.nickname} ")
-                val atSpan = ForegroundColorSpan(Color.parseColor("#1b7ae8"))
-                binding.etMessage.text.setSpan(
-                    atSpan,
-                    selectionStart - 1,
-                    selectionStart + user.nickname.length,
-                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
-                )
-                return
-            }
+        if (selectionStart > 0 && content[selectionStart - 1] == '@') {
+            binding.etMessage.text.insert(selectionStart, "${user.nickname} ")
+            val atSpan = ForegroundColorSpan(Color.parseColor("#1b7ae8"))
+            binding.etMessage.text.setSpan(
+                atSpan,
+                selectionStart - 1,
+                selectionStart + user.nickname.length,
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE
+            )
+        } else {
+            binding.etMessage.text.insert(selectionStart, "@${user.nickname} ")
+            val atSpan = ForegroundColorSpan(Color.parseColor("#1b7ae8"))
+            binding.etMessage.text.setSpan(
+                atSpan,
+                selectionStart,
+                selectionStart + user.nickname.length + 1,
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE
+            )
         }
 
-        binding.etMessage.text.insert(selectionStart, "@${user.nickname} ")
-        val atSpan = ForegroundColorSpan(Color.parseColor("#1b7ae8"))
-        binding.etMessage.text.setSpan(
-            atSpan,
-            selectionStart,
-            selectionStart + user.nickname.length + 1,
-            Spanned.SPAN_INCLUSIVE_INCLUSIVE
-        )
     }
 
 

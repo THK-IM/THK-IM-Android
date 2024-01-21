@@ -58,6 +58,7 @@
             android:id="@+id/fl_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingVertical="5dp"
             android:orientation="vertical" />
 
         <TextView

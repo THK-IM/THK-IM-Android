@@ -111,7 +111,7 @@ class IMTextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
                 atSpan,
                 range.first - 1,
                 range.last + 1,
-                Spanned.SPAN_INCLUSIVE_INCLUSIVE
+                Spanned.SPAN_EXCLUSIVE_INCLUSIVE
             )
         }
         tvMsgContent.text = spannable

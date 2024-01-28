@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
-import com.thk.android.im.live.api.RoomApi
 import com.thk.android.im.live.vo.CreateRoomReqVo
 import com.thk.android.im.live.vo.JoinRoomReqVo
 import com.thk.android.im.live.room.PCFactoryWrapper
@@ -17,20 +16,19 @@ import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.audio.JavaAudioDeviceModule
-import org.webrtc.audio.JavaAudioDeviceModule.SamplesReadyCallback
 
 
-class LiveManager private constructor() {
+class IMLiveManager private constructor() {
 
     companion object {
-        private var innerManager: LiveManager? = null
+        private var innerManager: IMLiveManager? = null
 
         @Synchronized
-        fun shared(): LiveManager {
+        fun shared(): IMLiveManager {
             if (innerManager == null) {
-                innerManager = LiveManager()
+                innerManager = IMLiveManager()
             }
-            return innerManager as LiveManager
+            return innerManager as IMLiveManager
         }
     }
 
@@ -85,9 +83,9 @@ class LiveManager private constructor() {
             }
     }
 
-    fun createRoom(mode: Mode): Flowable<Room> {
+    fun createRoom(ids: Set<Long>, mode: Mode): Flowable<Room> {
         _room?.destroy()
-        return liveApi.createRoom(CreateRoomReqVo(this.selfId, mode.value))
+        return liveApi.createRoom(CreateRoomReqVo(this.selfId, mode.value, ids))
             .flatMap {
                 val room = Room(it.id, selfId, mode, Role.Broadcaster, it.members)
                 _room = room

@@ -3,7 +3,7 @@ package com.thk.android.im.live.room
 import android.util.Base64
 import com.google.gson.Gson
 import com.thk.android.im.live.DataChannelMsg
-import com.thk.android.im.live.LiveManager
+import com.thk.android.im.live.IMLiveManager
 import com.thk.android.im.live.Role
 import com.thk.android.im.live.utils.MediaConstraintsHelper
 import com.thk.android.im.live.vo.PublishStreamReqVo
@@ -22,6 +22,7 @@ import org.webrtc.VideoSource
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
+
 class LocalParticipant(
     uId: Long,
     roomId: String,
@@ -36,11 +37,13 @@ class LocalParticipant(
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
     private var innerDataChannel: DataChannel? = null
     private var cameraName: String? = null
+    private var width: Int = 960
+    private var height: Int = 480
 
     override fun initPeerConn() {
         super.initPeerConn()
         if (peerConnection != null) {
-            val pcFactoryWrapper = LiveManager.shared().getPCFactoryWrapper()
+            val pcFactoryWrapper = IMLiveManager.shared().getPCFactoryWrapper()
             if (audioEnable && role == Role.Broadcaster) {
                 val audioSource = pcFactoryWrapper.factory.createAudioSource(
                     MediaConstraintsHelper.build(
@@ -61,7 +64,7 @@ class LocalParticipant(
             }
 
             if (videoEnable && role == Role.Broadcaster) {
-                LiveManager.shared().app?.let { app ->
+                IMLiveManager.shared().app?.let { app ->
                     videoCapture = createVideoCapture()
                     videoCapture?.let {
                         surfaceTextureHelper =
@@ -81,7 +84,8 @@ class LocalParticipant(
                             RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY)
                         )
                         it.initialize(surfaceTextureHelper, app, videoSource!!.capturerObserver)
-                        it.startCapture(160, 240, 5)
+
+                        it.startCapture(width, height, 10)
                         addVideoTrack(videoTrack)
                     }
                 }
@@ -124,37 +128,69 @@ class LocalParticipant(
                 LLog.e("remote sdp error: ${t?.message}")
             }
         }
-        LiveManager.shared().liveApi.publishStream(reqVo)
+        IMLiveManager.shared().liveApi.publishStream(reqVo)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         compositeDisposable.add(subscriber)
     }
 
     private fun createVideoCapture(): CameraVideoCapturer? {
-        val context = LiveManager.shared().app ?: return null
+        val context = IMLiveManager.shared().app ?: return null
         //优先使用Camera2
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         val deviceNames = enumerator.deviceNames
-        //前置
-        for (name in deviceNames) {
-            if (enumerator.isFrontFacing(name)) {
-                cameraName = name
-                return enumerator.createCapturer(name, null)
-            }
-        }
+
+        var maxHeight = 0
         //后置
         for (name in deviceNames) {
             if (enumerator.isBackFacing(name)) {
-                cameraName = name
-                return enumerator.createCapturer(name, null)
+                val supports = enumerator.getSupportedFormats(name)
+                for (support in supports) {
+                    LLog.d(
+                        "support",
+                        "background, ${cameraName}, ${support.width} ${support.height}"
+                    )
+                    if (support.height > maxHeight) {
+                        width = (support.width * 0.6).toInt()
+                        height = (support.height * 0.6).toInt()
+                        cameraName = name
+                        maxHeight = support.height
+                    }
+                }
             }
         }
+        if (cameraName != null) {
+            return enumerator.createCapturer(cameraName!!, null)
+        }
+
+
+        maxHeight = 0
+        //前置
+        for (name in deviceNames) {
+            if (enumerator.isFrontFacing(name)) {
+                val supports = enumerator.getSupportedFormats(name)
+                for (support in supports) {
+                    LLog.d("support", "front, ${cameraName},  ${support.width} ${support.height}")
+                    if (support.height >= maxHeight) {
+                        width = (support.width * 0.6).toInt()
+                        height = (support.height * 0.6).toInt()
+                        cameraName = name
+                        maxHeight = support.height
+                    }
+                }
+            }
+        }
+        if (cameraName != null) {
+            return enumerator.createCapturer(cameraName!!, null)
+        }
+
+
         return null
     }
 
     private fun getFrontCameraName(): String? {
-        val context = LiveManager.shared().app ?: return null
+        val context = IMLiveManager.shared().app ?: return null
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         val deviceNames = enumerator.deviceNames
@@ -168,7 +204,7 @@ class LocalParticipant(
     }
 
     private fun getBackCameraName(): String? {
-        val context = LiveManager.shared().app ?: return null
+        val context = IMLiveManager.shared().app ?: return null
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         val deviceNames = enumerator.deviceNames
@@ -183,7 +219,7 @@ class LocalParticipant(
 
     fun switchCamera() {
         if (cameraName == null) return
-        val context = LiveManager.shared().app ?: return
+        val context = IMLiveManager.shared().app ?: return
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         cameraName = if (enumerator.isFrontFacing(cameraName)) {

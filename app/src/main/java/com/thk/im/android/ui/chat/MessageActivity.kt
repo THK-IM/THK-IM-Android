@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import com.thk.android.im.live.Mode
 import com.thk.im.android.R
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionType
@@ -16,9 +17,10 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActivityMessageBinding
 import com.thk.im.android.ui.base.BaseActivity
+import com.thk.im.android.ui.call.LiveCallActivity
+import com.thk.im.android.ui.contact.ContactUserActivity
 import com.thk.im.android.ui.fragment.IMMessageFragment
 import com.thk.im.android.ui.group.GroupActivity
-import com.thk.im.android.ui.contact.ContactUserActivity
 
 class MessageActivity : BaseActivity() {
 
@@ -62,28 +64,29 @@ class MessageActivity : BaseActivity() {
     }
 
     override fun menuMoreVisibility(id: Int): Int {
-        if (id == R.id.tb_menu2) {
-            return View.GONE
-        } else if (id == R.id.tb_menu1) {
-            return View.VISIBLE
-        }
         return View.VISIBLE
     }
 
     override fun menuIcon(id: Int): Drawable? {
         if (id == R.id.tb_menu1) {
+            return ContextCompat.getDrawable(this, R.drawable.ic_call)
+        } else if (id == R.id.tb_menu2) {
             return ContextCompat.getDrawable(this, R.drawable.ic_more)
         }
         return super.menuIcon(id)
     }
 
     override fun onToolBarMenuClick(view: View) {
-        if (view.id == R.id.tb_menu1) {
+        if (view.id == R.id.tb_menu2) {
             user?.let {
                 ContactUserActivity.startContactUserActivity(this, it)
             }
             group?.let {
                 GroupActivity.startGroupActivity(this, it)
+            }
+        } else if (view.id == R.id.tb_menu1) {
+            user?.let {
+                LiveCallActivity.startCallActivity(this, Mode.Video, it)
             }
         }
     }

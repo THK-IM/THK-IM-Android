@@ -1,6 +1,8 @@
 package com.thk.im.android
 
 import android.app.Application
+import com.thk.android.im.live.IMLiveManager
+import com.thk.android.im.live.api.DefaultLiveApi
 import com.thk.im.android.api.DataRepository
 import com.thk.im.android.constant.Host
 import com.thk.im.android.core.IMCoreManager
@@ -49,10 +51,10 @@ class IMApplication : Application() {
         IMCoreManager.groupModule = IMGroupModule()
         IMUIManager.init(this)
         IMUIManager.pageRouter = ExternalPageRouter()
+        IMLiveManager.shared().init(this)
     }
 
     fun initIMUser(token: String, uId: Long): Flowable<Boolean> {
-
         return Flowable.create({
             val signalModule = DefaultSignalModule(this, Host.Websocket, token)
             val fileLoaderModule = DefaultFileLoadModule(this, Host.MsgAPI, token)
@@ -64,9 +66,9 @@ class IMApplication : Application() {
             IMCoreManager.imApi = imApi
             IMUIManager.mediaProvider = mediaProvider
             IMUIManager.mediaPreviewer = mediaPreviewer
-
             IMCoreManager.initUser(uId)
-
+            IMLiveManager.shared().liveApi = DefaultLiveApi(token, Host.RtcApi)
+            IMLiveManager.shared().selfId = uId
             it.onNext(true)
             it.onComplete()
         }, BackpressureStrategy.LATEST)

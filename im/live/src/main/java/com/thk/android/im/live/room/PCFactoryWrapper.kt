@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
-import com.thk.android.im.live.LiveManager
+import com.thk.android.im.live.IMLiveManager
 import org.webrtc.EglBase
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.audio.JavaAudioDeviceModule
@@ -32,12 +32,12 @@ class PCFactoryWrapper(
     }
 
     fun getAudioInputDevice(): Array<AudioDeviceInfo> {
-        if (LiveManager.shared().app == null) {
+        if (IMLiveManager.shared().app == null) {
             return emptyArray()
         }
         val audioManager =
-            LiveManager.shared().app!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val packageManager = LiveManager.shared().app!!.packageManager
+            IMLiveManager.shared().app!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val packageManager = IMLiveManager.shared().app!!.packageManager
         if (!packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)) {
             return emptyArray()
         }

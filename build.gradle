@@ -62,7 +62,7 @@ ext {
                     "pictureselector"                  : "io.github.lucksiege:pictureselector:v3.11.1",
                     "pictureselector-compress"         : "io.github.lucksiege:compress:v3.11.1",
                     "opuslib"                          : "top.oply.opuslib:opuslib:1.0.2",
-                    "webrtc-sdk"                       : "io.github.webrtc-sdk:android:114.5735.02",
+                    "webrtc-sdk"                       : "io.github.webrtc-sdk:android:114.5735.07",
                     "room"                             : "androidx.room:room-runtime:$version_room",
                     "room-compiler-annotationProcessor": "androidx.room:room-compiler:$version_room",
                     "room-compiler-kapt"               : "androidx.room:room-compiler:$version_room",

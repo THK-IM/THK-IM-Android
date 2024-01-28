@@ -1,6 +1,6 @@
 package com.thk.android.im.live.room
 
-import com.thk.android.im.live.LiveManager
+import com.thk.android.im.live.IMLiveManager
 import com.thk.android.im.live.Member
 import com.thk.android.im.live.Mode
 import com.thk.android.im.live.Role
@@ -26,7 +26,7 @@ class Room(
 
 
     private fun initLocalParticipant(role: Role) {
-        val selfId = LiveManager.shared().selfId
+        val selfId = IMLiveManager.shared().selfId
         localParticipant = if (role == Role.Broadcaster) {
             LocalParticipant(
                 selfId,

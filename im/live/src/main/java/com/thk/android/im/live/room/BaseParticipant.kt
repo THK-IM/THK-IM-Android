@@ -4,7 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
 import com.thk.android.im.live.DataChannelMsg
-import com.thk.android.im.live.LiveManager
+import com.thk.android.im.live.IMLiveManager
 import com.thk.android.im.live.Mode
 import com.thk.android.im.live.NewStreamNotify
 import com.thk.android.im.live.NotifyBean
@@ -49,7 +49,7 @@ abstract class BaseParticipant(
         val configuration = PeerConnection.RTCConfiguration(emptyList())
         //必须设置PeerConnection.SdpSemantics.UNIFIED_PLAN
         configuration.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
-        this.peerConnection = LiveManager.shared().getPCFactoryWrapper()
+        this.peerConnection = IMLiveManager.shared().getPCFactoryWrapper()
             .factory
             .createPeerConnection(configuration, this)
     }
@@ -302,7 +302,7 @@ abstract class BaseParticipant(
     }
 
     open fun onNewBufferMessage(bb: ByteBuffer) {
-        LiveManager.shared().getRoom()?.let {
+        IMLiveManager.shared().getRoom()?.let {
             handler.post {
                 it.receivedDcMsg(bb)
             }
@@ -321,12 +321,12 @@ abstract class BaseParticipant(
                         Role.Audience
                     }
                 }
-                val room = LiveManager.shared().getRoom()
+                val room = IMLiveManager.shared().getRoom()
                 room?.let {
                     val audioEnable = it.mode == Mode.Audio || it.mode == Mode.Video
                     val videoEnable = it.mode == Mode.Video
                     val remoteParticipant = RemoteParticipant(newStream.uId, newStream.roomId, role, newStream.streamKey, audioEnable, videoEnable)
-                    LiveManager.shared().getRoom()?.let {
+                    IMLiveManager.shared().getRoom()?.let {
                         handler.post {
                             it.participantJoin(remoteParticipant)
                         }
@@ -338,7 +338,7 @@ abstract class BaseParticipant(
             NotifyType.RemoveStream.value -> {
                 val removeStreamNotify =
                     Gson().fromJson(notify.message, RemoveStreamNotify::class.java)
-                LiveManager.shared().getRoom()?.let {
+                IMLiveManager.shared().getRoom()?.let {
                     handler.post {
                         it.participantLeave(
                             removeStreamNotify.roomId,
@@ -350,7 +350,7 @@ abstract class BaseParticipant(
 
             NotifyType.DataChannelMsg.value -> {
                 val dataChannelMsg = Gson().fromJson(notify.message, DataChannelMsg::class.java)
-                LiveManager.shared().getRoom()?.let {
+                IMLiveManager.shared().getRoom()?.let {
                     handler.post {
                         it.receivedDcMsg(dataChannelMsg.uId, dataChannelMsg.text)
                     }
@@ -394,9 +394,9 @@ abstract class BaseParticipant(
         LLog.d("$uId, attach, ${videoTracks.size}, $svr")
         svr?.let {
             if (videoTracks.size > 0) {
-                it.init(LiveManager.shared().getPCFactoryWrapper().eglCtx, null)
-                it.setMirror(true)
-                it.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+                it.init(IMLiveManager.shared().getPCFactoryWrapper().eglCtx, null)
+//                it.setMirror(true)
+                it.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
                 it.keepScreenOn = true
                 it.setZOrderMediaOverlay(true)
                 it.setEnableHardwareScaler(false)
@@ -441,7 +441,7 @@ abstract class BaseParticipant(
             v.dispose()
         }
         dataChannelMap.clear()
-        LiveManager.shared().getRoom()?.onParticipantLeave(this)
+        IMLiveManager.shared().getRoom()?.onParticipantLeave(this)
         handler.removeCallbacksAndMessages(null)
         compositeDisposable.clear()
     }

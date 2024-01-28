@@ -8,6 +8,8 @@ data class CreateRoomReqVo(
     val uId: Long,
     @SerializedName("mode")
     var mode: Int,
+    @SerializedName("members")
+    var members: Set<Long>,
 )
 
 data class CreateRoomResVo(

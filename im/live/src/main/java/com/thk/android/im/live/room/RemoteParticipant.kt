@@ -1,10 +1,8 @@
 package com.thk.android.im.live.room
 
 import android.util.Base64
-import com.thk.android.im.live.LiveApi
-import com.thk.android.im.live.LiveManager
+import com.thk.android.im.live.IMLiveManager
 import com.thk.android.im.live.Role
-import com.thk.android.im.live.api.RtcApi
 import com.thk.android.im.live.vo.PlayStreamReqVo
 import com.thk.android.im.live.vo.PlayStreamResVo
 import com.thk.im.android.core.base.BaseSubscriber
@@ -64,7 +62,7 @@ class RemoteParticipant(
                 }
             }
         }
-        LiveManager.shared().liveApi
+        IMLiveManager.shared().liveApi
             .playStream(reqVo)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)

@@ -5,5 +5,5 @@ enum class SignalType(val value: Int) {
     SignalHeatBeat(1),
     SignalSyncTime(2),
     SignalConnId(3),
-    SignalKickOffUser(5),
+    SignalKickOffUser(4),
 }

@@ -102,6 +102,13 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".ui.call.LiveCallActivity"
+            android:icon="@mipmap/icon_launcher"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".WebRtcActivity"
             android:icon="@mipmap/icon_launcher"
             android:label="@string/app_name"

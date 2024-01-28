@@ -16,9 +16,7 @@ interface LiveApi {
 
     fun publishStream(req: PublishStreamReqVo): Flowable<PublishStreamResVo>
 
-
     fun playStream(req: PlayStreamReqVo): Flowable<PlayStreamResVo>
-
 
     fun createRoom(req: CreateRoomReqVo): Flowable<CreateRoomResVo>
 

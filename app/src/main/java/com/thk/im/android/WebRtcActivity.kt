@@ -17,7 +17,7 @@ import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.thk.android.im.live.room.Room
-import com.thk.android.im.live.LiveManager
+import com.thk.android.im.live.IMLiveManager
 import com.thk.android.im.live.room.BaseParticipant
 import com.thk.android.im.live.Mode
 import com.thk.android.im.live.Role
@@ -27,6 +27,7 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.popup.KeyboardPopupWindow
+import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.databinding.ActivityWebrtcBinding
 import com.thk.im.android.view.ParticipantView
 import io.reactivex.disposables.CompositeDisposable
@@ -150,7 +151,7 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
                     finish()
                 }
             }
-            LiveManager.shared().joinRoom(roomId, Role.Broadcaster)
+            IMLiveManager.shared().joinRoom(roomId, Role.Broadcaster)
                 .compose(RxTransform.flowableToMain()).subscribe(subscriber)
             disposables.add(subscriber)
         } else {
@@ -168,7 +169,7 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
                     finish()
                 }
             }
-            LiveManager.shared().createRoom(Mode.Video).compose(RxTransform.flowableToMain())
+            IMLiveManager.shared().createRoom(emptySet(),  Mode.Video).compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             disposables.add(subscriber)
         }
@@ -208,7 +209,7 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
 
                 override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
                     super.onDenied(permissions, doNotAskAgain)
-                    com.thk.im.android.core.base.utils.ToastUtils.show("permission denied")
+                    ToastUtils.show("permission denied")
                 }
             })
     }
@@ -218,8 +219,8 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
         keyboardPopupWindow.dismiss()
         disposables.clear()
         handler.removeCallbacksAndMessages(null)
-        LiveManager.shared().getRoom()?.unRegisterObserver(this)
-        LiveManager.shared().destroyRoom()
+        IMLiveManager.shared().getRoom()?.unRegisterObserver(this)
+        IMLiveManager.shared().destroyRoom()
     }
 
     override fun join(p: BaseParticipant) {

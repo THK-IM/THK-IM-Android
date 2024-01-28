@@ -1,6 +1,7 @@
-package com.thk.android.im.live.room
+package com.thk.android.im.live
 
 import com.google.gson.annotations.SerializedName
+import com.thk.android.im.live.room.BaseParticipant
 import java.nio.ByteBuffer
 
 
@@ -32,8 +33,8 @@ data class NotifyBean(
 data class NewStreamNotify(
     @SerializedName("room_id")
     var roomId: String,
-    @SerializedName("uid")
-    var uid: String,
+    @SerializedName("u_id")
+    var uId: Long,
     @SerializedName("stream_key")
     var streamKey: String,
     @SerializedName("role")
@@ -43,22 +44,22 @@ data class NewStreamNotify(
 data class RemoveStreamNotify(
     @SerializedName("room_id")
     var roomId: String,
-    @SerializedName("uid")
-    var uid: String,
+    @SerializedName("u_id")
+    var uId: Long,
     @SerializedName("stream_key")
     var streamKey: String,
 )
 
 data class DataChannelMsg(
-    @SerializedName("uid")
-    var uid: String,
+    @SerializedName("u_id")
+    var uId: Long,
     @SerializedName("text")
     var text: String,
 )
 
 data class Member(
-    @SerializedName("uid")
-    var uid: String,
+    @SerializedName("u_id")
+    var uId: Long,
     @SerializedName("role")
     var role: Int,
     @SerializedName("join_time")
@@ -72,7 +73,7 @@ interface RoomObserver {
 
     fun leave(p: BaseParticipant)
 
-    fun onTextMsgReceived(uid: String, text: String)
+    fun onTextMsgReceived(uId: Long, text: String)
 
     fun onBufferMsgReceived(bb: ByteBuffer)
 }

@@ -11,6 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
@@ -222,6 +223,10 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgSenderLongClick(message: Message, pos: Int, it: View) {
+        if (session.type != SessionType.Group.value
+            && session.type != SessionType.SuperGroup.value) {
+            return 
+        }
         val fromUId = message.fUid
         if (fromUId > 0 && fromUId != IMCoreManager.uId) {
             val subscriber = object : BaseSubscriber<User>() {

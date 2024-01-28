@@ -1,22 +1,20 @@
-package com.thk.android.im.live.bean
+package com.thk.android.im.live.vo
 
 import com.google.gson.annotations.SerializedName
-import com.thk.android.im.live.room.Member
+import com.thk.android.im.live.Member
 
-data class CreateRoomReqBean(
-    @SerializedName("uid")
-    var uid: String,
+data class CreateRoomReqVo(
+    @SerializedName("u_id")
+    val uId: Long,
     @SerializedName("mode")
     var mode: Int,
 )
 
-data class CreateRoomResBean(
+data class CreateRoomResVo(
     @SerializedName("id")
     var id: String,
     @SerializedName("owner_id")
-    var ownerId: String,
-    @SerializedName("token")
-    var token: String,
+    var ownerId: Long,
     @SerializedName("create_time")
     var createTime: Long,
     @SerializedName("participants")

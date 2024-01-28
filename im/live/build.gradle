@@ -59,6 +59,8 @@ dependencies {
     implementation rootProject.ext.dependencies["retrofit-adapter-rxjava2"]
     api rootProject.ext.dependencies["webrtc-sdk"]
 
+    implementation project(":im:core")
+
 
 }
 

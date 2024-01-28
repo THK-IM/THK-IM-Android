@@ -19,16 +19,14 @@ import com.hjq.permissions.XXPermissions
 import com.thk.android.im.live.room.Room
 import com.thk.android.im.live.LiveManager
 import com.thk.android.im.live.room.BaseParticipant
-import com.thk.android.im.live.room.Mode
-import com.thk.android.im.live.room.Role
-import com.thk.android.im.live.room.RoomObserver
+import com.thk.android.im.live.Mode
+import com.thk.android.im.live.Role
+import com.thk.android.im.live.RoomObserver
 import com.thk.im.android.adapter.MessageAdapter
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.base.popup.KeyboardPopupWindow
-import com.thk.im.android.core.base.utils.IMKeyboardUtils
 import com.thk.im.android.databinding.ActivityWebrtcBinding
 import com.thk.im.android.view.ParticipantView
 import io.reactivex.disposables.CompositeDisposable
@@ -152,7 +150,7 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
                     finish()
                 }
             }
-            LiveManager.shared().joinRoom(roomId, Role.Broadcaster, "xxxxxx")
+            LiveManager.shared().joinRoom(roomId, Role.Broadcaster)
                 .compose(RxTransform.flowableToMain()).subscribe(subscriber)
             disposables.add(subscriber)
         } else {
@@ -285,8 +283,8 @@ class WebRtcActivity : AppCompatActivity(), RoomObserver {
         }
     }
 
-    override fun onTextMsgReceived(uid: String, text: String) {
-        val content = "user-${uid}: $text"
+    override fun onTextMsgReceived(uId: Long, text: String) {
+        val content = "user-${uId}: $text"
         adapter.addData(content)
         binding.rcvMessages.scrollToPosition(adapter.itemCount - 1)
     }

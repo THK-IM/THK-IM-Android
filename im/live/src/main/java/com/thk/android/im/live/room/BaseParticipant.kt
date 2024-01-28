@@ -3,10 +3,17 @@ package com.thk.android.im.live.room
 import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
+import com.thk.android.im.live.DataChannelMsg
 import com.thk.android.im.live.LiveManager
-import com.thk.android.im.live.base.LLog
-import com.thk.android.im.live.base.StringUtils
+import com.thk.android.im.live.Mode
+import com.thk.android.im.live.NewStreamNotify
+import com.thk.android.im.live.NotifyBean
+import com.thk.android.im.live.NotifyType
+import com.thk.android.im.live.RemoveStreamNotify
+import com.thk.android.im.live.Role
 import com.thk.android.im.live.utils.MediaConstraintsHelper
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.utils.StringUtils
 import io.reactivex.disposables.CompositeDisposable
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
@@ -23,7 +30,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 abstract class BaseParticipant(
-    val uid: String,
+    val uId: Long,
     val roomId: String,
     val role: Role,
 ) : PeerConnection.Observer, DataChannel.Observer {
@@ -50,7 +57,7 @@ abstract class BaseParticipant(
     open fun startPeerConnection(peerConnection: PeerConnection) {
         peerConnection.createOffer(object : SdpObserver {
             override fun onCreateSuccess(p0: SessionDescription?) {
-                LLog.d("${uid}, createOffer onCreateSuccess")
+                LLog.d("${uId}, createOffer onCreateSuccess")
                 p0?.let {
                     if (it.type == SessionDescription.Type.OFFER) {
                         onLocalSdpCreated(it)
@@ -59,15 +66,15 @@ abstract class BaseParticipant(
             }
 
             override fun onSetSuccess() {
-                LLog.d("${uid}, createOffer onSetSuccess")
+                LLog.d("${uId}, createOffer onSetSuccess")
             }
 
             override fun onCreateFailure(p0: String?) {
-                LLog.e("${uid}, createOffer onCreateFailure $p0")
+                LLog.e("${uId}, createOffer onCreateFailure $p0")
             }
 
             override fun onSetFailure(p0: String?) {
-                LLog.e("${uid}, createOffer onSetFailure $p0")
+                LLog.e("${uId}, createOffer onSetFailure $p0")
             }
 
         }, MediaConstraintsHelper.offerOrAnswerConstraint(this is RemoteParticipant))
@@ -111,80 +118,80 @@ abstract class BaseParticipant(
     open fun onLocalSdpCreated(sdp: SessionDescription) {
         peerConnection?.setLocalDescription(object : SdpObserver {
             override fun onCreateSuccess(p0: SessionDescription?) {
-                LLog.d("${uid}, setLocalDescription onCreateSuccess")
+                LLog.d("${uId}, setLocalDescription onCreateSuccess")
             }
 
             override fun onSetSuccess() {
-                LLog.d("${uid}, setLocalDescription onSetSuccess")
+                LLog.d("${uId}, setLocalDescription onSetSuccess")
                 peerConnection?.let {
                     onLocalSdpSetSuccess(it.localDescription)
                 }
             }
 
             override fun onCreateFailure(p0: String?) {
-                LLog.e("${uid}, setLocalDescription onCreateFailure $p0")
+                LLog.e("${uId}, setLocalDescription onCreateFailure $p0")
             }
 
             override fun onSetFailure(p0: String?) {
-                LLog.e("${uid}, setLocalDescription onSetFailure $p0")
+                LLog.e("${uId}, setLocalDescription onSetFailure $p0")
             }
 
         }, sdp)
     }
 
     open fun onLocalSdpSetSuccess(sdp: SessionDescription) {
-        LLog.d("${uid}, onLocalSdpSetSuccess, ${sdp.description}")
+        LLog.d("${uId}, onLocalSdpSetSuccess, ${sdp.description}")
     }
 
     fun setRemoteSessionDescription(sdp: SessionDescription) {
-        LLog.d("${uid}, setRemoteSessionDescription, ${sdp.description}")
+        LLog.d("${uId}, setRemoteSessionDescription, ${sdp.description}")
         peerConnection?.setRemoteDescription(object : SdpObserver {
             override fun onCreateSuccess(p0: SessionDescription?) {
-                LLog.d("${uid}, setRemoteDescription onCreateSuccess")
+                LLog.d("${uId}, setRemoteDescription onCreateSuccess")
             }
 
             override fun onSetSuccess() {
-                LLog.d("${uid}, setRemoteDescription onSetSuccess")
+                LLog.d("${uId}, setRemoteDescription onSetSuccess")
             }
 
             override fun onCreateFailure(p0: String?) {
-                LLog.e("${uid}, setRemoteDescription onCreateFailure $p0")
+                LLog.e("${uId}, setRemoteDescription onCreateFailure $p0")
             }
 
             override fun onSetFailure(p0: String?) {
-                LLog.e("${uid}, setRemoteDescription onSetFailure $p0")
+                LLog.e("${uId}, setRemoteDescription onSetFailure $p0")
             }
         }, sdp)
     }
 
 
     override fun onSignalingChange(p0: PeerConnection.SignalingState?) {
-        LLog.d("${uid}, onSignalingChange $p0")
+        LLog.d("${uId}, onSignalingChange $p0")
     }
 
     override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
-        LLog.d("${uid}, onIceConnectionChange $p0")
+        LLog.d("${uId}, onIceConnectionChange $p0")
     }
 
     override fun onIceConnectionReceivingChange(p0: Boolean) {
-        LLog.d("${uid}, onIceConnectionReceivingChange $p0")
+        LLog.d("${uId}, onIceConnectionReceivingChange $p0")
     }
 
     override fun onIceGatheringChange(p0: PeerConnection.IceGatheringState?) {
-        LLog.d("${uid}, onIceGatheringChange $p0")
+        LLog.d("${uId}, onIceGatheringChange $p0")
     }
 
     override fun onIceCandidate(p0: IceCandidate?) {
-        LLog.d("${uid}, onIceCandidate $p0")
+        LLog.d("${uId}, onIceCandidate $p0")
     }
 
     override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {
-        LLog.d("${uid}, onIceCandidatesRemoved $p0")
+        LLog.d("${uId}, onIceCandidatesRemoved $p0")
     }
 
     override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {
         super.onConnectionChange(newState)
-        LLog.d("${uid}, onConnectionChange ${newState.toString()}")
+        LLog.d("${uId}, onConnectionChange ${newState.toString()}")
         peerConnection?.connectionState()?.let {
             when (it) {
                 PeerConnection.PeerConnectionState.CONNECTING, PeerConnection.PeerConnectionState.NEW -> {
@@ -204,9 +211,9 @@ abstract class BaseParticipant(
     }
 
     override fun onAddStream(p0: MediaStream?) {
-        LLog.d("${uid}, onAddStream")
+        LLog.d("${uId}, onAddStream")
         p0?.let {
-            LLog.d("${uid}, onAddStream, ${it.audioTracks.size}, ${it.videoTracks.size}")
+            LLog.d("${uId}, onAddStream, ${it.audioTracks.size}, ${it.videoTracks.size}")
             handler.post {
                 if (this is RemoteParticipant) {
                     if (it.videoTracks != null) {
@@ -225,9 +232,9 @@ abstract class BaseParticipant(
     }
 
     override fun onRemoveStream(p0: MediaStream?) {
-        LLog.d("${uid}, onRemoveStream")
+        LLog.d("${uId}, onRemoveStream")
         p0?.let {
-            LLog.d("${uid}, onRemoveStream, ${it.audioTracks.size}, ${it.videoTracks.size}")
+            LLog.d("${uId}, onRemoveStream, ${it.audioTracks.size}, ${it.videoTracks.size}")
             if (this is RemoteParticipant) {
                 if (it.videoTracks != null) {
                     handler.post {
@@ -245,7 +252,7 @@ abstract class BaseParticipant(
     }
 
     override fun onDataChannel(p0: DataChannel?) {
-        LLog.d("${uid}, onDataChannel")
+        LLog.d("${uId}, onDataChannel")
         p0?.let {
             it.registerObserver(this)
             it.label()?.let { label ->
@@ -255,17 +262,17 @@ abstract class BaseParticipant(
     }
 
     override fun onRenegotiationNeeded() {
-        LLog.d("${uid}, onRenegotiationNeeded")
+        LLog.d("${uId}, onRenegotiationNeeded")
     }
 
     override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
         super.onAddTrack(p0, p1)
-        LLog.d("${uid}, onAddTrack")
+        LLog.d("${uId}, onAddTrack")
     }
 
     override fun onRemoveTrack(receiver: RtpReceiver?) {
         super.onRemoveTrack(receiver)
-        LLog.d("${uid}, onRemoveTrack")
+        LLog.d("${uId}, onRemoveTrack")
     }
 
     override fun onBufferedAmountChange(p0: Long) {
@@ -303,7 +310,7 @@ abstract class BaseParticipant(
     }
 
     open fun onNewMessage(message: String) {
-        LLog.d("$uid, onNewMessage: $message")
+        LLog.d("$uId, onNewMessage: $message")
         val notify = Gson().fromJson(message, NotifyBean::class.java)
         when (notify.type) {
             NotifyType.NewStream.value -> {
@@ -318,7 +325,7 @@ abstract class BaseParticipant(
                 room?.let {
                     val audioEnable = it.mode == Mode.Audio || it.mode == Mode.Video
                     val videoEnable = it.mode == Mode.Video
-                    val remoteParticipant = RemoteParticipant(newStream.uid, newStream.roomId, role, newStream.streamKey, audioEnable, videoEnable)
+                    val remoteParticipant = RemoteParticipant(newStream.uId, newStream.roomId, role, newStream.streamKey, audioEnable, videoEnable)
                     LiveManager.shared().getRoom()?.let {
                         handler.post {
                             it.participantJoin(remoteParticipant)
@@ -345,7 +352,7 @@ abstract class BaseParticipant(
                 val dataChannelMsg = Gson().fromJson(notify.message, DataChannelMsg::class.java)
                 LiveManager.shared().getRoom()?.let {
                     handler.post {
-                        it.receivedDcMsg(dataChannelMsg.uid, dataChannelMsg.text)
+                        it.receivedDcMsg(dataChannelMsg.uId, dataChannelMsg.text)
                     }
                 }
             }
@@ -353,29 +360,29 @@ abstract class BaseParticipant(
     }
 
     protected fun addVideoTrack(videoTrack: VideoTrack) {
-        LLog.d("$uid, addVideoTrack")
+        LLog.d("$uId, addVideoTrack")
         videoTracks.add(videoTrack)
         attach()
     }
 
     private fun removeVideoTrack(videoTrack: VideoTrack) {
-        LLog.d("$uid, removeVideoTrack")
+        LLog.d("$uId, removeVideoTrack")
         videoTracks.remove(videoTrack)
         detach()
     }
 
     protected fun addAudioTrack(audioTrack: AudioTrack) {
-        LLog.d("$uid, addAudioTrack")
+        LLog.d("$uId, addAudioTrack")
         audioTracks.add(audioTrack)
     }
 
     private fun removeAudioTrack(audioTrack: AudioTrack) {
-        LLog.d("$uid, removeAudioTrack")
+        LLog.d("$uId, removeAudioTrack")
         audioTracks.remove(audioTrack)
     }
 
     open fun attachViewRender(svr: SurfaceViewRenderer) {
-        LLog.d("$uid, attachViewRender $svr")
+        LLog.d("$uId, attachViewRender $svr")
         if (this.svr != null) {
             detach()
         }
@@ -384,7 +391,7 @@ abstract class BaseParticipant(
     }
 
     private fun attach() {
-        LLog.d("$uid, attach, ${videoTracks.size}, $svr")
+        LLog.d("$uId, attach, ${videoTracks.size}, $svr")
         svr?.let {
             if (videoTracks.size > 0) {
                 it.init(LiveManager.shared().getPCFactoryWrapper().eglCtx, null)
@@ -402,12 +409,12 @@ abstract class BaseParticipant(
     }
 
     open fun detachViewRender() {
-        LLog.d("$uid ,detachViewRender")
+        LLog.d("$uId ,detachViewRender")
         detach()
     }
 
     private fun detach() {
-        LLog.d("$uid , detach ${this.svr.toString()}")
+        LLog.d("$uId , detach ${this.svr.toString()}")
         svr?.let {
             it.release()
             LLog.d("detach svr ${videoTracks.size}")
@@ -425,7 +432,7 @@ abstract class BaseParticipant(
     }
 
     open fun onDisConnected() {
-        LLog.d("$uid, onDisConnected: ")
+        LLog.d("$uId, onDisConnected: ")
         detachViewRender()
         videoTracks.clear()
         audioTracks.clear()

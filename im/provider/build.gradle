@@ -126,6 +126,8 @@ afterEvaluate {
                         implementation rootProject.ext.dependencies["pictureselector-compress"]
                         implementation rootProject.ext.dependencies["glide"]
                         implementation rootProject.ext.dependencies["opuslib"]
+                        implementation "io.github.thk-im:core:${core_version}"
+                        implementation "io.github.thk-im:ui:${ui_version}"
                     }
                 }
             }
@@ -163,6 +165,8 @@ afterEvaluate {
                         implementation rootProject.ext.dependencies["pictureselector-compress"]
                         implementation rootProject.ext.dependencies["glide"]
                         implementation rootProject.ext.dependencies["opuslib"]
+                        implementation "io.github.thk-im:core:${core_version}"
+                        implementation "io.github.thk-im:ui:${ui_version}"
                     }
                 }
             }

@@ -1,12 +1,16 @@
 package com.thk.android.im.live.room
 
 import com.thk.android.im.live.LiveManager
-import com.thk.android.im.live.base.LLog
+import com.thk.android.im.live.Member
+import com.thk.android.im.live.Mode
+import com.thk.android.im.live.Role
+import com.thk.android.im.live.RoomObserver
+import com.thk.im.android.core.base.LLog
 import java.nio.ByteBuffer
 
 class Room(
     val id: String,
-    val uid: String,
+    val uId: Long,
     val mode: Mode,
     role: Role,
     members: List<Member>?
@@ -22,20 +26,19 @@ class Room(
 
 
     private fun initLocalParticipant(role: Role) {
-        LiveManager.shared().selfId?.let {
-            localParticipant = if (role == Role.Broadcaster) {
-                LocalParticipant(
-                    it,
-                    id,
-                    role,
-                    audioEnable = mode == Mode.Audio || mode == Mode.Video,
-                    videoEnable = mode == Mode.Video
-                )
-            } else {
-                LocalParticipant(
-                    it, id, role, audioEnable = false, videoEnable = false
-                )
-            }
+        val selfId = LiveManager.shared().selfId
+        localParticipant = if (role == Role.Broadcaster) {
+            LocalParticipant(
+                selfId,
+                id,
+                role,
+                audioEnable = mode == Mode.Audio || mode == Mode.Video,
+                videoEnable = mode == Mode.Video
+            )
+        } else {
+            LocalParticipant(
+                selfId, id, role, audioEnable = false, videoEnable = false
+            )
         }
     }
 
@@ -50,14 +53,15 @@ class Room(
                 }
                 val audioEnable = mode == Mode.Audio || mode == Mode.Video
                 val videoEnable = mode == Mode.Video
-                val remoteParticipant = RemoteParticipant(m.uid, id, role, m.streamKey, audioEnable, videoEnable)
+                val remoteParticipant =
+                    RemoteParticipant(m.uId, id, role, m.streamKey, audioEnable, videoEnable)
                 this.remoteParticipants.add(remoteParticipant)
             }
         }
     }
 
     fun participantJoin(p: BaseParticipant) {
-        LLog.d("participantJoin ${p.uid}")
+        LLog.d("participantJoin ${p.uId}")
         if (p is RemoteParticipant) {
             if (!remoteParticipants.contains(p)) {
                 remoteParticipants.add(p)
@@ -170,14 +174,14 @@ class Room(
     }
 
     private fun notifyJoin(p: BaseParticipant) {
-        LLog.d("notifyJoin, ${p.uid}")
+        LLog.d("notifyJoin, ${p.uId}")
         for (o in observers) {
             o.join(p)
         }
     }
 
     private fun notifyLeave(p: BaseParticipant) {
-        LLog.d("notifyLeave, ${p.uid}")
+        LLog.d("notifyLeave, ${p.uId}")
         for (o in observers) {
             o.leave(p)
         }
@@ -187,7 +191,7 @@ class Room(
         return if (localParticipant != null) {
             val success = localParticipant!!.sendMessage(text)
             if (success) {
-                receivedDcMsg(uid, text)
+                receivedDcMsg(uId, text)
             }
             success
         } else {
@@ -211,9 +215,9 @@ class Room(
         }
     }
 
-    fun receivedDcMsg(uid: String, text: String) {
+    fun receivedDcMsg(uId: Long, text: String) {
         observers.forEach {
-            it.onTextMsgReceived(uid, text)
+            it.onTextMsgReceived(uId, text)
         }
     }
 

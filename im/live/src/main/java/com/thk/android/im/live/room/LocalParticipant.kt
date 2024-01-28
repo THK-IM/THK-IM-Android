@@ -2,15 +2,15 @@ package com.thk.android.im.live.room
 
 import android.util.Base64
 import com.google.gson.Gson
+import com.thk.android.im.live.DataChannelMsg
 import com.thk.android.im.live.LiveManager
-import com.thk.android.im.live.api.ApiManager
-import com.thk.android.im.live.api.RtcApi
-import com.thk.android.im.live.base.BaseSubscriber
-import com.thk.android.im.live.base.LLog
-import com.thk.android.im.live.base.RxTransform
-import com.thk.android.im.live.bean.PublishReqBean
-import com.thk.android.im.live.bean.PublishResBean
+import com.thk.android.im.live.Role
 import com.thk.android.im.live.utils.MediaConstraintsHelper
+import com.thk.android.im.live.vo.PublishStreamReqVo
+import com.thk.android.im.live.vo.PublishStreamResVo
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.RxTransform
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer
@@ -21,13 +21,14 @@ import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoSource
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
+
 class LocalParticipant(
-    uid: String,
+    uId: Long,
     roomId: String,
     role: Role,
     private val audioEnable: Boolean,
     private val videoEnable: Boolean
-) : BaseParticipant(uid, roomId, role) {
+) : BaseParticipant(uId, roomId, role) {
 
     private var pushStreamKey: String? = null
     private var videoSource: VideoSource? = null
@@ -48,7 +49,7 @@ class LocalParticipant(
                 )
                 // 创建AudioTrack，音频轨
                 val audioTrack = pcFactoryWrapper.factory.createAudioTrack(
-                    "audio/$roomId/$uid",
+                    "audio/$roomId/$uId",
                     audioSource
                 )
                 peerConnection?.addTransceiver(
@@ -72,7 +73,7 @@ class LocalParticipant(
                             pcFactoryWrapper.factory.createVideoSource(it.isScreencast)
                         val videoTrack =
                             pcFactoryWrapper.factory.createVideoTrack(
-                                "video/$roomId/$uid",
+                                "video/$roomId/$uId",
                                 videoSource
                             )
                         peerConnection?.addTransceiver(
@@ -101,9 +102,9 @@ class LocalParticipant(
         val offer = sdp.description
         val offerBase64 =
             String(Base64.encode(offer.toByteArray(Charset.forName("UTF-8")), Base64.DEFAULT))
-        val bean = PublishReqBean(roomId, uid, offerBase64)
-        val subscriber = object : BaseSubscriber<PublishResBean>() {
-            override fun onNext(t: PublishResBean?) {
+        val reqVo = PublishStreamReqVo(roomId, uId, offerBase64)
+        val subscriber = object : BaseSubscriber<PublishStreamResVo>() {
+            override fun onNext(t: PublishStreamResVo?) {
                 t?.let {
                     val answer = String(
                         Base64.decode(
@@ -123,8 +124,7 @@ class LocalParticipant(
                 LLog.e("remote sdp error: ${t?.message}")
             }
         }
-        ApiManager.getApi(RtcApi::class.java)
-            .requestPublish(bean)
+        LiveManager.shared().liveApi.publishStream(reqVo)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         compositeDisposable.add(subscriber)
@@ -180,6 +180,7 @@ class LocalParticipant(
         }
         return null
     }
+
     fun switchCamera() {
         if (cameraName == null) return
         val context = LiveManager.shared().app ?: return
@@ -221,7 +222,7 @@ class LocalParticipant(
         return if (innerDataChannel == null) {
             false
         } else {
-            val msg = DataChannelMsg(uid, text)
+            val msg = DataChannelMsg(uId, text)
             val msgStr = Gson().toJson(msg)
             val buffer = DataChannel.Buffer(ByteBuffer.wrap(msgStr.toByteArray()), false)
             innerDataChannel!!.send(buffer)

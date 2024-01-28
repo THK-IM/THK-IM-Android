@@ -1,24 +1,26 @@
 package com.thk.android.im.live.room
 
 import android.util.Base64
-import com.thk.android.im.live.api.ApiManager
+import com.thk.android.im.live.LiveApi
+import com.thk.android.im.live.LiveManager
+import com.thk.android.im.live.Role
 import com.thk.android.im.live.api.RtcApi
-import com.thk.android.im.live.base.BaseSubscriber
-import com.thk.android.im.live.base.RxTransform
-import com.thk.android.im.live.bean.PlayReqBean
-import com.thk.android.im.live.bean.PlayResBean
+import com.thk.android.im.live.vo.PlayStreamReqVo
+import com.thk.android.im.live.vo.PlayStreamResVo
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import org.webrtc.MediaStreamTrack
 import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 import java.nio.charset.Charset
 class RemoteParticipant(
-    uid: String,
+    uId: Long,
     roomId: String,
     role: Role,
     private val subStreamKey: String,
     private val audioEnable: Boolean,
     private val videoEnable: Boolean
-) : BaseParticipant(uid, roomId, role) {
+) : BaseParticipant(uId, roomId, role) {
 
     private var streamKey: String? = null
 
@@ -46,9 +48,9 @@ class RemoteParticipant(
         val offer = sdp.description
         val offerBase64 =
             String(Base64.encode(offer.toByteArray(Charset.forName("UTF-8")), Base64.DEFAULT))
-        val bean = PlayReqBean(roomId, uid, offerBase64, streamKey = subStreamKey)
-        val subscriber = object : BaseSubscriber<PlayResBean>() {
-            override fun onNext(t: PlayResBean?) {
+        val reqVo = PlayStreamReqVo(roomId, uId, offerBase64, streamKey = subStreamKey)
+        val subscriber = object : BaseSubscriber<PlayStreamResVo>() {
+            override fun onNext(t: PlayStreamResVo?) {
                 t?.let {
                     val answer = String(
                         Base64.decode(
@@ -62,8 +64,8 @@ class RemoteParticipant(
                 }
             }
         }
-        ApiManager.getApi(RtcApi::class.java)
-            .requestPlay(bean)
+        LiveManager.shared().liveApi
+            .playStream(reqVo)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         compositeDisposable.add(subscriber)

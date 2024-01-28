@@ -6,14 +6,10 @@ import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
-import com.thk.android.im.live.api.ApiManager
 import com.thk.android.im.live.api.RoomApi
-import com.thk.android.im.live.bean.CreateRoomReqBean
-import com.thk.android.im.live.bean.JoinRoomReqBean
-import com.thk.android.im.live.room.Member
-import com.thk.android.im.live.room.Mode
+import com.thk.android.im.live.vo.CreateRoomReqVo
+import com.thk.android.im.live.vo.JoinRoomReqVo
 import com.thk.android.im.live.room.PCFactoryWrapper
-import com.thk.android.im.live.room.Role
 import com.thk.android.im.live.room.Room
 import io.reactivex.Flowable
 import org.webrtc.DefaultVideoDecoderFactory
@@ -39,13 +35,13 @@ class LiveManager private constructor() {
     }
 
     var app: Application? = null
-    var selfId: String? = null
+    var selfId: Long = 0L
+    lateinit var liveApi: LiveApi
     private var pcFactoryWrapper: PCFactoryWrapper? = null
     private var _room: Room? = null
 
-    fun init(app: Application, selfId: String, debug: Boolean) {
+    fun init(app: Application) {
         this.app = app
-        this.selfId = selfId
         PeerConnectionFactory.initialize(
             PeerConnectionFactory.InitializationOptions
                 .builder(app).createInitializationOptions()
@@ -67,14 +63,13 @@ class LiveManager private constructor() {
         audioManager.mode = AudioManager.MODE_NORMAL
     }
 
-    fun joinRoom(roomId: String, role: Role, token: String): Flowable<Room> {
+    fun joinRoom(roomId: String, role: Role): Flowable<Room> {
         _room?.destroy()
-        return ApiManager.getApi(RoomApi::class.java)
-            .joinRoom(JoinRoomReqBean(roomId, this.selfId!!, role.value, token))
+        return liveApi.joinRoom(JoinRoomReqVo(roomId, this.selfId, role.value))
             .flatMap {
                 val members = mutableListOf<Member>()
                 for (m in it.members) {
-                    if (m.uid != selfId) {
+                    if (m.uId != selfId) {
                         members.add(m)
                     }
                 }
@@ -84,7 +79,7 @@ class LiveManager private constructor() {
                     3 -> Mode.Video
                     else -> Mode.Chat
                 }
-                val room = Room(roomId, selfId.toString(), mode, role, members)
+                val room = Room(roomId, selfId, mode, role, members)
                 _room = room
                 Flowable.just(room)
             }
@@ -92,10 +87,9 @@ class LiveManager private constructor() {
 
     fun createRoom(mode: Mode): Flowable<Room> {
         _room?.destroy()
-        return ApiManager.getApi(RoomApi::class.java)
-            .createRoom(CreateRoomReqBean(this.selfId!!, mode.value))
+        return liveApi.createRoom(CreateRoomReqVo(this.selfId, mode.value))
             .flatMap {
-                val room = Room(it.id, selfId.toString(), mode, Role.Broadcaster, it.members)
+                val room = Room(it.id, selfId, mode, Role.Broadcaster, it.members)
                 _room = room
                 Flowable.just(room)
             }
@@ -119,12 +113,7 @@ class LiveManager private constructor() {
                 val encoderFactory = DefaultVideoEncoderFactory(eglBaseContext, true, true)
                 val decoderFactory = DefaultVideoDecoderFactory(eglBaseContext)
                 val audioDeviceModule = JavaAudioDeviceModule.builder(this.app)
-                    .setSamplesReadyCallback(object : SamplesReadyCallback {
-                        override fun onWebRtcAudioRecordSamplesReady(p0: JavaAudioDeviceModule.AudioSamples?) {
-
-                        }
-
-                    })
+                    .setSamplesReadyCallback { }
                     .createAudioDeviceModule()
                 val peerConnectionFactory = PeerConnectionFactory.builder().setOptions(options)
                     .setVideoEncoderFactory(encoderFactory).setVideoDecoderFactory(decoderFactory)

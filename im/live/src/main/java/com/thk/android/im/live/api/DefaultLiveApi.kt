@@ -1,0 +1,79 @@
+package com.thk.android.im.live.api
+
+import com.thk.android.im.live.LiveApi
+import com.thk.android.im.live.vo.CreateRoomReqVo
+import com.thk.android.im.live.vo.CreateRoomResVo
+import com.thk.android.im.live.vo.JoinRoomReqVo
+import com.thk.android.im.live.vo.JoinRoomResVo
+import com.thk.android.im.live.vo.PlayStreamReqVo
+import com.thk.android.im.live.vo.PlayStreamResVo
+import com.thk.android.im.live.vo.PublishStreamReqVo
+import com.thk.android.im.live.vo.PublishStreamResVo
+import com.thk.im.android.core.api.internal.APITokenInterceptor
+import com.thk.im.android.core.api.internal.MessageApi
+import com.thk.im.android.core.api.internal.SessionApi
+import io.reactivex.Flowable
+import okhttp3.ConnectionPool
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
+
+class DefaultLiveApi(var token: String, var serverUrl: String) : LiveApi {
+
+    private val defaultTimeout: Long = 30
+    private val maxIdleConnection = 8
+    private val keepAliveDuration: Long = 60
+
+    private val interceptor = APITokenInterceptor(token)
+
+    private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(defaultTimeout, TimeUnit.SECONDS)
+        .writeTimeout(defaultTimeout, TimeUnit.SECONDS)
+        .readTimeout(defaultTimeout, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .addInterceptor(interceptor)
+        .connectionPool(ConnectionPool(maxIdleConnection, keepAliveDuration, TimeUnit.SECONDS))
+        .build()
+
+    private val retrofit: Retrofit = Retrofit.Builder()
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .baseUrl(serverUrl)
+        .build()
+
+
+    private fun <T> getApi(cls: Class<T>): T {
+        return retrofit.create(cls)
+    }
+
+    private val roomApi: RoomApi = getApi(RoomApi::class.java)
+    private val rtcApi: RtcApi = getApi(RtcApi::class.java)
+
+    init {
+        interceptor.addValidEndpoint(serverUrl)
+    }
+
+    override fun getEndpoint(): String {
+        return serverUrl
+    }
+
+    override fun publishStream(req: PublishStreamReqVo): Flowable<PublishStreamResVo> {
+        return rtcApi.requestPublish(req)
+    }
+
+    override fun playStream(req: PlayStreamReqVo): Flowable<PlayStreamResVo> {
+        return rtcApi.requestPlay(req)
+    }
+
+    override fun createRoom(req: CreateRoomReqVo): Flowable<CreateRoomResVo> {
+        return roomApi.createRoom(req)
+    }
+
+    override fun joinRoom(req: JoinRoomReqVo): Flowable<JoinRoomResVo> {
+        return roomApi.joinRoom(req)
+    }
+
+}

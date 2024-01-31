@@ -116,11 +116,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver {
     private fun initRoom() {
         room?.let {
             it.getAllParticipants().forEach { p ->
-                if (p is LocalParticipant) {
-                    binding.participantFirst.setParticipant(p)
-                } else {
-                    binding.participantSecond.setParticipant(p)
-                }
+                join(p)
             }
         }
     }
@@ -145,10 +141,12 @@ class LiveCallActivity : BaseActivity(), RoomObserver {
 
     override fun join(p: BaseParticipant) {
         if (p is LocalParticipant) {
-            binding.participantFirst.setParticipant(p)
-            binding.participantFirst.setMoveByTouch(true)
+            binding.participantLocal.setParticipant(p)
+            binding.participantLocal.setFullscreenMode(true)
         } else {
-            binding.participantSecond.setParticipant(p)
+            binding.participantLocal.setFullscreenMode(false)
+            binding.participantRemote.setParticipant(p)
+            binding.participantRemote.setFullscreenMode(true)
         }
     }
 
@@ -163,8 +161,8 @@ class LiveCallActivity : BaseActivity(), RoomObserver {
 
     override fun onDestroy() {
         super.onDestroy()
-        binding.participantFirst.destroy()
-        binding.participantSecond.destroy()
+        binding.participantLocal.destroy()
+        binding.participantRemote.destroy()
     }
 
 }

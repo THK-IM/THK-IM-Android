@@ -40,16 +40,16 @@
         >
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.thk.im.android.view.ParticipantView
-        android:id="@+id/participantSecond"
+    <com.thk.android.im.live.view.ParticipantView
+        android:id="@+id/participantRemote"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         />
 
-    <com.thk.im.android.view.ParticipantView
-        android:id="@+id/participantFirst"
+    <com.thk.android.im.live.view.ParticipantView
+        android:id="@+id/participantLocal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"

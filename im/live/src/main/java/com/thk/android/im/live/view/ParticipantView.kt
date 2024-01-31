@@ -1,0 +1,169 @@
+package com.thk.android.im.live.view
+
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import androidx.constraintlayout.widget.ConstraintLayout
+import com.thk.android.im.live.room.BaseParticipant
+import com.thk.im.android.core.base.utils.AppUtils
+import com.thk.im.android.live.R
+import com.thk.im.android.live.databinding.ViewParticipantBinding
+
+
+class ParticipantView : ConstraintLayout {
+
+    private var participant: BaseParticipant? = null
+    private val binding: ViewParticipantBinding
+    private var isFullScreen = true // 默认最大化显示
+
+    private var lastPositionX = 0f
+    private var lastPositionY = 0f
+
+    private var defaultScaleX = 0.35f
+    private var defaultScaleY = 0.3f
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int)
+            : super(context, attrs, defStyleAttr)
+
+    init {
+        val view = LayoutInflater.from(context).inflate(R.layout.view_participant, this, true)
+        binding = ViewParticipantBinding.bind(view)
+        binding.btnVideoMuted.setOnClickListener {
+            participant?.let {
+                val muted = it.getVideoMuted()
+                it.setVideoMuted(!muted)
+            }
+            setFullscreenMode(true)
+            setSelected()
+        }
+        binding.btnAudioMuted.setOnClickListener {
+            participant?.let {
+                val muted = it.getAudioMuted()
+                it.setAudioMuted(!muted)
+            }
+            setFullscreenMode(false)
+            setSelected()
+        }
+    }
+
+    override fun performClick(): Boolean {
+        super.performClick()
+        return false
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (!isFullScreen && event != null) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    lastPositionX = event.x
+                    lastPositionY = event.y
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    var newTransformX = (translationX + (event.x - lastPositionX) * defaultScaleX)
+                    var newTransformY = (translationY + (event.y - lastPositionY) * defaultScaleY)
+                    newTransformX =
+                        newTransformX.coerceAtMost(AppUtils.instance().screenWidth * (1 - defaultScaleX) / 2)
+                    newTransformY =
+                        newTransformY.coerceAtMost(AppUtils.instance().screenHeight * (1 - defaultScaleY) / 2)
+                    translationX =
+                        newTransformX.coerceAtLeast(-AppUtils.instance().screenWidth * (1 - defaultScaleX) / 2)
+                    translationY =
+                        newTransformY.coerceAtLeast(-AppUtils.instance().screenHeight * (1 - defaultScaleY) / 2)
+                }
+
+                MotionEvent.ACTION_UP -> {}
+                MotionEvent.ACTION_CANCEL -> {}
+            }
+            return true
+        }
+        return super.onTouchEvent(event)
+    }
+
+    fun setDefaultScale(scaleX: Float, scaleY: Float) {
+        this.defaultScaleX = scaleX
+        this.defaultScaleY = scaleY
+    }
+
+    fun setFullscreenMode(isFullScreen: Boolean) {
+        if (this.isFullScreen == isFullScreen) {
+            return
+        }
+        this.isFullScreen = isFullScreen
+        if (isFullScreen) {
+            switchToFullscreen()
+        } else {
+            switchToDragView()
+        }
+    }
+
+    private fun switchToFullscreen() {
+        val animators = AnimatorSet()
+        val animatorTranslationX = ObjectAnimator.ofFloat(this, "translationX", 0f)
+        val animatorTranslationY = ObjectAnimator.ofFloat(this, "translationY", 0f)
+        val animatorScaleX = ObjectAnimator.ofFloat(this, "scaleX", 1f)
+        val animatorScaleY = ObjectAnimator.ofFloat(this, "scaleY", 1f)
+        animators.duration = 150
+        animators.play(animatorTranslationX).with(animatorTranslationY).with(animatorScaleX)
+            .with(animatorScaleY)
+        animators.start()
+    }
+
+    private fun switchToDragView() {
+        val translationX = (AppUtils.instance().screenWidth * (1 - defaultScaleX)) / 2
+        val translationY = (0 - AppUtils.instance().screenHeight * (1 - defaultScaleY)) / 2
+        val scaleX = defaultScaleX
+        val scaleY = defaultScaleY
+        val animators = AnimatorSet()
+        val animatorTranslationX = ObjectAnimator.ofFloat(this, "translationX", translationX)
+        val animatorTranslationY = ObjectAnimator.ofFloat(this, "translationY", translationY)
+        val animatorScaleX = ObjectAnimator.ofFloat(this, "scaleX", scaleX)
+        val animatorScaleY = ObjectAnimator.ofFloat(this, "scaleY", scaleY)
+        animators.duration = 150
+        animators.play(animatorTranslationX).with(animatorTranslationY).with(animatorScaleX)
+            .with(animatorScaleY)
+        animators.start()
+    }
+
+
+    private fun setSelected() {
+        participant?.let {
+            binding.btnVideoMuted.isSelected = !it.getVideoMuted()
+            binding.btnAudioMuted.isSelected = !it.getAudioMuted()
+        }
+    }
+
+    fun setParticipant(p: BaseParticipant) {
+        if (participant != null) {
+            participant!!.detachViewRender()
+        }
+        participant = p
+        participant!!.attachViewRender(binding.rtcRendererVideo)
+        participant!!.initPeerConn()
+        setSelected()
+    }
+
+    fun getParticipant(): BaseParticipant? {
+        return participant
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        participant?.attachViewRender(binding.rtcRendererVideo)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        participant?.detachViewRender()
+    }
+
+    fun destroy() {
+        participant?.detachViewRender()
+        participant = null
+    }
+}

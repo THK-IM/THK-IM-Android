@@ -28,15 +28,15 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait">
 
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
         </activity>
 
         <activity
@@ -107,12 +107,6 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
-
-        <activity
-            android:name=".WebRtcActivity"
-            android:icon="@mipmap/icon_launcher"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait" />
 
         <activity
             android:name=".MediaTestActivity"

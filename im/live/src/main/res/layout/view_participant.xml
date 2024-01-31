@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#40000000"
-        android:textColor="@color/white"
+        android:textColor="#ffffff"
         android:textSize="16dp"
         app:layout_constraintLeft_toLeftOf="@id/rtc_renderer_video"
         app:layout_constraintTop_toTopOf="@id/rtc_renderer_video" />

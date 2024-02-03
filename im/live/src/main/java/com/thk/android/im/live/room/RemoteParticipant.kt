@@ -37,7 +37,6 @@ class RemoteParticipant(
                     RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.RECV_ONLY)
                 )
             }
-            startPeerConnection(it)
         }
     }
 

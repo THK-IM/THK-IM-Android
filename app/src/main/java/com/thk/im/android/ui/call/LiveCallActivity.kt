@@ -14,6 +14,7 @@ import com.thk.android.im.live.Role
 import com.thk.android.im.live.RoomObserver
 import com.thk.android.im.live.room.BaseParticipant
 import com.thk.android.im.live.room.LocalParticipant
+import com.thk.android.im.live.room.RemoteParticipant
 import com.thk.android.im.live.room.Room
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
@@ -22,17 +23,21 @@ import com.thk.im.android.databinding.ActvitiyLiveCallBinding
 import com.thk.im.android.ui.base.BaseActivity
 import java.nio.ByteBuffer
 
-class LiveCallActivity : BaseActivity(), RoomObserver {
+class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
 
     companion object {
         fun startCallActivity(
             ctx: Context,
             mode: Mode,
-            user: User
+            user: User,
+            roomId: String?
         ) {
             val intent = Intent(ctx, LiveCallActivity::class.java)
             intent.putExtra("mode", mode.value)
             intent.putExtra("user", user)
+            roomId?.let {
+                intent.putExtra("roomId", it)
+            }
             ctx.startActivity(intent)
         }
     }
@@ -42,6 +47,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver {
     private var mode: Int = 0
     private var room: Room? = null
     private var roomId: String? = null
+    private var status: LiveCallStatus = LiveCallStatus.Init
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActvitiyLiveCallBinding.inflate(layoutInflater)
@@ -52,7 +58,19 @@ class LiveCallActivity : BaseActivity(), RoomObserver {
         } else {
             intent.getParcelableExtra("user")
         }
+        user?.let {
+            binding.llRequestCall.initUI(it, this)
+            binding.llCalling.initUI(it, this)
+            binding.llBeCalling.initUI(it, this)
+        }
         mode = intent.getIntExtra("mode", 0)
+        val roomId = intent.getStringExtra("roomId")
+        status = if (roomId.isNullOrBlank()) {
+            LiveCallStatus.RequestCall
+        } else {
+            this.roomId = roomId
+            LiveCallStatus.BeRequestCall
+        }
         checkPermission()
     }
 
@@ -60,13 +78,23 @@ class LiveCallActivity : BaseActivity(), RoomObserver {
         XXPermissions.with(this).permission(Permission.CAMERA, Permission.RECORD_AUDIO)
             .request(object : OnPermissionCallback {
                 override fun onGranted(permissions: MutableList<String>, allGranted: Boolean) {
-                    createRoom()
+                    createOrJoinRoom()
                 }
 
                 override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
                     super.onDenied(permissions, doNotAskAgain)
                 }
             })
+    }
+
+    private fun createOrJoinRoom() {
+        if (status == LiveCallStatus.BeRequestCall) {
+            showBeCallingView()
+            joinRoom()
+        } else {
+            showRequestCallView()
+            createRoom()
+        }
     }
 
     private fun createRoom() {
@@ -121,32 +149,34 @@ class LiveCallActivity : BaseActivity(), RoomObserver {
         }
     }
 
-    fun showRequestCallView() {
-        binding.llRequestCall.visibility = View.VISIBLE
-        binding.llCalling.visibility = View.GONE
-        binding.llBeCalling.visibility = View.GONE
-    }
-
-    fun showCallingView() {
-        binding.llRequestCall.visibility = View.GONE
-        binding.llCalling.visibility = View.VISIBLE
-        binding.llBeCalling.visibility = View.GONE
-    }
-
-    fun showBeCallingView() {
+    private fun showBeCallingView() {
         binding.llRequestCall.visibility = View.GONE
         binding.llCalling.visibility = View.GONE
         binding.llBeCalling.visibility = View.VISIBLE
     }
 
+    private fun showRequestCallView() {
+        binding.llRequestCall.visibility = View.VISIBLE
+        binding.llCalling.visibility = View.GONE
+        binding.llBeCalling.visibility = View.GONE
+
+    }
+
+    private fun showCallingView() {
+        binding.llRequestCall.visibility = View.GONE
+        binding.llCalling.visibility = View.VISIBLE
+        binding.llBeCalling.visibility = View.GONE
+    }
+
     override fun join(p: BaseParticipant) {
-        if (p is LocalParticipant) {
-            binding.participantLocal.setParticipant(p)
-            binding.participantLocal.setFullscreenMode(true)
-        } else {
+        if (p is RemoteParticipant) {
+            showCallingView()
             binding.participantLocal.setFullscreenMode(false)
             binding.participantRemote.setParticipant(p)
             binding.participantRemote.setFullscreenMode(true)
+        } else {
+            binding.participantLocal.setParticipant(p)
+            binding.participantLocal.setFullscreenMode(true)
         }
     }
 
@@ -163,6 +193,117 @@ class LiveCallActivity : BaseActivity(), RoomObserver {
         super.onDestroy()
         binding.participantLocal.destroy()
         binding.participantRemote.destroy()
+        IMLiveManager.shared().getRoom()?.destroy()
+    }
+
+    override fun currentLocalCamera(): Int {
+        if (room != null) {
+            val participants = room!!.getAllParticipants()
+            for (p in participants) {
+                if (p is LocalParticipant) {
+                    return p.currentCamera()
+                }
+            }
+        }
+        return 1
+    }
+
+    override fun isCurrentCameraOpened(): Boolean {
+        if (room != null) {
+            val participants = room!!.getAllParticipants()
+            for (p in participants) {
+                if (p is LocalParticipant) {
+                    return !p.getVideoMuted()
+                }
+            }
+        }
+        return false
+    }
+
+    override fun switchLocalCamera() {
+        room?.let {
+            it.getAllParticipants().forEach {p ->
+                if(p is LocalParticipant) {
+                    p.switchCamera()
+                }
+            }
+        }
+    }
+
+    override fun openLocalCamera() {
+        room?.let {
+            it.getAllParticipants().forEach {p ->
+                if(p is LocalParticipant) {
+                    p.setVideoMuted(false)
+                }
+            }
+        }
+    }
+
+    override fun closeLocalCamera() {
+        room?.let {
+            it.getAllParticipants().forEach {p ->
+                if(p is LocalParticipant) {
+                    p.setVideoMuted(true)
+                }
+            }
+        }
+    }
+
+    override fun openRemoteVideo(user: User) {
+        room?.let {
+            it.getAllParticipants().forEach {p ->
+                if(p is RemoteParticipant) {
+                    if (user.id == p.uId) {
+                        p.setVideoMuted(false)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun closeRemoteVideo(user: User) {
+        room?.let {
+            it.getAllParticipants().forEach {p ->
+                if(p is RemoteParticipant) {
+                    if (user.id == p.uId) {
+                        p.setVideoMuted(true)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun openRemoteAudio(user: User) {
+        room?.let {
+            it.getAllParticipants().forEach {p ->
+                if(p is RemoteParticipant) {
+                    if (user.id == p.uId) {
+                        p.setAudioMuted(false)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun closeRemoteAudio(user: User) {
+        room?.let {
+            it.getAllParticipants().forEach {p ->
+                if(p is RemoteParticipant) {
+                    if (user.id == p.uId) {
+                        p.setAudioMuted(true)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun accept() {
+        joinRoom()
+    }
+
+    override fun hangup() {
+        finish()
     }
 
 }

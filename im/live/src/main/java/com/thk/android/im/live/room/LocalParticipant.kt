@@ -37,8 +37,6 @@ class LocalParticipant(
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
     private var innerDataChannel: DataChannel? = null
     private var cameraName: String? = null
-    private var width: Int = 960
-    private var height: Int = 480
 
     override fun initPeerConn() {
         super.initPeerConn()
@@ -85,7 +83,7 @@ class LocalParticipant(
                         )
                         it.initialize(surfaceTextureHelper, app, videoSource!!.capturerObserver)
 
-                        it.startCapture(width, height, 10)
+                        it.startCapture(1080, 720, 10)
                         addVideoTrack(videoTrack)
                     }
                 }
@@ -95,9 +93,23 @@ class LocalParticipant(
                 maxRetransmits = 3
             })
             innerDataChannel?.registerObserver(this)
-            startPeerConnection(peerConnection!!)
         } else {
             LLog.e("peerConnection create failed")
+        }
+    }
+
+    fun currentCamera(): Int {
+        if (cameraName == null) {
+            return 0
+        }
+        val enumerator =
+            if (Camera2Enumerator.isSupported(IMLiveManager.shared().app)) Camera2Enumerator(
+                IMLiveManager.shared().app
+            ) else Camera1Enumerator()
+        return if (enumerator.isFrontFacing(cameraName!!)) {
+            1
+        } else {
+            2
         }
     }
 
@@ -136,56 +148,12 @@ class LocalParticipant(
 
     private fun createVideoCapture(): CameraVideoCapturer? {
         val context = IMLiveManager.shared().app ?: return null
-        //优先使用Camera2
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
-        val deviceNames = enumerator.deviceNames
-
-        var maxHeight = 0
-        //后置
-        for (name in deviceNames) {
-            if (enumerator.isBackFacing(name)) {
-                val supports = enumerator.getSupportedFormats(name)
-                for (support in supports) {
-                    LLog.d(
-                        "support",
-                        "background, ${cameraName}, ${support.width} ${support.height}"
-                    )
-                    if (support.height > maxHeight) {
-                        width = (support.width * 0.6).toInt()
-                        height = (support.height * 0.6).toInt()
-                        cameraName = name
-                        maxHeight = support.height
-                    }
-                }
-            }
-        }
+        cameraName = getBackCameraName()
         if (cameraName != null) {
             return enumerator.createCapturer(cameraName!!, null)
         }
-
-
-        maxHeight = 0
-        //前置
-        for (name in deviceNames) {
-            if (enumerator.isFrontFacing(name)) {
-                val supports = enumerator.getSupportedFormats(name)
-                for (support in supports) {
-                    LLog.d("support", "front, ${cameraName},  ${support.width} ${support.height}")
-                    if (support.height >= maxHeight) {
-                        width = (support.width * 0.6).toInt()
-                        height = (support.height * 0.6).toInt()
-                        cameraName = name
-                        maxHeight = support.height
-                    }
-                }
-            }
-        }
-        if (cameraName != null) {
-            return enumerator.createCapturer(cameraName!!, null)
-        }
-
-
         return null
     }
 
@@ -194,13 +162,14 @@ class LocalParticipant(
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         val deviceNames = enumerator.deviceNames
-        //前置
+        var cameraName: String? = null
         for (name in deviceNames) {
             if (enumerator.isFrontFacing(name)) {
-                return name
+                cameraName = name
+                break
             }
         }
-        return null
+        return cameraName
     }
 
     private fun getBackCameraName(): String? {
@@ -208,13 +177,14 @@ class LocalParticipant(
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         val deviceNames = enumerator.deviceNames
-        //前置
+        var cameraName: String? = null
         for (name in deviceNames) {
             if (enumerator.isBackFacing(name)) {
-                return name
+                cameraName = name
+                break
             }
         }
-        return null
+        return cameraName
     }
 
     fun switchCamera() {

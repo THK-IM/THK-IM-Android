@@ -108,13 +108,7 @@ class MediaTestActivity : AppCompatActivity() {
         })
 
         binding.buttonThird.setOnClickListener(View.OnClickListener {
-            val intent = Intent()
-            intent.setClass(this, WebRtcActivity::class.java)
-            if (binding.etRoom.text.toString().isNotEmpty()) {
-                val roomId: String = binding.etRoom.text.toString()
-                intent.putExtra("room_id", roomId)
-            }
-            startActivity(intent)
+
         })
     }
 

@@ -86,7 +86,7 @@ class MessageActivity : BaseActivity() {
             }
         } else if (view.id == R.id.tb_menu1) {
             user?.let {
-                LiveCallActivity.startCallActivity(this, Mode.Video, it)
+                LiveCallActivity.startCallActivity(this, Mode.Video, it, null)
             }
         }
     }

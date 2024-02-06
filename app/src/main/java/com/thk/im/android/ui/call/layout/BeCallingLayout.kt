@@ -5,8 +5,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.thk.im.android.R
-import com.thk.im.android.core.base.IMImageLoader
-import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.LayoutBeCallingBinding
 import com.thk.im.android.ui.call.LiveCallProtocol
 
@@ -24,10 +22,7 @@ class BeCallingLayout : ConstraintLayout {
         binding = LayoutBeCallingBinding.bind(view)
     }
 
-    fun initUI(user: User, liveCallProtocol: LiveCallProtocol) {
-        user.avatar?.let {
-            IMImageLoader.displayImageUrl(binding.ivOther, it)
-        }
-        binding.tvOther.text = user.nickname
+    fun initCall(protocol: LiveCallProtocol) {
+
     }
 }

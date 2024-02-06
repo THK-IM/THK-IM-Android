@@ -29,15 +29,33 @@ interface LiveCallProtocol {
      */
     fun closeLocalCamera()
 
+    /**
+     * 打开远端视频
+     */
     fun openRemoteVideo(user: User)
 
+    /**
+     * 关闭远端视频
+     */
     fun closeRemoteVideo(user: User)
 
+    /**
+     * 打开远端音频
+     */
     fun openRemoteAudio(user: User)
 
+    /**
+     * 关闭远端音频
+     */
     fun closeRemoteAudio(user: User)
 
+    /**
+     * 接听
+     */
     fun accept()
 
+    /**
+     * 挂断
+     */
     fun hangup()
 }

@@ -59,9 +59,10 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
             intent.getParcelableExtra("user")
         }
         user?.let {
-            binding.llRequestCall.initUI(it, this)
-            binding.llCalling.initUI(it, this)
-            binding.llBeCalling.initUI(it, this)
+            binding.llCallingInfo.setUserInfo(it)
+            binding.llRequestCall.initCall(this)
+            binding.llCalling.initCall(this)
+            binding.llBeCalling.initCall(this)
         }
         mode = intent.getIntExtra("mode", 0)
         val roomId = intent.getStringExtra("roomId")
@@ -222,8 +223,8 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
 
     override fun switchLocalCamera() {
         room?.let {
-            it.getAllParticipants().forEach {p ->
-                if(p is LocalParticipant) {
+            it.getAllParticipants().forEach { p ->
+                if (p is LocalParticipant) {
                     p.switchCamera()
                 }
             }
@@ -232,8 +233,8 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
 
     override fun openLocalCamera() {
         room?.let {
-            it.getAllParticipants().forEach {p ->
-                if(p is LocalParticipant) {
+            it.getAllParticipants().forEach { p ->
+                if (p is LocalParticipant) {
                     p.setVideoMuted(false)
                 }
             }
@@ -242,8 +243,8 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
 
     override fun closeLocalCamera() {
         room?.let {
-            it.getAllParticipants().forEach {p ->
-                if(p is LocalParticipant) {
+            it.getAllParticipants().forEach { p ->
+                if (p is LocalParticipant) {
                     p.setVideoMuted(true)
                 }
             }
@@ -252,8 +253,8 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
 
     override fun openRemoteVideo(user: User) {
         room?.let {
-            it.getAllParticipants().forEach {p ->
-                if(p is RemoteParticipant) {
+            it.getAllParticipants().forEach { p ->
+                if (p is RemoteParticipant) {
                     if (user.id == p.uId) {
                         p.setVideoMuted(false)
                     }
@@ -264,8 +265,8 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
 
     override fun closeRemoteVideo(user: User) {
         room?.let {
-            it.getAllParticipants().forEach {p ->
-                if(p is RemoteParticipant) {
+            it.getAllParticipants().forEach { p ->
+                if (p is RemoteParticipant) {
                     if (user.id == p.uId) {
                         p.setVideoMuted(true)
                     }
@@ -276,8 +277,8 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
 
     override fun openRemoteAudio(user: User) {
         room?.let {
-            it.getAllParticipants().forEach {p ->
-                if(p is RemoteParticipant) {
+            it.getAllParticipants().forEach { p ->
+                if (p is RemoteParticipant) {
                     if (user.id == p.uId) {
                         p.setAudioMuted(false)
                     }
@@ -288,8 +289,8 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
 
     override fun closeRemoteAudio(user: User) {
         room?.let {
-            it.getAllParticipants().forEach {p ->
-                if(p is RemoteParticipant) {
+            it.getAllParticipants().forEach { p ->
+                if (p is RemoteParticipant) {
                     if (user.id == p.uId) {
                         p.setAudioMuted(true)
                     }

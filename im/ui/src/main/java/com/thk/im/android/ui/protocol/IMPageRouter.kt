@@ -9,4 +9,6 @@ interface IMPageRouter {
     fun openSession(ctx: Context, session: Session)
 
     fun openContactUserPage(ctx: Context, user: User)
+
+    fun openLiveCall(ctx: Context, session: Session)
 }

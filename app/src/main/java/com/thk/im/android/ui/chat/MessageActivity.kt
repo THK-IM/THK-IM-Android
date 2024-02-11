@@ -23,6 +23,7 @@ import com.thk.im.android.ui.call.LiveCallActivity
 import com.thk.im.android.ui.contact.ContactUserActivity
 import com.thk.im.android.ui.fragment.IMMessageFragment
 import com.thk.im.android.ui.group.GroupActivity
+import com.thk.im.android.ui.manager.IMUIManager
 
 class MessageActivity : BaseActivity() {
 
@@ -86,19 +87,13 @@ class MessageActivity : BaseActivity() {
                 GroupActivity.startGroupActivity(this, it)
             }
         } else if (view.id == R.id.tb_menu1) {
-            user?.let {
-                val ids = mutableSetOf(it.id, IMLiveManager.shared().selfId)
-                val subscriber = object: BaseSubscriber<Room>() {
-                    override fun onNext(t: Room?) {
-                        t?.let {
-                            LiveCallActivity.startCallActivity(this@MessageActivity)
-                        }
-                    }
-                }
-                IMLiveManager.shared().createRoom(ids, Mode.Video)
-                    .compose(RxTransform.flowableToMain())
-                    .subscribe(subscriber)
-                addDispose(subscriber)
+            val session = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra("session", Session::class.java)
+            } else {
+                intent.getParcelableExtra("session")
+            }
+            session?.let {
+                IMUIManager.pageRouter?.openLiveCall(this@MessageActivity, it)
             }
         }
     }

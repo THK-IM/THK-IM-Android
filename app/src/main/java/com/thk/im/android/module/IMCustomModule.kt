@@ -67,12 +67,14 @@ class IMCustomModule(val app: Application) : DefaultCustomModule() {
     }
 
     private fun onNewLiveCall(signal: LiveSignal) {
+        if (signal.ownerId == IMLiveManager.shared().selfId) {
+            return
+        }
         val room = IMLiveManager.shared().getRoom()
         if (room == null) {
             val subscriber = object : BaseSubscriber<Room>() {
                 override fun onNext(t: Room?) {
                     t?.let {
-                        IMLiveManager.shared().getRoom()?.members?.addAll(signal.members)
                         startLiveCall()
                     }
                 }
@@ -98,18 +100,10 @@ class IMCustomModule(val app: Application) : DefaultCustomModule() {
     }
 
     private fun hangupLiveCall(signal: LiveSignal) {
-        IMLiveManager.shared().getRoom()?.let {
-            if (it.id == signal.roomId) {
-                it.onMemberHangup(signal.operatorId)
-            }
-        }
+        IMLiveManager.shared().onMemberHangup(signal.roomId, signal.operatorId)
     }
 
     private fun endLiveCall(signal: LiveSignal) {
-        IMLiveManager.shared().getRoom()?.let {
-            if (it.id == signal.roomId) {
-                it.onEndCall()
-            }
-        }
+        IMLiveManager.shared().onEndCall(signal.roomId)
     }
 }

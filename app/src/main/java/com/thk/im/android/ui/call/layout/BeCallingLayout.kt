@@ -11,6 +11,7 @@ import com.thk.im.android.ui.call.LiveCallProtocol
 class BeCallingLayout : ConstraintLayout {
 
     private var binding: LayoutBeCallingBinding
+    private lateinit var liveCallProtocol: LiveCallProtocol
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -23,6 +24,23 @@ class BeCallingLayout : ConstraintLayout {
     }
 
     fun initCall(protocol: LiveCallProtocol) {
+        liveCallProtocol = protocol
+        binding.ivHangup.setOnClickListener {
+            liveCallProtocol.hangup()
+        }
 
+        binding.ivOpenCloseCamera.isSelected = liveCallProtocol.isCurrentCameraOpened()
+        binding.ivOpenCloseCamera.setOnClickListener {
+            if (it.isSelected) {
+                liveCallProtocol.openLocalCamera()
+            } else {
+                liveCallProtocol.closeLocalCamera()
+            }
+            it.isSelected = !it.isSelected
+        }
+
+        binding.ivSwitchCamera.setOnClickListener {
+            liveCallProtocol.switchLocalCamera()
+        }
     }
 }

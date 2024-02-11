@@ -8,6 +8,7 @@ import com.thk.android.im.live.vo.JoinRoomResVo
 import com.thk.android.im.live.vo.RefuseJoinRoomVo
 import io.reactivex.Flowable
 import retrofit2.http.Body
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 
 interface RoomApi {
@@ -27,7 +28,8 @@ interface RoomApi {
         @Body req: RefuseJoinRoomVo
     ): Flowable<Void>
 
-    @POST("/room")
+
+    @HTTP(method = "DELETE", path = "/room", hasBody = true)
     fun delRoom(
         @Body req: DelRoomVo
     ): Flowable<Void>

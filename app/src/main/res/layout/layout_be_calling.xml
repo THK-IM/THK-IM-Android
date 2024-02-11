@@ -25,7 +25,7 @@
                 android:layout_height="36dp"/>
         </androidx.appcompat.widget.LinearLayoutCompat>
         <View
-            android:layout_width="100dp"
+            android:layout_width="80dp"
             android:layout_height="60dp"/>
         <androidx.appcompat.widget.LinearLayoutCompat
             android:gravity="center"
@@ -53,32 +53,20 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         >
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:gravity="center"
-            android:background="@drawable/shape_black_oval"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_hangup"
+            android:src="@drawable/ic_call_hangup"
             android:layout_width="60dp"
-            android:layout_height="60dp">
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/iv_hangup"
-                android:src="@drawable/ic_call_hangup"
-                android:layout_width="36dp"
-                android:layout_height="36dp"/>
-        </androidx.appcompat.widget.LinearLayoutCompat>
-        <View
-            android:layout_width="200dp"
             android:layout_height="60dp"/>
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:gravity="center"
-            android:background="@drawable/shape_black_oval"
+        <View
+            android:layout_width="120dp"
+            android:layout_height="60dp"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_accept"
+            android:src="@drawable/ic_call_accept"
             android:layout_width="60dp"
-            android:layout_height="60dp">
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/iv_accept"
-                android:src="@drawable/ic_call_accept"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+            android:layout_height="60dp"
+            />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

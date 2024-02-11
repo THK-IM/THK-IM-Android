@@ -83,13 +83,13 @@ class IMApplication : Application() {
 
     private fun addActivityListener() {
         this.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                currentActivity = activity
-            }
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
 
             override fun onActivityStarted(activity: Activity) {}
 
-            override fun onActivityResumed(activity: Activity) {}
+            override fun onActivityResumed(activity: Activity) {
+                currentActivity = activity
+            }
 
             override fun onActivityPaused(activity: Activity) {}
 

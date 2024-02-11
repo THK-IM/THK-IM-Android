@@ -247,6 +247,7 @@ class Room(
         for (o in observers) {
             o.onEndCall()
         }
+
     }
 
 }

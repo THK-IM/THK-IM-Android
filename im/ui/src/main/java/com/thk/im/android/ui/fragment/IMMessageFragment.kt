@@ -53,7 +53,7 @@ import com.thk.im.android.ui.protocol.IMContentResult
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
+class IMMessageFragment: Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow
     private var keyboardShowing = false
     private var session: Session? = null
@@ -299,10 +299,10 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
             val popupHeight =
                 ((operators.size / rowCount + operators.size % rowCount) * 60 + 30).dp2px()
             point.x =
-                (com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth / 2).toFloat()
+                (AppUtils.instance().screenWidth / 2).toFloat()
             if (locations[1] <= 300.dp2px() && (locations[1] + view.height) >= (com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight - 300.dp2px())) {
                 point.y =
-                    ((com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight - popupHeight) / 2).toFloat()
+                    ((AppUtils.instance().screenHeight - popupHeight) / 2).toFloat()
             } else if (locations[1] > (300.dp2px())) {
                 point.y = (locations[1] - popupHeight).toFloat()
             } else {

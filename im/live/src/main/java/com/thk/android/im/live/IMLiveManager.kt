@@ -115,8 +115,17 @@ class IMLiveManager private constructor() {
         }
 
         val subscriber = object : BaseSubscriber<Void>() {
-            override fun onNext(t: Void?) {
+            override fun onError(t: Throwable?) {
+                super.onError(t)
                 destroyRoom()
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                destroyRoom()
+            }
+
+            override fun onNext(t: Void?) {
             }
         }
         if (room!!.ownerId == selfId) {

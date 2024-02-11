@@ -2,20 +2,18 @@ package com.thk.im.android.ui.call
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.Mode
-import com.thk.android.im.live.Role
 import com.thk.android.im.live.RoomObserver
 import com.thk.android.im.live.room.BaseParticipant
 import com.thk.android.im.live.room.LocalParticipant
 import com.thk.android.im.live.room.RemoteParticipant
 import com.thk.android.im.live.room.Room
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
@@ -26,60 +24,53 @@ import java.nio.ByteBuffer
 class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
 
     companion object {
-        fun startCallActivity(
-            ctx: Context,
-            mode: Mode,
-            user: User,
-            roomId: String?
-        ) {
+        fun startCallActivity(ctx: Context) {
             val intent = Intent(ctx, LiveCallActivity::class.java)
-            intent.putExtra("mode", mode.value)
-            intent.putExtra("user", user)
-            roomId?.let {
-                intent.putExtra("roomId", it)
-            }
             ctx.startActivity(intent)
         }
     }
 
     private lateinit var binding: ActvitiyLiveCallBinding
-    private var user: User? = null
-    private var mode: Int = 0
-    private var room: Room? = null
-    private var roomId: String? = null
-    private var status: LiveCallStatus = LiveCallStatus.Init
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActvitiyLiveCallBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        user = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("user", User::class.java)
-        } else {
-            intent.getParcelableExtra("user")
-        }
-        user?.let {
-            binding.llCallingInfo.setUserInfo(it)
-            binding.llRequestCall.initCall(this)
-            binding.llCalling.initCall(this)
-            binding.llBeCalling.initCall(this)
-        }
-        mode = intent.getIntExtra("mode", 0)
-        val roomId = intent.getStringExtra("roomId")
-        status = if (roomId.isNullOrBlank()) {
-            LiveCallStatus.RequestCall
-        } else {
-            this.roomId = roomId
-            LiveCallStatus.BeRequestCall
-        }
+        val room = IMLiveManager.shared().getRoom() ?: return
+        room.registerObserver(this)
+        initUserInfo(room)
+
+        binding.llRequestCall.initCall(this)
+        binding.llCalling.initCall(this)
+        binding.llBeCalling.initCall(this)
+
         checkPermission()
+    }
+
+    private fun initUserInfo(room: Room) {
+        room.members.forEach {
+            if (it != IMLiveManager.shared().selfId) {
+                val subscriber = object : BaseSubscriber<User>() {
+                    override fun onNext(t: User?) {
+                        t?.let { user ->
+                            binding.llCallingInfo.setUserInfo(user)
+                        }
+                    }
+
+                }
+                IMCoreManager.userModule.queryUser(it)
+                    .compose(RxTransform.flowableToMain())
+                    .subscribe(subscriber)
+                addDispose(subscriber)
+            }
+        }
     }
 
     private fun checkPermission() {
         XXPermissions.with(this).permission(Permission.CAMERA, Permission.RECORD_AUDIO)
             .request(object : OnPermissionCallback {
                 override fun onGranted(permissions: MutableList<String>, allGranted: Boolean) {
-                    createOrJoinRoom()
+                    initRoom()
                 }
 
                 override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
@@ -88,64 +79,24 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
             })
     }
 
-    private fun createOrJoinRoom() {
-        if (status == LiveCallStatus.BeRequestCall) {
-            showBeCallingView()
-            joinRoom()
-        } else {
-            showRequestCallView()
-            createRoom()
-        }
-    }
-
-    private fun createRoom() {
-        user?.let {
-            val subscriber = object : BaseSubscriber<Room>() {
-                override fun onNext(t: Room?) {
-                    t?.let {
-                        room = t
-                        initRoom()
-                    }
-                }
-
-                override fun onComplete() {
-                    super.onComplete()
-                    removeDispose(this)
-                }
-            }
-            IMLiveManager.shared().createRoom(mutableSetOf(it.id), Mode.Video)
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            addDispose(subscriber)
-        }
-    }
-
-    private fun joinRoom() {
-        roomId?.let {
-            val subscriber = object : BaseSubscriber<Room>() {
-                override fun onNext(t: Room?) {
-                    t?.let {
-                        room = t
-                        initRoom()
-                    }
-                }
-
-                override fun onComplete() {
-                    super.onComplete()
-                    removeDispose(this)
-                }
-            }
-            IMLiveManager.shared().joinRoom(it, Role.Broadcaster)
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            addDispose(subscriber)
-        }
-    }
-
     private fun initRoom() {
+        val room = IMLiveManager.shared().getRoom()
         room?.let {
+            var remoteParticipantCnt = 0
             it.getAllParticipants().forEach { p ->
                 join(p)
+                if (p is RemoteParticipant) {
+                    remoteParticipantCnt ++
+                }
+            }
+            if (remoteParticipantCnt > 0) {
+                showCallingView()
+            } else {
+                if (it.ownerId == IMLiveManager.shared().selfId) {
+                    showRequestCallView()
+                } else {
+                    showBeCallingView()
+                }
             }
         }
     }
@@ -169,9 +120,18 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         binding.llBeCalling.visibility = View.GONE
     }
 
+    override fun onHangup(uId: Long) {
+        IMLiveManager.shared().leaveRoom()
+        finish()
+    }
+
+    override fun onEndCall() {
+        IMLiveManager.shared().leaveRoom()
+        finish()
+    }
+
     override fun join(p: BaseParticipant) {
         if (p is RemoteParticipant) {
-            showCallingView()
             binding.participantLocal.setFullscreenMode(false)
             binding.participantRemote.setParticipant(p)
             binding.participantRemote.setFullscreenMode(true)
@@ -198,20 +158,22 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun currentLocalCamera(): Int {
+        val room = IMLiveManager.shared().getRoom()
         if (room != null) {
-            val participants = room!!.getAllParticipants()
+            val participants = room.getAllParticipants()
             for (p in participants) {
                 if (p is LocalParticipant) {
                     return p.currentCamera()
                 }
             }
         }
-        return 1
+        return 0
     }
 
     override fun isCurrentCameraOpened(): Boolean {
+        val room = IMLiveManager.shared().getRoom()
         if (room != null) {
-            val participants = room!!.getAllParticipants()
+            val participants = room.getAllParticipants()
             for (p in participants) {
                 if (p is LocalParticipant) {
                     return !p.getVideoMuted()
@@ -222,6 +184,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun switchLocalCamera() {
+        val room = IMLiveManager.shared().getRoom()
         room?.let {
             it.getAllParticipants().forEach { p ->
                 if (p is LocalParticipant) {
@@ -232,6 +195,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun openLocalCamera() {
+        val room = IMLiveManager.shared().getRoom()
         room?.let {
             it.getAllParticipants().forEach { p ->
                 if (p is LocalParticipant) {
@@ -242,6 +206,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun closeLocalCamera() {
+        val room = IMLiveManager.shared().getRoom()
         room?.let {
             it.getAllParticipants().forEach { p ->
                 if (p is LocalParticipant) {
@@ -252,6 +217,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun openRemoteVideo(user: User) {
+        val room = IMLiveManager.shared().getRoom()
         room?.let {
             it.getAllParticipants().forEach { p ->
                 if (p is RemoteParticipant) {
@@ -264,6 +230,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun closeRemoteVideo(user: User) {
+        val room = IMLiveManager.shared().getRoom()
         room?.let {
             it.getAllParticipants().forEach { p ->
                 if (p is RemoteParticipant) {
@@ -276,6 +243,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun openRemoteAudio(user: User) {
+        val room = IMLiveManager.shared().getRoom()
         room?.let {
             it.getAllParticipants().forEach { p ->
                 if (p is RemoteParticipant) {
@@ -288,6 +256,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun closeRemoteAudio(user: User) {
+        val room = IMLiveManager.shared().getRoom()
         room?.let {
             it.getAllParticipants().forEach { p ->
                 if (p is RemoteParticipant) {
@@ -300,10 +269,16 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun accept() {
-        joinRoom()
+        val room = IMLiveManager.shared().getRoom()
+        room?.let {
+            it.getAllParticipants().forEach { p ->
+                p.startPeerConnection()
+            }
+        }
     }
 
     override fun hangup() {
+        IMLiveManager.shared().leaveRoom()
         finish()
     }
 

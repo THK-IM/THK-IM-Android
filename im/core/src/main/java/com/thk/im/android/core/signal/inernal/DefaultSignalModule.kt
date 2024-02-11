@@ -143,13 +143,14 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     override fun sendSignal(signal: String) {
-        LLog.d("DefaultSignalModule", "Send Signal $webSocket $status ${Thread.currentThread().name}")
         if (status != SignalStatus.Connected) {
-            throw RuntimeException("disconnected")
+            return
         }
         val success = webSocket?.send(signal)
         if (success == false) {
-            LLog.e("send result false")
+            LLog.e("DefaultSignalModule, Send Signal failed $webSocket $status ${Thread.currentThread().name}")
+        } else {
+            LLog.d("DefaultSignalModule", "Send Signal $webSocket $status ${Thread.currentThread().name}")
         }
     }
 

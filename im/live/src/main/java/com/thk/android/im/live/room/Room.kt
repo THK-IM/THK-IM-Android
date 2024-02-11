@@ -1,8 +1,8 @@
 package com.thk.android.im.live.room
 
 import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.Member
 import com.thk.android.im.live.Mode
+import com.thk.android.im.live.ParticipantVo
 import com.thk.android.im.live.Role
 import com.thk.android.im.live.RoomObserver
 import com.thk.im.android.core.base.LLog
@@ -12,8 +12,11 @@ class Room(
     val id: String,
     val uId: Long,
     val mode: Mode,
+    val members: MutableSet<Long>, // 房间内成员
+    val ownerId: Long,
+    val createTime: Long,
     role: Role,
-    members: List<Member>?
+    participantVos: List<ParticipantVo>? // 当前参与人
 ) {
     private val observers: MutableList<RoomObserver> = ArrayList()
     private var localParticipant: LocalParticipant? = null
@@ -21,7 +24,7 @@ class Room(
 
     init {
         initLocalParticipant(role)
-        initRemoteParticipant(members)
+        initRemoteParticipant(participantVos)
     }
 
 
@@ -42,20 +45,22 @@ class Room(
         }
     }
 
-    private fun initRemoteParticipant(members: List<Member>?) {
-        members?.let { ms ->
-            for (m in ms) {
-                val role = when (m.role) {
+    private fun initRemoteParticipant(participantVos: List<ParticipantVo>?) {
+        participantVos?.let { vos ->
+            for (vo in vos) {
+                val role = when (vo.role) {
                     Role.Broadcaster.value -> Role.Broadcaster
                     else -> {
                         Role.Audience
                     }
                 }
-                val audioEnable = mode == Mode.Audio || mode == Mode.Video
-                val videoEnable = mode == Mode.Video
-                val remoteParticipant =
-                    RemoteParticipant(m.uId, id, role, m.streamKey, audioEnable, videoEnable)
-                this.remoteParticipants.add(remoteParticipant)
+                if (vo.uId != uId) {
+                    val audioEnable = mode == Mode.Audio || mode == Mode.Video
+                    val videoEnable = mode == Mode.Video
+                    val remoteParticipant =
+                        RemoteParticipant(vo.uId, id, role, vo.streamKey, audioEnable, videoEnable)
+                    this.remoteParticipants.add(remoteParticipant)
+                }
             }
         }
     }
@@ -126,6 +131,7 @@ class Room(
         for (p in remoteParticipants) {
             p.leave()
         }
+        observers.clear()
         remoteParticipants.clear()
         localParticipant?.leave()
         localParticipant = null
@@ -229,6 +235,18 @@ class Room(
 
     fun switchCamera() {
         localParticipant?.switchCamera()
+    }
+
+    fun onMemberHangup(uId: Long) {
+        for (o in observers) {
+            o.onHangup(uId)
+        }
+    }
+
+    fun onEndCall() {
+        for (o in observers) {
+            o.onEndCall()
+        }
     }
 
 }

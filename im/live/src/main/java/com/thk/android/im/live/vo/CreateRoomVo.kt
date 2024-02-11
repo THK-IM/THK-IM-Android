@@ -1,7 +1,7 @@
 package com.thk.android.im.live.vo
 
 import com.google.gson.annotations.SerializedName
-import com.thk.android.im.live.Member
+import com.thk.android.im.live.ParticipantVo
 
 data class CreateRoomReqVo(
     @SerializedName("u_id")
@@ -19,8 +19,10 @@ data class CreateRoomResVo(
     var ownerId: Long,
     @SerializedName("create_time")
     var createTime: Long,
+    @SerializedName("members")
+    var members: Set<Long>,
     @SerializedName("participants")
-    var members: MutableList<Member>,
+    var participantVos: MutableList<ParticipantVo>?,
     @SerializedName("mode")
     var mode: Int,
 )

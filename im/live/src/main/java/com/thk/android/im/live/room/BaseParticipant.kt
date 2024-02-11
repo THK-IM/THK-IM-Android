@@ -54,8 +54,8 @@ abstract class BaseParticipant(
             .createPeerConnection(configuration, this)
     }
 
-    open fun startPeerConnection(peerConnection: PeerConnection) {
-        peerConnection.createOffer(object : SdpObserver {
+    open fun startPeerConnection() {
+        peerConnection?.createOffer(object : SdpObserver {
             override fun onCreateSuccess(p0: SessionDescription?) {
                 LLog.d("${uId}, createOffer onCreateSuccess")
                 p0?.let {
@@ -421,7 +421,6 @@ abstract class BaseParticipant(
             for (v in videoTracks) {
                 v.removeSink(it)
             }
-            videoTracks.clear()
         }
         svr = null
     }

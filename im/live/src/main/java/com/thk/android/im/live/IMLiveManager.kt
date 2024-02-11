@@ -6,10 +6,14 @@ import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
-import com.thk.android.im.live.vo.CreateRoomReqVo
-import com.thk.android.im.live.vo.JoinRoomReqVo
 import com.thk.android.im.live.room.PCFactoryWrapper
 import com.thk.android.im.live.room.Room
+import com.thk.android.im.live.vo.CreateRoomReqVo
+import com.thk.android.im.live.vo.DelRoomVo
+import com.thk.android.im.live.vo.JoinRoomReqVo
+import com.thk.android.im.live.vo.RefuseJoinRoomVo
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import io.reactivex.Flowable
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
@@ -36,7 +40,7 @@ class IMLiveManager private constructor() {
     var selfId: Long = 0L
     lateinit var liveApi: LiveApi
     private var pcFactoryWrapper: PCFactoryWrapper? = null
-    private var _room: Room? = null
+    private var room: Room? = null
 
     fun init(app: Application) {
         this.app = app
@@ -62,44 +66,93 @@ class IMLiveManager private constructor() {
     }
 
     fun joinRoom(roomId: String, role: Role): Flowable<Room> {
-        _room?.destroy()
         return liveApi.joinRoom(JoinRoomReqVo(roomId, this.selfId, role.value))
             .flatMap {
-                val members = mutableListOf<Member>()
-                for (m in it.members) {
-                    if (m.uId != selfId) {
-                        members.add(m)
+                val participantVos = mutableListOf<ParticipantVo>()
+                it.participants?.let { ps ->
+                    for (p in ps) {
+                        if (p.uId != selfId) {
+                            participantVos.add(p)
+                        }
                     }
                 }
+
                 val mode = when (it.mode) {
                     1 -> Mode.Chat
                     2 -> Mode.Audio
                     3 -> Mode.Video
                     else -> Mode.Chat
                 }
-                val room = Room(roomId, selfId, mode, role, members)
-                _room = room
+                val room = Room(roomId, selfId, mode, it.members.toMutableSet(),
+                    it.ownerId, it.createTime, role, participantVos
+                )
+                this@IMLiveManager.room = room
                 Flowable.just(room)
             }
     }
 
     fun createRoom(ids: Set<Long>, mode: Mode): Flowable<Room> {
-        _room?.destroy()
         return liveApi.createRoom(CreateRoomReqVo(this.selfId, mode.value, ids))
             .flatMap {
-                val room = Room(it.id, selfId, mode, Role.Broadcaster, it.members)
-                _room = room
+                val createMode = when (it.mode) {
+                    1 -> Mode.Chat
+                    2 -> Mode.Audio
+                    3 -> Mode.Video
+                    else -> Mode.Chat
+                }
+                val room = Room(
+                    it.id, selfId, createMode, it.members.toMutableSet(),
+                    it.ownerId, it.createTime, Role.Broadcaster, it.participantVos
+                )
+                this@IMLiveManager.room = room
                 Flowable.just(room)
             }
     }
 
+    fun leaveRoom() {
+        if (room == null) {
+            return
+        }
+
+        val subscriber = object : BaseSubscriber<Void>() {
+            override fun onNext(t: Void?) {
+                destroyRoom()
+            }
+        }
+        if (room!!.ownerId == selfId) {
+            liveApi.delRoom(DelRoomVo(room!!.id, selfId))
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+        } else {
+            liveApi.refuseJoinRoom(RefuseJoinRoomVo(room!!.id, selfId))
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+        }
+    }
+
+    fun onMemberHangup(roomId: String, uId: Long) {
+        room?.let {
+            if (it.id == roomId) {
+                it.onMemberHangup(uId)
+            }
+        }
+    }
+
+    fun onEndCall(roomId: String) {
+        room?.let {
+            if (it.id == roomId) {
+                it.onEndCall()
+            }
+        }
+    }
+
     fun getRoom(): Room? {
-        return _room
+        return room
     }
 
     fun destroyRoom() {
-        _room?.destroy()
-        _room = null
+        room?.destroy()
+        room = null
     }
 
     fun getPCFactoryWrapper(): PCFactoryWrapper {

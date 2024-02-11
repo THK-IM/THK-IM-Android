@@ -3,15 +3,15 @@ package com.thk.android.im.live.api
 import com.thk.android.im.live.LiveApi
 import com.thk.android.im.live.vo.CreateRoomReqVo
 import com.thk.android.im.live.vo.CreateRoomResVo
+import com.thk.android.im.live.vo.DelRoomVo
 import com.thk.android.im.live.vo.JoinRoomReqVo
 import com.thk.android.im.live.vo.JoinRoomResVo
 import com.thk.android.im.live.vo.PlayStreamReqVo
 import com.thk.android.im.live.vo.PlayStreamResVo
 import com.thk.android.im.live.vo.PublishStreamReqVo
 import com.thk.android.im.live.vo.PublishStreamResVo
+import com.thk.android.im.live.vo.RefuseJoinRoomVo
 import com.thk.im.android.core.api.internal.APITokenInterceptor
-import com.thk.im.android.core.api.internal.MessageApi
-import com.thk.im.android.core.api.internal.SessionApi
 import io.reactivex.Flowable
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
@@ -74,6 +74,14 @@ class DefaultLiveApi(var token: String, var serverUrl: String) : LiveApi {
 
     override fun joinRoom(req: JoinRoomReqVo): Flowable<JoinRoomResVo> {
         return roomApi.joinRoom(req)
+    }
+
+    override fun refuseJoinRoom(req: RefuseJoinRoomVo): Flowable<Void> {
+        return roomApi.refuseJoinRoom(req)
+    }
+
+    override fun delRoom(req: DelRoomVo): Flowable<Void> {
+        return roomApi.delRoom(req)
     }
 
 }

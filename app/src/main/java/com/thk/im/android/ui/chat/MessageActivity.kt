@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import com.thk.android.im.live.IMLiveManager
 import com.thk.android.im.live.Mode
+import com.thk.android.im.live.room.Room
 import com.thk.im.android.R
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionType
@@ -23,7 +25,6 @@ import com.thk.im.android.ui.fragment.IMMessageFragment
 import com.thk.im.android.ui.group.GroupActivity
 
 class MessageActivity : BaseActivity() {
-
 
     private lateinit var binding: ActivityMessageBinding
 
@@ -56,7 +57,7 @@ class MessageActivity : BaseActivity() {
     }
 
     override fun getToolbar(): Toolbar {
-        return binding.tbTop.toolbar
+        return binding.tbMessage.toolbar
     }
 
     override fun needBackIcon(): Boolean {
@@ -86,7 +87,18 @@ class MessageActivity : BaseActivity() {
             }
         } else if (view.id == R.id.tb_menu1) {
             user?.let {
-                LiveCallActivity.startCallActivity(this, Mode.Video, it, null)
+                val ids = mutableSetOf(it.id, IMLiveManager.shared().selfId)
+                val subscriber = object: BaseSubscriber<Room>() {
+                    override fun onNext(t: Room?) {
+                        t?.let {
+                            LiveCallActivity.startCallActivity(this@MessageActivity)
+                        }
+                    }
+                }
+                IMLiveManager.shared().createRoom(ids, Mode.Video)
+                    .compose(RxTransform.flowableToMain())
+                    .subscribe(subscriber)
+                addDispose(subscriber)
             }
         }
     }

@@ -5,7 +5,7 @@ import com.thk.im.android.core.db.entity.User
 interface LiveCallProtocol {
 
     /**
-     * 获取本地摄像头 1 前置 2 后置
+     * 获取本地摄像头: 0 未知, 1 后置, 2 前置
      */
     fun currentLocalCamera(): Int
 

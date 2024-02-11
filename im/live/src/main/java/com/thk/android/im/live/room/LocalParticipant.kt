@@ -107,9 +107,9 @@ class LocalParticipant(
                 IMLiveManager.shared().app
             ) else Camera1Enumerator()
         return if (enumerator.isFrontFacing(cameraName!!)) {
-            1
-        } else {
             2
+        } else {
+            1
         }
     }
 

@@ -57,7 +57,7 @@ data class DataChannelMsg(
     var text: String,
 )
 
-data class Member(
+data class ParticipantVo(
     @SerializedName("u_id")
     var uId: Long,
     @SerializedName("role")
@@ -69,6 +69,11 @@ data class Member(
 )
 
 interface RoomObserver {
+
+    fun onHangup(uId: Long)
+
+    fun onEndCall()
+
     fun join(p: BaseParticipant)
 
     fun leave(p: BaseParticipant)

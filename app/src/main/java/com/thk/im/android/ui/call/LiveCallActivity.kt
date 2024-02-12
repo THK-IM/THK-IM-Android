@@ -84,7 +84,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         room?.let {
             var remoteParticipantCnt = 0
             it.getAllParticipants().forEach { p ->
-                join(p)
+                initParticipant(p)
                 if (p is RemoteParticipant) {
                     remoteParticipantCnt ++
                 }
@@ -111,7 +111,6 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         binding.llRequestCall.visibility = View.VISIBLE
         binding.llCalling.visibility = View.GONE
         binding.llBeCalling.visibility = View.GONE
-
     }
 
     private fun showCallingView() {
@@ -130,15 +129,25 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         finish()
     }
 
-    override fun join(p: BaseParticipant) {
+    private fun initParticipant(p: BaseParticipant) {
         if (p is RemoteParticipant) {
             binding.participantLocal.setFullscreenMode(false)
             binding.participantRemote.setParticipant(p)
             binding.participantRemote.setFullscreenMode(true)
+            binding.participantRemote.startPeerConnection()
         } else {
             binding.participantLocal.setParticipant(p)
             binding.participantLocal.setFullscreenMode(true)
+            val room = IMLiveManager.shared().getRoom() ?: return
+            if (room.ownerId == IMLiveManager.shared().selfId) {
+                binding.participantLocal.startPeerConnection()
+            }
         }
+    }
+
+    override fun join(p: BaseParticipant) {
+        showCallingView()
+        initParticipant(p)
     }
 
     override fun leave(p: BaseParticipant) {
@@ -271,6 +280,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     override fun accept() {
         val room = IMLiveManager.shared().getRoom()
         room?.let {
+            showCallingView()
             it.getAllParticipants().forEach { p ->
                 p.startPeerConnection()
             }

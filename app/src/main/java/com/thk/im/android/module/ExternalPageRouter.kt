@@ -1,4 +1,4 @@
-package com.thk.im.android
+package com.thk.im.android.module
 
 import android.content.Context
 import android.content.Intent

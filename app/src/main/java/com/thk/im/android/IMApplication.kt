@@ -15,6 +15,7 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule
 import com.thk.im.android.media.Provider
+import com.thk.im.android.module.ExternalPageRouter
 import com.thk.im.android.module.IMContactModule
 import com.thk.im.android.module.IMCustomModule
 import com.thk.im.android.module.IMGroupModule

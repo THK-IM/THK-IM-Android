@@ -10,6 +10,8 @@ import com.thk.im.android.ui.call.LiveCallProtocol
 
 class CallingLayout : ConstraintLayout {
 
+    private lateinit var liveCallProtocol: LiveCallProtocol
+
     private var binding: LayoutCallingBinding
 
     constructor(context: Context) : super(context)
@@ -23,6 +25,23 @@ class CallingLayout : ConstraintLayout {
     }
 
     fun initCall(protocol: LiveCallProtocol) {
+        liveCallProtocol = protocol
+        binding.ivHangup.setOnClickListener {
+            liveCallProtocol.hangup()
+        }
 
+        binding.ivSwitchCamera.isSelected = liveCallProtocol.isCurrentCameraOpened()
+        binding.ivSwitchCamera.setOnClickListener {
+            if (it.isSelected) {
+                liveCallProtocol.openLocalCamera()
+            } else {
+                liveCallProtocol.closeLocalCamera()
+            }
+            it.isSelected = !it.isSelected
+        }
+
+        binding.ivSwitchCamera.setOnClickListener {
+            liveCallProtocol.switchLocalCamera()
+        }
     }
 }

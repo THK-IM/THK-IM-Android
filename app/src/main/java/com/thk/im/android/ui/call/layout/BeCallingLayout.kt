@@ -29,6 +29,10 @@ class BeCallingLayout : ConstraintLayout {
             liveCallProtocol.hangup()
         }
 
+        binding.ivAccept.setOnClickListener {
+            liveCallProtocol.accept()
+        }
+
         binding.ivOpenCloseCamera.isSelected = liveCallProtocol.isCurrentCameraOpened()
         binding.ivOpenCloseCamera.setOnClickListener {
             if (it.isSelected) {

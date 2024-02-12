@@ -148,6 +148,10 @@ class ParticipantView : ConstraintLayout {
         setSelected()
     }
 
+    fun startPeerConnection() {
+        participant?.startPeerConnection()
+    }
+
     fun getParticipant(): BaseParticipant? {
         return participant
     }

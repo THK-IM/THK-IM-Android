@@ -15,6 +15,7 @@ import com.thk.android.im.live.room.RemoteParticipant
 import com.thk.android.im.live.room.Room
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActvitiyLiveCallBinding
@@ -146,6 +147,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun join(p: BaseParticipant) {
+        LLog.v("LiveCallActivity join")
         showCallingView()
         initParticipant(p)
     }
@@ -281,8 +283,11 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         val room = IMLiveManager.shared().getRoom()
         room?.let {
             showCallingView()
+            binding.participantLocal.startPeerConnection()
             it.getAllParticipants().forEach { p ->
-                p.startPeerConnection()
+                if (p is RemoteParticipant) {
+                    initParticipant(p)
+                }
             }
         }
     }

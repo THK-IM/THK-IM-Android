@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.thk.android.im.live.room.BaseParticipant
+import com.thk.android.im.live.room.LocalParticipant
 import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.live.R
 import com.thk.im.android.live.databinding.ViewParticipantBinding
@@ -150,6 +151,37 @@ class ParticipantView : ConstraintLayout {
 
     fun startPeerConnection() {
         participant?.startPeerConnection()
+    }
+
+    fun isAudioMuted(): Boolean {
+        return participant?.getAudioMuted() ?: false
+    }
+
+    fun muteAudio(muted: Boolean) {
+        participant?.setAudioMuted(muted)
+    }
+
+    fun isVideoMuted(): Boolean {
+        return participant?.getVideoMuted() ?: false
+    }
+
+    fun muteVideo(muted: Boolean) {
+        participant?.setVideoMuted(muted)
+    }
+
+    fun switchCamera() {
+        participant?.let {
+            if (it is LocalParticipant) {
+                it.switchCamera()
+            }
+        }
+    }
+
+    fun currentCamera(): Int {
+        if (participant != null && participant!! is LocalParticipant) {
+            return (participant!! as LocalParticipant).currentCamera()
+        }
+        return 0
     }
 
     fun getParticipant(): BaseParticipant? {

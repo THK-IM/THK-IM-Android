@@ -1,18 +1,15 @@
 package com.thk.im.android.ui.call
 
-import com.thk.im.android.core.db.entity.User
-
 interface LiveCallProtocol {
+
+    fun isSpeakerOn(): Boolean
+
+    fun muteSpeaker(mute: Boolean)
 
     /**
      * 获取本地摄像头: 0 未知, 1 后置, 2 前置
      */
     fun currentLocalCamera(): Int
-
-    /**
-     * 本地摄像头是否开启 1 开启 0 关闭
-     */
-    fun isCurrentCameraOpened(): Boolean
 
     /**
      * 切换本地摄像头
@@ -22,32 +19,39 @@ interface LiveCallProtocol {
     /**
      * 打开本地摄像头
      */
-    fun openLocalCamera()
+    fun muteLocalVideo(mute: Boolean)
+
+    fun isLocalVideoMuted(): Boolean
 
     /**
-     * 关闭本地摄像头
+     * 打开/关闭本地音频
      */
-    fun closeLocalCamera()
+    fun muteLocalAudio(mute: Boolean)
 
     /**
-     * 打开远端视频
+     * 本地音频是否关闭
      */
-    fun openRemoteVideo(user: User)
+    fun isLocalAudioMuted(): Boolean
 
     /**
-     * 关闭远端视频
+     * 打开/关闭远端音频
      */
-    fun closeRemoteVideo(user: User)
+    fun muteRemoteAudio(uId: Long, mute: Boolean)
 
     /**
-     * 打开远端音频
+     * 远端音频是否关闭
      */
-    fun openRemoteAudio(user: User)
+    fun isRemoteAudioMuted(): Boolean
 
     /**
-     * 关闭远端音频
+     * 打开/关闭远端视频
      */
-    fun closeRemoteAudio(user: User)
+    fun muteRemoteVideo(uId: Long, mute: Boolean)
+
+    /**
+     * 远端视频是否关闭
+     */
+    fun isRemoteVideoMuted(uId: Long): Boolean
 
     /**
      * 接听

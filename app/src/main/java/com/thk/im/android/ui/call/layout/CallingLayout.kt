@@ -30,18 +30,23 @@ class CallingLayout : ConstraintLayout {
             liveCallProtocol.hangup()
         }
 
-        binding.ivSwitchCamera.isSelected = liveCallProtocol.isCurrentCameraOpened()
-        binding.ivSwitchCamera.setOnClickListener {
-            if (it.isSelected) {
-                liveCallProtocol.openLocalCamera()
-            } else {
-                liveCallProtocol.closeLocalCamera()
-            }
-            it.isSelected = !it.isSelected
+        binding.ivAudioMute.isSelected = liveCallProtocol.isLocalAudioMuted()
+        binding.ivAudioMute.setOnClickListener {
+            liveCallProtocol.muteLocalAudio(!binding.ivAudioMute.isSelected)
+            binding.ivAudioMute.isSelected = liveCallProtocol.isLocalAudioMuted()
         }
 
-        binding.ivSwitchCamera.setOnClickListener {
-            liveCallProtocol.switchLocalCamera()
+        binding.ivSwitchSpeaker.isSelected = liveCallProtocol.isSpeakerOn()
+        binding.ivSwitchSpeaker.setOnClickListener {
+            liveCallProtocol.muteSpeaker(!binding.ivSwitchSpeaker.isSelected)
+            binding.ivSwitchSpeaker.isSelected = !binding.ivSwitchSpeaker.isSelected
+        }
+
+
+        binding.ivOpenCloseCamera.isSelected = liveCallProtocol.isLocalVideoMuted()
+        binding.ivOpenCloseCamera.setOnClickListener {
+            liveCallProtocol.muteLocalVideo(!liveCallProtocol.isLocalVideoMuted())
+            binding.ivOpenCloseCamera.isSelected = liveCallProtocol.isLocalVideoMuted()
         }
     }
 }

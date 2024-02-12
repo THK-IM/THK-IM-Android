@@ -168,116 +168,54 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         IMLiveManager.shared().getRoom()?.destroy()
     }
 
-    override fun currentLocalCamera(): Int {
-        val room = IMLiveManager.shared().getRoom()
-        if (room != null) {
-            val participants = room.getAllParticipants()
-            for (p in participants) {
-                if (p is LocalParticipant) {
-                    return p.currentCamera()
-                }
-            }
-        }
-        return 0
-    }
-
-    override fun isCurrentCameraOpened(): Boolean {
-        val room = IMLiveManager.shared().getRoom()
-        if (room != null) {
-            val participants = room.getAllParticipants()
-            for (p in participants) {
-                if (p is LocalParticipant) {
-                    return !p.getVideoMuted()
-                }
-            }
-        }
+    override fun isSpeakerOn(): Boolean {
         return false
     }
 
+    override fun muteSpeaker(mute: Boolean) {
+        IMLiveManager.shared().getPCFactoryWrapper().setSpeakerMute(mute)
+    }
+
+    override fun currentLocalCamera(): Int {
+        return binding.participantLocal.currentCamera()
+    }
+
     override fun switchLocalCamera() {
-        val room = IMLiveManager.shared().getRoom()
-        room?.let {
-            it.getAllParticipants().forEach { p ->
-                if (p is LocalParticipant) {
-                    p.switchCamera()
-                }
-            }
-        }
+        binding.participantLocal.switchCamera()
     }
 
-    override fun openLocalCamera() {
-        val room = IMLiveManager.shared().getRoom()
-        room?.let {
-            it.getAllParticipants().forEach { p ->
-                if (p is LocalParticipant) {
-                    p.setVideoMuted(false)
-                }
-            }
-        }
+    override fun muteLocalVideo(mute: Boolean) {
+        binding.participantLocal.muteVideo(mute)
     }
 
-    override fun closeLocalCamera() {
-        val room = IMLiveManager.shared().getRoom()
-        room?.let {
-            it.getAllParticipants().forEach { p ->
-                if (p is LocalParticipant) {
-                    p.setVideoMuted(true)
-                }
-            }
-        }
+    override fun isLocalVideoMuted(): Boolean {
+        return binding.participantLocal.isVideoMuted()
     }
 
-    override fun openRemoteVideo(user: User) {
-        val room = IMLiveManager.shared().getRoom()
-        room?.let {
-            it.getAllParticipants().forEach { p ->
-                if (p is RemoteParticipant) {
-                    if (user.id == p.uId) {
-                        p.setVideoMuted(false)
-                    }
-                }
-            }
-        }
+    override fun muteLocalAudio(mute: Boolean) {
+        binding.participantLocal.muteAudio(mute)
     }
 
-    override fun closeRemoteVideo(user: User) {
-        val room = IMLiveManager.shared().getRoom()
-        room?.let {
-            it.getAllParticipants().forEach { p ->
-                if (p is RemoteParticipant) {
-                    if (user.id == p.uId) {
-                        p.setVideoMuted(true)
-                    }
-                }
-            }
-        }
+    override fun isLocalAudioMuted(): Boolean {
+        return binding.participantLocal.isAudioMuted()
     }
 
-    override fun openRemoteAudio(user: User) {
-        val room = IMLiveManager.shared().getRoom()
-        room?.let {
-            it.getAllParticipants().forEach { p ->
-                if (p is RemoteParticipant) {
-                    if (user.id == p.uId) {
-                        p.setAudioMuted(false)
-                    }
-                }
-            }
-        }
+    override fun muteRemoteAudio(uId: Long, mute: Boolean) {
+        binding.participantRemote.muteAudio(mute)
     }
 
-    override fun closeRemoteAudio(user: User) {
-        val room = IMLiveManager.shared().getRoom()
-        room?.let {
-            it.getAllParticipants().forEach { p ->
-                if (p is RemoteParticipant) {
-                    if (user.id == p.uId) {
-                        p.setAudioMuted(true)
-                    }
-                }
-            }
-        }
+    override fun isRemoteAudioMuted(): Boolean {
+        return binding.participantRemote.isAudioMuted()
     }
+
+    override fun muteRemoteVideo(uId: Long, mute: Boolean) {
+        binding.participantRemote.muteVideo(mute)
+    }
+
+    override fun isRemoteVideoMuted(uId: Long): Boolean {
+        return binding.participantRemote.isVideoMuted()
+    }
+
 
     override fun accept() {
         val room = IMLiveManager.shared().getRoom()

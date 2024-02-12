@@ -396,7 +396,7 @@ abstract class BaseParticipant(
             if (videoTracks.size > 0) {
                 it.init(IMLiveManager.shared().getPCFactoryWrapper().eglCtx, null)
 //                it.setMirror(true)
-                it.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+                it.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
                 it.keepScreenOn = true
                 it.setZOrderMediaOverlay(true)
                 it.setEnableHardwareScaler(false)

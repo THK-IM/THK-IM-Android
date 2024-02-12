@@ -83,7 +83,7 @@ class LocalParticipant(
                         )
                         it.initialize(surfaceTextureHelper, app, videoSource!!.capturerObserver)
 
-                        it.startCapture(1080, 720, 10)
+                        it.startCapture(640, 480, 20)
                         addVideoTrack(videoTrack)
                     }
                 }

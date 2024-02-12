@@ -2,8 +2,14 @@ package com.thk.im.android.ui.call
 
 interface LiveCallProtocol {
 
+    /**
+     * 扬声器是否打开
+     */
     fun isSpeakerOn(): Boolean
 
+    /**
+     * 打开/关闭扬声器
+     */
     fun muteSpeaker(mute: Boolean)
 
     /**
@@ -41,7 +47,7 @@ interface LiveCallProtocol {
     /**
      * 远端音频是否关闭
      */
-    fun isRemoteAudioMuted(): Boolean
+    fun isRemoteAudioMuted(uId: Long): Boolean
 
     /**
      * 打开/关闭远端视频

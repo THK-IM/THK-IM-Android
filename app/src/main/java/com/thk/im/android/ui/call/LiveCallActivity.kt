@@ -204,7 +204,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         binding.participantRemote.muteAudio(mute)
     }
 
-    override fun isRemoteAudioMuted(): Boolean {
+    override fun isRemoteAudioMuted(uId: Long): Boolean {
         return binding.participantRemote.isAudioMuted()
     }
 

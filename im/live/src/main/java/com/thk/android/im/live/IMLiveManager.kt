@@ -48,19 +48,37 @@ class IMLiveManager private constructor() {
             PeerConnectionFactory.InitializationOptions
                 .builder(app).createInitializationOptions()
         )
+        muteSpeaker(false)
+    }
+
+    fun isSpeakerMuted(): Boolean {
+        if (app == null) {
+            return false
+        }
+        val audioManager = app!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        return audioManager.isSpeakerphoneOn
+    }
+
+    fun muteSpeaker(mute: Boolean) {
+        if (app == null) {
+            return
+        }
         // 设置扬声器播放
-        val audioManager = app.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val audioManager = app!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&  // Check FEATURE_AUDIO_OUTPUT to guard against false positives.
-            app.packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)
+            app!!.packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)
         ) {
             val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
             for (device in devices) {
-                if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER && !mute) {
+                    audioManager.setCommunicationDevice(device)
+                }
+                if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER_SAFE && mute) {
                     audioManager.setCommunicationDevice(device)
                 }
             }
         } else {
-            audioManager.isSpeakerphoneOn = true
+            audioManager.isSpeakerphoneOn = !mute
         }
         audioManager.mode = AudioManager.MODE_NORMAL
     }

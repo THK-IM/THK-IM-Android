@@ -6,25 +6,33 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.thk.android.im.live.room.BaseParticipant
 import com.thk.android.im.live.room.LocalParticipant
 import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.live.R
 import com.thk.im.android.live.databinding.ViewParticipantBinding
+import kotlin.math.abs
 
 
 class ParticipantView : ConstraintLayout {
 
     private var participant: BaseParticipant? = null
     private val binding: ViewParticipantBinding
-    private var isFullScreen = true // 默认最大化显示
+    private var fullScreen = true // 默认最大化显示
 
     private var lastPositionX = 0f
     private var lastPositionY = 0f
 
     private var defaultScaleX = 0.35f
     private var defaultScaleY = 0.3f
+
+
+    private var initPositionX = 0f
+    private var initPositionY = 0f
+    private var initTs = 0L
+
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -54,15 +62,18 @@ class ParticipantView : ConstraintLayout {
 
     override fun performClick(): Boolean {
         super.performClick()
-        return false
+        return true
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (!isFullScreen && event != null) {
+        if (!fullScreen && event != null) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     lastPositionX = event.x
                     lastPositionY = event.y
+                    initPositionX = event.x
+                    initPositionY = event.y
+                    initTs = System.currentTimeMillis()
                 }
 
                 MotionEvent.ACTION_MOVE -> {
@@ -78,7 +89,13 @@ class ParticipantView : ConstraintLayout {
                         newTransformY.coerceAtLeast(-AppUtils.instance().screenHeight * (1 - defaultScaleY) / 2)
                 }
 
-                MotionEvent.ACTION_UP -> {}
+                MotionEvent.ACTION_UP -> {
+                    if (System.currentTimeMillis() - initTs < 500) {
+                        if (abs(event.x-lastPositionX) < 20 && abs(event.y - lastPositionY) < 20) {
+                            performClick()
+                        }
+                    }
+                }
                 MotionEvent.ACTION_CANCEL -> {}
             }
             return true
@@ -91,11 +108,15 @@ class ParticipantView : ConstraintLayout {
         this.defaultScaleY = scaleY
     }
 
+    fun isFullScreen(): Boolean {
+        return fullScreen
+    }
+
     fun setFullscreenMode(isFullScreen: Boolean) {
-        if (this.isFullScreen == isFullScreen) {
+        if (this.fullScreen == isFullScreen) {
             return
         }
-        this.isFullScreen = isFullScreen
+        this.fullScreen = isFullScreen
         if (isFullScreen) {
             switchToFullscreen()
         } else {
@@ -113,6 +134,7 @@ class ParticipantView : ConstraintLayout {
         animators.play(animatorTranslationX).with(animatorTranslationY).with(animatorScaleX)
             .with(animatorScaleY)
         animators.start()
+        this.alpha = 1f
     }
 
     private fun switchToDragView() {
@@ -120,15 +142,16 @@ class ParticipantView : ConstraintLayout {
         val translationY = (0 - AppUtils.instance().screenHeight * (1 - defaultScaleY)) / 2
         val scaleX = defaultScaleX
         val scaleY = defaultScaleY
-        val animators = AnimatorSet()
         val animatorTranslationX = ObjectAnimator.ofFloat(this, "translationX", translationX)
         val animatorTranslationY = ObjectAnimator.ofFloat(this, "translationY", translationY)
         val animatorScaleX = ObjectAnimator.ofFloat(this, "scaleX", scaleX)
         val animatorScaleY = ObjectAnimator.ofFloat(this, "scaleY", scaleY)
+        val animators = AnimatorSet()
         animators.duration = 150
         animators.play(animatorTranslationX).with(animatorTranslationY).with(animatorScaleX)
             .with(animatorScaleY)
         animators.start()
+        this.alpha = 1f
     }
 
 

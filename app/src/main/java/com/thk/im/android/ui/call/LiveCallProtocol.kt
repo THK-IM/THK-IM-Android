@@ -5,7 +5,7 @@ interface LiveCallProtocol {
     /**
      * 扬声器是否打开
      */
-    fun isSpeakerOn(): Boolean
+    fun isSpeakerMuted(): Boolean
 
     /**
      * 打开/关闭扬声器

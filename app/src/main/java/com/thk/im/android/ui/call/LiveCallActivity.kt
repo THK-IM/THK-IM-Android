@@ -10,7 +10,6 @@ import com.hjq.permissions.XXPermissions
 import com.thk.android.im.live.IMLiveManager
 import com.thk.android.im.live.RoomObserver
 import com.thk.android.im.live.room.BaseParticipant
-import com.thk.android.im.live.room.LocalParticipant
 import com.thk.android.im.live.room.RemoteParticipant
 import com.thk.android.im.live.room.Room
 import com.thk.im.android.core.IMCoreManager
@@ -44,6 +43,26 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         binding.llRequestCall.initCall(this)
         binding.llCalling.initCall(this)
         binding.llBeCalling.initCall(this)
+
+        binding.participantLocal.setOnClickListener {
+            if (!binding.participantLocal.isFullScreen()) {
+                binding.participantLocal.setFullscreenMode(true)
+                binding.participantRemote.setFullscreenMode(false)
+                binding.participantRemote.bringToFront()
+                binding.llCallingInfo.bringToFront()
+                binding.llCalling.bringToFront()
+            }
+        }
+
+        binding.participantRemote.setOnClickListener {
+            if (!binding.participantRemote.isFullScreen()) {
+                binding.participantRemote.setFullscreenMode(true)
+                binding.participantLocal.setFullscreenMode(false)
+                binding.participantLocal.bringToFront()
+                binding.llCallingInfo.bringToFront()
+                binding.llCalling.bringToFront()
+            }
+        }
 
         checkPermission()
     }
@@ -87,7 +106,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
             it.getAllParticipants().forEach { p ->
                 initParticipant(p)
                 if (p is RemoteParticipant) {
-                    remoteParticipantCnt ++
+                    remoteParticipantCnt++
                 }
             }
             if (remoteParticipantCnt > 0) {
@@ -153,6 +172,8 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     }
 
     override fun leave(p: BaseParticipant) {
+        IMLiveManager.shared().leaveRoom()
+        finish()
     }
 
     override fun onTextMsgReceived(uId: Long, text: String) {
@@ -168,12 +189,12 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         IMLiveManager.shared().getRoom()?.destroy()
     }
 
-    override fun isSpeakerOn(): Boolean {
-        return false
+    override fun isSpeakerMuted(): Boolean {
+        return IMLiveManager.shared().isSpeakerMuted()
     }
 
     override fun muteSpeaker(mute: Boolean) {
-        IMLiveManager.shared().getPCFactoryWrapper().setSpeakerMute(mute)
+        IMLiveManager.shared().muteSpeaker(mute)
     }
 
     override fun currentLocalCamera(): Int {

@@ -39,12 +39,12 @@ class CallingLayout : ConstraintLayout {
         binding.ivSwitchSpeaker.isSelected = liveCallProtocol.isSpeakerMuted()
         binding.ivSwitchSpeaker.setOnClickListener {
             liveCallProtocol.muteSpeaker(!binding.ivSwitchSpeaker.isSelected)
-            binding.ivSwitchSpeaker.isSelected = !binding.ivSwitchSpeaker.isSelected
+            binding.ivSwitchSpeaker.isSelected = liveCallProtocol.isSpeakerMuted()
         }
 
         binding.ivOpenCloseCamera.isSelected = liveCallProtocol.isLocalVideoMuted()
         binding.ivOpenCloseCamera.setOnClickListener {
-            liveCallProtocol.muteLocalVideo(!liveCallProtocol.isLocalVideoMuted())
+            liveCallProtocol.muteLocalVideo(!binding.ivOpenCloseCamera.isSelected)
             binding.ivOpenCloseCamera.isSelected = liveCallProtocol.isLocalVideoMuted()
         }
 

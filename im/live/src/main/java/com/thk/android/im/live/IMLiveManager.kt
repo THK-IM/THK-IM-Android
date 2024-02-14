@@ -56,7 +56,7 @@ class IMLiveManager private constructor() {
             return false
         }
         val audioManager = app!!.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        return audioManager.isSpeakerphoneOn
+        return !audioManager.isSpeakerphoneOn
     }
 
     fun muteSpeaker(mute: Boolean) {
@@ -68,14 +68,15 @@ class IMLiveManager private constructor() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&  // Check FEATURE_AUDIO_OUTPUT to guard against false positives.
             app!!.packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)
         ) {
-            val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
-            for (device in devices) {
-                if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER && !mute) {
-                    audioManager.setCommunicationDevice(device)
+            if (!mute) {
+                val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+                for (device in devices) {
+                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                        audioManager.setCommunicationDevice(device)
+                    }
                 }
-                if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER_SAFE && mute) {
-                    audioManager.setCommunicationDevice(device)
-                }
+            } else {
+                audioManager.clearCommunicationDevice()
             }
         } else {
             audioManager.isSpeakerphoneOn = !mute

@@ -46,21 +46,22 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
 
         binding.participantLocal.setOnClickListener {
             if (!binding.participantLocal.isFullScreen()) {
-                binding.participantLocal.setFullscreenMode(true)
-                binding.participantRemote.setFullscreenMode(false)
                 binding.participantRemote.bringToFront()
                 binding.llCallingInfo.bringToFront()
                 binding.llCalling.bringToFront()
+                binding.participantRemote.setFullscreenMode(false)
+                binding.participantLocal.setFullscreenMode(true)
             }
         }
 
         binding.participantRemote.setOnClickListener {
+            LLog.d("onClick: participantRemote")
             if (!binding.participantRemote.isFullScreen()) {
-                binding.participantRemote.setFullscreenMode(true)
-                binding.participantLocal.setFullscreenMode(false)
                 binding.participantLocal.bringToFront()
                 binding.llCallingInfo.bringToFront()
                 binding.llCalling.bringToFront()
+                binding.participantLocal.setFullscreenMode(false)
+                binding.participantRemote.setFullscreenMode(true)
             }
         }
 
@@ -78,8 +79,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
                     }
 
                 }
-                IMCoreManager.userModule.queryUser(it)
-                    .compose(RxTransform.flowableToMain())
+                IMCoreManager.userModule.queryUser(it).compose(RxTransform.flowableToMain())
                     .subscribe(subscriber)
                 addDispose(subscriber)
             }

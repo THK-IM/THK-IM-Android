@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.thk.android.im.live.view.ParticipantView
-        android:id="@+id/participantRemote"
+        android:id="@+id/participant_remote"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -13,7 +13,7 @@
         />
 
     <com.thk.android.im.live.view.ParticipantView
-        android:id="@+id/participantLocal"
+        android:id="@+id/participant_local"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"

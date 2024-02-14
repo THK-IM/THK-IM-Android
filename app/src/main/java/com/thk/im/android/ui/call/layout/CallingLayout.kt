@@ -47,5 +47,9 @@ class CallingLayout : ConstraintLayout {
             liveCallProtocol.muteLocalVideo(!liveCallProtocol.isLocalVideoMuted())
             binding.ivOpenCloseCamera.isSelected = liveCallProtocol.isLocalVideoMuted()
         }
+
+        binding.ivSwitchCamera.setOnClickListener {
+            liveCallProtocol.switchLocalCamera()
+        }
     }
 }

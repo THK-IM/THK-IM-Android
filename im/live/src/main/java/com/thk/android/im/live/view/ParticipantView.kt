@@ -6,7 +6,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
-import android.view.View
+import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.thk.android.im.live.room.BaseParticipant
 import com.thk.android.im.live.room.LocalParticipant
@@ -42,27 +42,20 @@ class ParticipantView : ConstraintLayout {
     init {
         val view = LayoutInflater.from(context).inflate(R.layout.view_participant, this, true)
         binding = ViewParticipantBinding.bind(view)
-        binding.btnVideoMuted.setOnClickListener {
-            participant?.let {
-                val muted = it.getVideoMuted()
-                it.setVideoMuted(!muted)
-            }
-            setFullscreenMode(true)
-            setSelected()
-        }
-        binding.btnAudioMuted.setOnClickListener {
-            participant?.let {
-                val muted = it.getAudioMuted()
-                it.setAudioMuted(!muted)
-            }
-            setFullscreenMode(false)
-            setSelected()
-        }
     }
 
     override fun performClick(): Boolean {
-        super.performClick()
-        return true
+        return super.performClick()
+    }
+
+    override fun bringToFront() {
+        super.bringToFront()
+        val surfaceView = binding.rtcRendererVideo
+        val parent = surfaceView.parent as ViewGroup
+        parent.removeView(surfaceView)
+        surfaceView.setZOrderOnTop(true)
+        surfaceView.setZOrderMediaOverlay(true)
+        parent.addView(surfaceView)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -90,12 +83,13 @@ class ParticipantView : ConstraintLayout {
                 }
 
                 MotionEvent.ACTION_UP -> {
-                    if (System.currentTimeMillis() - initTs < 500) {
-                        if (abs(event.x-lastPositionX) < 20 && abs(event.y - lastPositionY) < 20) {
+                    if (System.currentTimeMillis() - initTs < 200) {
+                        if (abs(event.x - lastPositionX) < 20 && abs(event.y - lastPositionY) < 20) {
                             performClick()
                         }
                     }
                 }
+
                 MotionEvent.ACTION_CANCEL -> {}
             }
             return true
@@ -130,11 +124,10 @@ class ParticipantView : ConstraintLayout {
         val animatorTranslationY = ObjectAnimator.ofFloat(this, "translationY", 0f)
         val animatorScaleX = ObjectAnimator.ofFloat(this, "scaleX", 1f)
         val animatorScaleY = ObjectAnimator.ofFloat(this, "scaleY", 1f)
-        animators.duration = 150
+        animators.duration = 400
         animators.play(animatorTranslationX).with(animatorTranslationY).with(animatorScaleX)
             .with(animatorScaleY)
         animators.start()
-        this.alpha = 1f
     }
 
     private fun switchToDragView() {
@@ -147,20 +140,13 @@ class ParticipantView : ConstraintLayout {
         val animatorScaleX = ObjectAnimator.ofFloat(this, "scaleX", scaleX)
         val animatorScaleY = ObjectAnimator.ofFloat(this, "scaleY", scaleY)
         val animators = AnimatorSet()
-        animators.duration = 150
+        animators.duration = 400
         animators.play(animatorTranslationX).with(animatorTranslationY).with(animatorScaleX)
             .with(animatorScaleY)
         animators.start()
-        this.alpha = 1f
     }
 
-
-    private fun setSelected() {
-        participant?.let {
-            binding.btnVideoMuted.isSelected = !it.getVideoMuted()
-            binding.btnAudioMuted.isSelected = !it.getAudioMuted()
-        }
-    }
+    private fun setSelected() {}
 
     fun setParticipant(p: BaseParticipant) {
         if (participant != null) {

@@ -68,4 +68,19 @@
         app:layout_constraintRight_toRightOf="parent"
         />
 
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@id/iv_hangup"
+        app:layout_constraintLeft_toRightOf="@id/iv_hangup"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@drawable/shape_black_oval"
+        android:layout_width="48dp"
+        android:layout_height="48dp">
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_switch_camera"
+            android:src="@drawable/ic_switch_camera"
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

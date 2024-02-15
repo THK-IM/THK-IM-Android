@@ -174,8 +174,12 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             msgVHOperator?.onMsgCellClick(message, pos, it)
         }
         contentContainer.setOnLongClickListener {
-            msgVHOperator?.onMsgCellLongClick(message, pos, it)
-            true
+            if (canSelect()) {
+                msgVHOperator?.onMsgCellLongClick(message, pos, it)
+                true
+            } else {
+                false
+            }
         }
     }
 

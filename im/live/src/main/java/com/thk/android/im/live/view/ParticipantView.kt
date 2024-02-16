@@ -8,11 +8,13 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.thk.android.im.live.IMLiveManager
 import com.thk.android.im.live.room.BaseParticipant
 import com.thk.android.im.live.room.LocalParticipant
 import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.live.R
 import com.thk.im.android.live.databinding.ViewParticipantBinding
+import org.webrtc.RendererCommon
 import kotlin.math.abs
 
 
@@ -42,6 +44,9 @@ class ParticipantView : ConstraintLayout {
     init {
         val view = LayoutInflater.from(context).inflate(R.layout.view_participant, this, true)
         binding = ViewParticipantBinding.bind(view)
+        binding.rtcRendererVideo.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+        binding.rtcRendererVideo.keepScreenOn = true
+        binding.rtcRendererVideo.setEnableHardwareScaler(false)
     }
 
     override fun performClick(): Boolean {
@@ -191,6 +196,10 @@ class ParticipantView : ConstraintLayout {
             return (participant!! as LocalParticipant).currentCamera()
         }
         return 0
+    }
+
+    fun setMirror(enable: Boolean) {
+        binding.rtcRendererVideo.setMirror(enable)
     }
 
     fun getParticipant(): BaseParticipant? {

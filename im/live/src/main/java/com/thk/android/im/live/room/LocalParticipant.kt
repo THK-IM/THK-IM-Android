@@ -83,15 +83,16 @@ class LocalParticipant(
                         )
                         it.initialize(surfaceTextureHelper, app, videoSource!!.capturerObserver)
 
-                        it.startCapture(1440, 1080, 20)
+                        it.startCapture(1280, 720, 30)
                         addVideoTrack(videoTrack)
 
                         peerConnection?.senders?.forEach { sender ->
                             if (sender.track()?.kind() == "video") {
                                 val parameters = sender.parameters
                                 for (e in parameters.encodings) {
-                                    e.maxBitrateBps = (1024 * 8 * 1024)
-                                    e.minBitrateBps = (1024 * 8 * 200)
+                                    val minBitrate = 1024 * 8 * 384
+                                    e.maxBitrateBps = 4 * minBitrate
+                                    e.minBitrateBps = minBitrate
                                 }
                                 sender.parameters = parameters
                             }

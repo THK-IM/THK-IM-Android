@@ -64,6 +64,9 @@ data class Session(
     @SerializedName("last_msg")
     @ColumnInfo(name = "last_msg", typeAffinity = ColumnInfo.TEXT)
     var lastMsg: String?,
+    @SerializedName("msg_sync_time")
+    @ColumnInfo(name = "msg_sync_time")
+    var msgSyncTime: Long = 0,
     @SerializedName("member_sync_time")
     @ColumnInfo(name = "member_sync_time")
     var memberSyncTime: Long = 0,
@@ -84,19 +87,19 @@ data class Session(
     @Ignore
     constructor(id: Long) : this(
         id, 0, 0, 0, "", null, "", 0, 0, 0,
-        0, null, 0, null, null, 0, 0, 0, 0, 0
+        0, null, 0, null, null, 0, 0, 0, 0, 0, 0
     )
 
     @Ignore
     constructor() : this(
         0, 0, 0, 0, "", null,  "", 0, 0, 0,
-        0, null, 0, null, null, 0, 0, 0, 0, 0
+        0, null, 0, null, null, 0, 0, 0, 0, 0, 0
     )
 
     @Ignore
     constructor(type: Int, entityId: Long) : this(
         0, 0, type, entityId, "", null, "", 0, 0, 0,
-        0, null, 0, null, null, 0, 0, 0, 0, 0
+        0, null, 0, null, null, 0, 0, 0, 0, 0, 0
     )
 
 }

@@ -1,6 +1,7 @@
 package com.thk.im.android.core.api.internal
 
 import com.thk.im.android.core.api.vo.ListVo
+import com.thk.im.android.core.api.vo.MessageVo
 import com.thk.im.android.core.api.vo.SessionMemberVo
 import com.thk.im.android.core.api.vo.SessionVo
 import com.thk.im.android.core.api.vo.UpdateUserSession
@@ -54,6 +55,17 @@ interface SessionApi {
         @Path("uid") uid: Long,
         @Path("sid") sid: Long,
     ): Flowable<Void>
+
+
+    @GET("/session/{id}/message")
+    fun querySessionMessage(
+        @Path("id") id: Long,
+        @Query("s_id") sid: Long,
+        @Query("c_time") cTime: Long,
+        @Query("offset") offset: Int,
+        @Query("count") count: Int,
+        @Query("asc") asc: Int
+    ): Flowable<ListVo<MessageVo>>
 
 
 }

@@ -112,7 +112,7 @@ class GroupActivity : BaseActivity() {
         val ids = getMemberIds()
         val uId = IMCoreManager.uId
 
-        val createGroupVo = CreateGroupVo(uId, ids, groupName, announce, SessionType.Group.value)
+        val createGroupVo = CreateGroupVo(uId, ids, groupName, announce, SessionType.SuperGroup.value)
         val subscriber = object : BaseSubscriber<Group>() {
             override fun onNext(t: Group?) {
             }

@@ -75,6 +75,10 @@ open class DefaultMessageModule : MessageModule {
         return 200
     }
 
+    open fun getSessionMemberCountPerRequest(): Int {
+        return 100
+    }
+
     override fun registerMsgProcessor(processor: IMBaseMsgProcessor) {
         processorMap[processor.messageType()] = processor
     }
@@ -84,6 +88,59 @@ open class DefaultMessageModule : MessageModule {
         return processor ?: processorMap[0]!!
     }
 
+    @Throws(Exception::class)
+    private fun batchProcessMessages(messages: List<Message>, ack: Boolean = true){
+        val sessionMessages = mutableMapOf<Long, MutableList<Message>>()
+        val unProcessorMessages = mutableListOf<Message>()
+        val needProcessMessages = mutableListOf<Message>()
+        for (m in messages) {
+            if (m.fUid == IMCoreManager.uId) {
+                m.oprStatus =
+                    m.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
+            }
+            m.sendStatus = MsgSendStatus.Success.value
+            if (getMsgProcessor(m.type).needReprocess(m)) {
+                // 状态操作消息交给对应消息处理器自己处理
+                needProcessMessages.add(m)
+            } else {
+                // 其他消息批量处理
+                if (sessionMessages[m.sid] == null) {
+                    sessionMessages[m.sid] = mutableListOf(m)
+                } else {
+                    sessionMessages[m.sid]!!.add(m)
+                }
+                unProcessorMessages.add(m)
+            }
+        }
+        // 消息入库并ACK
+        if (unProcessorMessages.isNotEmpty()) {
+            // 插入数据库
+            IMCoreManager.getImDataBase().messageDao()
+                .insertOrIgnore(unProcessorMessages)
+            if (ack) {
+                for (m in unProcessorMessages) {
+                    if (m.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
+                        ackMessageToCache(m)
+                    }
+                }
+            }
+        }
+
+        for (m in needProcessMessages) {
+            getMsgProcessor(m.type).received(m)
+        }
+
+        // 更新每个session的最后一条消息
+        for (sessionMessage in sessionMessages) {
+            XEventBus.post(IMEvent.BatchMsgNew.value, sessionMessage.value)
+            val lastMsg = IMCoreManager.getImDataBase().messageDao()
+                .findLastMessageBySessionId(sessionMessage.key)
+            lastMsg?.let {
+                processSessionByMessage(it)
+            }
+        }
+    }
+
     override fun syncOfflineMessages() {
         val lastTime = this.getOfflineMsgLastSyncTime()
         val count = this.getOfflineMsgCountPerRequest()
@@ -91,70 +148,27 @@ open class DefaultMessageModule : MessageModule {
         val disposable = object : BaseSubscriber<List<Message>>() {
             override fun onNext(messages: List<Message>) {
                 try {
-                    val sessionMessages = mutableMapOf<Long, MutableList<Message>>()
-                    val unProcessorMessages = mutableListOf<Message>()
-                    val needProcessMessages = mutableListOf<Message>()
-                    for (m in messages) {
-                        if (m.fUid == IMCoreManager.uId) {
-                            m.oprStatus =
-                                m.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
-                        }
-                        m.sendStatus = MsgSendStatus.Success.value
-                        if (getMsgProcessor(m.type).needReprocess(m)) {
-                            // 状态操作消息交给对应消息处理器自己处理
-                            needProcessMessages.add(m)
-                        } else {
-                            // 其他消息批量处理
-                            if (sessionMessages[m.sid] == null) {
-                                sessionMessages[m.sid] = mutableListOf(m)
-                            } else {
-                                sessionMessages[m.sid]!!.add(m)
-                            }
-                            unProcessorMessages.add(m)
+                    batchProcessMessages(messages)
+                    if (messages.isNotEmpty()) {
+                        val severTime = messages.last().cTime
+                        val success = setOfflineMsgSyncTime(severTime)
+                        if (success && messages.count() >= count) {
+                            syncOfflineMessages()
                         }
                     }
-                    // 消息入库并ACK
-                    if (unProcessorMessages.isNotEmpty()) {
-                        // 插入数据库
-                        IMCoreManager.getImDataBase().messageDao()
-                            .insertOrIgnore(unProcessorMessages)
-                        for (m in unProcessorMessages) {
-                            if (m.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
-                                ackMessageToCache(m)
-                            }
-                        }
-                    }
-
-                    for (m in needProcessMessages) {
-                        getMsgProcessor(m.type).received(m)
-                    }
-
-                    // 更新每个session的最后一条消息
-                    for (sessionMessage in sessionMessages) {
-                        XEventBus.post(IMEvent.BatchMsgNew.value, sessionMessage.value)
-                        val lastMsg = IMCoreManager.getImDataBase().messageDao()
-                            .findLastMessageBySessionId(sessionMessage.key)
-                        lastMsg?.let {
-                            processSessionByMessage(it)
-                        }
-                    }
-
                 } catch (e: Exception) {
                     e.message?.let { LLog.e(it) }
-                }
-
-                if (messages.isNotEmpty()) {
-                    val severTime = messages.last().cTime
-                    val success = setOfflineMsgSyncTime(severTime)
-                    if (success && messages.count() >= count) {
-                        syncOfflineMessages()
-                    }
                 }
             }
 
             override fun onError(t: Throwable?) {
                 super.onError(t)
                 t?.printStackTrace()
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                this@DefaultMessageModule.disposes.remove(this)
             }
         }
         IMCoreManager.imApi.queryUserLatestMessages(IMCoreManager.uId, lastTime, count)
@@ -227,9 +241,67 @@ open class DefaultMessageModule : MessageModule {
                 super.onError(t)
                 t?.printStackTrace()
             }
+
+            override fun onComplete() {
+                super.onComplete()
+                this@DefaultMessageModule.disposes.remove(this)
+            }
         }
         IMCoreManager.imApi.queryUserLatestSessions(IMCoreManager.uId, count, lastTime, null)
             .compose(RxTransform.flowableToIo()).subscribe(disposable)
+        this.disposes.add(disposable)
+    }
+
+    private fun syncSessionMessage(session: Session) {
+        val count = getOfflineMsgCountPerRequest()
+        val subscriber = object : BaseSubscriber<List<Message>>() {
+            override fun onNext(t: List<Message>?) {
+                t?.let {
+                    batchProcessMessages(it, false)
+                    if (it.isNotEmpty()) {
+                        val lastTime = it.last().cTime
+                        IMCoreManager.db.sessionDao().updateMsgSyncTime(session.id, lastTime)
+                        if (it.count() >= count) {
+                            session.msgSyncTime = lastTime
+                            syncSessionMessage(session)
+                        }
+                    }
+                }
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                this@DefaultMessageModule.disposes.remove(this)
+            }
+
+        }
+        IMCoreManager.imApi.querySessionMessages(session.id, session.msgSyncTime, 0, count, 1)
+            .compose(RxTransform.flowableToIo())
+            .subscribe(subscriber)
+        this.disposes.add(subscriber)
+    }
+
+    override fun syncSuperGroupMessages() {
+        val disposable = object : BaseSubscriber<List<Session>>() {
+            override fun onNext(t: List<Session>?) {
+                t?.let {
+                    for (s in it) {
+                        syncSessionMessage(s)
+                    }
+                }
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                this@DefaultMessageModule.disposes.remove(this)
+            }
+        }
+        Flowable.just("")
+            .flatMap {
+                val superGroupSessions = IMCoreManager.db.sessionDao().findAll(SessionType.SuperGroup.value)
+                Flowable.just(superGroupSessions)
+            }.compose(RxTransform.flowableToMain())
+            .subscribe(disposable)
         this.disposes.add(disposable)
     }
 
@@ -500,7 +572,7 @@ open class DefaultMessageModule : MessageModule {
             it.onComplete()
         }, BackpressureStrategy.LATEST).flatMap {
             if (it.isEmpty()) {
-                return@flatMap queryLastSessionMember(sessionId, 100)
+                return@flatMap queryLastSessionMember(sessionId, getSessionMemberCountPerRequest())
             } else {
                 return@flatMap Flowable.just(it)
             }
@@ -549,7 +621,8 @@ open class DefaultMessageModule : MessageModule {
                 disposes.remove(this)
             }
         }
-        queryLastSessionMember(sessionId, 100).compose(RxTransform.flowableToIo())
+        val count = getSessionMemberCountPerRequest()
+        queryLastSessionMember(sessionId, count).compose(RxTransform.flowableToIo())
             .subscribe(subscriber)
         disposes.add(subscriber)
 

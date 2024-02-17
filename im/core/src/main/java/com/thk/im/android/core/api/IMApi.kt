@@ -88,6 +88,15 @@ interface IMApi {
         clientMsgIds: Set<Long>
     ): Flowable<Message>
 
+
+    fun querySessionMessages(
+        sessionId: Long,
+        cTime: Long,
+        offset: Int,
+        count: Int,
+        asc: Int
+    ): Flowable<List<Message>>
+
     /**
      * 获取cTime之后创建的消息
      */

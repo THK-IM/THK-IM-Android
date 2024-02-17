@@ -6,7 +6,6 @@ import com.thk.im.android.core.db.entity.Session
 @Dao
 internal interface SessionDao {
 
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOrReplace(sessions: List<Session>)
 
@@ -40,17 +39,23 @@ internal interface SessionDao {
     @Query("update session set member_sync_time = :time where id = :id")
     fun updateMemberSyncTime(id: Long, time: Long)
 
+    @Query("update session set msg_sync_time = :time where id = :id")
+    fun updateMsgSyncTime(id: Long, time: Long)
+
     @Query("update session set member_count = :count where id = :id")
     fun updateMemberCount(id: Long, count: Int)
 
     @Query("select member_sync_time from session where id= :id ")
     fun findMemberSyncTime(id: Long): Long
 
+    @Query("select msg_sync_time from session where id= :id ")
+    fun findMsgSyncTime(id: Long): Long
+
     @Query("select * from session where parent_id = :parentId and id != :parentId and m_time <= :mTime order by top_timestamp desc, m_time desc limit 0, :count")
     fun findByParentId(parentId: Long, count: Int, mTime: Long): List<Session>
 
-    @Query("select * from session order by m_time desc")
-    fun findAll(): List<Session>
+    @Query("select * from session where type = :type order by top_timestamp desc, m_time desc ")
+    fun findAll(type: Int): List<Session>
 
     @Query("select * from session where entity_id = :entityId and type = :type")
     fun findByEntityId(entityId: Long, type: Int): Session?

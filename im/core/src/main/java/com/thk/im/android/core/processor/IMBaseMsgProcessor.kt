@@ -7,6 +7,7 @@ import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
+import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
@@ -26,8 +27,8 @@ abstract class IMBaseMsgProcessor {
     @WorkerThread
     open fun received(msg: Message) {
         // 默认插入数据库
-        val dbMsg =
-            IMCoreManager.getImDataBase().messageDao().findById(msg.id, msg.fUid, msg.sid)
+        val dbMsg = IMCoreManager.getImDataBase().messageDao().findById(msg.id, msg.fUid, msg.sid)
+        val dbSession = IMCoreManager.getImDataBase().sessionDao().findById(msg.sid)
         if (dbMsg == null) {
             if (msg.fUid == IMCoreManager.uId) {
                 // 如果发件人为自己，插入前补充消息状态为已接受并已读
@@ -40,8 +41,10 @@ abstract class IMBaseMsgProcessor {
                 notify = true,
                 notifySession = true,
             )
-            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
-                IMCoreManager.messageModule.ackMessageToCache(msg)
+            if (dbSession?.type != SessionType.SuperGroup.value) {
+                if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
+                    IMCoreManager.messageModule.ackMessageToCache(msg)
+                }
             }
         } else {
             if (dbMsg.sendStatus != MsgSendStatus.Success.value) {
@@ -58,8 +61,10 @@ abstract class IMBaseMsgProcessor {
                     notifySession = true,
                 )
             }
-            if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
-                IMCoreManager.messageModule.ackMessageToCache(msg)
+            if (dbSession?.type != SessionType.SuperGroup.value) {
+                if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
+                    IMCoreManager.messageModule.ackMessageToCache(msg)
+                }
             }
         }
     }
@@ -148,7 +153,7 @@ abstract class IMBaseMsgProcessor {
     }
 
     /**
-     * 重发
+     * 发送消息
      */
     open fun send(msg: Message, resend: Boolean = false, callback: IMSendMsgCallback? = null) {
         var originMsg = msg

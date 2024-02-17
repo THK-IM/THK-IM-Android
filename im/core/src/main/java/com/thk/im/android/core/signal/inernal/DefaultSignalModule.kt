@@ -159,7 +159,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     private fun onStatusChange(status: SignalStatus) {
-        LLog.d("DefaultSignalModule", "status: ${this.status} $status")
+        LLog.d("DefaultSignalModule", "status: ${this.status} $status ${Thread.currentThread().name}")
         if (this.status != status) {
             this.status = status
             signalListener?.onSignalStatusChange(status.value)

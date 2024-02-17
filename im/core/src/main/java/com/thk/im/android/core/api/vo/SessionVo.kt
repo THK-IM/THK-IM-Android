@@ -43,7 +43,7 @@ data class SessionVo(
     fun toSession(): Session {
         return Session(
             id, parentId, type, entityId, name, noteName, remark, mute, status, role, top,
-            extData, 0, null, null, 0, 0, deleted, cTime, mTime
+            extData, 0, null, null, 0, 0, 0, deleted, cTime, mTime
         )
     }
 

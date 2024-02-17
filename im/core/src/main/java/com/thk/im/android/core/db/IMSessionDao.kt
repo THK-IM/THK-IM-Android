@@ -24,15 +24,20 @@ interface IMSessionDao {
 
     fun updateMemberSyncTime(id: Long, time: Long)
 
+    fun updateMsgSyncTime(id: Long, time: Long)
+
     fun updateMemberCount(id: Long, count: Int)
 
     fun findByEntityId(entityId: Long, type: Int): Session?
 
     fun findById(id: Long): Session?
 
+    fun findMsgSyncTimeById(id: Long): Long
+
     fun findMemberSyncTimeById(id: Long): Long
 
     fun findByParentId(parentId: Long, count: Int, mTime: Long): List<Session>
 
-    fun findAll(): List<Session>
+
+    fun findAll(type: Int): List<Session>
 }

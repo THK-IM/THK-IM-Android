@@ -79,6 +79,7 @@ object IMCoreManager {
                     messageModule.syncOfflineMessages()
                     messageModule.syncLatestSessionsFromServer()
                     contactModule.syncContacts()
+                    messageModule.syncSuperGroupMessages()
                 }
                 XEventBus.post(IMEvent.OnlineStatusUpdate.value, status)
             }

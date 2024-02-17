@@ -6,6 +6,7 @@ import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
@@ -151,6 +152,10 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
 
     private fun addReadMessagesToCache(sessionId: Long, msgIds: Set<Long>) {
         LLog.v("ReadMessageProcessor addReadMessages $msgIds")
+        val session = IMCoreManager.db.sessionDao().findById(sessionId)
+        if (SessionType.SuperGroup.value == session?.type) {
+            return
+        }
         try {
             readLock.writeLock().tryLock(1, TimeUnit.SECONDS)
             if (needReadMap[sessionId] == null) {

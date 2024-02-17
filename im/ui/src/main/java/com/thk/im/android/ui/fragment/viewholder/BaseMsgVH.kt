@@ -92,22 +92,18 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     }
 
     private fun readMessage() {
-        if (session.type == SessionType.Single.value ||
-            session.type == SessionType.Group.value
-        ) {
-            if (message.msgId <= 0) {
-                return
-            }
-            if (message.oprStatus.and(MsgOperateStatus.ClientRead.value) > 0
-                && message.oprStatus.and(MsgOperateStatus.ServerRead.value) > 0
-            ) {
-                return
-            }
-            LLog.v("readMessage ${message.id} ${message.oprStatus}")
-            msgVHOperator?.readMessage(message)
-            message.oprStatus = message.oprStatus.or(MsgOperateStatus.ClientRead.value)
-                .or(MsgOperateStatus.ServerRead.value)
+        if (message.msgId <= 0) {
+            return
         }
+        if (message.oprStatus.and(MsgOperateStatus.ClientRead.value) > 0 &&
+            (message.oprStatus.and(MsgOperateStatus.ServerRead.value) > 0 || session.type == SessionType.SuperGroup.value)
+        ) {
+            return
+        }
+        LLog.v("readMessage ${message.id} ${message.oprStatus}")
+        msgVHOperator?.readMessage(message)
+        message.oprStatus = message.oprStatus.or(MsgOperateStatus.ClientRead.value)
+            .or(MsgOperateStatus.ServerRead.value)
     }
 
     fun onCreate() {

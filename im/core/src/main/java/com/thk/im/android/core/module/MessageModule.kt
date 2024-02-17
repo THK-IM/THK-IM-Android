@@ -29,6 +29,12 @@ interface MessageModule : BaseModule {
      */
     fun syncLatestSessionsFromServer()
 
+
+    /**
+     * 同步超级群消息
+     */
+    fun syncSuperGroupMessages()
+
     /**
      * 获取session, 先查本地数据库后查服务端
      */

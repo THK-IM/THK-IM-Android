@@ -18,9 +18,6 @@ internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSes
         return roomDatabase.sessionDao().findByEntityId(entityId, type)
     }
 
-    override fun findById(id: Long): Session? {
-        return roomDatabase.sessionDao().findById(id)
-    }
 
     override fun update(session: Session) {
         return roomDatabase.sessionDao().update(session)
@@ -54,8 +51,16 @@ internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSes
         return roomDatabase.sessionDao().updateMemberSyncTime(id, time)
     }
 
+    override fun updateMsgSyncTime(id: Long, time: Long) {
+        return roomDatabase.sessionDao().updateMsgSyncTime(id, time)
+    }
+
     override fun findMemberSyncTimeById(id: Long): Long {
         return roomDatabase.sessionDao().findMemberSyncTime(id)
+    }
+
+    override fun findMsgSyncTimeById(id: Long): Long {
+        return roomDatabase.sessionDao().findMsgSyncTime(id)
     }
 
     override fun updateMemberCount(id: Long, count: Int) {
@@ -66,9 +71,12 @@ internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSes
         return roomDatabase.sessionDao().findByParentId(parentId, count, mTime)
     }
 
-    override fun findAll(): List<Session> {
-        return roomDatabase.sessionDao().findAll()
+    override fun findAll(type: Int): List<Session> {
+        return roomDatabase.sessionDao().findAll(type)
     }
 
+    override fun findById(id: Long): Session? {
+        return roomDatabase.sessionDao().findById(id)
+    }
 
 }

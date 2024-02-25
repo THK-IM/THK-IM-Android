@@ -7,6 +7,7 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.thk.im.android.core.IMCoreManager
@@ -65,6 +66,10 @@ class IMTextMsgView : LinearLayout, IMsgView {
                 requestAtUsersInfo(message, atUsers)
             }
         }
+    }
+
+    override fun contentView(): ViewGroup {
+        return this
     }
 
     private fun requestAtUsersInfo(message: Message, atUsers: List<String>) {

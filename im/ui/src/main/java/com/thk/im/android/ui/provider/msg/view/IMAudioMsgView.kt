@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
@@ -34,6 +35,10 @@ class IMAudioMsgView : LinearLayout, IMsgView {
         val view = LayoutInflater.from(context)
             .inflate(R.layout.itemview_msg_audio, this, true)
         binding = ItemviewMsgAudioBinding.bind(view)
+    }
+
+    override fun contentView(): ViewGroup {
+        return this
     }
 
     override fun setMessage(

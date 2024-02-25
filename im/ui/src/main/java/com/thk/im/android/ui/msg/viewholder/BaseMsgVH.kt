@@ -2,7 +2,6 @@ package com.thk.im.android.ui.msg.viewholder
 
 import android.graphics.Color
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -24,6 +23,7 @@ import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMUIManager
+import com.thk.im.android.ui.msg.view.IMsgView
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
 
@@ -42,7 +42,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     open val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
     open val selectView: ImageView = itemView.findViewById(R.id.iv_msg_select)
 
-    abstract fun getContentView(): ViewGroup
+    abstract fun msgBodyView(): IMsgView
 
     /**
      * ViewHolder 绑定数据触发设置界面ui
@@ -76,7 +76,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         flContent.children.forEach {
             flContent.removeView(it)
         }
-        val contentContainer = getContentView()
+        val contentContainer = msgBodyView().contentView()
         if (hasBubble()) {
             when (getPositionType()) {
                 IMMsgPosType.Left.value -> {
@@ -220,10 +220,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         msgVHOperator?.onMsgResendClick(message)
     }
 
-    fun getPositionType(): Int {
-        return viewType % 3
-    }
-
     override fun onViewDetached() {
         super.onViewDetached()
         disposable.clear()
@@ -254,6 +250,10 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 selectView.visibility = View.GONE
             }
         }
+    }
+
+    private fun getPositionType(): Int {
+        return viewType % 3
     }
 
 }

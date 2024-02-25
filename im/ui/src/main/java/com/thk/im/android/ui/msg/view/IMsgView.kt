@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.msg.view
 
+import android.view.ViewGroup
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
@@ -11,6 +12,8 @@ interface IMsgView {
         delegate: IMMsgVHOperator?,
         isReply: Boolean = false
     )
+
+    fun contentView(): ViewGroup
 
 
 }

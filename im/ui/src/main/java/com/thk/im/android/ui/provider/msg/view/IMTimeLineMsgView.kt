@@ -3,6 +3,7 @@ package com.thk.im.android.ui.provider.msg.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.utils.DateUtils
@@ -29,6 +30,10 @@ class IMTimeLineMsgView : LinearLayout, IMsgView {
         val view = LayoutInflater.from(context)
             .inflate(R.layout.itemview_msg_timeline, this, true)
         binding = ItemviewMsgTimelineBinding.bind(view)
+    }
+
+    override fun contentView(): ViewGroup {
+        return this
     }
 
     override fun setMessage(

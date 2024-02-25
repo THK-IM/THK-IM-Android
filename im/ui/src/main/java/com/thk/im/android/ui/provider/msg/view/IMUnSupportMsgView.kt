@@ -3,6 +3,7 @@ package com.thk.im.android.ui.provider.msg.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.thk.im.android.core.db.entity.Message
@@ -28,6 +29,10 @@ class IMUnSupportMsgView : LinearLayout, IMsgView {
         val view = LayoutInflater.from(context)
             .inflate(R.layout.itemview_msg_text, this, true)
         binding = ItemviewMsgTextBinding.bind(view)
+    }
+
+    override fun contentView(): ViewGroup {
+        return this
     }
 
     override fun setMessage(

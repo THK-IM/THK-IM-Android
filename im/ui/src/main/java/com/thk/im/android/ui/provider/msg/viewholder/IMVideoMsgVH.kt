@@ -6,11 +6,11 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.extension.dp2px
 import com.thk.im.android.core.base.utils.DateUtils
-import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
@@ -108,22 +108,12 @@ class IMVideoMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     private fun renderDuration(duration: Int) {
         val durationView: TextView = itemView.findViewById(R.id.tv_video_duration)
         durationView.visibility = View.VISIBLE
-        durationView.text = com.thk.im.android.core.base.utils.DateUtils.secondToDuration(duration)
+        durationView.text = DateUtils.secondToDuration(duration)
     }
 
     private fun renderThumbnailImage(path: String) {
         val imageView: ImageView = itemView.findViewById(R.id.iv_msg_video_thumbnail)
         imageView.visibility = View.VISIBLE
         IMImageLoader.displayImageByPath(imageView, path)
-    }
-
-
-    override fun hasBubble(): Boolean {
-        return false
-    }
-
-
-    override fun onViewDetached() {
-        super.onViewDetached()
     }
 }

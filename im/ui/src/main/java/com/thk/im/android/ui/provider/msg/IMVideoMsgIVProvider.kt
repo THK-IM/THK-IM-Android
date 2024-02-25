@@ -14,6 +14,14 @@ class IMVideoMsgIVProvider : IMBaseMessageIVProvider() {
         return MsgType.VIDEO.value
     }
 
+    override fun hasBubble(): Boolean {
+        return false
+    }
+
+    override fun canSelect(): Boolean {
+        return true
+    }
+
     override fun createViewHolder(
         lifecycleOwner: LifecycleOwner,
         itemView: View,

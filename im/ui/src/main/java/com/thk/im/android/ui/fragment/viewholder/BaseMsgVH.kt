@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.core.view.children
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.MsgOperateStatus
@@ -23,6 +24,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMMsgPosType
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
 
@@ -41,8 +43,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     open val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
     open val selectView: ImageView = itemView.findViewById(R.id.iv_msg_select)
 
-    private var avatarTaskId: String? = null
-
     @LayoutRes
     abstract fun getContentId(): Int
 
@@ -55,11 +55,12 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         session: Session,
         msgVHOperator: IMMsgVHOperator
     ) {
-        onViewDetached()
         this.pos = position
         this.message = messages[position]
         this.session = session
         this.msgVHOperator = msgVHOperator
+        attachLayout()
+        onViewDetached()
         onViewAttached()
     }
 
@@ -79,10 +80,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         }
     }
 
-    open fun canSelect(): Boolean {
-        return true
-    }
-
     override fun onViewAttached() {
         super.onViewAttached()
         renderUserInfo()
@@ -91,24 +88,12 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         readMessage()
     }
 
-    private fun readMessage() {
-        if (message.msgId <= 0) {
-            return
-        }
-        if (message.oprStatus.and(MsgOperateStatus.ClientRead.value) > 0 &&
-            (message.oprStatus.and(MsgOperateStatus.ServerRead.value) > 0 || session.type == SessionType.SuperGroup.value)
-        ) {
-            return
-        }
-        LLog.v("readMessage ${message.id} ${message.oprStatus}")
-        msgVHOperator?.readMessage(message)
-        message.oprStatus = message.oprStatus.or(MsgOperateStatus.ClientRead.value)
-            .or(MsgOperateStatus.ServerRead.value)
-    }
-
-    fun onCreate() {
+    private fun attachLayout() {
         // 内容视图layout
         val flContent: LinearLayout = itemView.findViewById(R.id.fl_content)
+        flContent.children.forEach {
+            flContent.removeView(it)
+        }
         val contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
         if (hasBubble()) {
             when (getPositionType()) {
@@ -135,7 +120,8 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                         Color.parseColor("#20000000"),
                         Color.parseColor("#20000000"),
                         0,
-                        floatArrayOf(10f, 10f, 10f, 10f)
+                        floatArrayOf(10f, 10f, 10f, 10f),
+                        false
                     )
                 }
             }
@@ -180,7 +166,26 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     }
 
     open fun hasBubble(): Boolean {
-        return true
+        return IMUIManager.getMsgIVProviderByMsgType(message.type).hasBubble()
+    }
+
+    open fun canSelect(): Boolean {
+        return IMUIManager.getMsgIVProviderByMsgType(message.type).canSelect()
+    }
+
+    private fun readMessage() {
+        if (message.msgId <= 0) {
+            return
+        }
+        if (message.oprStatus.and(MsgOperateStatus.ClientRead.value) > 0 &&
+            (message.oprStatus.and(MsgOperateStatus.ServerRead.value) > 0 || session.type == SessionType.SuperGroup.value)
+        ) {
+            return
+        }
+        LLog.v("readMessage ${message.id} ${message.oprStatus}")
+        msgVHOperator?.readMessage(message)
+        message.oprStatus = message.oprStatus.or(MsgOperateStatus.ClientRead.value)
+            .or(MsgOperateStatus.ServerRead.value)
     }
 
     open fun renderUserInfo() {
@@ -240,9 +245,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     override fun onViewDetached() {
         super.onViewDetached()
         disposable.clear()
-        avatarTaskId?.let {
-            IMCoreManager.fileLoadModule.cancelDownloadListener(it)
-        }
     }
 
     open fun displayAvatar(imageView: ImageView, url: String) {

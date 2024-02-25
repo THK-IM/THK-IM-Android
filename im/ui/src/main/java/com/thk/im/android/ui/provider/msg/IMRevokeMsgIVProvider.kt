@@ -14,6 +14,14 @@ class IMRevokeMsgIVProvider : IMBaseMessageIVProvider() {
         return MsgType.Revoke.value
     }
 
+    override fun hasBubble(): Boolean {
+        return true
+    }
+
+    override fun canSelect(): Boolean {
+        return false
+    }
+
     override fun viewType(entity: Message): Int {
         // 撤回消息固定在中间显示
         return 3 * messageType() + IMMsgPosType.Mid.value

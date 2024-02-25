@@ -66,7 +66,7 @@ class IMAudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         val audioDurationView: TextView = itemView.findViewById(R.id.tv_audio_duration)
         val audioStatusView: View =
             itemView.findViewById(R.id.iv_audio_status)
-        audioDurationView.text = com.thk.im.android.core.base.utils.DateUtils.secondToDuration(seconds)
+        audioDurationView.text = DateUtils.secondToDuration(seconds)
         if (played) {
             audioStatusView.visibility = View.GONE
         } else {

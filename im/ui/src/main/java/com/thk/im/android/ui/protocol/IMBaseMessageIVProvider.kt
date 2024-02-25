@@ -52,8 +52,7 @@ abstract class IMBaseMessageIVProvider {
         parent: ViewGroup
     ): BaseMsgVH {
         val viewRes = getDefaultRes(viewType)
-        val itemView = LayoutInflater.from(parent.context)
-            .inflate(viewRes, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(viewRes, parent, false)
         return createViewHolder(lifecycleOwner, itemView, viewType)
     }
 
@@ -79,6 +78,14 @@ abstract class IMBaseMessageIVProvider {
                 R.layout.itemview_msg_mid_container
             }
         }
+    }
+
+    open fun hasBubble() : Boolean {
+        return false
+    }
+
+    open fun canSelect(): Boolean {
+        return false
     }
 
 

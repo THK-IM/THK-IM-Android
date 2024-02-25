@@ -33,9 +33,7 @@ class MessageAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseMsgVH {
         val provider = IMUIManager.getMsgIVProviderByViewType(viewType)
-        val holder = provider.viewHolder(lifecycleOwner, viewType, parent)
-        holder.onCreate()
-        return holder
+        return provider.viewHolder(lifecycleOwner, viewType, parent)
     }
 
     override fun onBindViewHolder(holder: BaseMsgVH, position: Int) {

@@ -30,17 +30,4 @@ class IMTimeLineMsgVH(
         val tvTime: TextView = itemView.findViewById(R.id.tv_time)
         tvTime.text = DateUtils.timeToMsgTime(message.cTime, IMCoreManager.commonModule.getSeverTime())
     }
-
-    override fun onViewDetached() {
-    }
-
-    override fun onLifeOwnerResume() {
-    }
-
-    override fun onLifeOwnerPause() {
-    }
-
-    override fun canSelect(): Boolean {
-        return false
-    }
 }

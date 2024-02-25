@@ -16,6 +16,14 @@ class IMTimeLineMsgIVProvider : IMBaseMessageIVProvider() {
         return timeLineMsgType
     }
 
+    override fun hasBubble(): Boolean {
+        return true
+    }
+
+    override fun canSelect(): Boolean {
+        return false
+    }
+
     override fun createViewHolder(
         lifecycleOwner: LifecycleOwner,
         itemView: View,

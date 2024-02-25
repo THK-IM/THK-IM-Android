@@ -13,6 +13,14 @@ class IMUnSupportMsgIVProvider : IMBaseMessageIVProvider() {
         return MsgType.UnSupport.value
     }
 
+    override fun hasBubble(): Boolean {
+        return true
+    }
+
+    override fun canSelect(): Boolean {
+        return true
+    }
+
     override fun createViewHolder(
         lifecycleOwner: LifecycleOwner,
         itemView: View,

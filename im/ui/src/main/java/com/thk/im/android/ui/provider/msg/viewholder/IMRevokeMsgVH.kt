@@ -49,8 +49,4 @@ class IMRevokeMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         }
     }
 
-    override fun canSelect(): Boolean {
-        return false
-    }
-
 }

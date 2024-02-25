@@ -82,6 +82,9 @@ internal interface MessageDao {
     @Query("select * from message where msg_id = :msgId and session_id = :sid")
     fun findByMsgId(msgId: Long, sid: Long): Message?
 
+    @Query("select * from message where msg_id in (:msgIds) and session_id = :sid")
+    fun findByMsgIds(msgIds: Set<Long>, sid: Long): List<Message>
+
     @Query("select * from message where session_id = :sId and msg_id != :msgId and type in (:types) and c_time <= :cTime order by c_time desc limit :count")
     fun findOlderMessage(
         sId: Long,

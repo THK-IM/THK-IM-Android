@@ -64,7 +64,27 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
 
 
     override fun findBySidBeforeCTime(sid: Long, cTime: Long, count: Int): List<Message> {
-        return roomDatabase.messageDao().findBySidBeforeCTime(sid, cTime, count)
+        val messages = roomDatabase.messageDao().findBySidBeforeCTime(sid, cTime, count)
+        val referMsgIds = mutableSetOf<Long>()
+        for (m in messages) {
+            m.rMsgId?.let {
+                referMsgIds.add(it)
+            }
+        }
+
+        if (referMsgIds.isNotEmpty()) {
+            val referMessages = roomDatabase.messageDao().findByMsgIds(referMsgIds, sid)
+            for (referMsg in referMessages) {
+                for (m in messages) {
+                    if (m.rMsgId != null && m.rMsgId == referMsg.msgId) {
+                        m.referMsg = referMsg
+                        break
+                    }
+                }
+            }
+        }
+
+        return messages
     }
 
     override fun getUnReadCount(id: Long, oprStatus: Int): Int {

@@ -65,6 +65,7 @@ data class Message(
     @SerializedName("m_time")
     @ColumnInfo(name = "m_time")
     var mTime: Long = 0,
+    var referMsg: Message? = null,
 ) : Parcelable {
 
     @Ignore

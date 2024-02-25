@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingVertical="5dp"
-    >
+    android:paddingVertical="5dp">
+
     <androidx.cardview.widget.CardView
         android:id="@+id/card_msg_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardCornerRadius="6dp"
         app:cardElevation="0dp"
-        app:cardMaxElevation="0dp"
-        >
+        app:cardMaxElevation="0dp">
+
         <ImageView
             android:id="@+id/iv_msg_video_thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            />
+            android:scaleType="fitXY" />
+
         <ImageView
             android:id="@+id/iv_video_play"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_gravity="center"
             android:layout_centerInParent="true"
+            android:layout_gravity="center"
             android:src="@drawable/icon_video_play" />
 
         <TextView
             android:id="@+id/tv_video_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="2dp"
             android:layout_gravity="bottom|right"
             android:layout_marginRight="4dp"
             android:layout_marginBottom="6dp"
-            android:textAlignment="center"
             android:background="@drawable/bg_tv_msg_tips"
+            android:padding="2dp"
+            android:textAlignment="center"
             android:textColor="@color/font_bg_main"
             android:textSize="@dimen/dp10" />
     </androidx.cardview.widget.CardView>
-</FrameLayout>
+</LinearLayout>

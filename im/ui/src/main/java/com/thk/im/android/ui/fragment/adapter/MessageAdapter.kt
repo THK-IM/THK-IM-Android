@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.ui.fragment.viewholder.BaseMsgVH
+import com.thk.im.android.ui.msg.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import com.thk.im.android.ui.provider.msg.IMTimeLineMsgIVProvider

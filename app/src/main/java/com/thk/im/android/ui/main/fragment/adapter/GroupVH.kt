@@ -12,7 +12,7 @@ import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.ui.fragment.viewholder.BaseVH
+import com.thk.im.android.ui.msg.viewholder.BaseVH
 import com.thk.im.android.ui.manager.IMUIManager
 import io.reactivex.disposables.CompositeDisposable
 

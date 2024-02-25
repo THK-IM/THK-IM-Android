@@ -1,0 +1,65 @@
+package com.thk.im.android.ui.provider.msg.view
+
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.LinearLayout
+import com.google.gson.Gson
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.ui.R
+import com.thk.im.android.ui.databinding.ItemviewMsgRevokeBinding
+import com.thk.im.android.ui.manager.IMRevokeMsgData
+import com.thk.im.android.ui.msg.view.IMsgView
+import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
+
+class IMRevokeMsgView : LinearLayout, IMsgView {
+
+    private var binding: ItemviewMsgRevokeBinding
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
+    init {
+        val view = LayoutInflater.from(context)
+            .inflate(R.layout.itemview_msg_revoke, this, true)
+        binding = ItemviewMsgRevokeBinding.bind(view)
+    }
+
+    override fun setMessage(
+        message: Message,
+        session: Session?,
+        delegate: IMMsgVHOperator?,
+        isReply: Boolean
+    ) {
+        val revokeData = Gson().fromJson(message.data, IMRevokeMsgData::class.java)
+        if (revokeData != null) {
+            binding.tvWhoRevoke.text = "${revokeData.nick}撤回了一条消息"
+            if (message.fUid == IMCoreManager.uId
+                && revokeData.content != null
+                && revokeData.type != null && revokeData.type == MsgType.TEXT.value
+            ) {
+                binding.tvReedit.visibility = View.VISIBLE
+                binding.tvReedit.isClickable = true
+                binding.tvReedit.setOnClickListener {
+                    delegate?.setEditText(revokeData.content!!)
+                }
+            } else {
+                binding.tvReedit.visibility = View.GONE
+            }
+        } else {
+            binding.tvWhoRevoke.text = "对方撤回了一条消息"
+            binding.tvReedit.visibility = View.GONE
+        }
+    }
+
+
+}

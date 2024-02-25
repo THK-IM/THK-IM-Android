@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.fragment.viewholder
+package com.thk.im.android.ui.msg.viewholder
 
 import android.view.View
 import android.widget.TextView
@@ -10,7 +10,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.module.GroupModule
 import com.thk.im.android.core.module.UserModule
-import com.thk.im.android.core.signal.SignalType
 import com.thk.im.android.core.SessionStatus
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R

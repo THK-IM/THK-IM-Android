@@ -1,0 +1,85 @@
+package com.thk.im.android.ui.provider.msg.view
+
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.LinearLayout
+import com.google.gson.Gson
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMMsgResourceType
+import com.thk.im.android.core.base.utils.DateUtils
+import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.ui.R
+import com.thk.im.android.ui.databinding.ItemviewMsgAudioBinding
+import com.thk.im.android.ui.manager.IMAudioMsgBody
+import com.thk.im.android.ui.manager.IMAudioMsgData
+import com.thk.im.android.ui.msg.view.IMsgView
+import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
+
+class IMAudioMsgView : LinearLayout, IMsgView {
+
+    private var binding: ItemviewMsgAudioBinding
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
+    init {
+        val view = LayoutInflater.from(context)
+            .inflate(R.layout.itemview_msg_audio, this, true)
+        binding = ItemviewMsgAudioBinding.bind(view)
+    }
+
+    override fun setMessage(
+        message: Message,
+        session: Session?,
+        delegate: IMMsgVHOperator?,
+        isReply: Boolean
+    ) {
+        var duration = 0
+        var path = ""
+        var played = false
+        if (!message.data.isNullOrEmpty()) {
+            val audioMsgData = Gson().fromJson(message.data, IMAudioMsgData::class.java)
+            audioMsgData?.let {
+                if (it.duration != null) {
+                    duration = it.duration!!
+                }
+                if (it.path != null) {
+                    path = it.path!!
+                }
+                played = it.played
+            }
+        }
+
+        if (!message.content.isNullOrEmpty()) {
+            val audioMsgBody = Gson().fromJson(message.content, IMAudioMsgBody::class.java)
+            audioMsgBody?.let {
+                if (it.duration != null) {
+                    duration = it.duration!!
+                }
+            }
+        }
+
+        render(duration, played)
+        if (path == "") {
+            IMCoreManager.messageModule.getMsgProcessor(message.type)
+                .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
+        }
+    }
+
+    private fun render(seconds: Int, played: Boolean) {
+        binding.tvAudioDuration.text = DateUtils.secondToDuration(seconds)
+        if (played) {
+            binding.ivAudioStatus.visibility = View.GONE
+        } else {
+            binding.ivAudioStatus.visibility = View.VISIBLE
+        }
+    }
+}

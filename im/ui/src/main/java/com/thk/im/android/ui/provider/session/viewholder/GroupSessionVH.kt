@@ -14,7 +14,7 @@ import com.thk.im.android.core.base.utils.StringUtils
 import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
+import com.thk.im.android.ui.msg.viewholder.BaseSessionVH
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 import io.reactivex.disposables.CompositeDisposable
 

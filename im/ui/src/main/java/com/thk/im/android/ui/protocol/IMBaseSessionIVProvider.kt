@@ -3,7 +3,7 @@ package com.thk.im.android.ui.protocol
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.ui.fragment.viewholder.BaseSessionVH
+import com.thk.im.android.ui.msg.viewholder.BaseSessionVH
 
 abstract class IMBaseSessionIVProvider {
 

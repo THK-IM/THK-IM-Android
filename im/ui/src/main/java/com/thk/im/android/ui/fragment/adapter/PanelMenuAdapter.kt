@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.viewholder.PanelMenuVH
+import com.thk.im.android.ui.msg.viewholder.PanelMenuVH
 import com.thk.im.android.ui.manager.IMUIManager
 
 class PanelMenuAdapter : RecyclerView.Adapter<PanelMenuVH>() {

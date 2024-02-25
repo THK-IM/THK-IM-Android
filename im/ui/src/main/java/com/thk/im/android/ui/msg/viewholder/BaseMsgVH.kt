@@ -1,13 +1,12 @@
-package com.thk.im.android.ui.fragment.viewholder
+package com.thk.im.android.ui.msg.viewholder
 
 import android.graphics.Color
-import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.annotation.LayoutRes
 import androidx.core.view.children
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
@@ -43,8 +42,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     open val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
     open val selectView: ImageView = itemView.findViewById(R.id.iv_msg_select)
 
-    @LayoutRes
-    abstract fun getContentId(): Int
+    abstract fun getContentView(): ViewGroup
 
     /**
      * ViewHolder 绑定数据触发设置界面ui
@@ -59,25 +57,9 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         this.message = messages[position]
         this.session = session
         this.msgVHOperator = msgVHOperator
-        attachLayout()
         onViewDetached()
+        attachLayout()
         onViewAttached()
-    }
-
-    fun updateSelectMode() {
-        if (!canSelect()) {
-            selectView.visibility = View.GONE
-            return
-        }
-        msgVHOperator?.let {
-            LLog.v("updateSelectMode ${it.isSelectMode()}")
-            if (it.isSelectMode()) {
-                selectView.visibility = View.VISIBLE
-                selectView.isSelected = it.isItemSelected(message)
-            } else {
-                selectView.visibility = View.GONE
-            }
-        }
     }
 
     override fun onViewAttached() {
@@ -94,7 +76,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         flContent.children.forEach {
             flContent.removeView(it)
         }
-        val contentContainer = LayoutInflater.from(itemView.context).inflate(getContentId(), null)
+        val contentContainer = getContentView()
         if (hasBubble()) {
             when (getPositionType()) {
                 IMMsgPosType.Left.value -> {
@@ -255,6 +237,23 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     override fun onViewRecycled() {
         super.onViewRecycled()
         msgVHOperator = null
+    }
+
+
+    fun updateSelectMode() {
+        if (!canSelect()) {
+            selectView.visibility = View.GONE
+            return
+        }
+        msgVHOperator?.let {
+            LLog.v("updateSelectMode ${it.isSelectMode()}")
+            if (it.isSelectMode()) {
+                selectView.visibility = View.VISIBLE
+                selectView.isSelected = it.isItemSelected(message)
+            } else {
+                selectView.visibility = View.GONE
+            }
+        }
     }
 
 }

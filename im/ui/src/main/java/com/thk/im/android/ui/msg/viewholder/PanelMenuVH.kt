@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.fragment.viewholder
+package com.thk.im.android.ui.msg.viewholder
 
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView

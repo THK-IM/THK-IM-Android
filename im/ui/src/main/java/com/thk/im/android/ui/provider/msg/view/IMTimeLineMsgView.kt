@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.provider.msg.view
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -42,6 +43,13 @@ class IMTimeLineMsgView : LinearLayout, IMsgView {
         delegate: IMMsgVHOperator?,
         isReply: Boolean
     ) {
+        if (isReply) {
+            binding.tvMsgContent.textSize = 12.0f
+            binding.tvMsgContent.setTextColor(Color.parseColor("#ff999999"))
+        } else {
+            binding.tvMsgContent.textSize = 14.0f
+            binding.tvMsgContent.setTextColor(Color.WHITE)
+        }
         binding.tvMsgContent.text =
             DateUtils.timeToMsgTime(message.cTime, IMCoreManager.commonModule.getSeverTime())
     }

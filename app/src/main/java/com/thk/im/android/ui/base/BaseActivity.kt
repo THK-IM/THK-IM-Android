@@ -120,6 +120,7 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         loading.destroy()
+        popupLoading.destroy()
         compositeDisposable.clear()
     }
 

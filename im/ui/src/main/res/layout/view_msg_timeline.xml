@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:paddingHorizontal="10dp"
     android:gravity="center_vertical"
-    android:minHeight="24dp"
     >
     <androidx.emoji2.widget.EmojiTextView
         android:id="@+id/tv_msg_content"

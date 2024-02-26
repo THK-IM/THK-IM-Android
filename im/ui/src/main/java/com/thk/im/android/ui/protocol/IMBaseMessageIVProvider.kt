@@ -1,25 +1,38 @@
 package com.thk.im.android.ui.protocol
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.msg.viewholder.BaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
+import com.thk.im.android.ui.msg.view.IMsgView
+import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
+import com.thk.im.android.ui.provider.msg.view.IMTextMsgView
 
 abstract class IMBaseMessageIVProvider {
-
-    open fun getSelfId(): Long {
-        return IMCoreManager.uId
-    }
 
     /**
      * 消息类型, ex: 文本(1)
      */
     abstract fun messageType(): Int
+
+    open fun hasBubble() : Boolean {
+        return false
+    }
+
+    open fun canSelect(): Boolean {
+        return false
+    }
+
+    open fun getSelfId(): Long {
+        return IMCoreManager.uId
+    }
 
     /**
      * 视图类型,一种消息类型可注册多种视图类型
@@ -56,6 +69,8 @@ abstract class IMBaseMessageIVProvider {
         return createViewHolder(lifecycleOwner, itemView, viewType)
     }
 
+    abstract fun replyMsgView(context: Context): IMsgView
+
     abstract fun createViewHolder(
         lifecycleOwner: LifecycleOwner,
         itemView: View,
@@ -78,14 +93,6 @@ abstract class IMBaseMessageIVProvider {
                 R.layout.itemview_msg_mid_container
             }
         }
-    }
-
-    open fun hasBubble() : Boolean {
-        return false
-    }
-
-    open fun canSelect(): Boolean {
-        return false
     }
 
 

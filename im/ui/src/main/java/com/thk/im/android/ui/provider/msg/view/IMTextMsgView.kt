@@ -46,12 +46,13 @@ class IMTextMsgView : LinearLayout, IMsgView {
         delegate: IMMsgVHOperator?,
         isReply: Boolean
     ) {
-        binding.tvMsgContent.setTextColor(
-            ContextCompat.getColor(
-                context,
-                R.color.font_main
-            )
-        )
+        if (isReply) {
+            binding.tvMsgContent.textSize = 12.0f
+            binding.tvMsgContent.setTextColor(Color.parseColor("#ff999999"))
+        } else {
+            binding.tvMsgContent.textSize = 16.0f
+            binding.tvMsgContent.setTextColor(Color.parseColor("#333333"))
+        }
         if (message.data != null) {
             renderMsg(message.data!!)
             return

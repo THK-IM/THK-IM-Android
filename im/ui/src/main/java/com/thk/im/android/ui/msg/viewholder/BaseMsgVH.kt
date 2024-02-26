@@ -23,6 +23,7 @@ import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMUIManager
+import com.thk.im.android.ui.msg.view.IMReplyMsgContainerView
 import com.thk.im.android.ui.msg.view.IMsgView
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
@@ -41,6 +42,10 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     open val ivMsgFailedView: ImageView? = itemView.findViewById(R.id.iv_msg_fail)
     open val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
     open val selectView: ImageView = itemView.findViewById(R.id.iv_msg_select)
+    open val msgContentView: LinearLayout = itemView.findViewById(R.id.msg_content)
+    open val msgBodyContentView: LinearLayout = itemView.findViewById(R.id.msg_body_content)
+    open val msgReplyContentView: IMReplyMsgContainerView = itemView.findViewById(R.id.msg_reply_content)
+
 
     abstract fun msgBodyView(): IMsgView
 
@@ -68,19 +73,15 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         renderMsgStatus()
         updateSelectMode()
         readMessage()
+        renderReplyMsg()
     }
 
     private fun attachLayout() {
         // 内容视图layout
-        val flContent: LinearLayout = itemView.findViewById(R.id.fl_content)
-        flContent.children.forEach {
-            flContent.removeView(it)
-        }
-        val contentContainer = msgBodyView().contentView()
         if (hasBubble()) {
             when (getPositionType()) {
                 IMMsgPosType.Left.value -> {
-                    contentContainer.setShape(
+                    msgContentView.setShape(
                         Color.parseColor("#ffffff"),
                         Color.parseColor("#ffffff"),
                         1,
@@ -89,7 +90,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 }
 
                 IMMsgPosType.Right.value -> {
-                    contentContainer.setShape(
+                    msgContentView.setShape(
                         Color.parseColor("#d1e3fe"),
                         Color.parseColor("#d1e3fe"),
                         1,
@@ -98,7 +99,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 }
 
                 else -> {
-                    contentContainer.setShape(
+                    msgContentView.setShape(
                         Color.parseColor("#20000000"),
                         Color.parseColor("#20000000"),
                         0,
@@ -109,7 +110,12 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             }
         }
 
-        flContent.addView(contentContainer)
+        msgBodyContentView.children.forEach {
+            if (it is IMsgView) {
+                msgBodyContentView.removeView(it)
+            }
+        }
+        msgBodyContentView.addView(msgBodyView().contentView())
 
         ivAvatarView?.setOnClickListener {
             msgVHOperator?.onMsgSenderClick(message, pos, it)
@@ -134,10 +140,10 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             }
         }
 
-        contentContainer.setOnClickListener {
+        msgBodyContentView.setOnClickListener {
             msgVHOperator?.onMsgCellClick(message, pos, it)
         }
-        contentContainer.setOnLongClickListener {
+        msgBodyContentView.setOnLongClickListener {
             if (canSelect()) {
                 msgVHOperator?.onMsgCellLongClick(message, pos, it)
                 true
@@ -174,25 +180,25 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         tvNicknameView?.let {
             if (session.type != SessionType.Single.value) {
                 it.visibility = View.VISIBLE
-                if (message.fUid != 0L) {
-                    val subscriber = object : BaseSubscriber<User>() {
-                        override fun onNext(t: User) {
-                            tvNicknameView?.text = t.nickname
-                            ivAvatarView?.let { iv ->
-                                t.avatar?.let { avatar ->
-                                    displayAvatar(iv, avatar)
-                                }
-                            }
-                        }
-                    }
-                    IMCoreManager.userModule.queryUser(message.fUid)
-                        .compose(RxTransform.flowableToMain())
-                        .subscribe(subscriber)
-                    disposable.add(subscriber)
-                }
             } else {
                 it.visibility = View.GONE
             }
+        }
+        if (message.fUid != 0L) {
+            val subscriber = object : BaseSubscriber<User>() {
+                override fun onNext(t: User) {
+                    tvNicknameView?.text = t.nickname
+                    ivAvatarView?.let { iv ->
+                        t.avatar?.let { avatar ->
+                            displayAvatar(iv, avatar)
+                        }
+                    }
+                }
+            }
+            IMCoreManager.userModule.queryUser(message.fUid)
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            disposable.add(subscriber)
         }
     }
 
@@ -215,6 +221,34 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         }
     }
 
+    private fun renderReplyMsg() {
+        if (message.rMsgId != null && message.referMsg != null) {
+            msgReplyContentView.visibility = View.VISIBLE
+            val subscriber = object : BaseSubscriber<User>() {
+                override fun onNext(t: User?) {
+                    t?.let { user ->
+                        message.referMsg?.let {
+                            msgReplyContentView.setMessage(
+                                user, it, session, msgVHOperator
+                            )
+                        }
+                    }
+                }
+
+                override fun onComplete() {
+                    super.onComplete()
+                    disposable.remove(this)
+                }
+            }
+            IMCoreManager.userModule.queryUser(message.referMsg!!.fUid)
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            disposable.add(subscriber)
+        } else {
+            msgReplyContentView.visibility = View.GONE
+        }
+    }
+
     open fun resend() {
         msgVHOperator?.onMsgResendClick(message)
     }
@@ -222,16 +256,17 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     override fun onViewDetached() {
         super.onViewDetached()
         disposable.clear()
+        msgBodyView().onViewDetached()
     }
-
-    open fun displayAvatar(imageView: ImageView, url: String) {
-        IMImageLoader.displayImageUrl(imageView, url)
-    }
-
 
     override fun onViewRecycled() {
         super.onViewRecycled()
         msgVHOperator = null
+        msgBodyView().onViewDestroyed()
+    }
+
+    open fun displayAvatar(imageView: ImageView, url: String) {
+        IMImageLoader.displayImageUrl(imageView, url)
     }
 
 

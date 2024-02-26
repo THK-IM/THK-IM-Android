@@ -23,7 +23,7 @@ import com.thk.im.android.ui.protocol.internal.IMMsgSender
 class IMBottomLayout : ConstraintLayout {
 
     private var contentHeight = 0
-    private var binding: LayoutMessageBottomBinding
+    private val binding: LayoutMessageBottomBinding
 
     private lateinit var lifecycleOwner: LifecycleOwner
     private lateinit var session: Session

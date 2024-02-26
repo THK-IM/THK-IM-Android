@@ -79,7 +79,7 @@ class IMImageMsgView : LinearLayout, IMsgView {
         }
 
         if (width != 0 && height != 0) {
-            setLayoutParams(width, height)
+            setLayoutParams(width, height, isReply)
         }
         if (imagePath != "") {
             renderImage(imagePath)
@@ -90,7 +90,7 @@ class IMImageMsgView : LinearLayout, IMsgView {
     }
 
 
-    private fun setLayoutParams(width: Int, height: Int) {
+    private fun setLayoutParams(width: Int, height: Int, isReply: Boolean) {
         val lp = binding.cardMsgContainer.layoutParams
         if (width > height) {
             val calWidth = maxOf(80.dp2px(), minOf(200.dp2px(), width))
@@ -102,6 +102,10 @@ class IMImageMsgView : LinearLayout, IMsgView {
             val calWidth = maxOf(calHeight * width / height, 60.dp2px())
             lp.width = calWidth
             lp.height = calHeight
+        }
+        if (isReply) {
+            lp.width /= 4
+            lp.height /= 4
         }
         binding.cardMsgContainer.layoutParams = lp
         binding.ivMsgContent.visibility = View.INVISIBLE

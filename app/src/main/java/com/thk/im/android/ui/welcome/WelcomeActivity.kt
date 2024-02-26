@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import com.thk.im.android.IMApplication
+import com.thk.im.android.MediaTestActivity
 import com.thk.im.android.api.ApiFactory
 import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.user.vo.LoginVo
@@ -90,11 +91,11 @@ class WelcomeActivity : BaseActivity() {
                 dismissLoading()
                 removeDispose(this)
             }
-
         }
         DataRepository.userApi.register(RegisterReq())
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
+        addDispose(subscriber)
     }
 
     private fun loginByToken(token: String) {
@@ -118,6 +119,7 @@ class WelcomeActivity : BaseActivity() {
         DataRepository.userApi.loginByToken(TokenLoginReq(token))
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
+        addDispose(subscriber)
     }
 
     private fun initIM(token: String, uId: Long) {

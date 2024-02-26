@@ -49,7 +49,7 @@ import kotlin.math.abs
 @SuppressLint("ClickableViewAccessibility")
 class IMInputLayout : ConstraintLayout {
 
-    private var binding: LayoutMessageInputBinding
+    private val binding: LayoutMessageInputBinding
     private val disposables = CompositeDisposable()
 
     private lateinit var lifecycleOwner: LifecycleOwner

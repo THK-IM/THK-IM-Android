@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.provider.msg.view
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -45,5 +46,12 @@ class IMRecordMsgView : LinearLayout, IMsgView {
         val recordBody = Gson().fromJson(message.content, IMRecordMsgBody::class.java)
         binding.tvRecordTitle.text = recordBody.title
         binding.tvRecordContent.text = recordBody.content
+
+        if (isReply) {
+            binding.tvRecordTitle.textSize = 12.0f
+            binding.tvRecordTitle.setTextColor(Color.parseColor("#ff999999"))
+            binding.tvRecordContent.textSize = 12.0f
+            binding.tvRecordContent.setTextColor(Color.parseColor("#ff999999"))
+        }
     }
 }

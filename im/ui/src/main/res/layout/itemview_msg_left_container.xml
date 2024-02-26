@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:padding="10dp">
 
@@ -13,8 +13,8 @@
         android:layout_alignParentLeft="true"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
-        android:visibility="gone"
-        android:src="@drawable/icon_msg_select" />
+        android:src="@drawable/icon_msg_select"
+        android:visibility="gone" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/avatar_container"
@@ -31,8 +31,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_avatar"
             android:layout_width="42dp"
-            android:layout_height="42dp"
-            />
+            android:layout_height="42dp" />
     </androidx.cardview.widget.CardView>
 
 
@@ -41,8 +40,8 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="40dp"
         android:layout_toRightOf="@id/avatar_container"
-        android:paddingLeft="6dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingLeft="6dp">
 
         <androidx.emoji2.widget.EmojiTextView
             android:id="@+id/tv_nickname"
@@ -54,10 +53,27 @@
             android:textSize="12sp" />
 
         <LinearLayout
-            android:id="@+id/fl_content"
+            android:id="@+id/msg_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:minHeight="48dp"
+            android:layout_marginTop="4dp"
+            android:orientation="vertical">
+
+            <com.thk.im.android.ui.msg.view.IMReplyMsgContainerView
+                android:id="@+id/msg_reply_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:id="@+id/msg_body_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:orientation="vertical"
+                android:padding="5dp"
+                />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_msg_tips"

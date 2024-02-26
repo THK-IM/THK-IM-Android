@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.provider.msg.view
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -45,6 +46,12 @@ class IMRevokeMsgView : LinearLayout, IMsgView {
         delegate: IMMsgVHOperator?,
         isReply: Boolean
     ) {
+        if (isReply) {
+            binding.tvReedit.textSize = 12.0f
+            binding.tvReedit.setTextColor(Color.parseColor("#ff999999"))
+            binding.tvWhoRevoke.textSize = 12.0f
+            binding.tvWhoRevoke.setTextColor(Color.parseColor("#ff999999"))
+        }
         val revokeData = Gson().fromJson(message.data, IMRevokeMsgData::class.java)
         if (revokeData != null) {
             binding.tvWhoRevoke.text = "${revokeData.nick}撤回了一条消息"

@@ -16,9 +16,23 @@
         android:src="@drawable/icon_msg_select" />
 
     <LinearLayout
-        android:id="@+id/fl_content"
+        android:id="@+id/msg_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:orientation="vertical" />
+        android:minHeight="20dp"
+        android:orientation="vertical">
+
+        <com.thk.im.android.ui.msg.view.IMReplyMsgContainerView
+            android:id="@+id/msg_reply_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:id="@+id/msg_body_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:orientation="vertical" />
+    </LinearLayout>
 </RelativeLayout>

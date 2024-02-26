@@ -87,7 +87,7 @@ class IMVideoMsgView : LinearLayout, IMsgView {
             }
         }
         if (width != 0 && height != 0) {
-            setLayoutParams(width, height)
+            setLayoutParams(width, height, isReply)
         }
         renderDuration(duration)
         if (imagePath != "") {
@@ -98,7 +98,7 @@ class IMVideoMsgView : LinearLayout, IMsgView {
         }
     }
 
-    private fun setLayoutParams(width: Int, height: Int) {
+    private fun setLayoutParams(width: Int, height: Int, isReply: Boolean) {
         val lp = binding.cardMsgContainer.layoutParams
         if (width > height) {
             val calWidth = maxOf(80.dp2px(), minOf(200.dp2px(), width))
@@ -110,6 +110,10 @@ class IMVideoMsgView : LinearLayout, IMsgView {
             val calWidth = maxOf(calHeight * width / height, 60.dp2px())
             lp.width = calWidth
             lp.height = calHeight
+        }
+        if (isReply) {
+            lp.width /= 4
+            lp.height /= 4
         }
         binding.cardMsgContainer.layoutParams = lp
         binding.ivMsgVideoThumbnail.visibility = View.INVISIBLE

@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.provider.msg.view
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -76,6 +77,14 @@ class IMAudioMsgView : LinearLayout, IMsgView {
         if (path == "") {
             IMCoreManager.messageModule.getMsgProcessor(message.type)
                 .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
+        }
+
+        if (isReply) {
+            binding.tvAudioDuration.textSize = 12.0f
+            binding.tvAudioDuration.setTextColor(Color.parseColor("#ff999999"))
+        } else {
+            binding.tvAudioDuration.textSize = 16.0f
+            binding.tvAudioDuration.setTextColor(Color.BLACK)
         }
     }
 

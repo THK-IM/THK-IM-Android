@@ -6,6 +6,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 interface IMsgView {
+
     fun setMessage(
         message: Message,
         session: Session?,
@@ -14,6 +15,10 @@ interface IMsgView {
     )
 
     fun contentView(): ViewGroup
+
+    fun onViewDetached() {}
+
+    fun onViewDestroyed() {}
 
 
 }

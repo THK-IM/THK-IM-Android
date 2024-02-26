@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.provider.msg.view
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -44,21 +45,23 @@ class IMUnSupportMsgView : LinearLayout, IMsgView {
         binding.tvMsgContent.text = "不支持的消息类型，请尝试升级客户端"
         when (message.fUid) {
             0L -> {
-                binding.tvMsgContent.setTextColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.hint_font_main
-                    )
-                )
+                if (isReply) {
+                    binding.tvMsgContent.textSize = 12.0f
+                    binding.tvMsgContent.setTextColor(Color.parseColor("#ff999999"))
+                } else {
+                    binding.tvMsgContent.textSize = 14.0f
+                    binding.tvMsgContent.setTextColor(Color.WHITE)
+                }
             }
 
             else -> {
-                binding.tvMsgContent.setTextColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.font_main
-                    )
-                )
+                if (isReply) {
+                    binding.tvMsgContent.textSize = 12.0f
+                    binding.tvMsgContent.setTextColor(Color.parseColor("#ff999999"))
+                } else {
+                    binding.tvMsgContent.textSize = 16.0f
+                    binding.tvMsgContent.setTextColor(Color.parseColor("#333333"))
+                }
             }
         }
     }

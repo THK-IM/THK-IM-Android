@@ -14,7 +14,7 @@ import com.thk.im.android.core.base.extension.dp2px
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.databinding.ItemviewMsgImageBinding
+import com.thk.im.android.ui.databinding.ViewMsgImageBinding
 import com.thk.im.android.ui.manager.IMImageMsgBody
 import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.android.ui.msg.view.IMsgView
@@ -22,7 +22,7 @@ import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMImageMsgView : LinearLayout, IMsgView {
 
-    private var binding: ItemviewMsgImageBinding
+    private var binding: ViewMsgImageBinding
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -34,8 +34,8 @@ class IMImageMsgView : LinearLayout, IMsgView {
 
     init {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.itemview_msg_image, this, true)
-        binding = ItemviewMsgImageBinding.bind(view)
+            .inflate(R.layout.view_msg_image, this, true)
+        binding = ViewMsgImageBinding.bind(view)
     }
 
     override fun contentView(): ViewGroup {

@@ -12,14 +12,14 @@ import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.databinding.ItemviewMsgRevokeBinding
+import com.thk.im.android.ui.databinding.ViewMsgRevokeBinding
 import com.thk.im.android.ui.manager.IMRevokeMsgData
 import com.thk.im.android.ui.msg.view.IMsgView
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMRevokeMsgView : LinearLayout, IMsgView {
 
-    private var binding: ItemviewMsgRevokeBinding
+    private var binding: ViewMsgRevokeBinding
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -31,8 +31,8 @@ class IMRevokeMsgView : LinearLayout, IMsgView {
 
     init {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.itemview_msg_revoke, this, true)
-        binding = ItemviewMsgRevokeBinding.bind(view)
+            .inflate(R.layout.view_msg_revoke, this, true)
+        binding = ViewMsgRevokeBinding.bind(view)
     }
 
     override fun contentView(): ViewGroup {

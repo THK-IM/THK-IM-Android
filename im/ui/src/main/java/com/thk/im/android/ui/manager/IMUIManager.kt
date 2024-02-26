@@ -86,7 +86,7 @@ object IMUIManager {
     }
 
     fun getMsgOperators(message: Message): List<IMMessageOperator> {
-        return msgOperators.values.toList()
+        return msgOperators.values.toList().sortedBy { opr -> opr.id() }
     }
 
     fun init(app: Application) {

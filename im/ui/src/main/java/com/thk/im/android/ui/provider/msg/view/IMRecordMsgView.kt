@@ -9,14 +9,14 @@ import com.google.gson.Gson
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.databinding.ItemviewMsgRecordBinding
+import com.thk.im.android.ui.databinding.ViewMsgRecordBinding
 import com.thk.im.android.ui.manager.IMRecordMsgBody
 import com.thk.im.android.ui.msg.view.IMsgView
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMRecordMsgView : LinearLayout, IMsgView {
 
-    private var binding: ItemviewMsgRecordBinding
+    private var binding: ViewMsgRecordBinding
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -28,8 +28,8 @@ class IMRecordMsgView : LinearLayout, IMsgView {
 
     init {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.itemview_msg_record, this, true)
-        binding = ItemviewMsgRecordBinding.bind(view)
+            .inflate(R.layout.view_msg_record, this, true)
+        binding = ViewMsgRecordBinding.bind(view)
     }
 
     override fun contentView(): ViewGroup {

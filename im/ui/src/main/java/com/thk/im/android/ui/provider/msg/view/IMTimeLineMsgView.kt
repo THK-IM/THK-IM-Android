@@ -10,13 +10,13 @@ import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.databinding.ItemviewMsgTimelineBinding
+import com.thk.im.android.ui.databinding.ViewMsgTimelineBinding
 import com.thk.im.android.ui.msg.view.IMsgView
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMTimeLineMsgView : LinearLayout, IMsgView {
 
-    private var binding: ItemviewMsgTimelineBinding
+    private var binding: ViewMsgTimelineBinding
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -28,8 +28,8 @@ class IMTimeLineMsgView : LinearLayout, IMsgView {
 
     init {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.itemview_msg_timeline, this, true)
-        binding = ItemviewMsgTimelineBinding.bind(view)
+            .inflate(R.layout.view_msg_timeline, this, true)
+        binding = ViewMsgTimelineBinding.bind(view)
     }
 
     override fun contentView(): ViewGroup {
@@ -42,7 +42,7 @@ class IMTimeLineMsgView : LinearLayout, IMsgView {
         delegate: IMMsgVHOperator?,
         isReply: Boolean
     ) {
-        binding.tvTime.text =
+        binding.tvMsgContent.text =
             DateUtils.timeToMsgTime(message.cTime, IMCoreManager.commonModule.getSeverTime())
     }
 }

@@ -15,7 +15,7 @@ import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.databinding.ItemviewMsgVideoBinding
+import com.thk.im.android.ui.databinding.ViewMsgVideoBinding
 import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
 import com.thk.im.android.ui.msg.view.IMsgView
@@ -23,7 +23,7 @@ import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMVideoMsgView : LinearLayout, IMsgView {
 
-    private var binding: ItemviewMsgVideoBinding
+    private var binding: ViewMsgVideoBinding
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -35,8 +35,8 @@ class IMVideoMsgView : LinearLayout, IMsgView {
 
     init {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.itemview_msg_video, this, true)
-        binding = ItemviewMsgVideoBinding.bind(view)
+            .inflate(R.layout.view_msg_video, this, true)
+        binding = ViewMsgVideoBinding.bind(view)
     }
 
     override fun contentView(): ViewGroup {

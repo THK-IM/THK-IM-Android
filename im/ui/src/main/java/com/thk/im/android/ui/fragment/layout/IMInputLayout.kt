@@ -25,8 +25,12 @@ import com.hjq.permissions.XXPermissions
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.RxTransform
+import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.base.utils.ToastUtils
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
@@ -38,6 +42,7 @@ import com.thk.im.android.ui.protocol.AudioCallback
 import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
+import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 import kotlin.math.abs
 
@@ -45,11 +50,13 @@ import kotlin.math.abs
 class IMInputLayout : ConstraintLayout {
 
     private var binding: LayoutMessageInputBinding
+    private val disposables = CompositeDisposable()
 
     private lateinit var lifecycleOwner: LifecycleOwner
     private lateinit var session: Session
     private var msgPreviewer: IMMsgPreviewer? = null
     private var msgSender: IMMsgSender? = null
+    private var replyMsg: Message? = null
 
     private var audioEventY = 0f
     private var audioCancel = false
@@ -241,6 +248,21 @@ class IMInputLayout : ConstraintLayout {
             msgSender?.forwardSelectedMessages(1)
             msgSender?.setSelectMode(false, null)
         }
+
+        binding.vReplyLine.setShape(
+            Color.parseColor("#ff999999"), Color.parseColor("#ff999999"),
+            1, floatArrayOf(2f, 2f, 2f, 2f), false
+        )
+
+        binding.ivReplyClose.setOnClickListener {
+            clearReplyMessage()
+            disposables.clear()
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        disposables.clear()
     }
 
     fun init(
@@ -450,8 +472,52 @@ class IMInputLayout : ConstraintLayout {
                 Spanned.SPAN_INCLUSIVE_INCLUSIVE
             )
         }
-
     }
 
+    fun showReplyMessage(message: Message) {
+        replyMsg = message
+        resetReplyLayout()
+    }
+
+    fun clearReplyMessage() {
+        replyMsg = null
+        resetReplyLayout()
+    }
+
+    fun getReplyMessage(): Message? {
+        return replyMsg
+    }
+
+    private fun resetReplyLayout() {
+        if (replyMsg == null) {
+            binding.layoutReply.visibility = GONE
+            return
+        }
+        binding.layoutReply.visibility = VISIBLE
+
+        val subscriber = object: BaseSubscriber<User>() {
+            override fun onNext(t: User?) {
+                t?.let {
+                    showReplyMessageContent(it)
+                }
+            }
+
+            override fun onComplete() {
+                super.onComplete()
+                disposables.remove(this)
+            }
+        }
+        IMCoreManager.userModule.queryUser(replyMsg!!.fUid)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposables.add(subscriber)
+    }
+
+    private fun showReplyMessageContent(user: User) {
+        replyMsg?.let {
+            binding.tvReplyUserNick.text = user.nickname
+            binding.tvReplyContent.text = IMCoreManager.messageModule.getMsgProcessor(it.type).getSessionDesc(it)
+        }
+    }
 
 }

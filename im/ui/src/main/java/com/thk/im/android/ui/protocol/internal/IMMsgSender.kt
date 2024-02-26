@@ -20,8 +20,7 @@ interface IMMsgSender {
         type: Int,
         body: Any?,
         data: Any?,
-        atUser: String? = null,
-        referMsgId: Long? = null
+        atUser: String? = null
     )
 
     /// 输入框添加内容
@@ -91,5 +90,11 @@ interface IMMsgSender {
     fun openAtPopupView()
 
     fun addAtUser(user: User, sessionMember: SessionMember?)
+
+    /// 回复消息
+    fun replyMessage(msg: Message)
+
+    /// 关闭回复消息
+    fun closeReplyMessage()
 
 }

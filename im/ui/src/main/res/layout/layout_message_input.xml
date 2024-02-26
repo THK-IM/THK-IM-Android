@@ -23,8 +23,8 @@
         android:layout_height="60dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:visibility="gone"
         android:paddingVertical="10dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -53,6 +53,62 @@
     </LinearLayout>
 
     <RelativeLayout
+        android:id="@+id/layout_reply"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="2dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <View
+            android:id="@+id/v_reply_line"
+            android:layout_width="4dp"
+            android:layout_alignParentLeft="true"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/iv_reply_close"
+            android:src="@drawable/ic_reply_close"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:layout_toLeftOf="@id/iv_reply_close"
+            android:layout_toRightOf="@id/v_reply_line"
+            >
+            <androidx.emoji2.widget.EmojiTextView
+                android:id="@+id/tv_reply_user_nick"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="textStart"
+                android:textSize="12sp"
+                android:textColor="#ff999999"
+                />
+            <androidx.emoji2.widget.EmojiTextView
+                android:id="@+id/tv_reply_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="textStart"
+                android:textSize="12sp"
+                android:textColor="#ff999999"
+                android:layout_marginTop="2dp"
+                />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/ll_message_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,7 +116,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/layout_reply">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_audio_record"

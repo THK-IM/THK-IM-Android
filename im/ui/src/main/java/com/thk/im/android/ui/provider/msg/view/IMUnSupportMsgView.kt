@@ -9,13 +9,13 @@ import androidx.core.content.ContextCompat
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.databinding.ItemviewMsgTextBinding
+import com.thk.im.android.ui.databinding.ViewMsgTextBinding
 import com.thk.im.android.ui.msg.view.IMsgView
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMUnSupportMsgView : LinearLayout, IMsgView {
 
-    private var binding: ItemviewMsgTextBinding
+    private var binding: ViewMsgTextBinding
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -27,8 +27,8 @@ class IMUnSupportMsgView : LinearLayout, IMsgView {
 
     init {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.itemview_msg_text, this, true)
-        binding = ItemviewMsgTextBinding.bind(view)
+            .inflate(R.layout.view_msg_unsupport, this, true)
+        binding = ViewMsgTextBinding.bind(view)
     }
 
     override fun contentView(): ViewGroup {

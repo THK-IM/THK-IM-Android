@@ -174,26 +174,25 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
         tvNicknameView?.let {
             if (session.type != SessionType.Single.value) {
                 it.visibility = View.VISIBLE
-            } else {
-                it.visibility = View.INVISIBLE
-            }
-        }
-
-        if (message.fUid != 0L) {
-            val subscriber = object : BaseSubscriber<User>() {
-                override fun onNext(t: User) {
-                    tvNicknameView?.text = t.nickname
-                    ivAvatarView?.let { iv ->
-                        t.avatar?.let {
-                            displayAvatar(iv, it)
+                if (message.fUid != 0L) {
+                    val subscriber = object : BaseSubscriber<User>() {
+                        override fun onNext(t: User) {
+                            tvNicknameView?.text = t.nickname
+                            ivAvatarView?.let { iv ->
+                                t.avatar?.let { avatar ->
+                                    displayAvatar(iv, avatar)
+                                }
+                            }
                         }
                     }
+                    IMCoreManager.userModule.queryUser(message.fUid)
+                        .compose(RxTransform.flowableToMain())
+                        .subscribe(subscriber)
+                    disposable.add(subscriber)
                 }
+            } else {
+                it.visibility = View.GONE
             }
-            IMCoreManager.userModule.queryUser(message.fUid)
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            disposable.add(subscriber)
         }
     }
 

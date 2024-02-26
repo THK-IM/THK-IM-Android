@@ -13,7 +13,7 @@ import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.databinding.ItemviewMsgAudioBinding
+import com.thk.im.android.ui.databinding.ViewMsgAudioBinding
 import com.thk.im.android.ui.manager.IMAudioMsgBody
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.msg.view.IMsgView
@@ -21,7 +21,7 @@ import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMAudioMsgView : LinearLayout, IMsgView {
 
-    private var binding: ItemviewMsgAudioBinding
+    private var binding: ViewMsgAudioBinding
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -33,8 +33,8 @@ class IMAudioMsgView : LinearLayout, IMsgView {
 
     init {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.itemview_msg_audio, this, true)
-        binding = ItemviewMsgAudioBinding.bind(view)
+            .inflate(R.layout.view_msg_audio, this, true)
+        binding = ViewMsgAudioBinding.bind(view)
     }
 
     override fun contentView(): ViewGroup {

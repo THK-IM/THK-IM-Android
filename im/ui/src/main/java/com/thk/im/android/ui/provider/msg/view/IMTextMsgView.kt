@@ -17,14 +17,14 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.databinding.ItemviewMsgTextBinding
+import com.thk.im.android.ui.databinding.ViewMsgTextBinding
 import com.thk.im.android.ui.msg.view.IMsgView
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.Flowable
 
 class IMTextMsgView : LinearLayout, IMsgView {
 
-    private var binding: ItemviewMsgTextBinding
+    private var binding: ViewMsgTextBinding
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -36,8 +36,8 @@ class IMTextMsgView : LinearLayout, IMsgView {
 
     init {
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.itemview_msg_text, this, true)
-        binding = ItemviewMsgTextBinding.bind(view)
+            .inflate(R.layout.view_msg_text, this, true)
+        binding = ViewMsgTextBinding.bind(view)
     }
 
     override fun setMessage(

@@ -19,6 +19,6 @@ class IMMsgReplyOperator: IMMessageOperator() {
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
-
+        sender.replyMessage(message)
     }
 }

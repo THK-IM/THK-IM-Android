@@ -53,7 +53,7 @@ import com.thk.im.android.ui.protocol.IMContentResult
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class IMMessageFragment: Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
+class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow
     private var keyboardShowing = false
     private var session: Session? = null
@@ -280,8 +280,10 @@ class IMMessageFragment: Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMembe
         // 对于不是自己发的消息才能发送已读消息
         if (message.fUid != IMCoreManager.uId && message.msgId > 0) {
             IMCoreManager.messageModule
-                .sendMessage(message.sid, MsgType.READ.value,
-                    null, null, null, message.msgId)
+                .sendMessage(
+                    message.sid, MsgType.READ.value,
+                    null, null, null, message.msgId
+                )
         }
     }
 
@@ -366,31 +368,6 @@ class IMMessageFragment: Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMembe
         }
     }
 
-    override fun openAtPopupView() {
-        context?.let {
-            session?.let { session ->
-                if (session.type != SessionType.SuperGroup.value &&
-                    session.type != SessionType.Group.value) {
-                    return
-                }
-                closeKeyboard()
-                XPopup.Builder(it).isDestroyOnDismiss(true)
-                    .hasShadowBg(false)
-                    .isViewMode(true)
-                    .maxHeight((AppUtils.instance().screenHeight * 0.6).toInt())
-                    .moveUpToKeyboard(true)
-                    .enableDrag(false)
-                    .asCustom(IMAtSessionMemberPopup(it, session, this))
-                    .show()
-            }
-        }
-    }
-
-    override fun addAtUser(user: User, sessionMember: SessionMember?) {
-        binding.llInputLayout.addAtSessionMember(user, sessionMember)
-    }
-
-
     private fun previewImageAndVideo(msg: Message, position: Int, originView: View) {
         val messages = binding.rcvMessage.getMessages()
         val mediaMessages = ArrayList<Message>()
@@ -444,14 +421,16 @@ class IMMessageFragment: Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMembe
         type: Int,
         body: Any?,
         data: Any?,
-        atUser: String?,
-        referMsgId: Long?
+        atUser: String?
     ) {
         val callback = object : IMSendMsgCallback {
             override fun onResult(message: Message, e: Exception?) {}
         }
-        IMCoreManager.messageModule
-            .sendMessage(session!!.id, type, body, data, atUser, referMsgId, callback)
+        val referMsg = binding.llInputLayout.getReplyMessage()
+        if (referMsg != null) {
+            binding.llInputLayout.clearReplyMessage()
+        }
+        IMCoreManager.messageModule.sendMessage(session!!.id, type, body, data, atUser, referMsg?.msgId, callback)
     }
 
     override fun addInputContent(text: String) {
@@ -523,6 +502,43 @@ class IMMessageFragment: Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMembe
 
     override fun addAtSessionMember(sessionMember: SessionMember, user: User) {
         binding.llInputLayout.addAtSessionMember(user, sessionMember)
+    }
+
+    override fun openAtPopupView() {
+        context?.let {
+            session?.let { session ->
+                if (session.type != SessionType.SuperGroup.value &&
+                    session.type != SessionType.Group.value
+                ) {
+                    return
+                }
+                closeKeyboard()
+                XPopup.Builder(it).isDestroyOnDismiss(true)
+                    .hasShadowBg(false)
+                    .isViewMode(true)
+                    .maxHeight((AppUtils.instance().screenHeight * 0.6).toInt())
+                    .moveUpToKeyboard(true)
+                    .enableDrag(false)
+                    .asCustom(IMAtSessionMemberPopup(it, session, this))
+                    .show()
+            }
+        }
+    }
+
+    override fun addAtUser(user: User, sessionMember: SessionMember?) {
+        binding.llInputLayout.addAtSessionMember(user, sessionMember)
+    }
+
+    override fun replyMessage(msg: Message) {
+        binding.llInputLayout.showReplyMessage(msg)
+        if (!isKeyboardShowing()) {
+            openKeyboard()
+            binding.rcvMessage.scrollToLatestMsg()
+        }
+    }
+
+    override fun closeReplyMessage() {
+        binding.llInputLayout.clearReplyMessage()
     }
 
 }

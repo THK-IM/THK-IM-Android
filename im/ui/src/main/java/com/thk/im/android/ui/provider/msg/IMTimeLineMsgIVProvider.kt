@@ -3,6 +3,7 @@ package com.thk.im.android.ui.provider.msg
 import android.content.Context
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.ui.msg.view.IMsgView
 import com.thk.im.android.ui.msg.viewholder.BaseMsgVH
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
@@ -11,12 +12,8 @@ import com.thk.im.android.ui.provider.msg.viewholder.IMTimeLineMsgVH
 
 class IMTimeLineMsgIVProvider : IMBaseMessageIVProvider() {
 
-    companion object {
-        const val timeLineMsgType = 9999
-    }
-
     override fun messageType(): Int {
-        return timeLineMsgType
+        return MsgType.TimeLine.value
     }
 
     override fun hasBubble(): Boolean {

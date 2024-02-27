@@ -3,6 +3,7 @@ package com.thk.im.android.ui.fragment.adapter
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.msg.viewholder.BaseMsgVH
@@ -62,7 +63,7 @@ class MessageAdapter(
 
     private fun newTimelineMessage(cTime: Long): Message {
         return Message(
-            0L, 0L, 0L, 0L, IMTimeLineMsgIVProvider.timeLineMsgType, cTime.toString(),
+            0L, 0L, 0L, 0L, MsgType.TimeLine.value, cTime.toString(),
             cTime.toString(), 0, 0, null, null, null, null, cTime, cTime
         )
     }
@@ -204,7 +205,7 @@ class MessageAdapter(
             }
             // 附加在该消息上的时间线消息也一并删除
             if (pos <= messageList.size - 1 && pos >= 0) {
-                if (messageList[pos].type == IMTimeLineMsgIVProvider.timeLineMsgType) {
+                if (messageList[pos].type == MsgType.TimeLine.value) {
                     messageList.removeAt(pos)
                     notifyItemRemoved(pos)
                 }
@@ -212,7 +213,7 @@ class MessageAdapter(
 
             val lastPos = pos - 1
             if (lastPos <= messageList.size - 1 && lastPos >= 0) {
-                if (messageList[lastPos].type == IMTimeLineMsgIVProvider.timeLineMsgType) {
+                if (messageList[lastPos].type == MsgType.TimeLine.value) {
                     messageList.removeAt(lastPos)
                     notifyItemRemoved(lastPos)
                 }
@@ -256,6 +257,13 @@ class MessageAdapter(
                     (it as BaseMsgVH).updateSelectMode()
                 }
             }
+        }
+    }
+
+    fun highlightFlashing(position: Int, times: Int, recyclerView: RecyclerView) {
+        val viewHolder = recyclerView.findViewHolderForLayoutPosition(position)
+        viewHolder?.let {
+            (it as BaseMsgVH).highlightFlashing(times)
         }
     }
 

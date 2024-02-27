@@ -54,7 +54,7 @@ interface IMMessageDao {
 
     fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
 
-    fun findBySidBeforeCTime(sid: Long, cTime: Long, count: Int): List<Message>
+    fun findByTimeRange(sid: Long, startTime: Long, endTime: Long, count: Int): List<Message>
 
     fun findById(id: Long, fUId: Long, sid: Long): Message?
 

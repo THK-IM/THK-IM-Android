@@ -65,6 +65,7 @@ enum class MsgType(var value: Int) {
     VIDEO(6),       // 视频消息
     RECORD(7),      // 消息记录
     Revoke(100),    // 撤回消息
+    TimeLine(9999), // 时间线消息
 }
 
 /**

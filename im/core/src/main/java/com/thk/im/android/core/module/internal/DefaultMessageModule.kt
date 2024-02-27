@@ -365,11 +365,11 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun queryLocalMessages(
-        sessionId: Long, cTime: Long, count: Int
+        sessionId: Long, startTime: Long, endTime: Long, count: Int
     ): Flowable<List<Message>> {
         return Flowable.create({
             val sessions = IMCoreManager.getImDataBase().messageDao()
-                .findBySidBeforeCTime(sessionId, cTime, count)
+                .findByTimeRange(sessionId, startTime, endTime, count)
             it.onNext(sessions)
             it.onComplete()
         }, BackpressureStrategy.LATEST)

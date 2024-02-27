@@ -26,7 +26,6 @@ import io.reactivex.disposables.CompositeDisposable
 
 class IMMessageLayout : RecyclerView, IMMsgVHOperator {
 
-    private var cTime: Long = 0L  // 根据创建时间加载消息
     private var hasMore: Boolean = true // 是否有更多消息
     private var count = 20        // 每次加载消息的数量
     private var isLoading = false // 是否正在加载中
@@ -130,8 +129,11 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
 
     private fun loadMessages() {
         if (!hasMore || isLoading) return
-        if (msgAdapter.getMessageCount() == 0) {
-            cTime = IMCoreManager.commonModule.getSeverTime()
+        val messages = getMessages()
+        val startTime = if (messages.isEmpty()) {
+            IMCoreManager.commonModule.getSeverTime()
+        } else {
+            messages.last().cTime
         }
         isLoading = true
         val subscriber = object : BaseSubscriber<List<Message>>() {
@@ -142,9 +144,6 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                 } else {
                     msgAdapter.addData(t)
                 }
-                if (t.isNotEmpty()) {
-                    cTime = t[t.size - 1].cTime
-                }
                 hasMore = t.size >= count
                 isLoading = false
             }
@@ -153,8 +152,13 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                 super.onError(t)
                 isLoading = false
             }
+
+            override fun onComplete() {
+                super.onComplete()
+                disposables.remove(this)
+            }
         }
-        IMCoreManager.messageModule.queryLocalMessages(session.id, cTime, count)
+        IMCoreManager.messageModule.queryLocalMessages(session.id, startTime, 0, count)
             .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
     }
@@ -195,6 +199,54 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         disposables.clear()
     }
 
+    override fun onMsgReferContentClick(message: Message, view: View) {
+        val position = this.getMessages().indexOf(message)
+        if (position > 0) {
+            scrollToRow(position)
+        } else {
+            val messages = getMessages()
+            val startTime = if (messages.isEmpty()) {
+                IMCoreManager.commonModule.getSeverTime()
+            } else {
+                messages.last().cTime
+            }
+            val subscriber = object : BaseSubscriber<List<Message>>() {
+                override fun onNext(t: List<Message>) {
+                    if (msgAdapter.getMessageCount() == 0) {
+                        msgAdapter.setData(t)
+                    } else {
+                        msgAdapter.addData(t)
+                    }
+                    val pos = msgAdapter.getMessages().indexOf(message)
+                    if (pos > 0) {
+                        scrollToRow(position)
+                    }
+                }
+
+                override fun onComplete() {
+                    super.onComplete()
+                    disposables.remove(this)
+                }
+            }
+            IMCoreManager.messageModule.queryLocalMessages(
+                message.sid,
+                startTime,
+                message.cTime,
+                Int.MAX_VALUE
+            )
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            disposables.add(subscriber)
+        }
+    }
+
+    private fun scrollToRow(row: Int) {
+        scrollToPosition(row)
+        postDelayed({
+            msgAdapter.highlightFlashing(row, 6, this)
+        }, 500)
+    }
+
     override fun onMsgCellClick(message: Message, position: Int, view: View) {
         msgPreviewer?.previewMessage(message, position, view)
     }
@@ -224,8 +276,9 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
 
     override fun onMsgSenderLongClick(message: Message, pos: Int, it: View) {
         if (session.type != SessionType.Group.value
-            && session.type != SessionType.SuperGroup.value) {
-            return 
+            && session.type != SessionType.SuperGroup.value
+        ) {
+            return
         }
         val fromUId = message.fUid
         if (fromUId > 0 && fromUId != IMCoreManager.uId) {
@@ -250,7 +303,6 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgCellLongClick(message: Message, position: Int, view: View) {
-//        msgSender.setSelectMode(true, message)
         msgSender?.popupMessageOperatorPanel(view, message)
     }
 

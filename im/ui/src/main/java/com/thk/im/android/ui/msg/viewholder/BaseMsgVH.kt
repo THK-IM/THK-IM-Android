@@ -44,7 +44,8 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
     open val selectView: ImageView = itemView.findViewById(R.id.iv_msg_select)
     open val msgContentView: LinearLayout = itemView.findViewById(R.id.msg_content)
     open val msgBodyContentView: LinearLayout = itemView.findViewById(R.id.msg_body_content)
-    open val msgReplyContentView: IMReplyMsgContainerView = itemView.findViewById(R.id.msg_reply_content)
+    open val msgReplyContentView: IMReplyMsgContainerView =
+        itemView.findViewById(R.id.msg_reply_content)
 
 
     abstract fun msgBodyView(): IMsgView
@@ -137,6 +138,12 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             msgVHOperator?.let {
                 selectView.isSelected = !selectView.isSelected
                 it.onSelected(message, selectView.isSelected)
+            }
+        }
+
+        msgReplyContentView.setOnClickListener { view ->
+            message.referMsg?.let {
+                msgVHOperator?.onMsgReferContentClick(it, view)
             }
         }
 
@@ -276,7 +283,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             return
         }
         msgVHOperator?.let {
-            LLog.v("updateSelectMode ${it.isSelectMode()}")
             if (it.isSelectMode()) {
                 selectView.visibility = View.VISIBLE
                 selectView.isSelected = it.isItemSelected(message)
@@ -288,6 +294,20 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
 
     private fun getPositionType(): Int {
         return viewType % 3
+    }
+
+    fun highlightFlashing(times: Int) {
+        if (times == 0) {
+            return
+        }
+        if (times % 2 == 0) {
+            itemView.setBackgroundColor(Color.parseColor("#2008AAFF"))
+        } else {
+            itemView.setBackgroundColor(Color.TRANSPARENT)
+        }
+        itemView.postDelayed({
+            highlightFlashing(times - 1)
+        }, 350)
     }
 
 }

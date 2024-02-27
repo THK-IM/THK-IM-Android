@@ -55,7 +55,8 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_gravity="bottom"
-            android:layout_marginRight="8dp" />
+            android:layout_marginRight="8dp"
+            android:indeterminateDrawable="@drawable/ic_anim_loading" />
 
         <LinearLayout
             android:layout_width="wrap_content"

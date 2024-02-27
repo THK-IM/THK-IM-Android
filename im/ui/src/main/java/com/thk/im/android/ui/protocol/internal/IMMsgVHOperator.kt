@@ -4,6 +4,7 @@ import android.view.View
 import com.thk.im.android.core.db.entity.Message
 
 interface IMMsgVHOperator {
+    fun onMsgReferContentClick(message: Message, view: View)
     fun onMsgCellClick(message: Message, position: Int, view: View)
     fun onMsgCellLongClick(message: Message, position: Int, view: View)
     fun onMsgSenderClick(message: Message, position: Int, view: View)

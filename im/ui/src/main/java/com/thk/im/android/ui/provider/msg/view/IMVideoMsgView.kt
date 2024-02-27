@@ -11,6 +11,7 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.extension.dp2px
+import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
@@ -49,7 +50,13 @@ class IMVideoMsgView : LinearLayout, IMsgView {
         delegate: IMMsgVHOperator?,
         isReply: Boolean
     ) {
-
+        if (isReply) {
+            binding.tvVideoDuration.visibility = View.GONE
+            val lp = binding.ivVideoPlay.layoutParams
+            lp.width = AppUtils.dp2px(10f)
+            lp.height = AppUtils.dp2px(10f)
+            binding.ivVideoPlay.layoutParams = lp
+        }
         var imagePath = ""
         var width = 0
         var height = 0
@@ -116,18 +123,14 @@ class IMVideoMsgView : LinearLayout, IMsgView {
             lp.height /= 4
         }
         binding.cardMsgContainer.layoutParams = lp
-        binding.ivMsgVideoThumbnail.visibility = View.INVISIBLE
-        binding.tvVideoDuration.visibility = View.INVISIBLE
     }
 
 
     private fun renderDuration(duration: Int) {
-        binding.tvVideoDuration.visibility = View.VISIBLE
         binding.tvVideoDuration.text = DateUtils.secondToDuration(duration)
     }
 
     private fun renderThumbnailImage(path: String) {
-        binding.ivMsgVideoThumbnail.visibility = View.VISIBLE
         IMImageLoader.displayImageByPath(binding.ivMsgVideoThumbnail, path)
     }
 }

@@ -130,7 +130,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     private fun loadMessages() {
         if (!hasMore || isLoading) return
         val messages = getMessages()
-        val startTime = if (messages.isEmpty()) {
+        val endTime = if (messages.isEmpty()) {
             IMCoreManager.commonModule.getSeverTime()
         } else {
             messages.last().cTime
@@ -158,7 +158,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                 disposables.remove(this)
             }
         }
-        IMCoreManager.messageModule.queryLocalMessages(session.id, startTime, 0, count)
+        IMCoreManager.messageModule.queryLocalMessages(session.id, 0, endTime, count)
             .compose(RxTransform.flowableToMain()).subscribe(subscriber)
         disposables.add(subscriber)
     }
@@ -205,7 +205,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
             scrollToRow(position)
         } else {
             val messages = getMessages()
-            val startTime = if (messages.isEmpty()) {
+            val endTime = if (messages.isEmpty()) {
                 IMCoreManager.commonModule.getSeverTime()
             } else {
                 messages.last().cTime
@@ -230,8 +230,8 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
             }
             IMCoreManager.messageModule.queryLocalMessages(
                 message.sid,
-                startTime,
                 message.cTime,
+                endTime,
                 Int.MAX_VALUE
             )
                 .compose(RxTransform.flowableToMain())

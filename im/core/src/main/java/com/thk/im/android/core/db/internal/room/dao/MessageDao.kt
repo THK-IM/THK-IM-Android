@@ -71,7 +71,7 @@ internal interface MessageDao {
     @Query("select * from message where send_status < :successStatus order by m_time asc")
     fun findSendingMessages(successStatus: Int): List<Message>
 
-    @Query("select * from message where session_id = :sid and type >= 0 and c_time <= :startTime and c_time >= :endTime order by c_time desc limit :count")
+    @Query("select * from message where session_id = :sid and type >= 0 and c_time >= :startTime and c_time <= :endTime order by c_time desc limit :count")
     fun findByTimeRange(sid: Long, startTime: Long, endTime: Long, count: Int): List<Message>
     @Query("select count(id) from message where session_id = :id and type >= 0 and opr_status & :oprStatus = 0")
     fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int

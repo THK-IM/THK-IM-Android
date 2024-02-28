@@ -89,7 +89,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     @Throws(Exception::class)
-    private fun batchProcessMessages(messages: List<Message>, ack: Boolean = true){
+    private fun batchProcessMessages(messages: List<Message>, ack: Boolean = true) {
         val sessionMessages = mutableMapOf<Long, MutableList<Message>>()
         val unProcessorMessages = mutableListOf<Message>()
         val needProcessMessages = mutableListOf<Message>()
@@ -298,7 +298,8 @@ open class DefaultMessageModule : MessageModule {
         }
         Flowable.just("")
             .flatMap {
-                val superGroupSessions = IMCoreManager.db.sessionDao().findAll(SessionType.SuperGroup.value)
+                val superGroupSessions =
+                    IMCoreManager.db.sessionDao().findAll(SessionType.SuperGroup.value)
                 Flowable.just(superGroupSessions)
             }.compose(RxTransform.flowableToMain())
             .subscribe(disposable)
@@ -524,13 +525,16 @@ open class DefaultMessageModule : MessageModule {
         val dispose = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {
                 val unReadCount = messageDao.getUnReadCount(t.id)
-                if (t.mTime < msg.mTime || t.unReadCount != unReadCount) {
+                if (t.mTime <= msg.mTime || t.unReadCount != unReadCount) {
                     val processor = getMsgProcessor(msg.type)
                     var statusText = ""
-                    if (msg.sendStatus == MsgSendStatus.Sending.value) {
-                        statusText = "[⬆️] "
+                    if (msg.sendStatus == MsgSendStatus.Sending.value ||
+                        msg.sendStatus == MsgSendStatus.Init.value ||
+                        msg.sendStatus == MsgSendStatus.Uploading.value
+                    ) {
+                        statusText = "⬅️"
                     } else if (msg.sendStatus == MsgSendStatus.SendFailed.value) {
-                        statusText = "[❗]"
+                        statusText = "❗"
                     }
                     t.lastMsg = "$statusText${processor.getSessionDesc(msg)}"
                     t.mTime = msg.mTime

@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.provider.panel
+package com.thk.im.android.ui.provider.emoji
 
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.panel.IMBasePanelFragment

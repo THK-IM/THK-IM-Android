@@ -1,7 +1,6 @@
-package com.thk.im.android.ui.provider.panel
+package com.thk.im.android.ui.provider.emoji
 
 import android.view.View
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.emoji2.widget.EmojiTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.ui.R

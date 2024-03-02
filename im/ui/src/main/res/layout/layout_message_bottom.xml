@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"/>
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/vp_menu"
+        android:id="@+id/vp_emoji_title"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@color/bg_operation_main"
@@ -25,13 +25,13 @@
         />
 
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/vp_content"
+        android:id="@+id/vp_emoji_content"
         android:layout_width="match_parent"
         android:layout_height="260dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/vp_menu" />
+        app:layout_constraintTop_toBottomOf="@id/vp_emoji_title" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_functions"

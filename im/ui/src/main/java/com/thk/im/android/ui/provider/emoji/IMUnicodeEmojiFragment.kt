@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.provider.panel
+package com.thk.im.android.ui.provider.emoji
 
 import android.os.Bundle
 import android.view.LayoutInflater

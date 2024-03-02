@@ -57,25 +57,25 @@ class IMBottomLayout : ConstraintLayout {
         binding.root.visibility = INVISIBLE
         val linearLayoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        binding.vpMenu.layoutManager = linearLayoutManager
+        binding.vpEmojiTitle.layoutManager = linearLayoutManager
 
         val adapter = PanelMenuAdapter()
         adapter.menuSelectListener = object : PanelMenuAdapter.MenuSelectListener {
             override fun onSelected(position: Int) {
-                binding.vpContent.currentItem = position
+                binding.vpEmojiContent.currentItem = position
             }
         }
-        binding.vpMenu.adapter = adapter
+        binding.vpEmojiTitle.adapter = adapter
 
-        binding.vpContent.adapter = PanelFragmentAdapter(lifecycleOwner as Fragment)
-        binding.vpContent.orientation = ViewPager2.ORIENTATION_HORIZONTAL
-        binding.vpContent.offscreenPageLimit = 5
-        binding.vpContent.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+        binding.vpEmojiContent.adapter = PanelFragmentAdapter(lifecycleOwner as Fragment)
+        binding.vpEmojiContent.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        binding.vpEmojiContent.offscreenPageLimit = 5
+        binding.vpEmojiContent.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 adapter.setSelected(position)
             }
         })
-        binding.vpContent.currentItem = 0
+        binding.vpEmojiContent.currentItem = 0
 
 
         val gridLayoutManager = GridLayoutManager(context, 4)
@@ -85,16 +85,16 @@ class IMBottomLayout : ConstraintLayout {
     }
 
     fun showBottomPanel(position: Int) {
-        binding.vpContent.currentItem = position
+        binding.vpEmojiContent.currentItem = position
         binding.root.visibility = VISIBLE
         contentHeight = if (position == 0) {
-            binding.vpMenu.visibility = VISIBLE
-            binding.vpContent.visibility = VISIBLE
+            binding.vpEmojiTitle.visibility = VISIBLE
+            binding.vpEmojiContent.visibility = VISIBLE
             binding.rcvFunctions.visibility = GONE
             300.dp2px()
         } else {
-            binding.vpMenu.visibility = GONE
-            binding.vpContent.visibility = GONE
+            binding.vpEmojiTitle.visibility = GONE
+            binding.vpEmojiContent.visibility = GONE
             binding.rcvFunctions.visibility = VISIBLE
             200.dp2px()
         }

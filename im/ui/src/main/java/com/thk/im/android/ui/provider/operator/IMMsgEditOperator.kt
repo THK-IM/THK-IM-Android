@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.provider.operator
 
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
@@ -27,6 +28,6 @@ class IMMsgEditOperator : IMMessageOperator() {
     }
 
     override fun supportMessage(message: Message): Boolean {
-        return (message.type == MsgType.Text.value)
+        return (message.type == MsgType.Text.value && message.fUid == IMCoreManager.uId)
     }
 }

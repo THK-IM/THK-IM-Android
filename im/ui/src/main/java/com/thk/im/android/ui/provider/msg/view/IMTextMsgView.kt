@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.content.ContextCompat
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
@@ -18,7 +17,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgTextBinding
-import com.thk.im.android.ui.msg.view.IMsgView
+import com.thk.im.android.ui.fragment.view.IMsgView
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.Flowable
 

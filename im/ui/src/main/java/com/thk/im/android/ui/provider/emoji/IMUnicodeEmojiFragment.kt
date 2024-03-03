@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.thk.im.android.ui.databinding.FragmentPanelUnicodeEmojiBinding
-import com.thk.im.android.ui.fragment.panel.IMBasePanelFragment
+import com.thk.im.android.ui.fragment.IMBaseEmojiFragment
 
-class IMUnicodeEmojiFragment : IMBasePanelFragment() {
+class IMUnicodeEmojiFragment : IMBaseEmojiFragment() {
 
     private lateinit var binding: FragmentPanelUnicodeEmojiBinding
 

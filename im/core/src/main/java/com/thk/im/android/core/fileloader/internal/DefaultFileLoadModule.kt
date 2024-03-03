@@ -195,12 +195,12 @@ class DefaultFileLoadModule(
     }
 
     override fun reset() {
-        for ((_, v) in downloadTaskMap ) {
+        for ((_, v) in downloadTaskMap) {
             v.first.cancel()
             v.second.clear()
         }
         downloadTaskMap.clear()
-        for ((_, v) in uploadTaskMap ) {
+        for ((_, v) in uploadTaskMap) {
             v.first.cancel()
             v.second.clear()
         }

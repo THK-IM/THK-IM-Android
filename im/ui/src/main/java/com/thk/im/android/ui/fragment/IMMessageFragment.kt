@@ -42,7 +42,6 @@ import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
 import com.thk.im.android.ui.fragment.popup.IMMessageOperatorPopup
 import com.thk.im.android.ui.fragment.popup.IMSessionChoosePopup
-import com.thk.im.android.ui.fragment.popup.IMSessionMemberAtDelegate
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.IMImageMsgData
@@ -53,6 +52,7 @@ import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.IMContentResult
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
+import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
 
 class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow

@@ -4,11 +4,11 @@ import android.content.Context
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.MsgType
-import com.thk.im.android.ui.msg.view.IMsgView
-import com.thk.im.android.ui.msg.viewholder.BaseMsgVH
+import com.thk.im.android.ui.fragment.view.IMsgView
+import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMUnSupportMsgView
-import com.thk.im.android.ui.provider.msg.viewholder.IMUnSupportMsgVH
+import com.thk.im.android.ui.provider.msg.viewholder.IMUnSupportMsgVHIM
 
 class IMUnSupportMsgIVProvider : IMBaseMessageIVProvider() {
 
@@ -32,7 +32,7 @@ class IMUnSupportMsgIVProvider : IMBaseMessageIVProvider() {
         lifecycleOwner: LifecycleOwner,
         itemView: View,
         viewType: Int
-    ): BaseMsgVH {
-        return IMUnSupportMsgVH(lifecycleOwner, itemView, viewType)
+    ): IMBaseMsgVH {
+        return IMUnSupportMsgVHIM(lifecycleOwner, itemView, viewType)
     }
 }

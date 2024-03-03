@@ -17,7 +17,7 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
-import com.thk.im.android.ui.fragment.adapter.MessageAdapter
+import com.thk.im.android.ui.fragment.adapter.IMMessageAdapter
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
@@ -31,7 +31,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     private var isLoading = false // 是否正在加载中
     private var hasScrollToBottom = false
     private val disposables = CompositeDisposable()
-    private lateinit var msgAdapter: MessageAdapter
+    private lateinit var msgAdapter: IMMessageAdapter
 
     private lateinit var lifecycleOwner: LifecycleOwner
     private lateinit var session: Session
@@ -65,7 +65,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         val linearLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
         linearLayoutManager.stackFromEnd = true
         layoutManager = linearLayoutManager
-        msgAdapter = MessageAdapter(session, lifecycleOwner, this)
+        msgAdapter = IMMessageAdapter(session, lifecycleOwner, this)
         adapter = msgAdapter
 
         addOnScrollListener(object : OnScrollListener() {
@@ -310,23 +310,23 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     fun getMessages(): List<Message> {
-        return (adapter as MessageAdapter).getMessages()
+        return (adapter as IMMessageAdapter).getMessages()
     }
 
     fun setSelectMode(selected: Boolean, message: Message?) {
-        (adapter as MessageAdapter).setSelectMode(selected, message, this)
+        (adapter as IMMessageAdapter).setSelectMode(selected, message, this)
     }
 
     override fun isSelectMode(): Boolean {
-        return (adapter as MessageAdapter).isSelectMode()
+        return (adapter as IMMessageAdapter).isSelectMode()
     }
 
     override fun isItemSelected(message: Message): Boolean {
-        return (adapter as MessageAdapter).isItemSelected(message)
+        return (adapter as IMMessageAdapter).isItemSelected(message)
     }
 
     override fun onSelected(message: Message, selected: Boolean) {
-        return (adapter as MessageAdapter).onSelected(message, selected)
+        return (adapter as IMMessageAdapter).onSelected(message, selected)
     }
 
     override fun readMessage(message: Message) {
@@ -339,7 +339,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     fun getSelectMessages(): Set<Message> {
-        return (adapter as MessageAdapter).getSelectedMessages()
+        return (adapter as IMMessageAdapter).getSelectedMessages()
     }
 
 }

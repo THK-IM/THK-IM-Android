@@ -28,7 +28,7 @@ interface StorageModule {
     /**
      * 拷贝文件
      */
-    fun copyFile(srcPath :String, desPath: String) :Boolean
+    fun copyFile(srcPath: String, desPath: String): Boolean
 
 
     /**

@@ -43,7 +43,7 @@ public class NetworkUtils {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         if (activeNetworkInfo != null) {
             int type = activeNetworkInfo.getType();
-            if (type == ConnectivityManager.TYPE_MOBILE  ||
+            if (type == ConnectivityManager.TYPE_MOBILE ||
                     type == ConnectivityManager.TYPE_MOBILE_SUPL ||
                     type == ConnectivityManager.TYPE_MOBILE_HIPRI ||
                     type == ConnectivityManager.TYPE_MOBILE_MMS ||

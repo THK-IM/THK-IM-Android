@@ -1,7 +1,6 @@
 package com.thk.im.android.core.module
 
 import com.thk.im.android.core.db.entity.Group
-import com.thk.im.android.core.db.entity.User
 import io.reactivex.Flowable
 
 

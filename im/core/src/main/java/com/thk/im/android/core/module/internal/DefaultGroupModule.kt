@@ -5,7 +5,6 @@ import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.module.GroupModule
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import java.io.FileNotFoundException
 
 open class DefaultGroupModule : GroupModule {
     override fun queryServerGroup(id: Long): Flowable<Group?> {

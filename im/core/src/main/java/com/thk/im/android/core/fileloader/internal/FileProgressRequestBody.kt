@@ -3,7 +3,6 @@ package com.thk.im.android.core.fileloader.internal
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
-import okhttp3.internal.closeQuietly
 import okio.BufferedSink
 import okio.Source
 import okio.source

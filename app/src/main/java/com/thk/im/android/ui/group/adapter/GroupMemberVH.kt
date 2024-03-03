@@ -11,7 +11,7 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
-import com.thk.im.android.ui.msg.viewholder.BaseVH
+import com.thk.im.android.ui.fragment.viewholder.BaseVH
 import io.reactivex.disposables.CompositeDisposable
 
 class GroupMemberVH(liftOwner: LifecycleOwner, itemView: View) :

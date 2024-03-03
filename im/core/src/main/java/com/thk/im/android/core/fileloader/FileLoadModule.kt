@@ -11,7 +11,7 @@ interface FileLoadModule {
      * @param listener 进度监听器
      */
     fun download(key: String, message: Message, listener: LoadListener)
-    
+
 
     /**
      *  上传

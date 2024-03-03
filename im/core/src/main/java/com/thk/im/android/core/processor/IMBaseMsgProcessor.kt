@@ -306,7 +306,7 @@ abstract class IMBaseMsgProcessor {
         }
         val uIds = msg.atUsers!!.split("#")
         for (id in uIds) {
-            if (id == "${IMCoreManager.uId}")  {
+            if (id == "${IMCoreManager.uId}") {
                 if (msg.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) {
                     desc += "[有人@我]"
                 }

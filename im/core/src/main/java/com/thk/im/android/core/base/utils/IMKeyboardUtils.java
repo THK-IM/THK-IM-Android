@@ -17,12 +17,11 @@ import androidx.annotation.NonNull;
 public final class IMKeyboardUtils {
 
     private static final int TAG_ON_GLOBAL_LAYOUT_LISTENER = -8;
+    private static Application mApp;
 
     private IMKeyboardUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
-
-    private static Application mApp;
 
     public static void init(Application app) {
         mApp = app;
@@ -134,7 +133,6 @@ public final class IMKeyboardUtils {
         if (imm == null) return;
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0, resultReceiver);
     }
-
 
 
 }

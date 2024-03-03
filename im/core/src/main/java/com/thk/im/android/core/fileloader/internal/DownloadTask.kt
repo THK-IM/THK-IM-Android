@@ -55,7 +55,7 @@ class DownloadTask(
             override fun onResponse(call: Call, response: Response) {
                 if (response.code !in 200..299) {
                     response.close()
-                    val msg = response.body?.string()?: "unknown"
+                    val msg = response.body?.string() ?: "unknown"
                     val codeMessage = CodeMessage(response.code, msg)
                     notify(0, FileLoadState.Failed.value, HttpException(codeMessage))
                     return

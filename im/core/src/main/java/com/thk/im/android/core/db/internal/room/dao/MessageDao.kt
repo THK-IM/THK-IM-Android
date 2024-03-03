@@ -27,7 +27,7 @@ internal interface MessageDao {
     fun deleteBySessionId(sid: Long)
 
     @Query("delete from message where session_id in (:sids)")
-    fun deleteBySessionIds(sids : Set<Long>)
+    fun deleteBySessionIds(sids: Set<Long>)
 
     /**
      * 更新消息的发送壮体啊
@@ -73,6 +73,7 @@ internal interface MessageDao {
 
     @Query("select * from message where session_id = :sid and type >= 0 and c_time >= :startTime and c_time <= :endTime order by c_time desc limit :count")
     fun findByTimeRange(sid: Long, startTime: Long, endTime: Long, count: Int): List<Message>
+
     @Query("select count(id) from message where session_id = :id and type >= 0 and opr_status & :oprStatus = 0")
     fun getUnReadCount(id: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): Int
 

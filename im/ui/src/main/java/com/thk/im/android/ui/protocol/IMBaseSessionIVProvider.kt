@@ -3,7 +3,7 @@ package com.thk.im.android.ui.protocol
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.ui.msg.viewholder.BaseSessionVH
+import com.thk.im.android.ui.fragment.viewholder.session.IMBaseSessionVH
 
 abstract class IMBaseSessionIVProvider {
 
@@ -19,5 +19,9 @@ abstract class IMBaseSessionIVProvider {
     /**
      * 返回消息视图实例
      */
-    abstract fun viewHolder(lifecycleOwner: LifecycleOwner, viewType: Int, parent: ViewGroup): BaseSessionVH
+    abstract fun viewHolder(
+        lifecycleOwner: LifecycleOwner,
+        viewType: Int,
+        parent: ViewGroup
+    ): IMBaseSessionVH
 }

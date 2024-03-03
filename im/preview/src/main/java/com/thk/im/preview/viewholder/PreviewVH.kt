@@ -3,7 +3,7 @@ package com.thk.im.preview.viewholder
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.db.entity.Message
-import com.thk.im.android.ui.msg.viewholder.BaseVH
+import com.thk.im.android.ui.fragment.viewholder.BaseVH
 
 open class PreviewVH(liftOwner: LifecycleOwner, itemView: View) :
     BaseVH(liftOwner, itemView) {

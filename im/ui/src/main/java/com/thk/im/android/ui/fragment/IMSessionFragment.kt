@@ -16,7 +16,7 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.adapter.SessionAdapter
+import com.thk.im.android.ui.fragment.adapter.IMSessionAdapter
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 import io.reactivex.disposables.CompositeDisposable
@@ -29,7 +29,7 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
     }
 
     private lateinit var sessionRecyclerView: RecyclerView
-    private lateinit var sessionAdapter: SessionAdapter
+    private lateinit var IMSessionAdapter: IMSessionAdapter
     private val disposables = CompositeDisposable()
     private var hasMore = true
     private val count = 10
@@ -62,7 +62,7 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
 
     private fun initSessionRecyclerView(rootView: View) {
         sessionRecyclerView = rootView.findViewById(R.id.rcv_session)
-        sessionAdapter = SessionAdapter(this, this)
+        IMSessionAdapter = IMSessionAdapter(this, this)
         sessionRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -75,28 +75,28 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
         })
 
         sessionRecyclerView.layoutManager = LinearLayoutManager(context)
-        sessionRecyclerView.adapter = sessionAdapter
+        sessionRecyclerView.adapter = IMSessionAdapter
     }
 
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.SessionNew.value, Observer<Session> {
             it?.let {
                 if (it.parentId == parentId) {
-                    sessionAdapter.onNewSession(it)
+                    IMSessionAdapter.onNewSession(it)
                 }
             }
         })
         XEventBus.observe(this, IMEvent.SessionUpdate.value, Observer<Session> {
             it?.let {
                 if (it.parentId == parentId) {
-                    sessionAdapter.onSessionUpdate(it)
+                    IMSessionAdapter.onSessionUpdate(it)
                 }
             }
         })
         XEventBus.observe(this, IMEvent.SessionDelete.value, Observer<Session> {
             it?.let {
                 if (it.parentId == parentId) {
-                    sessionAdapter.onSessionRemove(it)
+                    IMSessionAdapter.onSessionRemove(it)
                 }
             }
         })
@@ -111,10 +111,10 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
         isLoading = true
         val subscriber = object : BaseSubscriber<List<Session>>() {
             override fun onNext(t: List<Session>) {
-                if (sessionAdapter.itemCount == 0) {
-                    sessionAdapter.setData(t)
+                if (IMSessionAdapter.itemCount == 0) {
+                    IMSessionAdapter.setData(t)
                 } else {
-                    sessionAdapter.addData(t)
+                    IMSessionAdapter.addData(t)
                 }
                 hasMore = t.size >= count
             }
@@ -125,8 +125,8 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
             }
         }
         var current = IMCoreManager.commonModule.getSeverTime()
-        if (sessionAdapter.getSessionList().isNotEmpty()) {
-            current = sessionAdapter.getSessionList().last().mTime
+        if (IMSessionAdapter.getSessionList().isNotEmpty()) {
+            current = IMSessionAdapter.getSessionList().last().mTime
         }
         IMCoreManager.messageModule.queryLocalSessions(parentId, 10, current)
             .compose(RxTransform.flowableToMain()).subscribe(subscriber)

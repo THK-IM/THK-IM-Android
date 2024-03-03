@@ -7,13 +7,10 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.Message
-import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.msg.viewholder.BaseMsgVH
+import com.thk.im.android.ui.fragment.view.IMsgView
+import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
-import com.thk.im.android.ui.msg.view.IMsgView
-import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
-import com.thk.im.android.ui.provider.msg.view.IMTextMsgView
 
 abstract class IMBaseMessageIVProvider {
 
@@ -63,7 +60,7 @@ abstract class IMBaseMessageIVProvider {
         lifecycleOwner: LifecycleOwner,
         viewType: Int,
         parent: ViewGroup
-    ): BaseMsgVH {
+    ): IMBaseMsgVH {
         val viewRes = getDefaultRes(viewType)
         val itemView = LayoutInflater.from(parent.context).inflate(viewRes, parent, false)
         return createViewHolder(lifecycleOwner, itemView, viewType)
@@ -75,7 +72,7 @@ abstract class IMBaseMessageIVProvider {
         lifecycleOwner: LifecycleOwner,
         itemView: View,
         viewType: Int
-    ): BaseMsgVH
+    ): IMBaseMsgVH
 
 
     open fun getDefaultRes(viewType: Int): Int {

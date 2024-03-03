@@ -3,7 +3,7 @@ package com.thk.im.android.ui.provider.session.provider
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.SessionType
-import com.thk.im.android.ui.msg.viewholder.BaseSessionVH
+import com.thk.im.android.ui.fragment.viewholder.session.IMBaseSessionVH
 import com.thk.im.android.ui.protocol.IMBaseSessionIVProvider
 import com.thk.im.android.ui.provider.session.viewholder.GroupSessionVH
 
@@ -14,7 +14,7 @@ class SuperGroupSessionIVProvider : IMBaseSessionIVProvider() {
 
     override fun viewHolder(
         lifecycleOwner: LifecycleOwner, viewType: Int, parent: ViewGroup
-    ): BaseSessionVH {
+    ): IMBaseSessionVH {
         return GroupSessionVH(lifecycleOwner, parent)
     }
 }

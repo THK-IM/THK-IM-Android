@@ -63,7 +63,12 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
     }
 
 
-    override fun findByTimeRange(sid: Long, startTime: Long, endTime: Long, count: Int): List<Message> {
+    override fun findByTimeRange(
+        sid: Long,
+        startTime: Long,
+        endTime: Long,
+        count: Int
+    ): List<Message> {
         val messages = roomDatabase.messageDao().findByTimeRange(sid, startTime, endTime, count)
         val referMsgIds = mutableSetOf<Long>()
         for (m in messages) {

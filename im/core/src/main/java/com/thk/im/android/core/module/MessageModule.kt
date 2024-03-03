@@ -53,7 +53,12 @@ interface MessageModule : BaseModule {
     /**
      * 分页获取本地message
      */
-    fun queryLocalMessages(sessionId: Long, startTime: Long, endTime: Long, count: Int): Flowable<List<Message>>
+    fun queryLocalMessages(
+        sessionId: Long,
+        startTime: Long,
+        endTime: Long,
+        count: Int
+    ): Flowable<List<Message>>
 
     /**
      * 批量删除多条Session

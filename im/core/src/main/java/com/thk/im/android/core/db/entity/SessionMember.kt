@@ -4,16 +4,14 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.Index
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-@Entity(tableName = "session_member",
-    primaryKeys= ["session_id", "user_id"],
+@Entity(
+    tableName = "session_member",
+    primaryKeys = ["session_id", "user_id"],
 )
 data class SessionMember(
     @SerializedName("session_id")

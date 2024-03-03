@@ -1,6 +1,6 @@
 package com.thk.im.android.core.module
 
-interface CommonModule: BaseModule {
+interface CommonModule : BaseModule {
 
     /**
      * 设置服务器时间

@@ -4,7 +4,6 @@ package com.thk.im.android.core.base.utils
 import android.content.Context
 import android.content.Context.VIBRATOR_SERVICE
 import android.os.Build
-import android.os.VibrationAttributes
 import android.os.Vibrator
 import android.os.VibratorManager
 

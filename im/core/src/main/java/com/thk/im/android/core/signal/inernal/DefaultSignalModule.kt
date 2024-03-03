@@ -95,7 +95,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     override fun disconnect(reason: String) {
-        LLog.d("DefaultSignalModule", "disconnect true" )
+        LLog.d("DefaultSignalModule", "disconnect true")
         mHandler.removeCallbacksAndMessages(null)
         signalListener = null
         NetworkManager.getInstance().unRegisterObserver(this)
@@ -150,7 +150,10 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         if (success == false) {
             LLog.e("DefaultSignalModule, Send Signal failed $webSocket $status ${Thread.currentThread().name}")
         } else {
-            LLog.d("DefaultSignalModule", "Send Signal $webSocket $status ${Thread.currentThread().name}")
+            LLog.d(
+                "DefaultSignalModule",
+                "Send Signal $webSocket $status ${Thread.currentThread().name}"
+            )
         }
     }
 
@@ -159,7 +162,10 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     private fun onStatusChange(status: SignalStatus) {
-        LLog.d("DefaultSignalModule", "status: ${this.status} $status ${Thread.currentThread().name}")
+        LLog.d(
+            "DefaultSignalModule",
+            "status: ${this.status} $status ${Thread.currentThread().name}"
+        )
         if (this.status != status) {
             this.status = status
             signalListener?.onSignalStatusChange(status.value)

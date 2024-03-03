@@ -188,16 +188,21 @@ open class DefaultIMApi(token: String, serverUrl: String) : IMApi {
         count: Int,
         asc: Int
     ): Flowable<List<Message>> {
-        return sessionApi.querySessionMessage(sessionId, sessionId, cTime, offset, count, asc).flatMap {
-            val messages = mutableListOf<Message>()
-            it.data.forEach { bean ->
-                messages.add(bean.toMessage())
+        return sessionApi.querySessionMessage(sessionId, sessionId, cTime, offset, count, asc)
+            .flatMap {
+                val messages = mutableListOf<Message>()
+                it.data.forEach { bean ->
+                    messages.add(bean.toMessage())
+                }
+                Flowable.just(messages)
             }
-            Flowable.just(messages)
-        }
     }
 
-    override fun queryUserLatestMessages(uId: Long, cTime: Long, count: Int): Flowable<List<Message>> {
+    override fun queryUserLatestMessages(
+        uId: Long,
+        cTime: Long,
+        count: Int
+    ): Flowable<List<Message>> {
         return messageApi.queryLatestMsg(uId, cTime, 0, count).flatMap {
             val messages = mutableListOf<Message>()
             it.data.forEach { bean ->

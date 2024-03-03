@@ -5,6 +5,7 @@ import com.google.android.flexbox.FlexboxLayout
 import com.lxj.xpopup.core.AttachPopupView
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
+import com.thk.im.android.ui.fragment.view.IMMessageOperatorItemView
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 

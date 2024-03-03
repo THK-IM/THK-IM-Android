@@ -4,11 +4,11 @@ import android.content.Context
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.MsgType
-import com.thk.im.android.ui.msg.view.IMsgView
-import com.thk.im.android.ui.msg.viewholder.BaseMsgVH
+import com.thk.im.android.ui.fragment.view.IMsgView
+import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMRecordMsgView
-import com.thk.im.android.ui.provider.msg.viewholder.IMRecordMsgVH
+import com.thk.im.android.ui.provider.msg.viewholder.IMRecordMsgVHIM
 
 class IMRecordMsgIVProvider : IMBaseMessageIVProvider() {
 
@@ -32,7 +32,7 @@ class IMRecordMsgIVProvider : IMBaseMessageIVProvider() {
         lifecycleOwner: LifecycleOwner,
         itemView: View,
         viewType: Int
-    ): BaseMsgVH {
-        return IMRecordMsgVH(lifecycleOwner, itemView, viewType)
+    ): IMBaseMsgVH {
+        return IMRecordMsgVHIM(lifecycleOwner, itemView, viewType)
     }
 }

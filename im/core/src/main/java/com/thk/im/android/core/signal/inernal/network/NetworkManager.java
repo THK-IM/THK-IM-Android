@@ -7,8 +7,8 @@ import com.thk.im.android.core.signal.inernal.network.utils.Constants;
 
 public class NetworkManager {
     private static volatile NetworkManager manager;
-    private Application application;
     private final NetworkStateReceiver receiver = new NetworkStateReceiver();
+    private Application application;
 
     public static NetworkManager getInstance() {
         if (manager == null) {

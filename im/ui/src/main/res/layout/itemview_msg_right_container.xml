@@ -85,7 +85,7 @@
                 android:minHeight="48dp"
                 android:orientation="vertical">
 
-                <com.thk.im.android.ui.msg.view.IMReplyMsgContainerView
+                <com.thk.im.android.ui.fragment.view.IMReplyMsgContainerView
                     android:id="@+id/msg_reply_content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />

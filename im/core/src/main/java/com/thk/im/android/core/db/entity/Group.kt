@@ -61,7 +61,8 @@ data class Group(
 ) : Parcelable {
 
     @Ignore
-    constructor(id: Long): this(id, "", "", 0L, 0L ,"",
+    constructor(id: Long) : this(
+        id, "", "", 0L, 0L, "",
         "", "", 0, 0, "", 0L, 0L
     )
 }

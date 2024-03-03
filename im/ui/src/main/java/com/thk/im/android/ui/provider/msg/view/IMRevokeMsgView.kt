@@ -14,8 +14,8 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgRevokeBinding
+import com.thk.im.android.ui.fragment.view.IMsgView
 import com.thk.im.android.ui.manager.IMRevokeMsgData
-import com.thk.im.android.ui.msg.view.IMsgView
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMRevokeMsgView : LinearLayout, IMsgView {

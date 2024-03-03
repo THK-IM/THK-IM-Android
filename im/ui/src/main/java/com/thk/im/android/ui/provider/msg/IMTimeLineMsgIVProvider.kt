@@ -4,11 +4,11 @@ import android.content.Context
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.MsgType
-import com.thk.im.android.ui.msg.view.IMsgView
-import com.thk.im.android.ui.msg.viewholder.BaseMsgVH
+import com.thk.im.android.ui.fragment.view.IMsgView
+import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMTimeLineMsgView
-import com.thk.im.android.ui.provider.msg.viewholder.IMTimeLineMsgVH
+import com.thk.im.android.ui.provider.msg.viewholder.IMTimeLineMsgVHIM
 
 class IMTimeLineMsgIVProvider : IMBaseMessageIVProvider() {
 
@@ -32,7 +32,7 @@ class IMTimeLineMsgIVProvider : IMBaseMessageIVProvider() {
         lifecycleOwner: LifecycleOwner,
         itemView: View,
         viewType: Int
-    ): BaseMsgVH {
-        return IMTimeLineMsgVH(lifecycleOwner, itemView, messageType())
+    ): IMBaseMsgVH {
+        return IMTimeLineMsgVHIM(lifecycleOwner, itemView, messageType())
     }
 }

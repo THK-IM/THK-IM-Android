@@ -102,7 +102,8 @@ class IMLiveManager private constructor() {
                     3 -> Mode.Video
                     else -> Mode.Chat
                 }
-                val room = Room(roomId, selfId, mode, it.members.toMutableSet(),
+                val room = Room(
+                    roomId, selfId, mode, it.members.toMutableSet(),
                     it.ownerId, it.createTime, role, participantVos
                 )
                 this@IMLiveManager.room = room

@@ -1,9 +1,8 @@
 package com.thk.im.android.core.fileloader.internal
 
 import com.google.gson.Gson
-import com.thk.im.android.core.exception.HttpException
 import com.thk.im.android.core.exception.CodeMessage
-import com.thk.im.android.core.exception.ClientException
+import com.thk.im.android.core.exception.HttpException
 import com.thk.im.android.core.fileloader.FileLoadState
 import okhttp3.Call
 import okhttp3.Callback
@@ -54,12 +53,15 @@ class UploadTask(
                             val uploadParams = Gson().fromJson(json, UploadParams::class.java)
                             startUpload(uploadParams)
                         } catch (e: Exception) {
-                            val codeMessage = CodeMessage(500, if (e.message == null) "internal server error" else e.message!! )
+                            val codeMessage = CodeMessage(
+                                500,
+                                if (e.message == null) "internal server error" else e.message!!
+                            )
                             notify(0, FileLoadState.Failed.value, HttpException(codeMessage))
                         }
                     }
                 } else {
-                    val msg = response.body?.string()?: "unknown"
+                    val msg = response.body?.string() ?: "unknown"
                     val codeMessage = CodeMessage(response.code, msg)
                     notify(0, FileLoadState.Failed.value, HttpException(codeMessage))
                 }
@@ -103,7 +105,7 @@ class UploadTask(
                     keyUrl = "${uploadParams.id}"
                     notify(100, FileLoadState.Success.value, null)
                 } else {
-                    val msg = response.body?.string()?: "unknown"
+                    val msg = response.body?.string() ?: "unknown"
                     val codeMessage = CodeMessage(response.code, msg)
                     notify(0, FileLoadState.Failed.value, HttpException(codeMessage))
                 }

@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.thk.android.im.live.IMLiveManager
 import com.thk.android.im.live.room.BaseParticipant
 import com.thk.android.im.live.room.LocalParticipant
 import com.thk.im.android.core.base.utils.AppUtils
@@ -47,10 +46,6 @@ class ParticipantView : ConstraintLayout {
         binding.rtcRendererVideo.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
         binding.rtcRendererVideo.keepScreenOn = true
         binding.rtcRendererVideo.setEnableHardwareScaler(false)
-    }
-
-    override fun performClick(): Boolean {
-        return super.performClick()
     }
 
     override fun bringToFront() {

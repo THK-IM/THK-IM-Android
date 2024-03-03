@@ -1,6 +1,6 @@
 package com.thk.im.android.ui.protocol
 
-import com.thk.im.android.ui.fragment.panel.IMBasePanelFragment
+import com.thk.im.android.ui.fragment.IMBaseEmojiFragment
 
 abstract class IMBaseEmojiFragmentProvider {
 
@@ -10,7 +10,7 @@ abstract class IMBaseEmojiFragmentProvider {
 
     abstract fun iconResId(): Int
 
-    abstract fun newFragment(): IMBasePanelFragment
+    abstract fun newFragment(): IMBaseEmojiFragment
 
 
 }

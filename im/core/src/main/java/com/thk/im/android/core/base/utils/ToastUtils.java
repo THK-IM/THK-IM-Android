@@ -4,17 +4,15 @@ import android.app.Application;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 
 public class ToastUtils {
 
+    private static final List<String> arrayList = Collections.emptyList();
     private static Application mApp;
     private static Toast mToast;
-
-    private static final List<String> arrayList = Collections.emptyList();
 
     private ToastUtils() {
     }

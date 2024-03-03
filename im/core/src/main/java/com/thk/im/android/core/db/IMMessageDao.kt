@@ -48,7 +48,10 @@ interface IMMessageDao {
         oprStatus: Int
     )
 
-    fun resetSendingMessage(status: Int = MsgSendStatus.SendFailed.value, successStatus: Int = MsgSendStatus.Success.value)
+    fun resetSendingMessage(
+        status: Int = MsgSendStatus.SendFailed.value,
+        successStatus: Int = MsgSendStatus.Success.value
+    )
 
     fun findSendingMessages(successStatus: Int = MsgSendStatus.Success.value): List<Message>
 

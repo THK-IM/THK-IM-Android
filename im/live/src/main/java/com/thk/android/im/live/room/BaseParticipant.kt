@@ -20,7 +20,6 @@ import org.webrtc.DataChannel
 import org.webrtc.IceCandidate
 import org.webrtc.MediaStream
 import org.webrtc.PeerConnection
-import org.webrtc.RendererCommon
 import org.webrtc.RtpReceiver
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
@@ -325,7 +324,14 @@ abstract class BaseParticipant(
                 room?.let {
                     val audioEnable = it.mode == Mode.Audio || it.mode == Mode.Video
                     val videoEnable = it.mode == Mode.Video
-                    val remoteParticipant = RemoteParticipant(newStream.uId, newStream.roomId, role, newStream.streamKey, audioEnable, videoEnable)
+                    val remoteParticipant = RemoteParticipant(
+                        newStream.uId,
+                        newStream.roomId,
+                        role,
+                        newStream.streamKey,
+                        audioEnable,
+                        videoEnable
+                    )
                     IMLiveManager.shared().getRoom()?.let {
                         handler.post {
                             it.participantJoin(remoteParticipant)

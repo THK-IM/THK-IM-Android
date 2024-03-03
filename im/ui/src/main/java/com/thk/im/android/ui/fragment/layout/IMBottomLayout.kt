@@ -15,9 +15,9 @@ import com.thk.im.android.core.base.extension.dp2px
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageBottomBinding
-import com.thk.im.android.ui.fragment.adapter.EmojiFragmentAdapter
-import com.thk.im.android.ui.fragment.adapter.EmojiTitleAdapter
-import com.thk.im.android.ui.fragment.panel.IMFunctionAdapter
+import com.thk.im.android.ui.fragment.adapter.IMEmojiFragmentAdapter
+import com.thk.im.android.ui.fragment.adapter.IMEmojiTitleAdapter
+import com.thk.im.android.ui.fragment.adapter.IMFunctionAdapter
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
@@ -61,8 +61,8 @@ class IMBottomLayout : ConstraintLayout {
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding.vpEmojiTitle.layoutManager = linearLayoutManager
 
-        val adapter = EmojiTitleAdapter()
-        adapter.menuSelectListener = object : EmojiTitleAdapter.MenuSelectListener {
+        val adapter = IMEmojiTitleAdapter()
+        adapter.menuSelectListener = object : IMEmojiTitleAdapter.MenuSelectListener {
             override fun onSelected(position: Int) {
                 binding.vpEmojiContent.currentItem = position
             }
@@ -73,7 +73,7 @@ class IMBottomLayout : ConstraintLayout {
             msgSender?.deleteContent(1)
         }
 
-        binding.vpEmojiContent.adapter = EmojiFragmentAdapter(lifecycleOwner as Fragment)
+        binding.vpEmojiContent.adapter = IMEmojiFragmentAdapter(lifecycleOwner as Fragment)
         binding.vpEmojiContent.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         binding.vpEmojiContent.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {

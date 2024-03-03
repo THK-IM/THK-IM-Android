@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkStateReceiver extends BroadcastReceiver {
-    private NetType netType;
     private final List<NetworkListener> listeners = new ArrayList<>();
+    private NetType netType;
 
     public NetworkStateReceiver() {
         netType = NetType.NONE;

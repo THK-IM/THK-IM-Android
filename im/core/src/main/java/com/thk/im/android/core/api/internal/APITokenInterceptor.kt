@@ -3,8 +3,8 @@ package com.thk.im.android.core.api.internal
 
 import com.google.gson.Gson
 import com.thk.im.android.core.base.utils.AppUtils
-import com.thk.im.android.core.exception.HttpException
 import com.thk.im.android.core.exception.CodeMessage
+import com.thk.im.android.core.exception.HttpException
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response

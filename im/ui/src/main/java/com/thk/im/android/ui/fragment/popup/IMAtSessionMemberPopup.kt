@@ -12,8 +12,9 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.popup.adapter.IMOnSessionMemberClick
-import com.thk.im.android.ui.fragment.popup.adapter.IMSessionMemberAdapter
+import com.thk.im.android.ui.fragment.adapter.IMOnSessionMemberClick
+import com.thk.im.android.ui.fragment.adapter.IMSessionMemberAdapter
+import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
 import io.reactivex.disposables.CompositeDisposable
 
 class IMAtSessionMemberPopup constructor(

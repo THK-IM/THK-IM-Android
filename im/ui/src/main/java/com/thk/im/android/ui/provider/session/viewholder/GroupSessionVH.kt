@@ -14,7 +14,7 @@ import com.thk.im.android.core.base.utils.StringUtils
 import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.msg.viewholder.BaseSessionVH
+import com.thk.im.android.ui.fragment.viewholder.session.IMBaseSessionVH
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 import io.reactivex.disposables.CompositeDisposable
 
@@ -22,7 +22,7 @@ class GroupSessionVH(
     lifecycleOwner: LifecycleOwner,
     parent: ViewGroup,
     resId: Int = R.layout.itemview_session
-) : BaseSessionVH(
+) : IMBaseSessionVH(
     lifecycleOwner, LayoutInflater.from(parent.context).inflate(resId, parent, false)
 ) {
     private val disposable = CompositeDisposable()
@@ -30,7 +30,8 @@ class GroupSessionVH(
     override fun onViewBind(session: Session, sessionVHOperator: IMSessionVHOperator) {
         super.onViewBind(session, sessionVHOperator)
         lastMsgView.text = session.lastMsg
-        lastTimeView.text = DateUtils.timeToMsgTime(session.mTime, IMCoreManager.commonModule.getSeverTime())
+        lastTimeView.text =
+            DateUtils.timeToMsgTime(session.mTime, IMCoreManager.commonModule.getSeverTime())
         if (session.unReadCount == 0) {
             unReadCountView.visibility = View.GONE
         } else {

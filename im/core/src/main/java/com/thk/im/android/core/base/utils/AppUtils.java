@@ -9,12 +9,9 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
 import android.util.DisplayMetrics;
-import android.util.SparseLongArray;
 import android.view.WindowManager;
 
 import com.thk.im.android.core.R;
-
-import java.util.ArrayList;
 
 public class AppUtils {
 
@@ -32,6 +29,11 @@ public class AppUtils {
 
     public static AppUtils instance() {
         return sAppUtils;
+    }
+
+    public static int dp2px(float dp) {
+        final float scale = Resources.getSystem().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5);
     }
 
     public Application getApp() {
@@ -84,7 +86,6 @@ public class AppUtils {
         return verName;
     }
 
-
     public int getScreenWidth() {
         WindowManager wm = (WindowManager) mApp
                 .getSystemService(Context.WINDOW_SERVICE);
@@ -99,12 +100,6 @@ public class AppUtils {
         DisplayMetrics outMetrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(outMetrics);
         return outMetrics.heightPixels;
-    }
-
-
-    public static int dp2px(float dp) {
-        final float scale = Resources.getSystem().getDisplayMetrics().density;
-        return (int) (dp * scale + 0.5);
     }
 
     /**
@@ -146,7 +141,7 @@ public class AppUtils {
             if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
                 soundPoll.play(newMsgSound, 1f, 1f, 1, 0, 1f);
             } else {
-                long[] pattern = new long[] {200, 200, 200, 200};
+                long[] pattern = new long[]{200, 200, 200, 200};
                 VibrateUtils.INSTANCE.vibrate(getApp(), pattern, -1);
             }
         }

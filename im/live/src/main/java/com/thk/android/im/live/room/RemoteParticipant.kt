@@ -11,6 +11,7 @@ import org.webrtc.MediaStreamTrack
 import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 import java.nio.charset.Charset
+
 class RemoteParticipant(
     uId: Long,
     roomId: String,
@@ -45,7 +46,8 @@ class RemoteParticipant(
         val offer = sdp.description
         val offerBase64 =
             String(Base64.encode(offer.toByteArray(Charset.forName("UTF-8")), Base64.DEFAULT))
-        val reqVo = PlayStreamReqVo(roomId, IMLiveManager.shared().selfId, offerBase64, subStreamKey)
+        val reqVo =
+            PlayStreamReqVo(roomId, IMLiveManager.shared().selfId, offerBase64, subStreamKey)
         val subscriber = object : BaseSubscriber<PlayStreamResVo>() {
             override fun onNext(t: PlayStreamResVo?) {
                 t?.let {

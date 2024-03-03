@@ -83,9 +83,7 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
             when (getPositionType()) {
                 IMMsgPosType.Left.value -> {
                     msgContentView.setShape(
-                        Color.parseColor("#ffffff"),
-                        Color.parseColor("#ffffff"),
-                        1,
+                        Color.parseColor("#ffdddddd"),
                         floatArrayOf(0f, 10f, 0f, 10f)
                     )
                 }
@@ -93,8 +91,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 IMMsgPosType.Right.value -> {
                     msgContentView.setShape(
                         Color.parseColor("#d1e3fe"),
-                        Color.parseColor("#d1e3fe"),
-                        1,
                         floatArrayOf(10f, 0f, 10f, 0f)
                     )
                 }
@@ -102,8 +98,6 @@ abstract class BaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val vie
                 else -> {
                     msgContentView.setShape(
                         Color.parseColor("#20000000"),
-                        Color.parseColor("#20000000"),
-                        0,
                         floatArrayOf(10f, 10f, 10f, 10f),
                         false
                     )

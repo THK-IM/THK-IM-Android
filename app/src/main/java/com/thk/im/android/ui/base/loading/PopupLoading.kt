@@ -15,8 +15,6 @@ open class PopupLoading(context: Context) : BasePopupView(context) {
         super.onCreate()
         findViewById<LinearLayout>(R.id.layout_container).setShape(
             Color.parseColor("#24000000"),
-            Color.parseColor("#24000000"),
-            0,
             floatArrayOf(6f, 6f, 6f, 6f)
         )
     }

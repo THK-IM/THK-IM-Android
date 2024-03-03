@@ -82,8 +82,11 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         } else {
             arguments?.getParcelable("session")!!
         }
+        binding.rcvMessage.setBackgroundColor(Color.parseColor("#F8F8F8"))
         binding.rcvMessage.init(this, session!!, this, this)
+        binding.llInputLayout.setBackgroundColor(Color.parseColor("#F0F0F0"))
         binding.llInputLayout.init(this, session!!, this, this)
+        binding.llBottomLayout.setBackgroundColor(Color.parseColor("#F0F0F0"))
         binding.llBottomLayout.init(this, session!!, this, this)
         initKeyboardWindow()
         initEventBus()
@@ -422,12 +425,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         IMCoreManager.messageModule.resend(msg)
     }
 
-    override fun sendMessage(
-        type: Int,
-        body: Any?,
-        data: Any?,
-        atUser: String?
-    ) {
+    override fun sendMessage(type: Int, body: Any?, data: Any?, atUser: String?) {
         val callback = object : IMSendMsgCallback {
             override fun onResult(message: Message, e: Exception?) {}
         }

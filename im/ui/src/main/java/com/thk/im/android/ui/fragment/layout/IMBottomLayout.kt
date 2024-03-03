@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.fragment.layout
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -14,8 +15,8 @@ import com.thk.im.android.core.base.extension.dp2px
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageBottomBinding
-import com.thk.im.android.ui.fragment.adapter.PanelFragmentAdapter
-import com.thk.im.android.ui.fragment.adapter.PanelMenuAdapter
+import com.thk.im.android.ui.fragment.adapter.EmojiFragmentAdapter
+import com.thk.im.android.ui.fragment.adapter.EmojiTitleAdapter
 import com.thk.im.android.ui.fragment.panel.IMFunctionAdapter
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
@@ -38,6 +39,7 @@ class IMBottomLayout : ConstraintLayout {
     init {
         val view = LayoutInflater.from(context).inflate(R.layout.layout_message_bottom, this, true)
         binding = LayoutMessageBottomBinding.bind(view)
+        binding.lyEmojiTab.setBackgroundColor(Color.parseColor("#F5F5F5"))
     }
 
     fun init(
@@ -59,24 +61,26 @@ class IMBottomLayout : ConstraintLayout {
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding.vpEmojiTitle.layoutManager = linearLayoutManager
 
-        val adapter = PanelMenuAdapter()
-        adapter.menuSelectListener = object : PanelMenuAdapter.MenuSelectListener {
+        val adapter = EmojiTitleAdapter()
+        adapter.menuSelectListener = object : EmojiTitleAdapter.MenuSelectListener {
             override fun onSelected(position: Int) {
                 binding.vpEmojiContent.currentItem = position
             }
         }
         binding.vpEmojiTitle.adapter = adapter
 
-        binding.vpEmojiContent.adapter = PanelFragmentAdapter(lifecycleOwner as Fragment)
+        binding.ivEmojiDel.setOnClickListener {
+            msgSender?.deleteContent(1)
+        }
+
+        binding.vpEmojiContent.adapter = EmojiFragmentAdapter(lifecycleOwner as Fragment)
         binding.vpEmojiContent.orientation = ViewPager2.ORIENTATION_HORIZONTAL
-        binding.vpEmojiContent.offscreenPageLimit = 5
         binding.vpEmojiContent.registerOnPageChangeCallback(object : OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 adapter.setSelected(position)
             }
         })
         binding.vpEmojiContent.currentItem = 0
-
 
         val gridLayoutManager = GridLayoutManager(context, 4)
         binding.rcvFunctions.layoutManager = gridLayoutManager
@@ -88,12 +92,12 @@ class IMBottomLayout : ConstraintLayout {
         binding.vpEmojiContent.currentItem = position
         binding.root.visibility = VISIBLE
         contentHeight = if (position == 0) {
-            binding.vpEmojiTitle.visibility = VISIBLE
+            binding.lyEmojiTab.visibility = VISIBLE
             binding.vpEmojiContent.visibility = VISIBLE
             binding.rcvFunctions.visibility = GONE
             300.dp2px()
         } else {
-            binding.vpEmojiTitle.visibility = GONE
+            binding.lyEmojiTab.visibility = GONE
             binding.vpEmojiContent.visibility = GONE
             binding.rcvFunctions.visibility = VISIBLE
             200.dp2px()

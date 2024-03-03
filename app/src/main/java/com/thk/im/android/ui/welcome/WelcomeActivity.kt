@@ -5,14 +5,12 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import com.thk.im.android.IMApplication
-import com.thk.im.android.MediaTestActivity
 import com.thk.im.android.api.ApiFactory
 import com.thk.im.android.api.DataRepository
 import com.thk.im.android.api.user.vo.LoginVo
-import com.thk.im.android.api.user.vo.TokenLoginReq
-import com.thk.im.android.api.user.vo.UserBasicInfoVo
 import com.thk.im.android.api.user.vo.RegisterReq
 import com.thk.im.android.api.user.vo.RegisterVo
+import com.thk.im.android.api.user.vo.TokenLoginReq
 import com.thk.im.android.api.user.vo.UserVo
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
@@ -60,9 +58,9 @@ class WelcomeActivity : BaseActivity() {
     }
 
     private fun showLogin() {
-        binding.btnLogin.setShape(Color.CYAN, Color.CYAN, 1, floatArrayOf(10f, 10f, 10f, 10f))
-        binding.btnRegister.setShape(Color.BLACK, Color.BLACK, 1, floatArrayOf(10f, 10f, 10f, 10f))
-        binding.btnQuickRegister.setShape(Color.RED, Color.RED, 1, floatArrayOf(10f, 10f, 10f, 10f))
+        binding.btnLogin.setShape(Color.CYAN, floatArrayOf(10f, 10f, 10f, 10f))
+        binding.btnRegister.setShape(Color.BLACK, floatArrayOf(10f, 10f, 10f, 10f))
+        binding.btnQuickRegister.setShape(Color.RED, floatArrayOf(10f, 10f, 10f, 10f))
         binding.btnLogin.setOnClickListener {
 
         }
@@ -126,7 +124,7 @@ class WelcomeActivity : BaseActivity() {
         val subscribe = object : BaseSubscriber<Boolean>() {
             override fun onNext(t: Boolean?) {
                 t?.let {
-                    LLog.v("init: $it" )
+                    LLog.v("init: $it")
                     gotoMainActivity()
                 }
             }

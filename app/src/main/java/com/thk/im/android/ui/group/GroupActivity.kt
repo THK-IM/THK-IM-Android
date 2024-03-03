@@ -21,6 +21,7 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
+import com.thk.im.android.core.base.extension.setShapeWithStroke
 import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.databinding.ActivityGroupBinding
@@ -92,7 +93,7 @@ class GroupActivity : BaseActivity() {
     override fun menuIcon(id: Int): Drawable? {
         return if (id == R.id.tb_menu2) {
             ContextCompat.getDrawable(this, R.drawable.ic_add)
-        } else  {
+        } else {
             ContextCompat.getDrawable(this, R.drawable.ic_choose)
         }
     }
@@ -112,7 +113,8 @@ class GroupActivity : BaseActivity() {
         val ids = getMemberIds()
         val uId = IMCoreManager.uId
 
-        val createGroupVo = CreateGroupVo(uId, ids, groupName, announce, SessionType.SuperGroup.value)
+        val createGroupVo =
+            CreateGroupVo(uId, ids, groupName, announce, SessionType.SuperGroup.value)
         val subscriber = object : BaseSubscriber<Group>() {
             override fun onNext(t: Group?) {
             }
@@ -151,10 +153,7 @@ class GroupActivity : BaseActivity() {
 
         binding.lyGroupAvatar.visibility = View.GONE
         binding.etAnnounceInput.setShape(
-            Color.parseColor("#333333"),
-            Color.parseColor("#ffffff"),
-            1,
-            floatArrayOf(5f, 5f, 5f, 5f)
+            Color.parseColor("#333333"), floatArrayOf(5f, 5f, 5f, 5f)
         )
 
         binding.lyGroupMember.setOnClickListener {
@@ -175,9 +174,9 @@ class GroupActivity : BaseActivity() {
         binding.lyGroupAvatar.visibility = View.VISIBLE
         IMImageLoader.displayImageUrl(binding.ivAvatarInput, group.avatar)
 
-        binding.etAnnounceInput.setShape(
+        binding.etAnnounceInput.setShapeWithStroke(
+            Color.parseColor("#F0F0F0"),
             Color.parseColor("#333333"),
-            Color.parseColor("#ffffff"),
             1,
             floatArrayOf(5f, 5f, 5f, 5f)
         )
@@ -191,7 +190,7 @@ class GroupActivity : BaseActivity() {
         binding.rcvMembers.adapter = adapter
         binding.rcvMembers.layoutManager = layoutManager
 
-        val subscriber = object :BaseSubscriber<List<SessionMember>>() {
+        val subscriber = object : BaseSubscriber<List<SessionMember>>() {
             override fun onNext(t: List<SessionMember>?) {
                 t?.let {
                     val ids = mutableListOf<Long>()

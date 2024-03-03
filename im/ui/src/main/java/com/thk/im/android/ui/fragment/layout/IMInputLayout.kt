@@ -78,7 +78,7 @@ class IMInputLayout : ConstraintLayout {
         binding.etMessage.isFocusable = true
         binding.etMessage.isFocusableInTouchMode = true
         binding.etMessage.requestFocus()
-        binding.tvSendMsg.setOnClickListener {
+        binding.ivSendMsg.setOnClickListener {
             binding.etMessage.text?.let {
                 val data = it.toString()
                 val regex = "(?<=@)(.+?)(?=\\s)".toRegex()
@@ -142,10 +142,10 @@ class IMInputLayout : ConstraintLayout {
                     }
                 }
                 if ((p0?.length ?: 0) > 0) {
-                    binding.tvSendMsg.visibility = View.VISIBLE
+                    binding.ivSendMsg.visibility = View.VISIBLE
                     binding.ivAddMore.visibility = View.GONE
                 } else {
-                    binding.tvSendMsg.visibility = View.GONE
+                    binding.ivSendMsg.visibility = View.GONE
                     binding.ivAddMore.visibility = View.VISIBLE
                     this@IMInputLayout.reeditMsg = null
                 }
@@ -259,8 +259,7 @@ class IMInputLayout : ConstraintLayout {
         }
 
         binding.vReplyLine.setShape(
-            Color.parseColor("#ff999999"), Color.parseColor("#ff999999"),
-            1, floatArrayOf(2f, 2f, 2f, 2f), false
+            Color.parseColor("#ff999999"), floatArrayOf(2f, 2f, 2f, 2f), false
         )
 
         binding.ivReplyClose.setOnClickListener {

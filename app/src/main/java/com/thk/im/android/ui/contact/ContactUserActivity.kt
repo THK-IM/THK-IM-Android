@@ -73,10 +73,7 @@ class ContactUserActivity : BaseActivity() {
 
         binding.tvFollow.visibility = View.VISIBLE
         binding.tvFollow.setShape(
-            Color.parseColor("#3282F6"),
-            Color.parseColor("#3282F6"),
-            1,
-            floatArrayOf(10f, 10f, 10f, 10f)
+            Color.parseColor("#3282F6"), floatArrayOf(10f, 10f, 10f, 10f)
         )
 
         binding.tvFollow.setOnClickListener {
@@ -86,10 +83,7 @@ class ContactUserActivity : BaseActivity() {
 
         binding.tvAddFriend.visibility = View.VISIBLE
         binding.tvAddFriend.setShape(
-            Color.parseColor("#3282F6"),
-            Color.parseColor("#3282F6"),
-            1,
-            floatArrayOf(10f, 10f, 10f, 10f)
+            Color.parseColor("#3282F6"), floatArrayOf(10f, 10f, 10f, 10f)
         )
 
         binding.tvAddFriend.setOnClickListener {
@@ -98,10 +92,7 @@ class ContactUserActivity : BaseActivity() {
 
         binding.tvSendMsg.visibility = View.VISIBLE
         binding.tvSendMsg.setShape(
-            Color.parseColor("#3282F6"),
-            Color.parseColor("#3282F6"),
-            1,
-            floatArrayOf(10f, 10f, 10f, 10f)
+            Color.parseColor("#3282F6"), floatArrayOf(10f, 10f, 10f, 10f)
         )
 
         binding.tvSendMsg.setOnClickListener {

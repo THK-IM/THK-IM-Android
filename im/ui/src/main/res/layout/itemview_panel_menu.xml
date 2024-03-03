@@ -3,14 +3,14 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:paddingHorizontal="8dp"
     android:gravity="center"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_menu"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="4dp"
         />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

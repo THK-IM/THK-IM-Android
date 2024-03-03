@@ -7,7 +7,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.msg.viewholder.PanelMenuVH
 import com.thk.im.android.ui.manager.IMUIManager
 
-class PanelMenuAdapter : RecyclerView.Adapter<PanelMenuVH>() {
+class EmojiTitleAdapter : RecyclerView.Adapter<PanelMenuVH>() {
 
     private var selectedIndex = 0
     var menuSelectListener: MenuSelectListener? = null
@@ -19,17 +19,17 @@ class PanelMenuAdapter : RecyclerView.Adapter<PanelMenuVH>() {
     }
 
     override fun getItemCount(): Int {
-        return IMUIManager.panelFragmentProviders.size
+        return IMUIManager.emojiFragmentProviders.size
     }
 
     override fun onBindViewHolder(holder: PanelMenuVH, position: Int) {
         holder.setPanelProvider(
             selectedIndex == position,
-            IMUIManager.panelFragmentProviders[position]
+            IMUIManager.emojiFragmentProviders[position]
         )
         holder.itemView.setOnClickListener {
             menuSelectListener?.let { listener ->
-                val intercept = IMUIManager.panelFragmentProviders[position]?.menuClicked()
+                val intercept = IMUIManager.emojiFragmentProviders[position]?.menuClicked()
                 if (intercept == null || !intercept) {
                     listener.onSelected(position)
                 }

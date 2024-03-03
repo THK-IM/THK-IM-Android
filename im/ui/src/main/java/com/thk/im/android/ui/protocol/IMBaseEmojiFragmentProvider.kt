@@ -2,7 +2,7 @@ package com.thk.im.android.ui.protocol
 
 import com.thk.im.android.ui.fragment.panel.IMBasePanelFragment
 
-abstract class IMBasePanelFragmentProvider {
+abstract class IMBaseEmojiFragmentProvider {
 
     abstract fun menuClicked(): Boolean
 

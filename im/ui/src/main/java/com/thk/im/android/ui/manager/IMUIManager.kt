@@ -10,13 +10,13 @@ import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.protocol.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
-import com.thk.im.android.ui.protocol.IMBasePanelFragmentProvider
+import com.thk.im.android.ui.protocol.IMBaseEmojiFragmentProvider
 import com.thk.im.android.ui.protocol.IMBaseSessionIVProvider
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.IMPageRouter
 import com.thk.im.android.ui.protocol.IMPreviewer
 import com.thk.im.android.ui.protocol.IMProvider
-import com.thk.im.android.ui.provider.emoji.IMUnicodeEmojiPanelProvider
+import com.thk.im.android.ui.provider.emoji.IMUnicodeEmojiEmojiProvider
 import com.thk.im.android.ui.provider.function.IMAlbumFunctionIVProvider
 import com.thk.im.android.ui.provider.function.IMCameraFunctionIVProvider
 import com.thk.im.android.ui.provider.msg.IMAudioMsgIVProvider
@@ -50,7 +50,7 @@ object IMUIManager {
 
     private val messageIVProviders = HashMap<Int, IMBaseMessageIVProvider>()
     private val sessionIVProviders = HashMap<Int, IMBaseSessionIVProvider>()
-    val panelFragmentProviders = HashMap<Int, IMBasePanelFragmentProvider>()
+    val emojiFragmentProviders = HashMap<Int, IMBaseEmojiFragmentProvider>()
     val functionIVProviders = HashMap<Int, IMBaseFunctionIVProvider>()
     private val msgOperators = HashMap<String, IMMessageOperator>()
     var mediaProvider: IMProvider? = null
@@ -122,10 +122,8 @@ object IMUIManager {
         registerSessionIVProvider(GroupSessionIVProvider())
         registerSessionIVProvider(SuperGroupSessionIVProvider())
 
-        for (i in 0..10) {
-            val unicodeEmojiProvider = IMUnicodeEmojiPanelProvider(i)
-            panelFragmentProviders[unicodeEmojiProvider.position()] = unicodeEmojiProvider
-        }
+        val unicodeEmojiProvider = IMUnicodeEmojiEmojiProvider(0)
+        emojiFragmentProviders[unicodeEmojiProvider.position()] = unicodeEmojiProvider
 
         val cameraFunctionProvider = IMCameraFunctionIVProvider()
         val albumFunctionIVProvider = IMAlbumFunctionIVProvider()

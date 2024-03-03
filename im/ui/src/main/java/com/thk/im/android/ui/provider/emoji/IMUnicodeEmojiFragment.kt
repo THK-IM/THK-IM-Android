@@ -43,7 +43,7 @@ class IMUnicodeEmojiFragment : IMBasePanelFragment() {
     }
 
     private fun initView() {
-        val gridLayoutManager = GridLayoutManager(context, 8)
+        val gridLayoutManager = GridLayoutManager(context, 7)
         binding.rcvEmojis.layoutManager = gridLayoutManager
 
         val adapter = IMUnicodeEmojiAdapter()
@@ -53,9 +53,6 @@ class IMUnicodeEmojiFragment : IMBasePanelFragment() {
             override fun onSelected(emoji: String) {
                 getMsgSender()?.addInputContent(emoji)
             }
-        }
-        binding.ivDeleteEmo.setOnClickListener {
-            getMsgSender()?.deleteContent(1)
         }
     }
 }

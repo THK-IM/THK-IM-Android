@@ -30,8 +30,7 @@ class IMReplyMsgContainerView : LinearLayout {
         binding = ViewReplyMsgContainerBinding.bind(view)
         binding.tvReplyMsgUserNick.setTextColor(Color.parseColor("#ff08AAFF"))
         binding.vReplyMsgLine.setShape(
-            Color.parseColor("#ff08AAFF"), Color.parseColor("#ff08AAFF"),
-            1, floatArrayOf(2f, 2f, 2f, 2f), false
+            Color.parseColor("#ff08AAFF"), floatArrayOf(2f, 2f, 2f, 2f), false
         )
     }
 

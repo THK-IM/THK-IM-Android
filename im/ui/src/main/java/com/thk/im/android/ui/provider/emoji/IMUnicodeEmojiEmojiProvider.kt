@@ -2,9 +2,9 @@ package com.thk.im.android.ui.provider.emoji
 
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.panel.IMBasePanelFragment
-import com.thk.im.android.ui.protocol.IMBasePanelFragmentProvider
+import com.thk.im.android.ui.protocol.IMBaseEmojiFragmentProvider
 
-class IMUnicodeEmojiPanelProvider(private val position: Int) : IMBasePanelFragmentProvider() {
+class IMUnicodeEmojiEmojiProvider(private val position: Int) : IMBaseEmojiFragmentProvider() {
 
     override fun menuClicked(): Boolean {
         return false

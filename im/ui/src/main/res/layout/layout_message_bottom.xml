@@ -3,35 +3,46 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ll_bottom_panel"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/bg_main"
-    >
-    <View
-        android:id="@+id/line"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/line"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ly_emoji_tab"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"/>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/vp_emoji_title"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/bg_operation_main"
-        app:layout_constraintTop_toBottomOf="@id/line"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
+        app:layout_constraintRight_toRightOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/vp_emoji_title"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:scrollbars="none"
+            android:overScrollMode="never"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_emoji_del"
+            android:layout_weight="0"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/ic_emoji_del" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/vp_emoji_content"
         android:layout_width="match_parent"
-        android:layout_height="260dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="240dp"
+        app:layout_constraintBottom_toTopOf="@id/ly_emoji_tab"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/vp_emoji_title" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_functions"
@@ -40,8 +51,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/line"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

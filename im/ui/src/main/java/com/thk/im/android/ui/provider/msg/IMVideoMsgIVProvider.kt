@@ -13,7 +13,7 @@ import com.thk.im.android.ui.provider.msg.viewholder.IMVideoMsgVH
 class IMVideoMsgIVProvider : IMBaseMessageIVProvider() {
 
     override fun messageType(): Int {
-        return MsgType.VIDEO.value
+        return MsgType.Video.value
     }
 
     override fun hasBubble(): Boolean {

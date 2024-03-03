@@ -4,13 +4,14 @@ import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
-import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.core.exception.ParameterException
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.ui.manager.IMRevokeMsgData
 import io.reactivex.Flowable
@@ -22,12 +23,13 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
 
     override fun send(msg: Message, resend: Boolean, callback: IMSendMsgCallback?) {
         if (msg.fUid != IMCoreManager.uId) {
+            callback?.onResult(msg, ParameterException)
             return
         }
         val subscriber = object : BaseSubscriber<Void>() {
 
             override fun onNext(t: Void?) {
-                callback?.onResult(msg,null)
+                callback?.onResult(msg, null)
             }
 
             override fun onError(t: Throwable?) {

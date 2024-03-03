@@ -37,6 +37,7 @@ import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
 import com.thk.im.android.ui.manager.IMAudioMsgData
+import com.thk.im.android.ui.manager.IMReeditMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.AudioCallback
 import com.thk.im.android.ui.protocol.AudioStatus
@@ -57,6 +58,7 @@ class IMInputLayout : ConstraintLayout {
     private var msgPreviewer: IMMsgPreviewer? = null
     private var msgSender: IMMsgSender? = null
     private var replyMsg: Message? = null
+    private var reeditMsg: Message? = null
 
     private var audioEventY = 0f
     private var audioCancel = false
@@ -94,7 +96,13 @@ class IMInputLayout : ConstraintLayout {
                     }
                     replacement
                 }
-                msgSender?.sendMessage(MsgType.TEXT.value, body, data, atUsers.ifEmpty { null })
+                if (reeditMsg != null) {
+                    val msg = IMReeditMsgData(reeditMsg!!.sid, reeditMsg!!.msgId, body)
+                    msgSender?.sendMessage(MsgType.Reedit.value, msg, null, null)
+                    reeditMsg = null
+                } else {
+                    msgSender?.sendMessage(MsgType.Text.value, body, data, atUsers.ifEmpty { null })
+                }
                 atMap.clear()
                 binding.etMessage.text.clearSpans()
                 binding.etMessage.text.clear()
@@ -139,6 +147,7 @@ class IMInputLayout : ConstraintLayout {
                 } else {
                     binding.tvSendMsg.visibility = View.GONE
                     binding.ivAddMore.visibility = View.VISIBLE
+                    this@IMInputLayout.reeditMsg = null
                 }
             }
         })
@@ -495,7 +504,7 @@ class IMInputLayout : ConstraintLayout {
         }
         binding.layoutReply.visibility = VISIBLE
 
-        val subscriber = object: BaseSubscriber<User>() {
+        val subscriber = object : BaseSubscriber<User>() {
             override fun onNext(t: User?) {
                 t?.let {
                     showReplyMessageContent(it)
@@ -516,7 +525,20 @@ class IMInputLayout : ConstraintLayout {
     private fun showReplyMessageContent(user: User) {
         replyMsg?.let {
             binding.tvReplyUserNick.text = user.nickname
-            binding.tvReplyContent.text = IMCoreManager.messageModule.getMsgProcessor(it.type).getSessionDesc(it)
+            binding.tvReplyContent.text =
+                IMCoreManager.messageModule.getMsgProcessor(it.type).getSessionDesc(it)
+        }
+    }
+
+    fun setReeditMessage(message: Message) {
+        this.reeditMsg = message
+        message.content?.let {
+            addInputContent(it)
+            msgSender?.let { sender ->
+                if (!sender.isKeyboardShowing()) {
+                    sender.openKeyboard()
+                }
+            }
         }
     }
 

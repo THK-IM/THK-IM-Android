@@ -57,7 +57,7 @@ class IMRevokeMsgView : LinearLayout, IMsgView {
             binding.tvWhoRevoke.text = "${revokeData.nick}撤回了一条消息"
             if (message.fUid == IMCoreManager.uId
                 && revokeData.content != null
-                && revokeData.type != null && revokeData.type == MsgType.TEXT.value
+                && revokeData.type != null && revokeData.type == MsgType.Text.value
             ) {
                 binding.tvReedit.visibility = View.VISIBLE
                 binding.tvReedit.isClickable = true

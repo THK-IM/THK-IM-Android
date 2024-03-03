@@ -5,6 +5,6 @@ import com.thk.im.android.core.db.entity.User
 
 interface IMSessionMemberAtDelegate {
 
-    fun addAtSessionMember(sessionMember: SessionMember, user: User)
+    fun onSessionMemberAt(sessionMember: SessionMember, user: User)
 
 }

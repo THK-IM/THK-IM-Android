@@ -18,7 +18,7 @@ class IMMsgRevokeOperator : IMMessageOperator() {
     }
 
     override fun resId(): Int {
-        return R.drawable.ic_msg_keyboard
+        return R.drawable.ic_msg_opr_revoke
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
@@ -34,5 +34,9 @@ class IMMsgRevokeOperator : IMMessageOperator() {
         IMCoreManager.messageModule
             .getMsgProcessor(MsgType.Revoke.value)
             .send(message, false, callback)
+    }
+
+    override fun supportMessage(message: Message): Boolean {
+        return message.type != MsgType.Revoke.value
     }
 }

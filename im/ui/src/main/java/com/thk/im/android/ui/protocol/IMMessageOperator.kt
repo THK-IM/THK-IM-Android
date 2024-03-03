@@ -8,4 +8,5 @@ abstract class IMMessageOperator {
     abstract fun title(): String
     abstract fun resId(): Int
     abstract fun onClick(sender: IMMsgSender, message: Message)
+    abstract fun supportMessage(message: Message): Boolean
 }

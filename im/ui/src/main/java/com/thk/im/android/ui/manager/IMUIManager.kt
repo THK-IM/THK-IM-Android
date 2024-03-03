@@ -13,9 +13,10 @@ import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.protocol.IMBasePanelFragmentProvider
 import com.thk.im.android.ui.protocol.IMBaseSessionIVProvider
 import com.thk.im.android.ui.protocol.IMMessageOperator
+import com.thk.im.android.ui.protocol.IMPageRouter
 import com.thk.im.android.ui.protocol.IMPreviewer
 import com.thk.im.android.ui.protocol.IMProvider
-import com.thk.im.android.ui.protocol.IMPageRouter
+import com.thk.im.android.ui.provider.emoji.IMUnicodeEmojiPanelProvider
 import com.thk.im.android.ui.provider.function.IMAlbumFunctionIVProvider
 import com.thk.im.android.ui.provider.function.IMCameraFunctionIVProvider
 import com.thk.im.android.ui.provider.msg.IMAudioMsgIVProvider
@@ -29,17 +30,18 @@ import com.thk.im.android.ui.provider.msg.IMVideoMsgIVProvider
 import com.thk.im.android.ui.provider.msg.proccessor.IMAudioMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMImageMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMRecordMsgProcessor
+import com.thk.im.android.ui.provider.msg.proccessor.IMReeditMessageProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMRevokeMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMTextMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMUnSupportMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMVideoMsgProcessor
 import com.thk.im.android.ui.provider.operator.IMMsgCopyOperator
 import com.thk.im.android.ui.provider.operator.IMMsgDeleteOperator
+import com.thk.im.android.ui.provider.operator.IMMsgEditOperator
 import com.thk.im.android.ui.provider.operator.IMMsgForwardOperator
 import com.thk.im.android.ui.provider.operator.IMMsgMultiSelectOperator
 import com.thk.im.android.ui.provider.operator.IMMsgReplyOperator
 import com.thk.im.android.ui.provider.operator.IMMsgRevokeOperator
-import com.thk.im.android.ui.provider.emoji.IMUnicodeEmojiPanelProvider
 import com.thk.im.android.ui.provider.session.provider.GroupSessionIVProvider
 import com.thk.im.android.ui.provider.session.provider.SingleSessionIVProvider
 import com.thk.im.android.ui.provider.session.provider.SuperGroupSessionIVProvider
@@ -86,7 +88,8 @@ object IMUIManager {
     }
 
     fun getMsgOperators(message: Message): List<IMMessageOperator> {
-        return msgOperators.values.toList().sortedBy { opr -> opr.id() }
+        return msgOperators.values.toList().filter { opr -> opr.supportMessage(message) }
+            .sortedBy { opr -> opr.id() }
     }
 
     fun init(app: Application) {
@@ -102,6 +105,7 @@ object IMUIManager {
         IMCoreManager.messageModule.registerMsgProcessor(IMVideoMsgProcessor())
         IMCoreManager.messageModule.registerMsgProcessor(IMRevokeMsgProcessor())
         IMCoreManager.messageModule.registerMsgProcessor(IMRecordMsgProcessor())
+        IMCoreManager.messageModule.registerMsgProcessor(IMReeditMessageProcessor())
 
         val providers = arrayOf(
             IMTimeLineMsgIVProvider(),
@@ -134,6 +138,7 @@ object IMUIManager {
         registerMsgOperator(IMMsgForwardOperator())
         registerMsgOperator(IMMsgReplyOperator())
         registerMsgOperator(IMMsgMultiSelectOperator())
+        registerMsgOperator(IMMsgEditOperator())
     }
 
 }

@@ -9,7 +9,7 @@ import com.thk.im.android.core.processor.IMBaseMsgProcessor
 class IMTextMsgProcessor : IMBaseMsgProcessor() {
 
     override fun messageType(): Int {
-        return MsgType.TEXT.value
+        return MsgType.Text.value
     }
 
     override fun getSessionDesc(msg: Message): String {

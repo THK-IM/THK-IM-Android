@@ -71,7 +71,7 @@ interface IMApi {
     /**
      * 重新编辑消息
      */
-    fun reeditMessage(uId: Long, sessionId: Long, msgId: Long, body: String?): Flowable<Void>
+    fun reeditMessage(uId: Long, sessionId: Long, msgId: Long, body: String): Flowable<Void>
 
     /**
      * 删除消息

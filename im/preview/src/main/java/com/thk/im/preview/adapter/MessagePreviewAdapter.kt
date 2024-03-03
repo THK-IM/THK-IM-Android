@@ -26,7 +26,7 @@ class MessagePreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: L
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreviewVH {
-        return if (viewType == MsgType.IMAGE.value) {
+        return if (viewType == MsgType.Image.value) {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.itemview_media_image, parent, false)
             ImagePreviewVH(lifecycleOwner, view)

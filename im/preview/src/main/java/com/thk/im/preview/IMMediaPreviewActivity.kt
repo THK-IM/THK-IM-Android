@@ -135,7 +135,7 @@ class IMMediaPreviewActivity : AppCompatActivity() {
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.MsgUpdate.value, Observer<Message> {
             it?.let {
-                if (it.type == MsgType.IMAGE.value) {
+                if (it.type == MsgType.Image.value) {
                     val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
                     adapter.updateMessage(it)
                 }
@@ -143,7 +143,7 @@ class IMMediaPreviewActivity : AppCompatActivity() {
         })
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
             it?.let {
-                if (it.type == MsgType.IMAGE.value) {
+                if (it.type == MsgType.Image.value) {
                     val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
                     adapter.updateMessage(it)
                 }
@@ -345,7 +345,7 @@ class IMMediaPreviewActivity : AppCompatActivity() {
                         IMCoreManager.getImDataBase().messageDao().findOlderMessage(
                             it.sid,
                             it.msgId,
-                            arrayOf(MsgType.IMAGE.value, MsgType.VIDEO.value),
+                            arrayOf(MsgType.Image.value, MsgType.Video.value),
                             it.cTime,
                             10
                         ).reversed()
@@ -355,7 +355,7 @@ class IMMediaPreviewActivity : AppCompatActivity() {
                         IMCoreManager.getImDataBase().messageDao().findNewerMessage(
                             it.sid,
                             it.msgId,
-                            arrayOf(MsgType.IMAGE.value, MsgType.VIDEO.value),
+                            arrayOf(MsgType.Image.value, MsgType.Video.value),
                             it.cTime,
                             10
                         )

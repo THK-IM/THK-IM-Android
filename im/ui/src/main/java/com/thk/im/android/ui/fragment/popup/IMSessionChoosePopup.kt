@@ -86,7 +86,7 @@ class IMSessionChoosePopup constructor(
                     }
                     val body = IMRecordMsgBody(t.title, cleanMessages, t.content)
                     IMCoreManager.messageModule
-                        .sendMessage(session.id, MsgType.RECORD.value, body, null)
+                        .sendMessage(session.id, MsgType.Record.value, body, null)
                 }
             }
             buildRecordBody().compose(RxTransform.flowableToMain())

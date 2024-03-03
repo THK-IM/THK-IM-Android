@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.protocol.internal
 
+import android.content.Context
 import android.view.View
 import androidx.emoji2.widget.EmojiEditText
 import com.thk.im.android.core.db.entity.Message
@@ -8,6 +9,9 @@ import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 
 interface IMMsgSender {
+
+    /// 获取Context
+    fun context(): Context
 
     /// 获取session
     fun getSession(): Session
@@ -96,5 +100,8 @@ interface IMMsgSender {
 
     /// 关闭回复消息
     fun closeReplyMessage()
+
+    /// 重编辑消息
+    fun reeditMessage(message: Message)
 
 }

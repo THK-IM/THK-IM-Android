@@ -3,6 +3,7 @@ package com.thk.im.android.ui.fragment
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.Context
 import android.graphics.Color
 import android.graphics.PointF
 import android.os.Build
@@ -170,11 +171,11 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
                 if (media.mimeType.startsWith("video", true)) {
                     val videoMsgData = IMVideoMsgData()
                     videoMsgData.path = media.path
-                    sendMessage(MsgType.VIDEO.value, null, videoMsgData)
+                    sendMessage(MsgType.Video.value, null, videoMsgData)
                 } else if (media.mimeType.startsWith("image", true)) {
                     val imageMsgData = IMImageMsgData()
                     imageMsgData.path = media.path
-                    sendMessage(MsgType.IMAGE.value, null, imageMsgData)
+                    sendMessage(MsgType.Image.value, null, imageMsgData)
                 }
             }
         } catch (e: Exception) {
@@ -241,11 +242,11 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
                 }
             }
 
-            MsgType.IMAGE.value, MsgType.VIDEO.value -> {
+            MsgType.Image.value, MsgType.Video.value -> {
                 previewImageAndVideo(msg, position, originView)
             }
 
-            MsgType.RECORD.value -> {
+            MsgType.Record.value -> {
                 previewRecord(msg)
             }
         }
@@ -281,7 +282,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         if (message.fUid != IMCoreManager.uId && message.msgId > 0) {
             IMCoreManager.messageModule
                 .sendMessage(
-                    message.sid, MsgType.READ.value,
+                    message.sid, MsgType.Read.value,
                     null, null, null, message.msgId
                 )
         }
@@ -374,7 +375,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         var count = 0
         val rightMessages = mutableListOf<Message>()
         for (i in position until messages.size) {
-            if (messages[i].type == MsgType.IMAGE.value || messages[i].type == MsgType.VIDEO.value) {
+            if (messages[i].type == MsgType.Image.value || messages[i].type == MsgType.Video.value) {
                 rightMessages.add(messages[i])
                 count++
             }
@@ -386,7 +387,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         mediaMessages.addAll(rightMessages.reversed())
         count = 0
         for (i in 0 until position) {
-            if (messages[position - 1 - i].type == MsgType.IMAGE.value || messages[position - 1 - i].type == MsgType.VIDEO.value) {
+            if (messages[position - 1 - i].type == MsgType.Image.value || messages[position - 1 - i].type == MsgType.Video.value) {
                 mediaMessages.add(messages[position - 1 - i])
                 count++
             }
@@ -407,6 +408,10 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
                 IMUIManager.mediaPreviewer?.previewRecordMessage(it, session, msg)
             }
         }
+    }
+
+    override fun context(): Context {
+        return requireContext()
     }
 
     override fun getSession(): Session {
@@ -430,7 +435,15 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         if (referMsg != null) {
             binding.llInputLayout.clearReplyMessage()
         }
-        IMCoreManager.messageModule.sendMessage(session!!.id, type, body, data, atUser, referMsg?.msgId, callback)
+        IMCoreManager.messageModule.sendMessage(
+            session!!.id,
+            type,
+            body,
+            data,
+            atUser,
+            referMsg?.msgId,
+            callback
+        )
     }
 
     override fun addInputContent(text: String) {
@@ -500,7 +513,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         return binding.llInputLayout.closeKeyboard()
     }
 
-    override fun addAtSessionMember(sessionMember: SessionMember, user: User) {
+    override fun onSessionMemberAt(sessionMember: SessionMember, user: User) {
         binding.llInputLayout.addAtSessionMember(user, sessionMember)
     }
 
@@ -539,6 +552,10 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
 
     override fun closeReplyMessage() {
         binding.llInputLayout.clearReplyMessage()
+    }
+
+    override fun reeditMessage(message: Message) {
+        binding.llInputLayout.setReeditMessage(message)
     }
 
 }

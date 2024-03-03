@@ -23,7 +23,7 @@ class IMRevokeMsgIVProvider : IMBaseMessageIVProvider() {
     }
 
     override fun canSelect(): Boolean {
-        return false
+        return true
     }
 
     override fun viewType(entity: Message): Int {

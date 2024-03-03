@@ -95,4 +95,13 @@ data class IMRecordMsgBody(
     var content: String
 )
 
+data class IMReeditMsgData(
+    @SerializedName("session_id")
+    val sessionId: Long,
+    @SerializedName("origin_id")
+    val originId: Long,
+    @SerializedName("edit")
+    val edit: String
+)
+
 

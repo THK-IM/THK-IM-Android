@@ -6,24 +6,27 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class IMMsgReplyOperator: IMMessageOperator() {
+class IMMsgEditOperator : IMMessageOperator() {
     override fun id(): String {
-        return "Reply"
+        return "Edit"
     }
 
     override fun title(): String {
-        return "回复"
+        return "编辑"
     }
 
     override fun resId(): Int {
-        return R.drawable.ic_msg_opr_reply
+        return R.drawable.ic_msg_opr_edit
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
-        sender.replyMessage(message)
+        if (message.type != MsgType.Text.value) {
+            return
+        }
+        sender.reeditMessage(message)
     }
 
     override fun supportMessage(message: Message): Boolean {
-        return message.type != MsgType.Revoke.value
+        return (message.type == MsgType.Text.value)
     }
 }

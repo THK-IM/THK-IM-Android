@@ -1,21 +1,21 @@
 package com.thk.im.android.ui.provider.msg.proccessor
 
 import com.google.gson.Gson
-import com.thk.im.android.core.base.LLog
-import com.thk.im.android.core.base.utils.CompressUtils
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMMsgResourceType
+import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.utils.CompressUtils
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
-import com.thk.im.android.core.MsgType
-import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.manager.IMImageMsgBody
 import com.thk.im.android.ui.manager.IMImageMsgData
 import io.reactivex.BackpressureStrategy
@@ -25,7 +25,7 @@ import java.io.FileNotFoundException
 class IMImageMsgProcessor : IMBaseMsgProcessor() {
 
     override fun messageType(): Int {
-        return MsgType.IMAGE.value
+        return MsgType.Image.value
     }
 
     override fun getSessionDesc(msg: Message): String {

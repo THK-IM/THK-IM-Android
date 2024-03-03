@@ -43,7 +43,7 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
     }
 
     override fun messageType(): Int {
-        return MsgType.READ.value
+        return MsgType.Read.value
     }
 
     override fun send(msg: Message, resend: Boolean, callback: IMSendMsgCallback?) {

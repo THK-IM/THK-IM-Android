@@ -10,7 +10,7 @@ import io.reactivex.Flowable
 
 class IMRecordMsgProcessor : IMBaseMsgProcessor() {
     override fun messageType(): Int {
-        return MsgType.RECORD.value
+        return MsgType.Record.value
     }
 
     override fun received(msg: Message) {

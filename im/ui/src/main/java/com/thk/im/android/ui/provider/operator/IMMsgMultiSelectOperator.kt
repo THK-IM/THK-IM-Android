@@ -15,10 +15,14 @@ class IMMsgMultiSelectOperator: IMMessageOperator() {
     }
 
     override fun resId(): Int {
-        return R.drawable.icon_msg_select
+        return R.drawable.ic_msg_opr_mulit_select
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
         sender.setSelectMode(true, message)
+    }
+
+    override fun supportMessage(message: Message): Boolean {
+        return true
     }
 }

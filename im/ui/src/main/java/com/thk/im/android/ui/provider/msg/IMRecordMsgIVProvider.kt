@@ -13,7 +13,7 @@ import com.thk.im.android.ui.provider.msg.viewholder.IMRecordMsgVH
 class IMRecordMsgIVProvider : IMBaseMessageIVProvider() {
 
     override fun messageType(): Int {
-        return MsgType.RECORD.value
+        return MsgType.Record.value
     }
 
     override fun hasBubble(): Boolean {

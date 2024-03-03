@@ -1,21 +1,21 @@
 package com.thk.im.android.ui.provider.msg.proccessor
 
 import com.google.gson.Gson
-import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.IMLoadType
 import com.thk.im.android.core.IMMsgResourceType
+import com.thk.im.android.core.MsgSendStatus
+import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
-import com.thk.im.android.core.MsgSendStatus
-import com.thk.im.android.core.MsgType
-import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.manager.IMAudioMsgBody
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import io.reactivex.BackpressureStrategy
@@ -191,6 +191,7 @@ class IMAudioMsgProcessor : IMBaseMsgProcessor() {
                     FileLoadState.Wait.value,
                     FileLoadState.Ing.value -> {
                     }
+
                     FileLoadState.Success.value -> {
                         if (data == null) {
                             data = IMAudioMsgData()
@@ -211,6 +212,7 @@ class IMAudioMsgProcessor : IMBaseMsgProcessor() {
                         insertOrUpdateDb(entity, notify = true, notifySession = false)
                         downLoadingUrls.remove(downloadUrl)
                     }
+
                     else -> {
                         downLoadingUrls.remove(downloadUrl)
                     }

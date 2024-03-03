@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.provider.operator
 
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
@@ -15,10 +16,14 @@ class IMMsgForwardOperator : IMMessageOperator() {
     }
 
     override fun resId(): Int {
-        return R.drawable.icon_msg_operate_forward
+        return R.drawable.ic_msg_opr_forward
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
         sender.forwardMessageToSession(arrayListOf(message), 0)
+    }
+
+    override fun supportMessage(message: Message): Boolean {
+        return message.type != MsgType.Revoke.value
     }
 }

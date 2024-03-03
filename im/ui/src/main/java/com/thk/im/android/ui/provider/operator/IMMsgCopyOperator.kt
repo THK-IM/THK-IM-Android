@@ -20,15 +20,19 @@ class IMMsgCopyOperator: IMMessageOperator() {
     }
 
     override fun resId(): Int {
-        return R.drawable.icon_love
+        return R.drawable.ic_msg_opr_copy
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
-        if (message.type == MsgType.TEXT.value) {
+        if (message.type == MsgType.Text.value) {
             val clipboard = IMCoreManager.app
                 .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip: ClipData = ClipData.newPlainText("text", message.content)
             clipboard.setPrimaryClip(clip)
         }
+    }
+
+    override fun supportMessage(message: Message): Boolean {
+        return (message.type == MsgType.Text.value)
     }
 }

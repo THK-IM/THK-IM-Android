@@ -41,7 +41,7 @@ class IMAtSessionMemberPopup constructor(
         sessionMemberAdapter.onSessionMemberClick = object : IMOnSessionMemberClick {
             override fun onSessionMemberClick(sessionMember: SessionMember, user: User) {
                 dismiss()
-                sessionMemberAtDelegate.addAtSessionMember(sessionMember, user)
+                sessionMemberAtDelegate.onSessionMemberAt(sessionMember, user)
             }
         }
         rcvSessionMember.adapter = sessionMemberAdapter

@@ -92,13 +92,13 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
     }
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {
-        if (msg.type == MsgType.IMAGE.value || msg.type == MsgType.VIDEO.value) {
+        if (msg.type == MsgType.Image.value || msg.type == MsgType.Video.value) {
             val messages = binding.rcvMessage.getMessages()
             val mediaMessages = ArrayList<Message>()
             var count = 0
             val rightMessages = mutableListOf<Message>()
             for (i in position until messages.size) {
-                if (messages[i].type == MsgType.IMAGE.value || messages[i].type == MsgType.VIDEO.value) {
+                if (messages[i].type == MsgType.Image.value || messages[i].type == MsgType.Video.value) {
                     rightMessages.add(messages[i])
                     count++
                 }
@@ -110,7 +110,7 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
             mediaMessages.addAll(rightMessages.reversed())
             count = 0
             for (i in 0 until position) {
-                if (messages[position - 1 - i].type == MsgType.IMAGE.value || messages[position - 1 - i].type == MsgType.VIDEO.value) {
+                if (messages[position - 1 - i].type == MsgType.Image.value || messages[position - 1 - i].type == MsgType.Video.value) {
                     mediaMessages.add(messages[position - 1 - i])
                     count++
                 }
@@ -121,7 +121,7 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
             IMUIManager.mediaPreviewer?.previewMediaMessage(
                 this, mediaMessages, originView, msg.msgId
             )
-        } else if (msg.type == MsgType.RECORD.value) {
+        } else if (msg.type == MsgType.Record.value) {
             val originSession: Session? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 intent.getParcelableExtra("originSession", Session::class.java)
             } else {

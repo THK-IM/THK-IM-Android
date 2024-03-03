@@ -18,7 +18,7 @@ class IMMsgDeleteOperator : IMMessageOperator() {
     }
 
     override fun resId(): Int {
-        return R.drawable.icon_msg_operate_forward
+        return R.drawable.ic_msg_opr_delete
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {
@@ -35,5 +35,9 @@ class IMMsgDeleteOperator : IMMessageOperator() {
                 }
             })
 
+    }
+
+    override fun supportMessage(message: Message): Boolean {
+        return true
     }
 }

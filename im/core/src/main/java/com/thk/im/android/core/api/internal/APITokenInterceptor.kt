@@ -3,7 +3,7 @@ package com.thk.im.android.core.api.internal
 
 import com.google.gson.Gson
 import com.thk.im.android.core.base.utils.AppUtils
-import com.thk.im.android.core.exception.HttpCodeMessageException
+import com.thk.im.android.core.exception.HttpException
 import com.thk.im.android.core.exception.CodeMessage
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -63,22 +63,22 @@ class APITokenInterceptor(private var token: String) : Interceptor {
                     val contentType = response.body?.contentType()
                     if (contentType == null) {
                         val codeMessage = CodeMessage(response.code, content)
-                        throw HttpCodeMessageException(codeMessage)
+                        throw HttpException(codeMessage)
                     }
                     if (contentType.toString().contains("application/json", true)) {
                         val codeMessage = gson.fromJson(content, CodeMessage::class.java)
-                        throw HttpCodeMessageException(codeMessage)
+                        throw HttpException(codeMessage)
                     } else {
                         val codeMessage = CodeMessage(response.code, content)
-                        throw HttpCodeMessageException(codeMessage)
+                        throw HttpException(codeMessage)
                     }
                 } else {
                     val codeMessage = CodeMessage(response.code, "unknown error")
-                    throw HttpCodeMessageException(codeMessage)
+                    throw HttpException(codeMessage)
                 }
             } else {
                 val codeMessage = CodeMessage(response.code, "unknown error")
-                throw HttpCodeMessageException(codeMessage)
+                throw HttpException(codeMessage)
             }
         }
     }

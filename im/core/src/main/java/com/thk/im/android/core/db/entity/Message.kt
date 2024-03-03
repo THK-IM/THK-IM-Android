@@ -7,6 +7,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import com.google.gson.annotations.SerializedName
+import com.thk.im.android.core.base.LLog
 import kotlinx.parcelize.Parcelize
 
 @Keep
@@ -66,6 +67,20 @@ data class Message(
     @ColumnInfo(name = "m_time")
     var mTime: Long = 0,
 ) : Parcelable {
+
+    fun getReadUIds(): Set<Long> {
+        if (this.rUsers.isNullOrBlank()) {
+            return emptySet()
+        }
+        val strUIds = this.rUsers!!.split("#")
+        val uIds = mutableSetOf<Long>()
+        strUIds.forEach { strUId ->
+            strUId.toLongOrNull()?.let {
+                uIds.add(it)
+            }
+        }
+        return uIds
+    }
 
     @SerializedName("refer_msg")
     @Ignore

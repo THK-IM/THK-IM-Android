@@ -38,6 +38,11 @@ class MainActivity : BaseActivity() {
 
     private fun onBottomItemSelected(it: MenuItem): Boolean {
         val pos = bottomMenuTitles.indexOf(it.title)
+        setNavigation(pos)
+        return true
+    }
+
+    private fun setNavigation(pos: Int) {
         binding.vpContainer.setCurrentItem(pos, false)
         setTitle(bottomMenuTitles.elementAt(pos))
         currentNavigationPos = pos
@@ -47,7 +52,6 @@ class MainActivity : BaseActivity() {
             binding.tbTop.toolbar.visibility = View.VISIBLE
             resetToolbar()
         }
-        return true
     }
 
     override fun getToolbar(): Toolbar {

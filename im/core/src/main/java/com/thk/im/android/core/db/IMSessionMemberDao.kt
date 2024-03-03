@@ -11,4 +11,6 @@ interface IMSessionMemberDao {
     fun delete(members: List<SessionMember>)
 
     fun findBySessionId(sessionId: Long): List<SessionMember>
+
+    fun findSessionMemberCount(sessionId: Long): Int
 }

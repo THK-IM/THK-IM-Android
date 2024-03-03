@@ -37,7 +37,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
+        android:layout_marginRight="4dp"
         android:layout_toLeftOf="@+id/avatar_container"
         android:layout_toRightOf="@+id/iv_msg_select"
         android:gravity="end"
@@ -45,10 +45,9 @@
 
         <ImageView
             android:id="@+id/iv_msg_fail"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_gravity="bottom"
-            android:layout_marginRight="8dp"
             android:src="@drawable/ic_msg_failed" />
 
         <ProgressBar
@@ -56,14 +55,21 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_gravity="bottom"
-            android:layout_marginRight="8dp"
             android:indeterminateDrawable="@drawable/ic_anim_loading" />
+
+        <com.thk.im.android.ui.fragment.view.IMReadStatusView
+            android:id="@+id/read_status"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="bottom"
+            />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingRight="6dp">
+            android:layout_marginLeft="4dp"
+            >
 
             <androidx.emoji2.widget.EmojiTextView
                 android:id="@+id/tv_nickname"
@@ -115,6 +121,4 @@
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
-
-
 </RelativeLayout>

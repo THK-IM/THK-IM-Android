@@ -21,13 +21,16 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
+import com.thk.im.android.ui.fragment.view.IMReadStatusView
 import com.thk.im.android.ui.fragment.view.IMReplyMsgContainerView
 import com.thk.im.android.ui.fragment.view.IMsgView
 import com.thk.im.android.ui.fragment.viewholder.BaseVH
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
+import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
+import java.lang.Integer.max
 
 abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val viewType: Int) :
     BaseVH(liftOwner, itemView) {
@@ -38,14 +41,15 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     private var pos: Int = 0
 
     private var disposable = CompositeDisposable()
-    open val ivAvatarView: ImageView? = itemView.findViewById(R.id.iv_avatar)
-    open val tvNicknameView: TextView? = itemView.findViewById(R.id.tv_nickname)
-    open val ivMsgFailedView: ImageView? = itemView.findViewById(R.id.iv_msg_fail)
-    open val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
-    open val selectView: ImageView = itemView.findViewById(R.id.iv_msg_select)
-    open val msgContentView: LinearLayout = itemView.findViewById(R.id.msg_content)
-    open val msgBodyContentView: LinearLayout = itemView.findViewById(R.id.msg_body_content)
-    open val msgReplyContentView: IMReplyMsgContainerView =
+    protected val ivAvatarView: ImageView? = itemView.findViewById(R.id.iv_avatar)
+    protected val tvNicknameView: TextView? = itemView.findViewById(R.id.tv_nickname)
+    private val ivMsgFailedView: ImageView? = itemView.findViewById(R.id.iv_msg_fail)
+    private val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
+    private val readStatusView: IMReadStatusView? = itemView.findViewById(R.id.read_status)
+    private val selectView: ImageView = itemView.findViewById(R.id.iv_msg_select)
+    private val msgContentView: LinearLayout = itemView.findViewById(R.id.msg_content)
+    private val msgBodyContentView: LinearLayout = itemView.findViewById(R.id.msg_body_content)
+    protected val msgReplyContentView: IMReplyMsgContainerView =
         itemView.findViewById(R.id.msg_reply_content)
 
 
@@ -209,18 +213,56 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
             MsgSendStatus.SendFailed.value -> {
                 pbMsgFailedView?.visibility = View.GONE
                 ivMsgFailedView?.visibility = View.VISIBLE
+                readStatusView?.visibility = View.GONE
             }
 
             MsgSendStatus.Success.value -> {
                 pbMsgFailedView?.visibility = View.GONE
                 ivMsgFailedView?.visibility = View.GONE
+                queryReadStatus()
             }
 
             else -> {
                 pbMsgFailedView?.visibility = View.VISIBLE
                 ivMsgFailedView?.visibility = View.GONE
+                readStatusView?.visibility = View.GONE
             }
         }
+    }
+
+    private fun queryReadStatus() {
+        if (session.type == SessionType.MsgRecord.value) {
+            return
+        }
+
+        val subscriber = object : BaseSubscriber<Int>() {
+            override fun onNext(t: Int?) {
+                t?.let {
+                    showReadStatus(it)
+                }
+                disposable.remove(this)
+            }
+
+            override fun onError(t: Throwable?) {
+                super.onError(t)
+                disposable.remove(this)
+            }
+        }
+        Flowable.just(0)
+            .flatMap {
+                val count = IMCoreManager.db.sessionMemberDao().findSessionMemberCount(session.id)
+                return@flatMap Flowable.just(count)
+            }.compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposable.add(subscriber)
+    }
+
+    private fun showReadStatus(count: Int) {
+        val memberCount = max(count-1, 1)
+        val readUIds = this.message.getReadUIds()
+        val progress = readUIds.count().toFloat()/memberCount.toFloat()
+        this.readStatusView?.visibility = View.VISIBLE
+        this.readStatusView?.updateStatus(Color.parseColor("#17a121"), 4f, progress)
     }
 
     private fun renderReplyMsg() {

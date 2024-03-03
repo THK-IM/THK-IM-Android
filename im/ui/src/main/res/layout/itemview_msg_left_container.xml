@@ -43,7 +43,7 @@
         android:layout_marginRight="40dp"
         android:layout_toRightOf="@id/avatar_container"
         android:orientation="vertical"
-        android:paddingLeft="6dp">
+        >
 
         <androidx.emoji2.widget.EmojiTextView
             android:id="@+id/tv_nickname"

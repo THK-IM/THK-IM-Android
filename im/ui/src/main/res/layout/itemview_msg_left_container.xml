@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingHorizontal="10dp"
+    android:padding="10dp"
     android:paddingVertical="5dp"
     >
 
@@ -35,62 +35,97 @@
             android:layout_height="42dp" />
     </androidx.cardview.widget.CardView>
 
-
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
-        android:layout_marginRight="10dp"
-        android:layout_toRightOf="@id/avatar_container"
-        android:orientation="vertical"
-        >
-
-        <androidx.emoji2.widget.EmojiTextView
-            android:id="@+id/tv_nickname"
-            android:layout_width="wrap_content"
-            android:layout_height="16dp"
-            android:layout_marginBottom="4dp"
-            android:ellipsize="end"
-            android:lines="1"
-            android:textColor="#999999"
-            android:textSize="12sp" />
+        android:orientation="horizontal"
+        android:layout_toRightOf="@id/avatar_container">
 
         <LinearLayout
-            android:id="@+id/msg_content"
+            android:layout_weight="8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
-
-            <com.thk.im.android.ui.fragment.view.IMReplyMsgContainerView
-                android:id="@+id/msg_reply_content"
+            android:orientation="vertical"
+            >
+            <androidx.emoji2.widget.EmojiTextView
+                android:id="@+id/tv_nickname"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="16dp"
+                android:layout_marginBottom="4dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textColor="#999999"
+                android:textSize="12sp" />
 
             <LinearLayout
-                android:id="@+id/msg_body_content"
+                android:id="@+id/msg_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="5dp"
-                />
+                android:minHeight="48dp"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <com.thk.im.android.ui.fragment.view.IMReplyMsgContainerView
+                    android:id="@+id/msg_reply_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:id="@+id/msg_body_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="5dp"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_msg_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/bg_tv_msg_tips"
+                android:gravity="center"
+                android:textColor="#999999"
+                android:textSize="12sp"
+                android:visibility="gone" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_msg_tips"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/bg_tv_msg_tips"
-            android:gravity="center"
-            android:textColor="#999999"
-            android:textSize="12sp"
-            android:visibility="gone" />
+        <RelativeLayout
+            android:layout_width="24dp"
+            android:layout_weight="1"
+            android:layout_height="30dp"
+            android:layout_gravity="bottom"
+            android:paddingLeft="4dp"
+            >
+            <ImageView
+                android:id="@+id/iv_msg_resend"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/ic_msg_failed"/>
+
+            <ProgressBar
+                android:id="@+id/pb_sending"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentBottom="true"
+                android:indeterminateDrawable="@drawable/ic_anim_loading"/>
+
+            <com.thk.im.android.ui.fragment.view.IMReadStatusView
+                android:id="@+id/read_status"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentBottom="true"
+                />
+        </RelativeLayout>
+
     </LinearLayout>
+
 
 
 </RelativeLayout>

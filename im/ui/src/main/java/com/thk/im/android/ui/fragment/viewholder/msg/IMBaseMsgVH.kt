@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.view.children
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
@@ -41,9 +42,10 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     private var pos: Int = 0
 
     private var disposable = CompositeDisposable()
+    private val cardAvatarContainerView: CardView? = itemView.findViewById(R.id.avatar_container)
     protected val ivAvatarView: ImageView? = itemView.findViewById(R.id.iv_avatar)
     protected val tvNicknameView: TextView? = itemView.findViewById(R.id.tv_nickname)
-    private val ivMsgFailedView: ImageView? = itemView.findViewById(R.id.iv_msg_fail)
+    private val resendView: ImageView? = itemView.findViewById(R.id.iv_msg_resend)
     private val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
     private val readStatusView: IMReadStatusView? = itemView.findViewById(R.id.read_status)
     private val selectView: ImageView = itemView.findViewById(R.id.iv_msg_select)
@@ -129,7 +131,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
             msgVHOperator?.onMsgSenderClick(message, pos, it)
         }
 
-        ivMsgFailedView?.setOnClickListener {
+        resendView?.setOnClickListener {
             resend()
         }
 
@@ -212,19 +214,21 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         when (message.sendStatus) {
             MsgSendStatus.SendFailed.value -> {
                 pbMsgFailedView?.visibility = View.GONE
-                ivMsgFailedView?.visibility = View.VISIBLE
+                resendView?.visibility = View.VISIBLE
                 readStatusView?.visibility = View.GONE
             }
 
             MsgSendStatus.Success.value -> {
                 pbMsgFailedView?.visibility = View.GONE
-                ivMsgFailedView?.visibility = View.GONE
-                queryReadStatus()
+                resendView?.visibility = View.GONE
+                if (message.fUid == IMCoreManager.uId) {
+                    queryReadStatus()
+                }
             }
 
             else -> {
                 pbMsgFailedView?.visibility = View.VISIBLE
-                ivMsgFailedView?.visibility = View.GONE
+                resendView?.visibility = View.GONE
                 readStatusView?.visibility = View.GONE
             }
         }
@@ -315,16 +319,16 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
 
 
     fun updateSelectMode() {
-        if (!canSelect()) {
-            selectView.visibility = View.GONE
-            return
-        }
         msgVHOperator?.let {
             if (it.isSelectMode()) {
-                selectView.visibility = View.VISIBLE
-                selectView.isSelected = it.isItemSelected(message)
+                if (canSelect()) {
+                    selectView.visibility = View.VISIBLE
+                    selectView.isSelected = it.isItemSelected(message)
+                }
+                cardAvatarContainerView?.visibility = View.GONE
             } else {
                 selectView.visibility = View.GONE
+                cardAvatarContainerView?.visibility = View.VISIBLE
             }
         }
     }

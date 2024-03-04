@@ -53,12 +53,16 @@ import com.thk.im.android.ui.protocol.IMContentResult
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
+import io.reactivex.Flowable
+import io.reactivex.disposables.CompositeDisposable
 
 class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow
+    private lateinit var binding: FragmentMessageBinding
     private var keyboardShowing = false
     private var session: Session? = null
-    private lateinit var binding: FragmentMessageBinding
+    private val disposables = CompositeDisposable()
+    private val memberMap = mutableMapOf<Long, Pair<User, SessionMember?>>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -72,6 +76,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
     override fun onDestroyView() {
         super.onDestroyView()
         keyboardPopupWindow.dismiss()
+        disposables.clear()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -90,6 +95,55 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         binding.llBottomLayout.init(this, session!!, this, this)
         initKeyboardWindow()
         initEventBus()
+        fetchSessionMembers()
+    }
+
+    private fun fetchSessionMembers() {
+        if (session == null) {
+            return
+        }
+        val subscriber = object : BaseSubscriber<Map<Long, Pair<User, SessionMember?>>>() {
+            override fun onNext(t: Map<Long, Pair<User, SessionMember?>>?) {
+                t?.let {
+                    updateSessionMember(it)
+                }
+                disposables.remove(this)
+            }
+
+            override fun onError(t: Throwable?) {
+                super.onError(t)
+                disposables.remove(this)
+            }
+        }
+        IMCoreManager.messageModule.querySessionMembers(session!!.id)
+            .flatMap { members ->
+                val uIds = mutableSetOf<Long>()
+                for (m in members) {
+                    uIds.add(m.userId)
+                }
+                return@flatMap IMCoreManager.userModule.queryUsers(uIds).flatMap { userMap ->
+                    val memberMap = mutableMapOf<Long, Pair<User, SessionMember?>>()
+                    for ((k, v) in userMap) {
+                        for (m in members) {
+                            if (m.userId == k) {
+                                val pair = Pair(v, m)
+                                memberMap[k] = pair
+                                break
+                            }
+                        }
+                    }
+                    return@flatMap Flowable.just(memberMap)
+                }
+            }.compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposables.add(subscriber)
+    }
+
+    private fun updateSessionMember(it: Map<Long, Pair<User, SessionMember?>>) {
+        for ((k, v) in it) {
+            memberMap[k] = v
+        }
+        binding.rcvMessage.refreshMessageUserInfo()
     }
 
     private fun initKeyboardWindow() {
@@ -555,6 +609,28 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
 
     override fun reeditMessage(message: Message) {
         binding.llInputLayout.setReeditMessage(message)
+    }
+
+    override fun syncGetSessionMemberInfo(userId: Long): Pair<User, SessionMember?>? {
+        return memberMap[userId]
+    }
+
+    override fun saveSessionMemberInfo(info: Pair<User, SessionMember?>) {
+        memberMap[info.first.id] = info
+    }
+
+    override fun asyncGetSessionMemberInfo(userId: Long): Flowable<Pair<User, SessionMember?>> {
+        val session = this.session
+        return IMCoreManager.userModule.queryUser(userId)
+            .flatMap { user ->
+                if (session != null && session.id > 0) {
+                    val sessionMember =
+                        IMCoreManager.db.sessionMemberDao().findSessionMember(session.id, userId)
+                    return@flatMap Flowable.just(Pair(user, sessionMember))
+                } else {
+                    return@flatMap Flowable.just(Pair(user, null))
+                }
+            }
     }
 
 }

@@ -6,15 +6,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.ui.fragment.layout.IMMessageLayout
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.manager.IMUIManager
-import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import kotlin.math.abs
 
 class IMMessageAdapter(
     private val session: Session,
     private val lifecycleOwner: LifecycleOwner,
-    private val msgVHOperator: IMMsgVHOperator
+    private val imMessageLayout: IMMessageLayout
 ) :
     RecyclerView.Adapter<IMBaseMsgVH>() {
 
@@ -37,7 +37,7 @@ class IMMessageAdapter(
     }
 
     override fun onBindViewHolder(holder: IMBaseMsgVH, position: Int) {
-        holder.onViewBind(position, messageList, session, msgVHOperator)
+        holder.onViewBind(position, messageList, session, imMessageLayout)
     }
 
     override fun onViewRecycled(holder: IMBaseMsgVH) {
@@ -240,7 +240,7 @@ class IMMessageAdapter(
         return messageList
     }
 
-    fun setSelectMode(open: Boolean, firstSelected: Message?, recyclerView: RecyclerView) {
+    fun setSelectMode(open: Boolean, firstSelected: Message?) {
         if (this.isSelectMode != open) {
             this.isSelectMode = open
             if (this.isSelectMode) {
@@ -251,10 +251,19 @@ class IMMessageAdapter(
                 selectedMessages.clear()
             }
             for (i in 0 until messageList.size) {
-                val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
+                val viewHolder = imMessageLayout.findViewHolderForLayoutPosition(i)
                 viewHolder?.let {
                     (it as IMBaseMsgVH).updateSelectMode()
                 }
+            }
+        }
+    }
+
+    fun updateUserInfo() {
+        for (i in 0 until messageList.size) {
+            val viewHolder = imMessageLayout.findViewHolderForLayoutPosition(i)
+            viewHolder?.let {
+                (it as IMBaseMsgVH).updateSelectMode()
             }
         }
     }

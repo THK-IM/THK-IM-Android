@@ -7,6 +7,7 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
+import io.reactivex.Flowable
 
 interface IMMsgSender {
 
@@ -103,5 +104,14 @@ interface IMMsgSender {
 
     /// 重编辑消息
     fun reeditMessage(message: Message)
+
+    /// 同步获取用户信息
+    fun syncGetSessionMemberInfo(userId: Long): Pair<User, SessionMember?>?
+
+    /// 设置用户信息
+    fun saveSessionMemberInfo(info: Pair<User, SessionMember?>)
+
+    /// 异步获取用户信息
+    fun asyncGetSessionMemberInfo(userId: Long): Flowable<Pair<User, SessionMember?>>
 
 }

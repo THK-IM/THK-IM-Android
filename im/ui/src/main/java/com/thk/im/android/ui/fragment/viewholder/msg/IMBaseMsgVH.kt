@@ -20,6 +20,7 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.view.IMReadStatusView
@@ -72,16 +73,15 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         this.msgVHOperator = msgVHOperator
         onViewDetached()
         attachLayout()
-        onViewAttached()
+        renderMsgStatus()
+        updateSelectMode()
+        renderReplyMsg()
+        fetchUserInfo()
     }
 
     override fun onViewAttached() {
         super.onViewAttached()
-        renderUserInfo()
-        renderMsgStatus()
-        updateSelectMode()
         readMessage()
-        renderReplyMsg()
     }
 
     private fun attachLayout() {
@@ -135,6 +135,10 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
             resend()
         }
 
+        readStatusView?.setOnClickListener {
+            msgVHOperator?.onMsgReadStatusClick(message)
+        }
+
         selectView.setOnClickListener {
             msgVHOperator?.let {
                 selectView.isSelected = !selectView.isSelected
@@ -166,11 +170,11 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     }
 
     private fun onLongClickContent(view: View): Boolean{
-        if (canSelect()) {
+        return if (canSelect()) {
             msgVHOperator?.onMsgCellLongClick(message, pos, view)
-            return true
+            true
         } else {
-            return false
+            false
         }
     }
 
@@ -191,13 +195,12 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         ) {
             return
         }
-        LLog.v("readMessage ${message.id} ${message.oprStatus}")
         msgVHOperator?.readMessage(message)
         message.oprStatus = message.oprStatus.or(MsgOperateStatus.ClientRead.value)
             .or(MsgOperateStatus.ServerRead.value)
     }
 
-    open fun renderUserInfo() {
+    open fun fetchUserInfo() {
         tvNicknameView?.let {
             if (session.type != SessionType.Single.value) {
                 it.visibility = View.VISIBLE
@@ -206,20 +209,27 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
             }
         }
         if (message.fUid != 0L) {
-            val subscriber = object : BaseSubscriber<User>() {
-                override fun onNext(t: User) {
-                    tvNicknameView?.text = t.nickname
-                    ivAvatarView?.let { iv ->
-                        t.avatar?.let { avatar ->
-                            displayAvatar(iv, avatar)
-                        }
-                    }
+            msgVHOperator?.let {
+                val userInfo = it.syncGetSessionMemberInfo(message.fUid)
+                userInfo?.let { info ->
+                    renderUserInfo(info)
                 }
             }
-            IMCoreManager.userModule.queryUser(message.fUid)
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            disposable.add(subscriber)
+        }
+    }
+
+    open fun renderUserInfo(info: Pair<User, SessionMember?>) {
+        var nickname = info.first.nickname
+        info.second?.let {
+            if (!it.noteName.isNullOrBlank()) {
+                nickname = it.noteName!!
+            }
+        }
+        tvNicknameView?.text = nickname
+        ivAvatarView?.let { iv ->
+            info.first.avatar?.let { avatar ->
+                displayAvatar(iv, avatar)
+            }
         }
     }
 

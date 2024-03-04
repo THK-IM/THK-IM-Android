@@ -16,12 +16,15 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
+import com.thk.im.android.core.exception.UnknownException
 import com.thk.im.android.ui.fragment.adapter.IMMessageAdapter
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
+import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 
 class IMMessageLayout : RecyclerView, IMMsgVHOperator {
@@ -171,6 +174,17 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         }
     }
 
+    private fun scrollToRow(row: Int) {
+        scrollToPosition(row)
+        postDelayed({
+            msgAdapter.highlightFlashing(row, 6, this)
+        }, 500)
+    }
+
+    fun refreshMessageUserInfo() {
+        msgAdapter.updateUserInfo()
+    }
+
     fun insertMessages(messages: List<Message>) {
         msgAdapter.insertNews(messages)
     }
@@ -239,12 +253,6 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         }
     }
 
-    private fun scrollToRow(row: Int) {
-        scrollToPosition(row)
-        postDelayed({
-            msgAdapter.highlightFlashing(row, 6, this)
-        }, 500)
-    }
 
     override fun onMsgCellClick(message: Message, position: Int, view: View) {
         msgPreviewer?.previewMessage(message, position, view)
@@ -271,6 +279,10 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                 .subscribe(subscriber)
             disposables.add(subscriber)
         }
+    }
+
+    override fun onMsgReadStatusClick(message: Message) {
+        // TODO
     }
 
     override fun onMsgSenderLongClick(message: Message, pos: Int, it: View) {
@@ -314,7 +326,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     fun setSelectMode(selected: Boolean, message: Message?) {
-        (adapter as IMMessageAdapter).setSelectMode(selected, message, this)
+        (adapter as IMMessageAdapter).setSelectMode(selected, message)
     }
 
     override fun isSelectMode(): Boolean {
@@ -338,8 +350,22 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         msgSender?.addInputContent(text)
     }
 
+    override fun syncGetSessionMemberInfo(userId: Long): Pair<User, SessionMember?>? {
+        return msgSender?.syncGetSessionMemberInfo(userId)
+    }
+
+    override fun saveSessionMemberInfo(info: Pair<User, SessionMember?>) {
+        msgSender?.saveSessionMemberInfo(info)
+    }
+
+    override fun asyncGetSessionMemberInfo(userId: Long): Flowable<Pair<User, SessionMember?>> {
+        if (msgSender == null) {
+            return Flowable.error(UnknownException)
+        }
+        return msgSender!!.asyncGetSessionMemberInfo(userId)
+    }
+
     fun getSelectMessages(): Set<Message> {
         return (adapter as IMMessageAdapter).getSelectedMessages()
     }
-
 }

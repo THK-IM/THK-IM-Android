@@ -30,6 +30,10 @@ internal class IMSessionMemberDaoImp(private val roomDatabase: IMRoomDataBase) :
         return roomDatabase.sessionMemberDao().findBySessionId(sessionId)
     }
 
+    override fun findSessionMember(sessionId: Long, userId: Long): SessionMember? {
+        return roomDatabase.sessionMemberDao().findSessionMember(sessionId, userId)
+    }
+
     override fun findSessionMemberCount(sessionId: Long): Int {
         return roomDatabase.sessionMemberDao().findSessionMemberCount(sessionId)
     }

@@ -149,7 +149,7 @@ open class DefaultMessageModule : MessageModule {
                     }
                 }
             }
-            XEventBus.post(IMEvent.BatchMsgNew.value, sessionMessage.value)
+            XEventBus.post(IMEvent.BatchMsgNew.value, Pair(sessionMessage.key, sessionMessage.value))
             // 更新每个session的最后一条消息
             val lastMsg = IMCoreManager.getImDataBase().messageDao()
                 .findLastMessageBySessionId(sessionMessage.key)

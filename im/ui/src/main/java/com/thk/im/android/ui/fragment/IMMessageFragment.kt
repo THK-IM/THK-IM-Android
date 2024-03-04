@@ -188,12 +188,13 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
 
 
     private fun initEventBus() {
-        XEventBus.observe(this, IMEvent.BatchMsgNew.value, Observer<List<Message>> {
-            if (it.isNotEmpty()) {
-                if (it[0].sid == session!!.id) {
-                    binding.rcvMessage.insertMessages(it)
+        XEventBus.observe(this, IMEvent.BatchMsgNew.value, Observer<Pair<Long, List<Message>>> {
+            session?.let { s ->
+                if (it.first == s.id) {
+                    binding.rcvMessage.insertMessages(it.second)
                 }
             }
+
         })
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
             it?.let {

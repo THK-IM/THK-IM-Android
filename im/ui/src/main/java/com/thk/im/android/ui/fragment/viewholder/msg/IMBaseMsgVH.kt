@@ -151,13 +151,26 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         msgBodyContentView.setOnClickListener {
             msgVHOperator?.onMsgCellClick(message, pos, it)
         }
+
+        msgReplyContentView.setOnLongClickListener {
+            onLongClickContent(it)
+        }
+
         msgBodyContentView.setOnLongClickListener {
-            if (canSelect()) {
-                msgVHOperator?.onMsgCellLongClick(message, pos, it)
-                true
-            } else {
-                false
-            }
+            onLongClickContent(it)
+        }
+
+        msgContentView.setOnLongClickListener {
+            onLongClickContent(it)
+        }
+    }
+
+    private fun onLongClickContent(view: View): Boolean{
+        if (canSelect()) {
+            msgVHOperator?.onMsgCellLongClick(message, pos, view)
+            return true
+        } else {
+            return false
         }
     }
 

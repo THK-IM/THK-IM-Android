@@ -43,6 +43,7 @@
         android:id="@+id/ll_message_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="60dp"
         android:paddingVertical="10dp"
         android:paddingHorizontal="6dp"
         app:layout_constraintBottom_toBottomOf="parent"

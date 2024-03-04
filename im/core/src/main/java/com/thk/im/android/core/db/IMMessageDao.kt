@@ -63,6 +63,8 @@ interface IMMessageDao {
 
     fun findByMsgId(msgId: Long, sid: Long): Message?
 
+    fun findByMsgIds(msgIds: Set<Long>, sid: Long): List<Message>
+
     fun findOlderMessage(
         sId: Long,
         msgId: Long,

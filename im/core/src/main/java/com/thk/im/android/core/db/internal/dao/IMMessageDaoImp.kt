@@ -83,7 +83,6 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
                 for (m in messages) {
                     if (m.rMsgId != null && m.rMsgId == referMsg.msgId) {
                         m.referMsg = referMsg
-                        break
                     }
                 }
             }
@@ -102,6 +101,10 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
 
     override fun findByMsgId(msgId: Long, sid: Long): Message? {
         return roomDatabase.messageDao().findByMsgId(msgId, sid)
+    }
+
+    override fun findByMsgIds(msgIds: Set<Long>, sid: Long): List<Message> {
+        return roomDatabase.messageDao().findByMsgIds(msgIds, sid)
     }
 
     override fun findOlderMessage(

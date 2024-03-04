@@ -130,9 +130,27 @@ open class DefaultMessageModule : MessageModule {
             getMsgProcessor(m.type).received(m)
         }
 
-        // 更新每个session的最后一条消息
         for (sessionMessage in sessionMessages) {
+            val replyMsgIds = mutableSetOf<Long>()
+            for (msg in sessionMessage.value) {
+                msg.rMsgId?.let {
+                    replyMsgIds.add(it)
+                }
+            }
+            if (replyMsgIds.isNotEmpty()) {
+                val replyMessages = IMCoreManager.db.messageDao().findByMsgIds(replyMsgIds, sessionMessage.key)
+                for (msg in sessionMessage.value) {
+                    msg.rMsgId?.let {
+                        for (replyMessage in replyMessages) {
+                            if (replyMessage.msgId == it) {
+                                msg.referMsg = replyMessage
+                            }
+                        }
+                    }
+                }
+            }
             XEventBus.post(IMEvent.BatchMsgNew.value, sessionMessage.value)
+            // 更新每个session的最后一条消息
             val lastMsg = IMCoreManager.getImDataBase().messageDao()
                 .findLastMessageBySessionId(sessionMessage.key)
             lastMsg?.let {

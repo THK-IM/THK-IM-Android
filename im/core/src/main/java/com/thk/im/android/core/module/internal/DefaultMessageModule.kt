@@ -144,6 +144,7 @@ open class DefaultMessageModule : MessageModule {
                         for (replyMessage in replyMessages) {
                             if (replyMessage.msgId == it) {
                                 msg.referMsg = replyMessage
+                                break
                             }
                         }
                     }

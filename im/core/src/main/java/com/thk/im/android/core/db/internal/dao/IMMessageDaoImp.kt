@@ -79,10 +79,11 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
 
         if (referMsgIds.isNotEmpty()) {
             val referMessages = roomDatabase.messageDao().findByMsgIds(referMsgIds, sid)
-            for (referMsg in referMessages) {
-                for (m in messages) {
+            for (m in messages) {
+                for (referMsg in referMessages) {
                     if (m.rMsgId != null && m.rMsgId == referMsg.msgId) {
                         m.referMsg = referMsg
+                        break
                     }
                 }
             }

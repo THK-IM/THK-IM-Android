@@ -8,7 +8,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.view.IMsgView
+import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
 
@@ -66,7 +66,7 @@ abstract class IMBaseMessageIVProvider {
         return createViewHolder(lifecycleOwner, itemView, viewType)
     }
 
-    abstract fun replyMsgView(context: Context): IMsgView
+    abstract fun replyMsgView(context: Context): IMsgBodyView
 
     abstract fun createViewHolder(
         lifecycleOwner: LifecycleOwner,

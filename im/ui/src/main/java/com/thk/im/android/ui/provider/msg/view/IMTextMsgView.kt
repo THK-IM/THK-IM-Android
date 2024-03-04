@@ -17,11 +17,11 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgTextBinding
-import com.thk.im.android.ui.fragment.view.IMsgView
+import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.Flowable
 
-class IMTextMsgView : LinearLayout, IMsgView {
+class IMTextMsgView : LinearLayout, IMsgBodyView {
 
     private var binding: ViewMsgTextBinding
 

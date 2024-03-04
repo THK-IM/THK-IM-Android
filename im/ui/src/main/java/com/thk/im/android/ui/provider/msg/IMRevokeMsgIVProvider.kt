@@ -5,7 +5,7 @@ import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
-import com.thk.im.android.ui.fragment.view.IMsgView
+import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
@@ -31,7 +31,7 @@ class IMRevokeMsgIVProvider : IMBaseMessageIVProvider() {
         return 3 * messageType() + IMMsgPosType.Mid.value
     }
 
-    override fun replyMsgView(context: Context): IMsgView {
+    override fun replyMsgView(context: Context): IMsgBodyView {
         return IMRevokeMsgView(context)
     }
 

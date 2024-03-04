@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.MsgType
-import com.thk.im.android.ui.fragment.view.IMsgView
+import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMTimeLineMsgView
@@ -24,7 +24,7 @@ class IMTimeLineMsgIVProvider : IMBaseMessageIVProvider() {
         return false
     }
 
-    override fun replyMsgView(context: Context): IMsgView {
+    override fun replyMsgView(context: Context): IMsgBodyView {
         return IMTimeLineMsgView(context)
     }
 

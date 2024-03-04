@@ -17,12 +17,12 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgVideoBinding
-import com.thk.im.android.ui.fragment.view.IMsgView
+import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
-class IMVideoMsgView : LinearLayout, IMsgView {
+class IMVideoMsgView : LinearLayout, IMsgBodyView {
 
     private var binding: ViewMsgVideoBinding
 

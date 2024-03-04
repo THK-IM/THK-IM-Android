@@ -24,8 +24,8 @@ import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.view.IMReadStatusView
 import com.thk.im.android.ui.fragment.view.IMReplyMsgContainerView
-import com.thk.im.android.ui.fragment.view.IMsgView
-import com.thk.im.android.ui.fragment.viewholder.BaseVH
+import com.thk.im.android.ui.fragment.view.IMsgBodyView
+import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
@@ -34,7 +34,7 @@ import io.reactivex.disposables.CompositeDisposable
 import java.lang.Integer.max
 
 abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val viewType: Int) :
-    BaseVH(liftOwner, itemView) {
+    IMBaseVH(liftOwner, itemView) {
 
     open lateinit var message: Message
     open lateinit var session: Session
@@ -55,7 +55,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         itemView.findViewById(R.id.msg_reply_content)
 
 
-    abstract fun msgBodyView(): IMsgView
+    abstract fun msgBodyView(): IMsgBodyView
 
     /**
      * ViewHolder 绑定数据触发设置界面ui
@@ -113,7 +113,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         }
 
         msgBodyContentView.children.forEach {
-            if (it is IMsgView) {
+            if (it is IMsgBodyView) {
                 msgBodyContentView.removeView(it)
             }
         }

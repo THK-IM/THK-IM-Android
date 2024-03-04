@@ -13,12 +13,12 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.module.GroupModule
 import com.thk.im.android.core.module.UserModule
 import com.thk.im.android.ui.R
-import com.thk.im.android.ui.fragment.viewholder.BaseVH
+import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 
 
 abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
-    BaseVH(liftOwner, itemView) {
+    IMBaseVH(liftOwner, itemView) {
 
     val nickView: AppCompatTextView = itemView.findViewById(R.id.tv_nickname)
     val avatarView: AppCompatImageView = itemView.findViewById(R.id.iv_avatar)

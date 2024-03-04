@@ -12,12 +12,12 @@ import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.ui.fragment.viewholder.BaseVH
+import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
 import com.thk.im.android.ui.manager.IMUIManager
 import io.reactivex.disposables.CompositeDisposable
 
 class GroupVH(liftOwner: LifecycleOwner, itemView: View) :
-    BaseVH(liftOwner, itemView) {
+    IMBaseVH(liftOwner, itemView) {
     private val disposable = CompositeDisposable()
     private val avatarView: AppCompatImageView = itemView.findViewById(R.id.iv_avatar)
     private val nickNameView: AppCompatTextView = itemView.findViewById(R.id.tv_name)

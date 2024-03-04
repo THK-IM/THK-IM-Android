@@ -4,7 +4,7 @@ import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.ui.fragment.view.IMsgView
+import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import com.thk.im.android.ui.provider.msg.view.IMVideoMsgView
@@ -18,7 +18,7 @@ class IMVideoMsgVHIM(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         view = IMVideoMsgView(itemView.context)
     }
 
-    override fun msgBodyView(): IMsgView {
+    override fun msgBodyView(): IMsgBodyView {
         return view
     }
 

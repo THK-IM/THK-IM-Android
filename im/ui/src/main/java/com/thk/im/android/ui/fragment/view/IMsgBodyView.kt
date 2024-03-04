@@ -5,7 +5,7 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
-interface IMsgView {
+interface IMsgBodyView {
 
     fun setMessage(
         message: Message,

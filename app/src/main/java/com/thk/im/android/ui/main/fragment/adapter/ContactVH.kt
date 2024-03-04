@@ -12,13 +12,13 @@ import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Contact
 import com.thk.im.android.core.db.entity.User
-import com.thk.im.android.ui.fragment.viewholder.BaseVH
+import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
 import io.reactivex.disposables.CompositeDisposable
 import java.lang.StringBuilder
 
 
 class ContactVH(liftOwner: LifecycleOwner, itemView: View) :
-    BaseVH(liftOwner, itemView) {
+    IMBaseVH(liftOwner, itemView) {
 
     private val disposable = CompositeDisposable()
     private val avatarView: AppCompatImageView = itemView.findViewById(R.id.iv_avatar)

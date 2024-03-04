@@ -3,10 +3,10 @@ package com.thk.im.preview.viewholder
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.db.entity.Message
-import com.thk.im.android.ui.fragment.viewholder.BaseVH
+import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
 
 open class PreviewVH(liftOwner: LifecycleOwner, itemView: View) :
-    BaseVH(liftOwner, itemView) {
+    IMBaseVH(liftOwner, itemView) {
 
     protected var message: Message? = null
     open fun bindMessage(message: Message) {

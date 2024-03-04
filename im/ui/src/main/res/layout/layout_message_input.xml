@@ -104,10 +104,10 @@
             android:id="@+id/et_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="40dp"
             android:layout_toLeftOf="@id/iv_emo"
             android:layout_toRightOf="@id/iv_audio_record"
             android:background="@drawable/bg_msg_input"
-            android:gravity="center_vertical"
             android:hint="@string/send_message_ddd"
             android:inputType="textMultiLine"
             android:maxLines="8"
@@ -120,16 +120,14 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bt_record_voice"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_toLeftOf="@id/iv_emo"
             android:layout_toRightOf="@id/iv_audio_record"
             android:background="@drawable/bg_msg_input"
-            android:gravity="center"
             android:padding="8dp"
             android:text="@string/tip_for_voice_forward"
             android:textColor="@color/font_main"
             android:textSize="16sp"
-            android:layout_marginLeft="6dp"
             android:visibility="gone" />
     </RelativeLayout>
 

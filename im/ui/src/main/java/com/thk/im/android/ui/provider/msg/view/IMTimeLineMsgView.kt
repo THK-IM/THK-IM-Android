@@ -51,6 +51,6 @@ class IMTimeLineMsgView : LinearLayout, IMsgBodyView {
             binding.tvMsgContent.setTextColor(Color.WHITE)
         }
         binding.tvMsgContent.text =
-            DateUtils.timeToMsgTime(message.cTime, IMCoreManager.commonModule.getSeverTime())
+            DateUtils.timeToMsgTime(message.cTime, IMCoreManager.severTime)
     }
 }

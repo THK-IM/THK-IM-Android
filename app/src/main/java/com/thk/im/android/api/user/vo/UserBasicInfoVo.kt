@@ -21,7 +21,7 @@ data class UserBasicInfoVo(
 ) : Parcelable {
 
     fun toUser(): User {
-        val now = IMCoreManager.commonModule.getSeverTime()
+        val now = IMCoreManager.severTime
         return User(id, displayId, nickname?:"", avatar, sex, null, null, now, now)
     }
 

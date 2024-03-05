@@ -108,7 +108,7 @@ abstract class IMBaseMsgProcessor {
         val sendStatus = MsgSendStatus.Init.value
         val type = this.messageType()
         val fUId = IMCoreManager.uId
-        val cTime = IMCoreManager.commonModule.getSeverTime()
+        val cTime = IMCoreManager.severTime
         // tips：msgId初始值给-id,发送成功后更新为服务端返回的msgId
         return Message(
             id,
@@ -171,7 +171,7 @@ abstract class IMBaseMsgProcessor {
             override fun onError(t: Throwable?) {
                 super.onError(t)
                 LLog.e("Message Send err $t")
-                originMsg.mTime = IMCoreManager.commonModule.getSeverTime()
+                originMsg.mTime = IMCoreManager.severTime
                 originMsg.sendStatus = MsgSendStatus.SendFailed.value
                 insertOrUpdateDb(originMsg)
                 callback?.onResult(originMsg, Exception(t))
@@ -217,7 +217,7 @@ abstract class IMBaseMsgProcessor {
             // 消息发送到服务器
             it.sendStatus = MsgSendStatus.Sending.value
             if (resend) {
-                it.mTime = IMCoreManager.commonModule.getSeverTime()
+                it.mTime = IMCoreManager.severTime
                 insertOrUpdateDb(
                     msg,
                     notify = true,
@@ -250,7 +250,7 @@ abstract class IMBaseMsgProcessor {
         forwardMessage.oprStatus =
             MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
         forwardMessage.sendStatus = MsgSendStatus.Init.value
-        forwardMessage.cTime = IMCoreManager.commonModule.getSeverTime()
+        forwardMessage.cTime = IMCoreManager.severTime
         forwardMessage.mTime = forwardMessage.cTime
 
         val subscriber = object : BaseSubscriber<Message>() {
@@ -284,7 +284,7 @@ abstract class IMBaseMsgProcessor {
      * 【插入或更新消息状态】
      */
     open fun insertOrUpdateDb(msg: Message, notify: Boolean = true, notifySession: Boolean = true) {
-        msg.mTime = IMCoreManager.commonModule.getSeverTime()
+        msg.mTime = IMCoreManager.severTime
         IMCoreManager.getImDataBase().messageDao().insertOrReplace(mutableListOf(msg))
         if (notify) {
             if (msg.rMsgId != null && msg.referMsg == null) {

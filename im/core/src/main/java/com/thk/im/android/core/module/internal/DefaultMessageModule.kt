@@ -418,7 +418,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     override fun generateNewMsgId(): Long {
-        val current = IMCoreManager.commonModule.getSeverTime()
+        val current = IMCoreManager.severTime
         try {
             idLock.tryLock(1, TimeUnit.SECONDS)
             if (current == lastTimestamp) {

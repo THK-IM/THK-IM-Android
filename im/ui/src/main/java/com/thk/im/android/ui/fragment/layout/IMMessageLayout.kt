@@ -134,7 +134,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         if (!hasMore || isLoading) return
         val messages = getMessages()
         val endTime = if (messages.isEmpty()) {
-            IMCoreManager.commonModule.getSeverTime()
+            IMCoreManager.severTime
         } else {
             messages.last().cTime
         }
@@ -220,7 +220,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         } else {
             val messages = getMessages()
             val endTime = if (messages.isEmpty()) {
-                IMCoreManager.commonModule.getSeverTime()
+                IMCoreManager.severTime
             } else {
                 messages.last().cTime
             }

@@ -64,7 +64,7 @@ abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
             if (this.session.topTimestamp > 0) {
                 this.session.topTimestamp = 0
             } else {
-                this.session.topTimestamp = IMCoreManager.commonModule.getSeverTime()
+                this.session.topTimestamp = IMCoreManager.severTime
             }
             this.sessionVHOperator?.updateSession(this.session)
         }

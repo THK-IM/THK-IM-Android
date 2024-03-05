@@ -41,6 +41,9 @@ object IMCoreManager {
     lateinit var storageModule: StorageModule
 
     var uId: Long = 0L
+    val severTime: Long
+        get() = commonModule.getSeverTime()
+
     fun init(app: Application, debug: Boolean = true) {
         this.app = app
         this.debug = debug

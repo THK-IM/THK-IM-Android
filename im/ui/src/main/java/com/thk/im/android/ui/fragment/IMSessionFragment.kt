@@ -124,7 +124,7 @@ class IMSessionFragment : Fragment(), IMSessionVHOperator {
                 isLoading = false
             }
         }
-        var current = IMCoreManager.commonModule.getSeverTime()
+        var current = IMCoreManager.severTime
         if (IMSessionAdapter.getSessionList().isNotEmpty()) {
             current = IMSessionAdapter.getSessionList().last().mTime
         }

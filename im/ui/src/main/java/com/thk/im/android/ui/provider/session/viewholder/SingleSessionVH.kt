@@ -31,7 +31,7 @@ class SingleSessionVH(
         super.onViewBind(session, sessionVHOperator)
         lastMsgView.text = session.lastMsg
         lastTimeView.text =
-            DateUtils.timeToMsgTime(session.mTime, IMCoreManager.commonModule.getSeverTime())
+            DateUtils.timeToMsgTime(session.mTime, IMCoreManager.severTime)
         if (session.unReadCount == 0) {
             unReadCountView.visibility = View.GONE
         } else {

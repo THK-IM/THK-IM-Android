@@ -6,6 +6,7 @@ import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.exception.DatabaseException
@@ -17,6 +18,10 @@ import io.reactivex.Flowable
 class IMReeditMessageProcessor : IMBaseMsgProcessor() {
     override fun messageType(): Int {
         return MsgType.Reedit.value
+    }
+
+    override fun needReprocess(msg: Message): Boolean {
+        return true
     }
 
     override fun send(msg: Message, resend: Boolean, callback: IMSendMsgCallback?) {
@@ -72,6 +77,7 @@ class IMReeditMessageProcessor : IMBaseMsgProcessor() {
         }
         val reeditMsgData = Gson().fromJson(msg.content!!, IMReeditMsgData::class.java) ?: return
         val success = updateOriginMsg(reeditMsgData)
+        LLog.d("IMReeditMessageProcessor updateOriginMsg $success")
         if (success) {
             if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
                 IMCoreManager.messageModule.ackMessageToCache(msg)

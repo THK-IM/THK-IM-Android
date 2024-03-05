@@ -327,19 +327,15 @@ class IMInputLayout : ConstraintLayout {
         val atSpans = binding.etMessage.text.getSpans<ForegroundColorSpan>()
         val selectionStart = binding.etMessage.selectionStart
         val selectionEnd = binding.etMessage.selectionEnd
-        var deleted = false
         for (span in atSpans) {
             val spanStart = binding.etMessage.text.getSpanStart(span)
             val spanEnd = binding.etMessage.text.getSpanEnd(span)
             LLog.d("$spanStart $spanEnd $selectionStart $selectionEnd")
             if (selectionStart + 1 in spanStart..spanEnd || selectionEnd - 1 in spanStart..spanEnd) {
-                deleted = true
                 binding.etMessage.text.removeSpan(span)
                 binding.etMessage.text.delete(spanStart, spanEnd)
+                return
             }
-        }
-        if (deleted) {
-            return
         }
         val index: Int = binding.etMessage.selectionStart
         if (!binding.etMessage.text.isNullOrEmpty()) {

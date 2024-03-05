@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
@@ -57,7 +58,8 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         if (!message.atUsers.isNullOrBlank()) {
             content = replaceIdToNickname(content, message.atUsers!!)
         }
-        render(content)
+        val updated = message.oprStatus.and(MsgOperateStatus.Update.value) > 0
+        render(content, updated)
     }
 
     private fun replaceIdToNickname(content: String, atUsers: String): String {
@@ -75,20 +77,27 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         return this
     }
 
-    private fun render(content: String) {
+    private fun render(content: String, updated: Boolean) {
         val regex = AtStringUtils.atRegex
         val sequence = regex.findAll(content)
-        val spannable = SpannableStringBuilder(content)
+        val contentSpannable = SpannableStringBuilder(content)
         sequence.forEach { matchResult ->
             val range = matchResult.range
             val atSpan = ForegroundColorSpan(Color.parseColor("#1390f4"))
-            spannable.setSpan(
+            contentSpannable.setSpan(
                 atSpan,
                 range.first - 1,
                 range.last + 1,
                 Spanned.SPAN_EXCLUSIVE_INCLUSIVE
             )
         }
-        binding.tvMsgContent.text = spannable
+        if (updated) {
+            val editStr = "已编辑"
+            val editSpan = ForegroundColorSpan(Color.parseColor("#999999"))
+            val editSpannable = SpannableStringBuilder(editStr)
+            editSpannable.setSpan(editSpan, 0, editStr.length, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
+            contentSpannable.append(editSpannable)
+        }
+        binding.tvMsgContent.text = contentSpannable
     }
 }

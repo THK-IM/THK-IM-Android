@@ -89,8 +89,8 @@ class IMReeditMessageProcessor : IMBaseMsgProcessor() {
         val originMsg = IMCoreManager.db.messageDao().findByMsgId(
             reeditMsgData.originId, reeditMsgData.sessionId
         ) ?: return false
-        originMsg.content = reeditMsgData.edit + "[已编辑]"
-        originMsg.data = null
+        originMsg.content = reeditMsgData.edit
+        originMsg.oprStatus = originMsg.oprStatus.or(MsgOperateStatus.Update.value)
         insertOrUpdateDb(originMsg)
         return true
     }

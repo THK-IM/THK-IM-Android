@@ -544,7 +544,7 @@ open class DefaultMessageModule : MessageModule {
         val dispose = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {
                 val unReadCount = messageDao.getUnReadCount(t.id)
-                if (t.mTime <= msg.mTime || t.unReadCount != unReadCount) {
+                if (t.mTime < msg.mTime || t.unReadCount != unReadCount) {
                     val processor = getMsgProcessor(msg.type)
                     var statusText = ""
                     if (msg.sendStatus == MsgSendStatus.Sending.value ||
@@ -585,6 +585,7 @@ open class DefaultMessageModule : MessageModule {
         if (session.status.and(SessionStatus.Silence.value) > 0) {
             return
         }
+        LLog.d("notifyNewMessage ${message.type}")
         AppUtils.instance().notifyNewMessage()
     }
 

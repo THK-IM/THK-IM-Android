@@ -92,7 +92,7 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
             )
         }
         if (updated) {
-            val editStr = "已编辑"
+            val editStr = "[已编辑]"
             val editSpan = ForegroundColorSpan(Color.parseColor("#999999"))
             val editSpannable = SpannableStringBuilder(editStr)
             editSpannable.setSpan(editSpan, 0, editStr.length, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)

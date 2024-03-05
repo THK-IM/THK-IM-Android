@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.provider.msg.proccessor
 
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.User
@@ -34,29 +35,12 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
                     return@replaceAtUIdsToNickname ""
                 }
             }
+            if (msg.oprStatus.and(MsgOperateStatus.Update.value) > 0) {
+                body += "[已编辑]"
+            }
             return super.getSessionDesc(msg) + body
         } else {
             return super.getSessionDesc(msg)
         }
-//        return if (msg.content != null) {
-//                val body = AtStringUtils.atRegex.replace(msg.content!!) { result ->
-//                    try {
-//                        val id = result.value.toLong()
-//                        val user = IMCoreManager.db.userDao().findById(id)
-//                        if (user == null) {
-//                            return@replace ""
-//                        } else {
-//                            return@replace user.nickname
-//                        }
-//                    } catch (e: Exception) {
-//                        e.printStackTrace()
-//                        return@replace ""
-//                    }
-//                }
-//                return super.getSessionDesc(msg) + body
-//            } else {
-//                return super.getSessionDesc(msg) + ""
-//            }
-//        }
     }
 }

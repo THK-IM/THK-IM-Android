@@ -35,10 +35,11 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
                     return@replaceAtUIdsToNickname ""
                 }
             }
+            var editFlag = ""
             if (msg.oprStatus.and(MsgOperateStatus.Update.value) > 0) {
-                body += "[已编辑]"
+                editFlag = "[已编辑]"
             }
-            return super.getSessionDesc(msg) + body
+            return super.getSessionDesc(msg) + editFlag + body
         } else {
             return super.getSessionDesc(msg)
         }

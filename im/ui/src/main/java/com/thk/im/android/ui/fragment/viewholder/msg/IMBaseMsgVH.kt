@@ -15,7 +15,6 @@ import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
-import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Message
@@ -219,13 +218,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     }
 
     open fun renderUserInfo(info: Pair<User, SessionMember?>) {
-        var nickname = info.first.nickname
-        info.second?.let {
-            if (!it.noteName.isNullOrBlank()) {
-                nickname = it.noteName!!
-            }
-        }
-        tvNicknameView?.text = nickname
+        tvNicknameView?.text = IMUIManager.nicknameForSessionMember(info.first, info.second)
         ivAvatarView?.let { iv ->
             info.first.avatar?.let { avatar ->
                 displayAvatar(iv, avatar)

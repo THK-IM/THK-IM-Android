@@ -43,6 +43,7 @@ import com.thk.im.android.ui.protocol.AudioCallback
 import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
+import com.thk.im.android.ui.utils.AtStringUtils
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 import kotlin.math.abs
@@ -79,35 +80,7 @@ class IMInputLayout : ConstraintLayout {
         binding.etMessage.isFocusableInTouchMode = true
         binding.etMessage.requestFocus()
         binding.ivSendMsg.setOnClickListener {
-            binding.etMessage.text?.let {
-                val data = it.toString()
-                val regex = "(?<=@)(.+?)(?=\\s)".toRegex()
-                var atUsers = ""
-                val body = regex.replace(data) { result ->
-                    var replacement = result.value
-                    for ((k, v) in atMap) {
-                        if (v == result.value) {
-                            replacement = k
-                            if (atUsers.isNotEmpty()) {
-                                atUsers += "#"
-                            }
-                            atUsers += k
-                        }
-                    }
-                    replacement
-                }
-                if (reeditMsg != null) {
-                    val msg = IMReeditMsgData(reeditMsg!!.sid, reeditMsg!!.msgId, body)
-                    msgSender?.sendMessage(MsgType.Reedit.value, msg, null, null)
-                    reeditMsg = null
-                } else {
-                    msgSender?.sendMessage(MsgType.Text.value, body, data, atUsers.ifEmpty { null })
-                }
-                atMap.clear()
-                binding.etMessage.text.clearSpans()
-                binding.etMessage.text.clear()
-                binding.etMessage.text = null
-            }
+            sendInputContent()
         }
 
         binding.etMessage.setOnKeyListener(object : View.OnKeyListener {
@@ -285,6 +258,32 @@ class IMInputLayout : ConstraintLayout {
         this.msgPreviewer = previewer
     }
 
+    private fun sendInputContent() {
+        binding.etMessage.text?.let {
+            val text = it.toString()
+            val (body, atUIds) = AtStringUtils.replaceAtNickNamesToUIds(text) { nickname ->
+                for ((k, v) in atMap) {
+                    if (v == nickname) {
+                        return@replaceAtNickNamesToUIds k.toLongOrNull()
+                            ?: return@replaceAtNickNamesToUIds 0L
+                    }
+                }
+                return@replaceAtNickNamesToUIds 0L
+            }
+            if (reeditMsg != null) {
+                val msg = IMReeditMsgData(reeditMsg!!.sid, reeditMsg!!.msgId, body)
+                msgSender?.sendMessage(MsgType.Reedit.value, msg, null, null)
+                reeditMsg = null
+            } else {
+                msgSender?.sendMessage(MsgType.Text.value, body, null, atUIds)
+            }
+            atMap.clear()
+            binding.etMessage.text.clearSpans()
+            binding.etMessage.text.clear()
+            binding.etMessage.text = null
+        }
+    }
+
     fun openKeyboard(): Boolean {
         val imm = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         binding.etMessage.requestFocus()
@@ -312,12 +311,10 @@ class IMInputLayout : ConstraintLayout {
     }
 
     fun addInputContent(text: String) {
-        if (binding.etMessage.text != null) {
-            val index: Int = binding.etMessage.selectionStart
-            binding.etMessage.text!!.insert(index, text)
-        } else {
-            binding.etMessage.setText(text.toCharArray(), 0, text.toCharArray().size)
-        }
+        val content = binding.etMessage.text
+        val index: Int = binding.etMessage.selectionStart
+        content.insert(index, text)
+        this.renderInputText(content)
     }
 
     fun getEditText(): EmojiEditText {
@@ -456,28 +453,38 @@ class IMInputLayout : ConstraintLayout {
         msgSender?.openAtPopupView()
     }
 
+    private fun addAtMap(user: User, sessionMember: SessionMember?) {
+        atMap["${user.id}"] = IMUIManager.nicknameForSessionMember(user, sessionMember)
+    }
+
+    private fun atNickname(id: Long): String? {
+        return atMap["$id"]
+    }
+
     fun addAtSessionMember(user: User, sessionMember: SessionMember?) {
-        atMap["${user.id}"] = user.nickname
-        LLog.d("insertAtSessionMember $sessionMember, $user")
+        this.addAtMap(user, sessionMember)
+        val nickname = this.atNickname(user.id) ?: return
         val selectionStart = binding.etMessage.selectionStart
         val content = binding.etMessage.text
         if (selectionStart > 0 && content[selectionStart - 1] == '@') {
-            binding.etMessage.text.insert(selectionStart, "${user.nickname} ")
-            val atSpan = ForegroundColorSpan(Color.parseColor("#1b7ae8"))
-            binding.etMessage.text.setSpan(
-                atSpan,
-                selectionStart - 1,
-                selectionStart + user.nickname.length,
-                Spanned.SPAN_INCLUSIVE_INCLUSIVE
-            )
+            content.insert(selectionStart, "$nickname ")
         } else {
-            binding.etMessage.text.insert(selectionStart, "@${user.nickname} ")
-            val atSpan = ForegroundColorSpan(Color.parseColor("#1b7ae8"))
+            content.insert(selectionStart, "@$nickname ")
+        }
+        this.renderInputText(content)
+    }
+
+    private fun renderInputText(content: Editable) {
+        val regex = AtStringUtils.atRegex
+        val sequence = regex.findAll(content)
+        sequence.forEach { matchResult ->
+            val range = matchResult.range
+            val atSpan = ForegroundColorSpan(Color.parseColor("#1390f4"))
             binding.etMessage.text.setSpan(
                 atSpan,
-                selectionStart,
-                selectionStart + user.nickname.length + 1,
-                Spanned.SPAN_INCLUSIVE_INCLUSIVE
+                range.first - 1,
+                range.last + 1,
+                Spanned.SPAN_EXCLUSIVE_INCLUSIVE
             )
         }
     }
@@ -531,14 +538,27 @@ class IMInputLayout : ConstraintLayout {
 
     fun setReeditMessage(message: Message) {
         this.reeditMsg = message
-        message.content?.let {
-            addInputContent(it)
+        if (message.content != null) {
+            var content = message.content!!
+            if (message.atUsers != null) {
+                content = AtStringUtils.replaceAtUIdsToNickname(content, message.atUsers!!) { id ->
+                    val member = msgSender?.syncGetSessionMemberInfo(id)
+                    if (member != null) {
+                        addAtMap(member.first, member.second)
+                        return@replaceAtUIdsToNickname atNickname(id) ?: ""
+                    }
+                    return@replaceAtUIdsToNickname ""
+                }
+            }
+            addInputContent(content)
+
             msgSender?.let { sender ->
                 if (!sender.isKeyboardShowing()) {
                     sender.openKeyboard()
                 }
             }
         }
+
     }
 
 }

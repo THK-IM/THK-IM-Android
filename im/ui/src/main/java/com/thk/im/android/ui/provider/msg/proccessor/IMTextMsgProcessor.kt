@@ -3,7 +3,9 @@ package com.thk.im.android.ui.provider.msg.proccessor
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
+import com.thk.im.android.ui.utils.AtStringUtils
 
 
 class IMTextMsgProcessor : IMBaseMsgProcessor() {
@@ -13,29 +15,48 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
     }
 
     override fun getSessionDesc(msg: Message): String {
-        return if (msg.data != null) {
-            super.getSessionDesc(msg) + msg.data!!
-        } else {
-            if (msg.content != null) {
-                val regex = "(?<=@)(.+?)(?=\\s)".toRegex()
-                val body = regex.replace(msg.content!!) { result ->
-                    try {
-                        val id = result.value.toLong()
-                        val user = IMCoreManager.db.userDao().findById(id)
-                        if (user == null) {
-                            return@replace ""
-                        } else {
-                            return@replace user.nickname
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        return@replace ""
+        return if (msg.content != null) {
+            var body = msg.content
+            if (!msg.atUsers.isNullOrBlank()) {
+                body = AtStringUtils.replaceAtUIdsToNickname(msg.content!!, msg.atUsers!!) { id ->
+                    if (id == -1L) {
+                        return@replaceAtUIdsToNickname User.all.nickname
                     }
+                    val sessionMember =
+                        IMCoreManager.db.sessionMemberDao().findSessionMember(msg.sid, id)
+                    if (sessionMember?.noteName != null && sessionMember.noteName!!.isNotEmpty()) {
+                        return@replaceAtUIdsToNickname sessionMember.noteName!!
+                    }
+                    val user = IMCoreManager.db.userDao().findById(id)
+                    if (user != null) {
+                        return@replaceAtUIdsToNickname user.nickname
+                    }
+                    return@replaceAtUIdsToNickname ""
                 }
-                return super.getSessionDesc(msg) + body
-            } else {
-                return super.getSessionDesc(msg) + ""
             }
+            return super.getSessionDesc(msg) + body
+        } else {
+            return super.getSessionDesc(msg)
         }
+//        return if (msg.content != null) {
+//                val body = AtStringUtils.atRegex.replace(msg.content!!) { result ->
+//                    try {
+//                        val id = result.value.toLong()
+//                        val user = IMCoreManager.db.userDao().findById(id)
+//                        if (user == null) {
+//                            return@replace ""
+//                        } else {
+//                            return@replace user.nickname
+//                        }
+//                    } catch (e: Exception) {
+//                        e.printStackTrace()
+//                        return@replace ""
+//                    }
+//                }
+//                return super.getSessionDesc(msg) + body
+//            } else {
+//                return super.getSessionDesc(msg) + ""
+//            }
+//        }
     }
 }

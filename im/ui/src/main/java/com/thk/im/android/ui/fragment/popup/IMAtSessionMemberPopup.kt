@@ -15,6 +15,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.adapter.IMOnSessionMemberClick
 import com.thk.im.android.ui.fragment.adapter.IMSessionMemberAdapter
 import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
+import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 
 class IMAtSessionMemberPopup constructor(
@@ -40,9 +41,9 @@ class IMAtSessionMemberPopup constructor(
         rcvSessionMember.layoutManager = LinearLayoutManager(context)
         sessionMemberAdapter = IMSessionMemberAdapter()
         sessionMemberAdapter.onSessionMemberClick = object : IMOnSessionMemberClick {
-            override fun onSessionMemberClick(sessionMember: SessionMember, user: User) {
+            override fun onSessionMemberClick(user: User, sessionMember: SessionMember?) {
                 dismiss()
-                sessionMemberAtDelegate.onSessionMemberAt(sessionMember, user)
+                sessionMemberAtDelegate.onSessionMemberAt(user, sessionMember)
             }
         }
         rcvSessionMember.adapter = sessionMemberAdapter
@@ -50,22 +51,52 @@ class IMAtSessionMemberPopup constructor(
     }
 
     private fun initData() {
-        val subscriber = object : BaseSubscriber<List<SessionMember>>() {
-            override fun onNext(t: List<SessionMember>?) {
+        fetchSessionMembers()
+    }
+
+    private fun fetchSessionMembers() {
+        val subscriber = object : BaseSubscriber<Map<Long, Pair<User, SessionMember?>>>() {
+            override fun onNext(t: Map<Long, Pair<User, SessionMember?>>?) {
                 t?.let {
-                    sessionMemberAdapter.setData(it)
+                    updateSessionMember(it)
                 }
+                compositeDisposable.remove(this)
             }
 
-            override fun onComplete() {
-                super.onComplete()
+            override fun onError(t: Throwable?) {
+                super.onError(t)
                 compositeDisposable.remove(this)
             }
         }
-        IMCoreManager.messageModule.querySessionMembers(session.id)
-            .compose(RxTransform.flowableToMain())
+        IMCoreManager.messageModule.querySessionMembers(session!!.id)
+            .flatMap { members ->
+                val uIds = mutableSetOf<Long>()
+                for (m in members) {
+                    uIds.add(m.userId)
+                }
+                return@flatMap IMCoreManager.userModule.queryUsers(uIds).flatMap { userMap ->
+                    val memberMap = mutableMapOf<Long, Pair<User, SessionMember?>>()
+                    for ((k, v) in userMap) {
+                        for (m in members) {
+                            if (m.userId == k) {
+                                val pair = Pair(v, m)
+                                memberMap[k] = pair
+                                break
+                            }
+                        }
+                    }
+                    return@flatMap Flowable.just(memberMap)
+                }
+            }.compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         compositeDisposable.add(subscriber)
+    }
+
+    private fun updateSessionMember(it: Map<Long, Pair<User, SessionMember?>>) {
+        val members = mutableListOf<Pair<User, SessionMember?>>()
+        members.addAll(it.values)
+        members.add(Pair(User.all, null))
+        sessionMemberAdapter.setData(members)
     }
 
     override fun onDestroy() {

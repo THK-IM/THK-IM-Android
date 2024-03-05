@@ -4,5 +4,5 @@ import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 
 interface IMOnSessionMemberClick {
-    fun onSessionMemberClick(sessionMember: SessionMember, user: User)
+    fun onSessionMemberClick(user: User, sessionMember: SessionMember?)
 }

@@ -566,7 +566,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         return binding.llInputLayout.closeKeyboard()
     }
 
-    override fun onSessionMemberAt(sessionMember: SessionMember, user: User) {
+    override fun onSessionMemberAt(user: User, sessionMember: SessionMember?) {
         binding.llInputLayout.addAtSessionMember(user, sessionMember)
     }
 
@@ -612,6 +612,9 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
     }
 
     override fun syncGetSessionMemberInfo(userId: Long): Pair<User, SessionMember?>? {
+        if (userId == -1L) {
+            return Pair(User.all, null)
+        }
         return memberMap[userId]
     }
 

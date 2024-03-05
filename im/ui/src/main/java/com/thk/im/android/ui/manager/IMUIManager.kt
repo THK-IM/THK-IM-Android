@@ -8,9 +8,11 @@ import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.base.utils.IMKeyboardUtils
 import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.SessionMember
+import com.thk.im.android.core.db.entity.User
+import com.thk.im.android.ui.protocol.IMBaseEmojiFragmentProvider
 import com.thk.im.android.ui.protocol.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
-import com.thk.im.android.ui.protocol.IMBaseEmojiFragmentProvider
 import com.thk.im.android.ui.protocol.IMBaseSessionIVProvider
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.IMPageRouter
@@ -137,6 +139,16 @@ object IMUIManager {
         registerMsgOperator(IMMsgReplyOperator())
         registerMsgOperator(IMMsgMultiSelectOperator())
         registerMsgOperator(IMMsgEditOperator())
+    }
+
+    fun nicknameForSessionMember(user: User, sessionMember: SessionMember?): String {
+        var nickname = user.nickname
+        sessionMember?.let {
+            if (!it.noteName.isNullOrBlank()) {
+                nickname = it.noteName!!
+            }
+        }
+        return nickname
     }
 
 }

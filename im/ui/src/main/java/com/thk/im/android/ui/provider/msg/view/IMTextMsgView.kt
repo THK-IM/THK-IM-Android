@@ -9,21 +9,21 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgTextBinding
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
-import io.reactivex.Flowable
+import com.thk.im.android.ui.utils.AtStringUtils
+import java.lang.ref.WeakReference
 
 class IMTextMsgView : LinearLayout, IMsgBodyView {
 
     private var binding: ViewMsgTextBinding
+
+    private var delegate: WeakReference<IMMsgVHOperator>? = null
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -45,6 +45,7 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         delegate: IMMsgVHOperator?,
         isReply: Boolean
     ) {
+        this.delegate = WeakReference(delegate)
         if (isReply) {
             binding.tvMsgContent.textSize = 12.0f
             binding.tvMsgContent.setTextColor(Color.parseColor("#ff999999"))
@@ -52,19 +53,21 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
             binding.tvMsgContent.textSize = 16.0f
             binding.tvMsgContent.setTextColor(Color.parseColor("#333333"))
         }
-        if (message.data != null) {
-            renderMsg(message.data!!)
-            return
+        var content = message.content ?: return
+        if (!message.atUsers.isNullOrBlank()) {
+            content = replaceIdToNickname(content, message.atUsers!!)
         }
-        if (message.atUsers.isNullOrBlank()) {
-            binding.tvMsgContent.text = message.content
-        } else {
-            val atUsers = message.atUsers!!.split("#")
-            if (atUsers.isEmpty()) {
-                binding.tvMsgContent.text = message.content
-            } else {
-                requestAtUsersInfo(message, atUsers)
-            }
+        render(content)
+    }
+
+    private fun replaceIdToNickname(content: String, atUsers: String): String {
+        return AtStringUtils.replaceAtUIdsToNickname(content, atUsers) { id ->
+            val opr = delegate?.get() ?: return@replaceAtUIdsToNickname ""
+            val info = opr.syncGetSessionMemberInfo(id) ?: return@replaceAtUIdsToNickname ""
+            return@replaceAtUIdsToNickname IMUIManager.nicknameForSessionMember(
+                info.first,
+                info.second
+            )
         }
     }
 
@@ -72,50 +75,9 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         return this
     }
 
-    private fun requestAtUsersInfo(message: Message, atUsers: List<String>) {
-        val uIds = mutableSetOf<Long>()
-        try {
-            for (atUser in atUsers) {
-                uIds.add(atUser.toLong())
-            }
-            val subscriber = object : BaseSubscriber<String>() {
-                override fun onNext(t: String?) {
-                    t?.let {
-                        renderMsg(it)
-                    }
-                }
-            }
-            IMCoreManager.userModule.queryUsers(uIds)
-                .compose(RxTransform.flowableToMain())
-                .flatMap {
-                    val userMap = mutableMapOf<String, User>()
-                    for ((k, v) in it) {
-                        userMap[k.toString()] = v
-                    }
-                    val regex = "(?<=@)(.+?)(?=\\s)".toRegex()
-                    val body = regex.replace(message.content!!) { result ->
-                        return@replace if (userMap[result.value] == null) {
-                            ""
-                        } else {
-                            userMap[result.value]!!.nickname
-                        }
-                    }
-                    return@flatMap Flowable.just(body)
-                }
-                .subscribe(subscriber)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun renderMsg(content: String) {
-        val regex = "(?<=@)(.+?)(?=\\s)".toRegex()
+    private fun render(content: String) {
+        val regex = AtStringUtils.atRegex
         val sequence = regex.findAll(content)
-        val count = sequence.count()
-        if (count == 0) {
-            binding.tvMsgContent.text = content
-            return
-        }
         val spannable = SpannableStringBuilder(content)
         sequence.forEach { matchResult ->
             val range = matchResult.range

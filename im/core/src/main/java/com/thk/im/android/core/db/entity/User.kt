@@ -49,7 +49,15 @@ data class User(
     var mTime: Long,
 ) : Parcelable {
 
+    companion object {
+        val all = User(-1L, "All")
+    }
+
     @Ignore
     constructor(id: Long) : this(id, "", "", null, null, null, null, 0L, 0L)
+
+    @Ignore
+    constructor(id: Long, nickname: String): this(id, "", nickname, null, null, null, null, 0, 0)
+
 
 }

@@ -4,12 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.core.db.entity.SessionMember
+import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.sessionmember.IMSessionMemberVH
 
 class IMSessionMemberAdapter: RecyclerView.Adapter<IMSessionMemberVH>() {
 
-    private val sessionMembers = mutableListOf<SessionMember>()
+    private val sessionMembers = mutableListOf<Pair<User, SessionMember?>>()
     var onSessionMemberClick: IMOnSessionMemberClick? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IMSessionMemberVH {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.itemview_session_member, parent, false)
@@ -24,7 +25,7 @@ class IMSessionMemberAdapter: RecyclerView.Adapter<IMSessionMemberVH>() {
         holder.bindSessionMember(sessionMembers[position], onSessionMemberClick)
     }
 
-    fun setData(it: List<SessionMember>) {
+    fun setData(it: MutableList<Pair<User, SessionMember?>>) {
         val oldSize = sessionMembers.size
         if (oldSize > 0) {
             sessionMembers.clear()

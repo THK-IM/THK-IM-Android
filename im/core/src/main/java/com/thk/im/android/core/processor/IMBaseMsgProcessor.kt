@@ -287,6 +287,7 @@ abstract class IMBaseMsgProcessor {
         LLog.i("insertOrUpdateMessages ${msg.id} ${msg.sendStatus}, ${notify}, $notifySession")
         val msgDao = IMCoreManager.getImDataBase().messageDao()
         msgDao.insertOrReplace(mutableListOf(msg))
+        msg.mTime = IMCoreManager.commonModule.getSeverTime()
         if (msg.rMsgId != null && msg.referMsg == null) {
             msg.referMsg = IMCoreManager.db.messageDao().findByMsgId(msg.rMsgId!!, msg.sid)
         }

@@ -44,6 +44,8 @@ import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.utils.AtStringUtils
+import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 import kotlin.math.abs
@@ -510,10 +512,15 @@ class IMInputLayout : ConstraintLayout {
         }
         binding.layoutReply.visibility = VISIBLE
 
-        val subscriber = object : BaseSubscriber<User>() {
-            override fun onNext(t: User?) {
+        val info = msgSender?.syncGetSessionMemberInfo(replyMsg!!.fUid)
+        if (info != null) {
+            binding.tvReplyUserNick.text = IMUIManager.nicknameForSessionMember(info.first, info.second)
+        }
+
+        val subscriber = object : BaseSubscriber<String>() {
+            override fun onNext(t: String?) {
                 t?.let {
-                    showReplyMessageContent(it)
+                    binding.tvReplyContent.text = it
                 }
             }
 
@@ -522,18 +529,14 @@ class IMInputLayout : ConstraintLayout {
                 disposables.remove(this)
             }
         }
-        IMCoreManager.userModule.queryUser(replyMsg!!.fUid)
+        Flowable.just(replyMsg)
+            .flatMap { msg ->
+                val content = IMCoreManager.messageModule.getMsgProcessor(msg.type).getSessionDesc(msg)
+                return@flatMap Flowable.just(content)
+            }
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         disposables.add(subscriber)
-    }
-
-    private fun showReplyMessageContent(user: User) {
-        replyMsg?.let {
-            binding.tvReplyUserNick.text = user.nickname
-            binding.tvReplyContent.text =
-                IMCoreManager.messageModule.getMsgProcessor(it.type).getSessionDesc(it)
-        }
     }
 
     fun setReeditMessage(message: Message) {

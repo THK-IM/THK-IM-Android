@@ -64,17 +64,20 @@ class IMApplication : Application() {
 
     fun initIMUser(token: String, uId: Long): Flowable<Boolean> {
         return Flowable.create({
+
+            val mediaProvider = Provider(this, token)
+            val mediaPreviewer = Previewer(this, token, Host.MsgAPI)
+            IMUIManager.mediaProvider = mediaProvider
+            IMUIManager.mediaPreviewer = mediaPreviewer
+
             val signalModule = DefaultSignalModule(this, Host.Websocket, token)
             val fileLoaderModule = DefaultFileLoadModule(this, Host.MsgAPI, token)
             val imApi = DefaultIMApi(token, Host.MsgAPI)
-            val mediaProvider = Provider(this, token)
-            val mediaPreviewer = Previewer(this, token, Host.MsgAPI)
             IMCoreManager.signalModule = signalModule
             IMCoreManager.fileLoadModule = fileLoaderModule
             IMCoreManager.imApi = imApi
-            IMUIManager.mediaProvider = mediaProvider
-            IMUIManager.mediaPreviewer = mediaPreviewer
             IMCoreManager.initUser(uId)
+
             IMLiveManager.shared().liveApi = DefaultLiveApi(token, Host.RtcApi)
             IMLiveManager.shared().selfId = uId
             it.onNext(true)

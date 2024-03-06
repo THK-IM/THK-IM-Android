@@ -64,8 +64,8 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
 
     private fun replaceIdToNickname(content: String, atUsers: String): String {
         return AtStringUtils.replaceAtUIdsToNickname(content, atUsers) { id ->
-            val opr = delegate?.get() ?: return@replaceAtUIdsToNickname ""
-            val info = opr.syncGetSessionMemberInfo(id) ?: return@replaceAtUIdsToNickname ""
+            val sender = delegate?.get()?.msgSender() ?: return@replaceAtUIdsToNickname ""
+            val info = sender.syncGetSessionMemberInfo(id) ?: return@replaceAtUIdsToNickname ""
             return@replaceAtUIdsToNickname IMUIManager.nicknameForSessionMember(
                 info.first,
                 info.second

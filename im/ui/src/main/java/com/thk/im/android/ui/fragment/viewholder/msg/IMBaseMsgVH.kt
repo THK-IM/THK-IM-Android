@@ -43,8 +43,8 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
 
     private var disposable = CompositeDisposable()
     private val cardAvatarContainerView: CardView? = itemView.findViewById(R.id.avatar_container)
-    protected val ivAvatarView: ImageView? = itemView.findViewById(R.id.iv_avatar)
-    protected val tvNicknameView: TextView? = itemView.findViewById(R.id.tv_nickname)
+    private val ivAvatarView: ImageView? = itemView.findViewById(R.id.iv_avatar)
+    private val tvNicknameView: TextView? = itemView.findViewById(R.id.tv_nickname)
     private val resendView: ImageView? = itemView.findViewById(R.id.iv_msg_resend)
     private val pbMsgFailedView: ProgressBar? = itemView.findViewById(R.id.pb_sending)
     private val readStatusView: IMReadStatusView? = itemView.findViewById(R.id.read_status)
@@ -194,7 +194,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         ) {
             return
         }
-        msgVHOperator?.readMessage(message)
+        msgVHOperator?.msgSender()?.readMessage(message)
         message.oprStatus = message.oprStatus.or(MsgOperateStatus.ClientRead.value)
             .or(MsgOperateStatus.ServerRead.value)
     }
@@ -208,19 +208,30 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
             }
         }
         if (message.fUid != 0L) {
-            msgVHOperator?.let {
-                val userInfo = it.syncGetSessionMemberInfo(message.fUid)
+            val sender = msgVHOperator?.msgSender()
+            if (sender != null) {
+                val userInfo = sender.syncGetSessionMemberInfo(message.fUid)
                 userInfo?.let { info ->
-                    renderUserInfo(info)
+                    renderUserInfo(info.first, info.second)
                 }
+            } else {
+                val subscriber = object : BaseSubscriber<User>() {
+                    override fun onNext(t: User) {
+                        renderUserInfo(t, null)
+                    }
+                }
+                IMCoreManager.userModule.queryUser(message.fUid)
+                    .compose(RxTransform.flowableToMain())
+                    .subscribe(subscriber)
+                disposable.add(subscriber)
             }
         }
     }
 
-    open fun renderUserInfo(info: Pair<User, SessionMember?>) {
-        tvNicknameView?.text = IMUIManager.nicknameForSessionMember(info.first, info.second)
+    open fun renderUserInfo(user: User, sessionMember: SessionMember?) {
+        tvNicknameView?.text = IMUIManager.nicknameForSessionMember(user, sessionMember)
         ivAvatarView?.let { iv ->
-            info.first.avatar?.let { avatar ->
+            user.avatar?.let { avatar ->
                 displayAvatar(iv, avatar)
             }
         }
@@ -251,7 +262,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     }
 
     private fun queryReadStatus() {
-        if (session.type == SessionType.MsgRecord.value) {
+        if (session.type == SessionType.MsgRecord.value || session.type == SessionType.SuperGroup.value) {
             return
         }
 

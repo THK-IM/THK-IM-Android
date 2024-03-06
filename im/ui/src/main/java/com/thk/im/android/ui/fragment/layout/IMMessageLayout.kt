@@ -341,29 +341,33 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         return (adapter as IMMessageAdapter).onSelected(message, selected)
     }
 
-    override fun readMessage(message: Message) {
-        msgSender?.readMessage(message)
+    override fun msgSender(): IMMsgSender? {
+        return msgSender
     }
 
-    override fun setEditText(text: String) {
-        msgSender?.openKeyboard()
-        msgSender?.addInputContent(text)
-    }
-
-    override fun syncGetSessionMemberInfo(userId: Long): Pair<User, SessionMember?>? {
-        return msgSender?.syncGetSessionMemberInfo(userId)
-    }
-
-    override fun saveSessionMemberInfo(info: Pair<User, SessionMember?>) {
-        msgSender?.saveSessionMemberInfo(info)
-    }
-
-    override fun asyncGetSessionMemberInfo(userId: Long): Flowable<Pair<User, SessionMember?>> {
-        if (msgSender == null) {
-            return Flowable.error(UnknownException)
-        }
-        return msgSender!!.asyncGetSessionMemberInfo(userId)
-    }
+//    override fun readMessage(message: Message) {
+//        msgSender?.readMessage(message)
+//    }
+//
+//    override fun setEditText(text: String) {
+//        msgSender?.openKeyboard()
+//        msgSender?.addInputContent(text)
+//    }
+//
+//    override fun syncGetSessionMemberInfo(userId: Long): Pair<User, SessionMember?>? {
+//        return msgSender?.syncGetSessionMemberInfo(userId)
+//    }
+//
+//    override fun saveSessionMemberInfo(info: Pair<User, SessionMember?>) {
+//        msgSender?.saveSessionMemberInfo(info)
+//    }
+//
+//    override fun asyncGetSessionMemberInfo(userId: Long): Flowable<Pair<User, SessionMember?>> {
+//        if (msgSender == null) {
+//            return Flowable.error(UnknownException)
+//        }
+//        return msgSender!!.asyncGetSessionMemberInfo(userId)
+//    }
 
     fun getSelectMessages(): Set<Message> {
         return (adapter as IMMessageAdapter).getSelectedMessages()

@@ -62,7 +62,8 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
                 binding.tvReedit.visibility = View.VISIBLE
                 binding.tvReedit.isClickable = true
                 binding.tvReedit.setOnClickListener {
-                    delegate?.setEditText(revokeData.content!!)
+                    delegate?.msgSender()?.addInputContent(revokeData.content!!)
+                    delegate?.msgSender()?.openKeyboard()
                 }
             } else {
                 binding.tvReedit.visibility = View.GONE

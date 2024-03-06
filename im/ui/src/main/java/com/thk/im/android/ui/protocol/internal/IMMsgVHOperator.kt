@@ -38,18 +38,7 @@ interface IMMsgVHOperator {
     /// 是否为被选中
     fun isItemSelected(message: Message): Boolean
 
-    /// 已读消息
-    fun readMessage(message: Message)
+    /// 获取发送者
+    fun msgSender(): IMMsgSender?
 
-    /// 设置输入框文字
-    fun setEditText(text: String)
-
-    /// 同步获取用户信息
-    fun syncGetSessionMemberInfo(userId: Long): Pair<User, SessionMember?>?
-
-    /// 设置用户信息
-    fun saveSessionMemberInfo(info: Pair<User, SessionMember?>)
-
-    /// 异步获取用户信息
-    fun asyncGetSessionMemberInfo(userId: Long): Flowable<Pair<User, SessionMember?>>
 }

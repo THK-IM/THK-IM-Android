@@ -4,7 +4,7 @@ import com.thk.im.android.core.api.vo.ListVo
 import com.thk.im.android.core.api.vo.MessageVo
 import com.thk.im.android.core.api.vo.SessionMemberVo
 import com.thk.im.android.core.api.vo.SessionVo
-import com.thk.im.android.core.api.vo.UpdateUserSession
+import com.thk.im.android.core.api.vo.UpdateUserSessionVo
 import io.reactivex.Flowable
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -47,7 +47,7 @@ interface SessionApi {
 
     @PUT("/user_session")
     fun updateSession(
-        @Body bean: UpdateUserSession
+        @Body bean: UpdateUserSessionVo
     ): Flowable<Void>
 
     @DELETE("/user_session/{uid}/{sid}")

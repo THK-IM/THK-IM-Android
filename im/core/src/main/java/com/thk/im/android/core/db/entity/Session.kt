@@ -37,6 +37,9 @@ data class Session(
     @SerializedName("note_name")
     @ColumnInfo(name = "note_name")
     var noteName: String?,
+    @SerializedName("note_name")
+    @ColumnInfo(name = "note_avatar")
+    var noteAvatar: String?,
     @SerializedName("remark")
     @ColumnInfo(name = "remark")
     var remark: String,
@@ -86,19 +89,19 @@ data class Session(
 
     @Ignore
     constructor(id: Long) : this(
-        id, 0, 0, 0, "", null, "", 0, 0, 0,
+        id, 0, 0, 0, "", null, null, "", 0, 0, 0,
         0, null, 0, null, null, 0, 0, 0, 0, 0, 0
     )
 
     @Ignore
     constructor() : this(
-        0, 0, 0, 0, "", null, "", 0, 0, 0,
+        0, 0, 0, 0, "", null, null, "", 0, 0, 0,
         0, null, 0, null, null, 0, 0, 0, 0, 0, 0
     )
 
     @Ignore
     constructor(type: Int, entityId: Long) : this(
-        0, 0, type, entityId, "", null, "", 0, 0, 0,
+        0, 0, type, entityId, "", null, null, "", 0, 0, 0,
         0, null, 0, null, null, 0, 0, 0, 0, 0, 0
     )
 

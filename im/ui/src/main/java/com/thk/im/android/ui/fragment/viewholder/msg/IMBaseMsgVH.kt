@@ -230,8 +230,9 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
 
     open fun renderUserInfo(user: User, sessionMember: SessionMember?) {
         tvNicknameView?.text = IMUIManager.nicknameForSessionMember(user, sessionMember)
+        val avatar = IMUIManager.avatarForSessionMember(user, sessionMember)
         ivAvatarView?.let { iv ->
-            user.avatar?.let { avatar ->
+            avatar?.let { avatar ->
                 displayAvatar(iv, avatar)
             }
         }

@@ -32,6 +32,9 @@ data class SessionMember(
     @SerializedName("note_name")
     @ColumnInfo(name = "note_name")
     var noteName: String?,
+    @SerializedName("note_avatar")
+    @ColumnInfo(name = "note_avatar")
+    var noteAvatar: String?,
     @SerializedName("ext_data")
     @ColumnInfo(name = "ext_data", typeAffinity = ColumnInfo.TEXT)
     var extData: String?,   //扩展字段

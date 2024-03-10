@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-data class UpdateUserSession(
+data class UpdateUserSessionVo(
     @SerializedName("u_id")
     var uId: Long,
     @SerializedName("s_id")
@@ -17,5 +17,9 @@ data class UpdateUserSession(
     @SerializedName("status")
     var status: Int?,
     @SerializedName("parent_id")
-    var parentId: Long?
+    var parentId: Long?,
+    @SerializedName("note_name")
+    var noteName: String?,
+    @SerializedName("note_avatar")
+    var noteAvatar: String?
 ) : Parcelable

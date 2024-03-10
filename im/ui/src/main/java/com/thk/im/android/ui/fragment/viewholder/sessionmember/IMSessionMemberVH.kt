@@ -36,7 +36,8 @@ class IMSessionMemberVH(itemView: View): RecyclerView.ViewHolder(itemView) {
     }
 
     private fun showUser(user: User, sessionMember: SessionMember?) {
-        user.avatar?.let {
+        val avatar = IMUIManager.avatarForSessionMember(user, sessionMember)
+        avatar?.let {
             IMImageLoader.displayImageUrl(avatarView, it)
         }
         nicknameView.text = IMUIManager.nicknameForSessionMember(user, sessionMember)

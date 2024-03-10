@@ -10,7 +10,7 @@ import com.thk.im.android.core.api.vo.MessageVo
 import com.thk.im.android.core.api.vo.ReadMsgVo
 import com.thk.im.android.core.api.vo.ReeditMsgVo
 import com.thk.im.android.core.api.vo.RevokeMsgVo
-import com.thk.im.android.core.api.vo.UpdateUserSession
+import com.thk.im.android.core.api.vo.UpdateUserSessionVo
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
@@ -103,12 +103,14 @@ open class DefaultIMApi(token: String, serverUrl: String) : IMApi {
     }
 
     override fun updateUserSession(uId: Long, session: Session): Flowable<Void> {
-        val updateUserSession = UpdateUserSession(
+        val updateUserSession = UpdateUserSessionVo(
             uId,
             session.id,
             session.topTimestamp,
             session.status,
-            session.parentId
+            session.parentId,
+            session.noteName,
+            session.noteAvatar,
         )
         return sessionApi.updateSession(updateUserSession)
     }

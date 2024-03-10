@@ -151,4 +151,12 @@ object IMUIManager {
         return nickname
     }
 
+    fun avatarForSessionMember(user: User, sessionMember: SessionMember?): String? {
+        return if (sessionMember?.noteAvatar != null && sessionMember.noteAvatar!!.isNotEmpty()) {
+            sessionMember.noteAvatar!!
+        } else {
+            user.avatar
+        }
+    }
+
 }

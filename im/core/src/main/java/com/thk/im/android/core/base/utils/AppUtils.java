@@ -13,15 +13,17 @@ import android.view.WindowManager;
 
 import com.thk.im.android.core.R;
 
+import java.util.Locale;
+import java.util.TimeZone;
+
 public class AppUtils {
 
     private static final AppUtils sAppUtils = new AppUtils();
     private Application mApp;
-
     private SoundPool soundPoll;
-
-
     private int newMsgSound;
+
+    private String language = Locale.getDefault().getLanguage();
 
     private AppUtils() {
 
@@ -75,7 +77,7 @@ public class AppUtils {
     /**
      * 获取版本号名称
      */
-    public String getVerName() {
+    public String getVersionName() {
         String verName = "";
         try {
             verName = mApp.getPackageManager().
@@ -84,6 +86,45 @@ public class AppUtils {
             e.printStackTrace();
         }
         return verName;
+    }
+
+    public String getTimeZone() {
+        int offset = TimeZone.getDefault().getRawOffset() / 3600 / 1000;
+        if (offset > 0) {
+            return "GMT+" + offset;
+        } else {
+            return "GMT" + offset;
+        }
+    }
+
+    public String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.toLowerCase().startsWith(manufacturer.toLowerCase())) {
+            return capitalize(model);
+        } else {
+            return capitalize(manufacturer) + " " + model;
+        }
+    }
+
+    private String capitalize(String str) {
+        if (str == null || str.length() == 0) {
+            return "";
+        }
+        char first = str.charAt(0);
+        if (Character.isUpperCase(first)) {
+            return str;
+        } else {
+            return Character.toUpperCase(first) + str.substring(1);
+        }
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public int getScreenWidth() {

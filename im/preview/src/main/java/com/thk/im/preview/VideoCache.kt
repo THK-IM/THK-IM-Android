@@ -29,7 +29,10 @@ object VideoCache {
                     if (url.startsWith(endpoint)) {
                         mutableMapOf(
                             APITokenInterceptor.tokenKey to "Bearer $token",
-                            APITokenInterceptor.clientVersionKey to AppUtils.instance().verName,
+                            APITokenInterceptor.versionKey to AppUtils.instance().versionName,
+                            APITokenInterceptor.timezoneKey to AppUtils.instance().timeZone,
+                            APITokenInterceptor.deviceKey to AppUtils.instance().deviceName,
+                            APITokenInterceptor.languageKey to AppUtils.instance().language,
                             APITokenInterceptor.platformKey to "Android"
                         )
                     } else {

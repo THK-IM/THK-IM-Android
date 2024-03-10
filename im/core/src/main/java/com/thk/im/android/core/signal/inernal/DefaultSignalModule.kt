@@ -123,7 +123,10 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             }
             onStatusChange(SignalStatus.Connecting)
             val request = Request.Builder()
-                .header(APITokenInterceptor.clientVersionKey, AppUtils.instance().verName)
+                .header(APITokenInterceptor.versionKey, AppUtils.instance().versionName)
+                .header(APITokenInterceptor.languageKey, AppUtils.instance().language)
+                .header(APITokenInterceptor.deviceKey, AppUtils.instance().deviceName)
+                .header(APITokenInterceptor.timezoneKey, AppUtils.instance().timeZone)
                 .header(APITokenInterceptor.tokenKey, token)
                 .header(APITokenInterceptor.platformKey, "Android")
                 .url(wsUrl)

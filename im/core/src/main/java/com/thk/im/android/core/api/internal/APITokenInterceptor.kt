@@ -14,8 +14,11 @@ class APITokenInterceptor(private var token: String) : Interceptor {
 
     companion object {
         const val tokenKey = "Authorization"
-        const val clientVersionKey = "Client-Version"
-        const val platformKey = "Client-Platform"
+        const val versionKey = "Version"
+        const val timezoneKey = "TimeZone"
+        const val deviceKey = "Device"
+        const val languageKey = "Accept-Language"
+        const val platformKey = "Platform"
     }
 
     private val gson = Gson()
@@ -89,8 +92,17 @@ class APITokenInterceptor(private var token: String) : Interceptor {
             if (origin.header(tokenKey) == null) {
                 builder.addHeader(tokenKey, "Bearer ${this.token}")
             }
-            if (origin.header(clientVersionKey) == null) {
-                builder.addHeader(clientVersionKey, AppUtils.instance().verName)
+            if (origin.header(versionKey) == null) {
+                builder.addHeader(versionKey, AppUtils.instance().versionName)
+            }
+            if (origin.header(timezoneKey) == null) {
+                builder.addHeader(timezoneKey, AppUtils.instance().timeZone)
+            }
+            if (origin.header(deviceKey) == null) {
+                builder.addHeader(deviceKey, AppUtils.instance().deviceName)
+            }
+            if (origin.header(languageKey) == null) {
+                builder.addHeader(languageKey, AppUtils.instance().language)
             }
             if (origin.header(platformKey) == null) {
                 builder.addHeader(platformKey, "Android")
@@ -99,7 +111,10 @@ class APITokenInterceptor(private var token: String) : Interceptor {
         } else {
             val builder = origin.newBuilder()
             builder.removeHeader(tokenKey)
-            builder.removeHeader(clientVersionKey)
+            builder.removeHeader(versionKey)
+            builder.removeHeader(languageKey)
+            builder.removeHeader(timezoneKey)
+            builder.removeHeader(deviceKey)
             builder.removeHeader(platformKey)
             builder
         }

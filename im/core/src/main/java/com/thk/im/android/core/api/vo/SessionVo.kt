@@ -21,6 +21,8 @@ data class SessionVo(
     var name: String = "",
     @SerializedName("note_name")
     var noteName: String = "",
+    @SerializedName("note_avatar")
+    var noteAvatar: String = "",
     @SerializedName("remark")
     var remark: String = "",
     @SerializedName("top")
@@ -42,7 +44,7 @@ data class SessionVo(
 ) : Parcelable {
     fun toSession(): Session {
         return Session(
-            id, parentId, type, entityId, name, noteName, remark, mute, status, role, top,
+            id, parentId, type, entityId, name, noteName, noteAvatar, remark, mute, status, role, top,
             extData, 0, null, null, 0, 0, 0, deleted, cTime, mTime
         )
     }

@@ -122,7 +122,7 @@ class IMSessionChoosePopup constructor(
                     return@flatMap Flowable.just(it)
                 }
         }.flatMap {
-            val title = if (session.type == SessionType.Group.value) {
+            val title = if (session.type == SessionType.Group.value || session.type == SessionType.SuperGroup.value) {
                 "的群聊记录"
             } else {
                 "的会话记录"

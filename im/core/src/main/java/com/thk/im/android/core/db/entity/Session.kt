@@ -14,8 +14,8 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(
     tableName = "session", indices = [
-        Index(value = ["type", "entity_id"], unique = true),
-        Index(value = ["parent_id"], unique = false)
+        Index(value = ["type", "entity_id"], unique = false),
+        Index(value = ["parent_id", "m_time"], unique = false)
     ]
 )
 data class Session(

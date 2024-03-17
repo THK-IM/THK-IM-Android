@@ -82,6 +82,20 @@ data class Message(
         return uIds
     }
 
+    fun getAtUIds(): Set<Long> {
+        if (this.atUsers.isNullOrBlank()) {
+            return emptySet()
+        }
+        val strUIds = this.atUsers!!.split("#")
+        val uIds = mutableSetOf<Long>()
+        strUIds.forEach { strUId ->
+            strUId.toLongOrNull()?.let {
+                uIds.add(it)
+            }
+        }
+        return uIds
+    }
+
     @SerializedName("refer_msg")
     @Ignore
     var referMsg: Message? = null

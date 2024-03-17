@@ -19,7 +19,7 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
         return if (msg.content != null) {
             var body = msg.content
             if (!msg.atUsers.isNullOrBlank()) {
-                body = AtStringUtils.replaceAtUIdsToNickname(msg.content!!, msg.atUsers!!) { id ->
+                body = AtStringUtils.replaceAtUIdsToNickname(msg.content!!, msg.getAtUIds()) { id ->
                     if (id == -1L) {
                         return@replaceAtUIdsToNickname User.all.nickname
                     }

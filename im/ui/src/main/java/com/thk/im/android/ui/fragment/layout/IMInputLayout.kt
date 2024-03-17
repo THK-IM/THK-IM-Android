@@ -550,13 +550,13 @@ class IMInputLayout : ConstraintLayout {
         if (message.content != null) {
             var content = message.content!!
             if (message.atUsers != null) {
-                content = AtStringUtils.replaceAtUIdsToNickname(content, message.atUsers!!) { id ->
+                content = AtStringUtils.replaceAtUIdsToNickname(content, message.getAtUIds()) { id ->
                     val member = msgSender?.syncGetSessionMemberInfo(id)
                     if (member != null) {
                         addAtMap(member.first, member.second)
-                        return@replaceAtUIdsToNickname atNickname(id) ?: ""
+                        return@replaceAtUIdsToNickname atNickname(id) ?: "$id"
                     }
-                    return@replaceAtUIdsToNickname ""
+                    return@replaceAtUIdsToNickname "$id"
                 }
             }
             addInputContent(content)

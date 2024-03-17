@@ -268,6 +268,9 @@ class IMInputLayout : ConstraintLayout {
         if (IMUIManager.getFunctionProvider(session).isEmpty()) {
             binding.ivAddMore.visibility = GONE
         }
+        if (session.functionFlag.and(IMChatFunction.Forward.value) == 0L) {
+            binding.ivMsgOprForward.visibility = GONE
+        }
     }
 
     private fun sendInputContent() {

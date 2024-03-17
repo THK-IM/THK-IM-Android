@@ -7,7 +7,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import com.google.gson.annotations.SerializedName
-import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.IMCoreManager
 import kotlinx.parcelize.Parcelize
 
 @Keep
@@ -94,6 +94,21 @@ data class Message(
             }
         }
         return uIds
+    }
+
+    fun isAtMe(): Boolean {
+        if (this.rUsers.isNullOrBlank()) {
+            return false
+        }
+        val strUIds = this.rUsers!!.split("#")
+        strUIds.forEach { strUId ->
+            strUId.toLongOrNull()?.let {
+                if (it == -1L || it == IMCoreManager.uId) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     @SerializedName("refer_msg")

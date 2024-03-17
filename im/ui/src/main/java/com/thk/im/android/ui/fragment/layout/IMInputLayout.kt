@@ -25,6 +25,8 @@ import com.hjq.permissions.XXPermissions
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.SessionMuted
+import com.thk.im.android.core.SessionStatus
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
@@ -37,6 +39,7 @@ import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
 import com.thk.im.android.ui.manager.IMAudioMsgData
+import com.thk.im.android.ui.manager.IMChatFunction
 import com.thk.im.android.ui.manager.IMReeditMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.AudioCallback
@@ -258,6 +261,13 @@ class IMInputLayout : ConstraintLayout {
         this.session = session
         this.msgSender = sender
         this.msgPreviewer = previewer
+
+        if (session.functionFlag.and(IMChatFunction.Audio.value) == 0L) {
+            binding.ivAudioRecord.visibility = GONE
+        }
+        if (IMUIManager.getFunctionProvider(session).isEmpty()) {
+            binding.ivAddMore.visibility = GONE
+        }
     }
 
     private fun sendInputContent() {

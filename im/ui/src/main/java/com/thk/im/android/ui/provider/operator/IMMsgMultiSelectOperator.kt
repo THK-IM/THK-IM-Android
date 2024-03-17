@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.provider.operator
 
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
@@ -22,7 +23,7 @@ class IMMsgMultiSelectOperator: IMMessageOperator() {
         sender.setSelectMode(true, message)
     }
 
-    override fun supportMessage(message: Message): Boolean {
+    override fun supportMessage(message: Message, session: Session): Boolean {
         return true
     }
 }

@@ -8,6 +8,7 @@ import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.base.utils.IMKeyboardUtils
 import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.protocol.IMBaseEmojiFragmentProvider
@@ -18,6 +19,7 @@ import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.IMPageRouter
 import com.thk.im.android.ui.protocol.IMPreviewer
 import com.thk.im.android.ui.protocol.IMProvider
+import com.thk.im.android.ui.protocol.IMUIResourceProvider
 import com.thk.im.android.ui.provider.emoji.IMUnicodeEmojiEmojiProvider
 import com.thk.im.android.ui.provider.function.IMAlbumFunctionIVProvider
 import com.thk.im.android.ui.provider.function.IMCameraFunctionIVProvider
@@ -58,6 +60,7 @@ object IMUIManager {
     var mediaProvider: IMProvider? = null
     var mediaPreviewer: IMPreviewer? = null
     var pageRouter: IMPageRouter? = null
+    var uiResourceProvider: IMUIResourceProvider? = null
 
     fun registerMsgIVProvider(vararg providers: IMBaseMessageIVProvider) {
         for (p in providers) {
@@ -89,9 +92,18 @@ object IMUIManager {
         msgOperators[operator.id()] = operator
     }
 
-    fun getMsgOperators(message: Message): List<IMMessageOperator> {
-        return msgOperators.values.toList().filter { opr -> opr.supportMessage(message) }
-            .sortedBy { opr -> opr.id() }
+    fun getFunctionProvider(session: Session): List<IMBaseFunctionIVProvider> {
+        return functionIVProviders.values.toList().filter { f ->
+            f.supportSession(session)
+        }.sortedBy { f -> f.position() }
+    }
+
+    fun getMsgOperators(message: Message, session: Session): List<IMMessageOperator> {
+        return msgOperators.values.toList().filter { opr ->
+            opr.supportMessage(
+                message, session
+            )
+        }.sortedBy { opr -> opr.id() }
     }
 
     fun init(app: Application) {

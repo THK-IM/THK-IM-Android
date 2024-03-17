@@ -76,6 +76,9 @@ data class Session(
     @SerializedName("member_count")
     @ColumnInfo(name = "member_count")
     var memberCount: Int,
+    @SerializedName("function_flag")
+    @ColumnInfo(name = "function_flag")
+    var functionFlag: Long,
     @SerializedName("deleted")
     @ColumnInfo(name = "deleted")
     var deleted: Int = 0,
@@ -89,20 +92,26 @@ data class Session(
 
     @Ignore
     constructor(id: Long) : this(
-        id, 0, 0, 0, "", null, null, "", 0, 0, 0,
-        0, null, 0, null, null, 0, 0, 0, 0, 0, 0
+        id, 0, 0, 0, "", null, null, "",
+        0, 0, 0, 0, null, 0, null,
+        null, 0, 0, 0, 0L,
+        0,0, 0
     )
 
     @Ignore
     constructor() : this(
-        0, 0, 0, 0, "", null, null, "", 0, 0, 0,
-        0, null, 0, null, null, 0, 0, 0, 0, 0, 0
+        0, 0, 0, 0, "", null, null, "",
+        0, 0, 0, 0, null, 0, null,
+        null, 0, 0, 0, 0L,
+        0,0, 0
     )
 
     @Ignore
     constructor(type: Int, entityId: Long) : this(
-        0, 0, type, entityId, "", null, null, "", 0, 0, 0,
-        0, null, 0, null, null, 0, 0, 0, 0, 0, 0
+        0, 0, type, entityId, "", null, null, "",
+        0, 0, 0, 0, null, 0, null,
+        null, 0, 0, 0, 0L,
+        0,0, 0
     )
 
 }

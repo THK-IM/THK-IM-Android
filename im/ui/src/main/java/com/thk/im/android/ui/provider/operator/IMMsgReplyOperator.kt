@@ -2,6 +2,7 @@ package com.thk.im.android.ui.provider.operator
 
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
@@ -23,7 +24,7 @@ class IMMsgReplyOperator: IMMessageOperator() {
         sender.replyMessage(message)
     }
 
-    override fun supportMessage(message: Message): Boolean {
-        return message.type != MsgType.Revoke.value
+    override fun supportMessage(message: Message, session: Session): Boolean {
+        return message.type != MsgType.Revoke.value && message.fUid != 0L
     }
 }

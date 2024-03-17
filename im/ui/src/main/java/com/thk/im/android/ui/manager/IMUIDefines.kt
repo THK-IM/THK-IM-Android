@@ -39,5 +39,18 @@ data class VideoMediaItem(
     var coverUrl: String?,
     var sourcePath: String?,
     var sourceUrl: String?,
-) :MediaItem(),  Parcelable
+) : MediaItem(), Parcelable
+
+/**
+功能，1基础功能 2语音 4 表情  8 图片 16视频  32转发 64已读
+ */
+enum class IMChatFunction(val value: Long) {
+    BaseInput(1), // 文本输入/删除/文本表情
+    Audio(2),
+    Emoji(4),      //
+    Image(8),
+    Video(16),
+    Forward(32),
+    Read(64)
+}
 

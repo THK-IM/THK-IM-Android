@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.protocol
 
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
 abstract class IMMessageOperator {
@@ -8,5 +9,5 @@ abstract class IMMessageOperator {
     abstract fun title(): String
     abstract fun resId(): Int
     abstract fun onClick(sender: IMMsgSender, message: Message)
-    abstract fun supportMessage(message: Message): Boolean
+    abstract fun supportMessage(message: Message, session: Session): Boolean
 }

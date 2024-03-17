@@ -43,6 +43,7 @@ import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
 import com.thk.im.android.ui.fragment.popup.IMMessageOperatorPopup
 import com.thk.im.android.ui.fragment.popup.IMSessionChoosePopup
 import com.thk.im.android.ui.manager.IMAudioMsgData
+import com.thk.im.android.ui.manager.IMChatFunction
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.android.ui.manager.IMUIManager
@@ -96,6 +97,10 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         initKeyboardWindow()
         initEventBus()
         fetchSessionMembers()
+
+        if (session?.functionFlag?.and(IMChatFunction.BaseInput.value) == 0L) {
+            binding.llInputLayout.visibility = View.GONE
+        }
     }
 
     private fun fetchSessionMembers() {
@@ -350,12 +355,15 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         if (isKeyboardShowing()) {
             closeKeyboard()
         }
+        if (this.session == null) {
+            return
+        }
         val locations = IntArray(2)
         view.getLocationOnScreen(locations)
         context?.let {
             val point = PointF()
             val popupWidth = 320.dp2px()
-            val operators = IMUIManager.getMsgOperators(message)
+            val operators = IMUIManager.getMsgOperators(message, this.session!!)
             val rowCount = 5
             val popupHeight =
                 ((operators.size / rowCount + operators.size % rowCount) * 60 + 30).dp2px()

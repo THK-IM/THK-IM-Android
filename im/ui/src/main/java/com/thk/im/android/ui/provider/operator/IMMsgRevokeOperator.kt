@@ -4,6 +4,7 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
@@ -36,7 +37,17 @@ class IMMsgRevokeOperator : IMMessageOperator() {
             .send(message, false, callback)
     }
 
-    override fun supportMessage(message: Message): Boolean {
-        return message.type != MsgType.Revoke.value
+    override fun supportMessage(message: Message, session: Session): Boolean {
+        if (message.type == MsgType.Revoke.value) {
+            return false
+        }
+        if (message.fUid != IMCoreManager.uId) {
+            return false
+        }
+        // 超过120s不允许撤回
+        if (kotlin.math.abs(message.cTime - IMCoreManager.severTime) > 1000 * 120) {
+            return false
+        }
+        return true
     }
 }

@@ -6,6 +6,7 @@ import android.content.Context
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
@@ -32,7 +33,7 @@ class IMMsgCopyOperator: IMMessageOperator() {
         }
     }
 
-    override fun supportMessage(message: Message): Boolean {
+    override fun supportMessage(message: Message, session: Session): Boolean {
         return (message.type == MsgType.Text.value)
     }
 }

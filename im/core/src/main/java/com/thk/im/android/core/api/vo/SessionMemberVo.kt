@@ -18,9 +18,9 @@ data class SessionMemberVo(
     @SerializedName("role")
     var role: Int = 0,
     @SerializedName("note_name")
-    var noteName: String? = null,
-    @SerializedName("note_name")
-    var noteAvatar: String? = null,
+    var noteName: String,
+    @SerializedName("note_avatar")
+    var noteAvatar: String,
     @SerializedName("status")
     var status: Int = 0,
     @SerializedName("deleted")

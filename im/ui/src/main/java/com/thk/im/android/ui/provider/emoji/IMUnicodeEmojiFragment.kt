@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.thk.im.android.ui.databinding.FragmentPanelUnicodeEmojiBinding
 import com.thk.im.android.ui.fragment.IMBaseEmojiFragment
+import com.thk.im.android.ui.manager.IMUIManager
 
 class IMUnicodeEmojiFragment : IMBaseEmojiFragment() {
 
     private lateinit var binding: FragmentPanelUnicodeEmojiBinding
 
     // 来自: https://emojixd.com/
-    private var emojis = listOf<String>(
+    private var defaultEmojis = listOf<String>(
         "😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂",
         "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩",
         "😘", "😗", "☺️", "😚", "😙", "🥲", "😋", "😛",
@@ -48,6 +49,7 @@ class IMUnicodeEmojiFragment : IMBaseEmojiFragment() {
 
         val adapter = IMUnicodeEmojiAdapter()
         binding.rcvEmojis.adapter = adapter
+        val emojis = IMUIManager.uiResourceProvider?.unicodeEmojis() ?: defaultEmojis
         adapter.setEmoji(emojis)
         adapter.onEmojiSelected = object : IMUnicodeEmojiAdapter.OnEmojiSelected {
             override fun onSelected(emoji: String) {

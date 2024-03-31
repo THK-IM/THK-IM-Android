@@ -195,7 +195,9 @@ class GroupActivity : BaseActivity() {
                 t?.let {
                     val ids = mutableListOf<Long>()
                     for (member in it) {
-                        ids.add(member.userId)
+                        if (member.deleted == 0) {
+                            ids.add(member.userId)
+                        }
                     }
                     showMembers(ids.toLongArray())
                 }
@@ -207,7 +209,7 @@ class GroupActivity : BaseActivity() {
                 IMCoreManager.messageModule.syncSessionMembers(group.sessionId)
             }
         }
-        IMCoreManager.messageModule.querySessionMembers(group.sessionId)
+        IMCoreManager.messageModule.querySessionMembers(group.sessionId, false)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         addDispose(subscriber)

@@ -208,23 +208,20 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
             }
         }
         if (message.fUid != 0L) {
-            val sender = msgVHOperator?.msgSender()
-            if (sender != null) {
-                val userInfo = sender.syncGetSessionMemberInfo(message.fUid)
-                userInfo?.let { info ->
-                    renderUserInfo(info.first, info.second)
-                }
-            } else {
-                val subscriber = object : BaseSubscriber<User>() {
-                    override fun onNext(t: User) {
-                        renderUserInfo(t, null)
-                    }
-                }
-                IMCoreManager.userModule.queryUser(message.fUid)
-                    .compose(RxTransform.flowableToMain())
-                    .subscribe(subscriber)
-                disposable.add(subscriber)
+            val userInfo = msgVHOperator?.msgSender()?.syncGetSessionMemberInfo(message.fUid)
+            userInfo?.let { info ->
+                renderUserInfo(info.first, info.second)
+                return
             }
+            val subscriber = object : BaseSubscriber<User>() {
+                override fun onNext(t: User) {
+                    renderUserInfo(t, null)
+                }
+            }
+            IMCoreManager.userModule.queryUser(message.fUid)
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            disposable.add(subscriber)
         }
     }
 
@@ -234,6 +231,17 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         ivAvatarView?.let { iv ->
             avatar?.let { avatar ->
                 displayAvatar(iv, avatar)
+                return
+            }
+        }
+        renderProviderAvatar(user)
+    }
+
+    private fun renderProviderAvatar(user: User) {
+        val resId = IMUIManager.uiResourceProvider?.avatar(user)
+        ivAvatarView?.let {
+            if (resId != null) {
+                it.setImageResource(resId)
             }
         }
     }

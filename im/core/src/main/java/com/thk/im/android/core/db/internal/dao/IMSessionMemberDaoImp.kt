@@ -17,12 +17,10 @@ internal class IMSessionMemberDaoImp(private val roomDatabase: IMRoomDataBase) :
 
     override fun delete(members: List<SessionMember>) {
         if (members.isNotEmpty()) {
-            val sId = members.last().sessionId
-            val uIds = mutableSetOf<Long>()
             for (m in members) {
-                uIds.add(m.userId)
+                m.deleted = 1
             }
-            return roomDatabase.sessionMemberDao().deleteBySIdAndUIds(sId, uIds)
+            return roomDatabase.sessionMemberDao().insertOrReplace(members)
         }
     }
 

@@ -38,6 +38,7 @@ class IMMessageAdapter(
 
     override fun onBindViewHolder(holder: IMBaseMsgVH, position: Int) {
         holder.onViewBind(position, messageList, session, imMessageLayout)
+        holder.onViewAttached()
     }
 
     override fun onViewRecycled(holder: IMBaseMsgVH) {
@@ -47,7 +48,6 @@ class IMMessageAdapter(
 
     override fun onViewAttachedToWindow(holder: IMBaseMsgVH) {
         super.onViewAttachedToWindow(holder)
-        holder.onViewAttached()
     }
 
     override fun onViewDetachedFromWindow(holder: IMBaseMsgVH) {

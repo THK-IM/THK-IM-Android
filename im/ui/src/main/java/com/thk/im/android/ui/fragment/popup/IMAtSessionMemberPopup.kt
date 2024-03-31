@@ -68,11 +68,13 @@ class IMAtSessionMemberPopup constructor(
                 compositeDisposable.remove(this)
             }
         }
-        IMCoreManager.messageModule.querySessionMembers(session!!.id)
+        IMCoreManager.messageModule.querySessionMembers(session.id, false)
             .flatMap { members ->
                 val uIds = mutableSetOf<Long>()
                 for (m in members) {
-                    uIds.add(m.userId)
+                    if (m.deleted == 0) {
+                        uIds.add(m.userId)
+                    }
                 }
                 return@flatMap IMCoreManager.userModule.queryUsers(uIds).flatMap { userMap ->
                     val memberMap = mutableMapOf<Long, Pair<User, SessionMember?>>()

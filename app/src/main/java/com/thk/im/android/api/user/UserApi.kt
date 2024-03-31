@@ -17,7 +17,7 @@ interface UserApi {
     /**
      * 注册
      */
-    @POST("/user/register")
+    @POST("/login/register")
     fun register(
         @Body body: RegisterReq
     ): Flowable<RegisterVo>
@@ -25,19 +25,19 @@ interface UserApi {
     /**
      * 通过token登录
      */
-    @POST("/user/login/token")
+    @POST("/login/token")
     fun loginByToken(
         @Body body: TokenLoginReq
     ): Flowable<LoginVo>
 
     // 用户查询自己的信息
-    @GET("/user/query/{id}")
+    @GET("/user/{id}")
     fun queryUser(
         @Path("id") id: Long
     ): Flowable<UserBasicInfoVo>
 
     // 用户查询他人的信息
-    @GET("/user/query")
+    @GET("/user/search")
     fun searchUserByDisplayId(
         @Query("display_id") displayId: String
     ): Flowable<UserBasicInfoVo>

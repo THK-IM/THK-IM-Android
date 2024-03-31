@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SignalStatus
 import com.thk.im.android.core.api.internal.APITokenInterceptor
 import com.thk.im.android.core.base.LLog
@@ -69,7 +70,14 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
             onStatusChange(SignalStatus.Connected)
             LLog.v("DefaultSignalModule", "Receive Signal: $text")
             try {
-                val signal = Gson().fromJson(text, Signal::class.java)
+                var decryptText = text
+                IMCoreManager.crypto?.let {
+                    val decrypted = it.decrypt(text)
+                    if (decrypted != null) {
+                        decryptText = decrypted
+                    }
+                }
+                val signal = Gson().fromJson(decryptText, Signal::class.java)
                 signalListener?.onNewSignal(signal.type, signal.body)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -149,7 +157,14 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         if (status != SignalStatus.Connected) {
             return
         }
-        val success = webSocket?.send(signal)
+        var encryptSignal = signal
+        IMCoreManager.crypto?.let {
+            val encryptText = it.encrypt(signal)
+            if (encryptText != null) {
+                encryptSignal = encryptText
+            }
+        }
+        val success = webSocket?.send(encryptSignal)
         if (success == false) {
             LLog.e("DefaultSignalModule, Send Signal failed $webSocket $status ${Thread.currentThread().name}")
         } else {

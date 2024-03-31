@@ -1,3 +1,5 @@
 package com.thk.im.android.core.exception
 
-class HttpException(val codeMessage: CodeMessage) : RuntimeException()
+import java.io.IOException
+
+class HttpException(val codeMessage: CodeMessage) : IOException()

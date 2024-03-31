@@ -551,7 +551,7 @@ open class DefaultMessageModule : MessageModule {
                         msg.sendStatus == MsgSendStatus.Init.value ||
                         msg.sendStatus == MsgSendStatus.Uploading.value
                     ) {
-                        statusText = "⬅️"
+                        statusText = "➡️"
                     } else if (msg.sendStatus == MsgSendStatus.SendFailed.value) {
                         statusText = "❗"
                     }
@@ -589,7 +589,11 @@ open class DefaultMessageModule : MessageModule {
         AppUtils.instance().notifyNewMessage()
     }
 
-    override fun querySessionMembers(sessionId: Long): Flowable<List<SessionMember>> {
+    override fun querySessionMembers(sessionId: Long, forceServer: Boolean): Flowable<List<SessionMember>> {
+        if (forceServer) {
+            return queryLastSessionMember(sessionId, getSessionMemberCountPerRequest())
+        }
+
         return Flowable.create<List<SessionMember>?>({
             val sessionMembers = IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
             it.onNext(sessionMembers)
@@ -610,17 +614,7 @@ open class DefaultMessageModule : MessageModule {
         }.flatMap {
             return@flatMap IMCoreManager.imApi.queryLatestSessionMembers(sessionId, it, null, count)
         }.flatMap {
-            val inserts = mutableListOf<SessionMember>()
-            val deletes = mutableListOf<SessionMember>()
-            for (sm in it) {
-                if (sm.deleted == 0) {
-                    inserts.add(sm)
-                } else {
-                    deletes.add(sm)
-                }
-            }
-            IMCoreManager.db.sessionMemberDao().insertOrReplace(inserts)
-            IMCoreManager.db.sessionMemberDao().delete(deletes)
+            IMCoreManager.db.sessionMemberDao().insertOrReplace(it)
             if (it.isNotEmpty()) {
                 val mTime = it.last().mTime
                 IMCoreManager.db.sessionDao().updateMemberSyncTime(sessionId, mTime)

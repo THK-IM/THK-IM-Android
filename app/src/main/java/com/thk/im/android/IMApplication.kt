@@ -15,6 +15,7 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule
 import com.thk.im.android.media.Provider
+import com.thk.im.android.module.CipherCrypto
 import com.thk.im.android.module.ExternalPageRouter
 import com.thk.im.android.module.IMContactModule
 import com.thk.im.android.module.IMCustomModule
@@ -53,6 +54,7 @@ class IMApplication : Application() {
     private fun initIMConfig() {
         val debug = true
         IMCoreManager.init(this, debug)
+        IMCoreManager.crypto = CipherCrypto("1234123412341234", "0000000000000000")
         IMCoreManager.userModule = IMUserModule()
         IMCoreManager.contactModule = IMContactModule()
         IMCoreManager.groupModule = IMGroupModule()

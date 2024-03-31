@@ -18,13 +18,13 @@ interface SessionMemberDao {
     @Query("delete from session_member where session_id = :sId and user_id in (:uIds)")
     fun deleteBySIdAndUIds(sId: Long, uIds: Set<Long>)
 
-    @Query("select * from session_member where session_id = :sessionId and deleted = 0 order by c_time asc")
+    @Query("select * from session_member where session_id = :sessionId order by c_time asc")
     fun findBySessionId(sessionId: Long): List<SessionMember>
 
     @Query("select count(0) from session_member where session_id = :sessionId and deleted = 0")
     fun findSessionMemberCount(sessionId: Long): Int
 
-    @Query("select * from session_member where session_id = :sessionId and user_id = :userId and deleted = 0")
+    @Query("select * from session_member where session_id = :sessionId and user_id = :userId")
     fun findSessionMember(sessionId: Long, userId: Long): SessionMember?
 
 }

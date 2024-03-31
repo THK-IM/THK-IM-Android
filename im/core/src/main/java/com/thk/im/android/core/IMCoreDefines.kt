@@ -73,3 +73,8 @@ enum class IMMsgResourceType(val value: String) {
 interface IMSendMsgCallback {
     fun onResult(message: Message, e: Exception?)
 }
+
+interface Crypto {
+    fun encrypt(text: String): String?
+    fun decrypt(cipherText: String): String?
+}

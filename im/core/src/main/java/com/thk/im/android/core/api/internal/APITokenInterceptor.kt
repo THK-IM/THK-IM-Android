@@ -2,12 +2,17 @@ package com.thk.im.android.core.api.internal
 
 
 import com.google.gson.Gson
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.exception.CodeMessage
 import com.thk.im.android.core.exception.HttpException
 import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import okhttp3.ResponseBody.Companion.toResponseBody
+import okio.Buffer
 
 
 class APITokenInterceptor(private var token: String) : Interceptor {
@@ -23,6 +28,7 @@ class APITokenInterceptor(private var token: String) : Interceptor {
 
     private val gson = Gson()
     private val endpoints = mutableSetOf<String>()
+    private val jsonType = "application/json; charset=utf-8".toMediaTypeOrNull()
 
     fun updateToken(token: String) {
         this.token = token
@@ -34,14 +40,15 @@ class APITokenInterceptor(private var token: String) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val newRequest = newRequest(chain.request())
-        val response = chain.proceed(newRequest)
-        return if (response.isRedirect) {
-            val newResponse = redirectResponse(response, chain)
-            normalResponse(newResponse)
+        val encryptedRequest = encryptRequest(newRequest)
+        val response = chain.proceed(encryptedRequest)
+        val redirectResponse = if (response.isRedirect) {
+            redirectResponse(response, chain)
         } else {
-            normalResponse(response)
+            response
         }
-
+        val decryptResponse = decryptResponse(redirectResponse)
+        return normalResponse(decryptResponse)
     }
 
     private fun redirectResponse(origin: Response, chain: Interceptor.Chain): Response {
@@ -56,8 +63,30 @@ class APITokenInterceptor(private var token: String) : Interceptor {
         }
     }
 
+    private fun decryptResponse(response: Response): Response {
+        if (isValidEndpoint(response.request.url.toUrl().toExternalForm())) {
+            val contentType = response.headers["Content-Type"]
+            contentType?.let { type ->
+                if (type.contains("application/json", true)) {
+                    response.body?.string()?.let { encryptText ->
+                        IMCoreManager.crypto?.let {
+                            val decryptText = it.decrypt(encryptText)
+                            decryptText?.let { text ->
+                                val newBody = text.toResponseBody(jsonType)
+                                return response.newBuilder()
+                                    .body(newBody)
+                                    .build()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return response
+    }
+
     private fun normalResponse(response: Response): Response {
-        if (response.code in 200..399) {
+        if (response.code in 200..299) {
             return response
         } else {
             if (response.body != null) {
@@ -72,7 +101,7 @@ class APITokenInterceptor(private var token: String) : Interceptor {
                         val codeMessage = gson.fromJson(content, CodeMessage::class.java)
                         throw HttpException(codeMessage)
                     } else {
-                        val codeMessage = CodeMessage(response.code, content)
+                        val codeMessage = CodeMessage(response.code, "unknown error")
                         throw HttpException(codeMessage)
                     }
                 } else {
@@ -119,6 +148,25 @@ class APITokenInterceptor(private var token: String) : Interceptor {
             builder
         }
         return builder.build()
+    }
+
+    private fun encryptRequest(origin: Request): Request {
+        if (isValidEndpoint(origin.url.toUrl().toExternalForm())) {
+            IMCoreManager.crypto?.let {
+                val buffer = Buffer()
+                origin.body?.writeTo(buffer)
+                if (buffer.size > 0) {
+                    val originContent = buffer.readUtf8()
+                    val decryptContent = it.encrypt(originContent)
+                    decryptContent?.let { content ->
+                        val encryptedBody =
+                            content.toRequestBody(jsonType)
+                        return origin.newBuilder().method(origin.method, encryptedBody).build()
+                    }
+                }
+            }
+        }
+        return origin
     }
 
     private fun isValidEndpoint(url: String): Boolean {

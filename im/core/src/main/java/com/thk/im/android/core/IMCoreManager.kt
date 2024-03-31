@@ -44,6 +44,8 @@ object IMCoreManager {
     val severTime: Long
         get() = commonModule.getSeverTime()
 
+    var crypto: Crypto? = null
+
     fun init(app: Application, debug: Boolean = true) {
         this.app = app
         this.debug = debug

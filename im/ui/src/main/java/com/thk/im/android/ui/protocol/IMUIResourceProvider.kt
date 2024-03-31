@@ -8,4 +8,6 @@ interface IMUIResourceProvider {
      * @return resId
      */
     fun avatar(user: User): Int?
+
+    fun unicodeEmojis(): List<String>?
 }

@@ -120,7 +120,7 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
                 disposables.remove(this)
             }
         }
-        IMCoreManager.messageModule.querySessionMembers(session!!.id)
+        IMCoreManager.messageModule.querySessionMembers(session!!.id, false)
             .flatMap { members ->
                 val uIds = mutableSetOf<Long>()
                 for (m in members) {

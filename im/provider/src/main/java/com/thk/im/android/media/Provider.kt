@@ -32,7 +32,15 @@ class Provider(app: Application, token: String) : IMProvider {
     override fun openCamera(
         activity: Activity, formats: List<IMFileFormat>, imContentResult: IMContentResult
     ) {
-        PictureSelector.create(activity).openCamera(SelectMimeType.ofAll())
+        var type = SelectMimeType.ofAll()
+        if (formats.size == 1) {
+            if (formats.first() == IMFileFormat.Image) {
+                type = SelectMimeType.TYPE_IMAGE
+            } else if (formats.first() == IMFileFormat.Video) {
+                type = SelectMimeType.TYPE_VIDEO
+            }
+        }
+        PictureSelector.create(activity).openCamera(type)
             .setCompressEngine(CompressFileEngine { context, source, call ->
                 if (source != null && source.size > 0) {
                     Luban.with(context).load(source).ignoreBy(300)

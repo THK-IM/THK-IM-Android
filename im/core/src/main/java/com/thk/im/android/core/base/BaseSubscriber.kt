@@ -6,7 +6,6 @@ abstract class BaseSubscriber<T> : DisposableSubscriber<T>() {
 
     override fun onError(t: Throwable?) {
         t?.printStackTrace()
-        onComplete()
     }
 
     override fun onComplete() {

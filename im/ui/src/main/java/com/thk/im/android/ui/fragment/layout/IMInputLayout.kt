@@ -25,8 +25,6 @@ import com.hjq.permissions.XXPermissions
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.MsgType
-import com.thk.im.android.core.SessionMuted
-import com.thk.im.android.core.SessionStatus
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
@@ -48,7 +46,6 @@ import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.utils.AtStringUtils
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 import kotlin.math.abs
@@ -87,6 +84,22 @@ class IMInputLayout : ConstraintLayout {
         binding.ivSendMsg.setOnClickListener {
             sendInputContent()
         }
+
+
+        val tintColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#999999")
+        binding.vReplyLine.setShape(
+            tintColor, floatArrayOf(2f, 2f, 2f, 2f), false
+        )
+
+        val inputColor =
+            IMUIManager.uiResourceProvider?.inputBgColor() ?: Color.parseColor("#EEEEEE")
+        binding.etMessage.setShape(
+            inputColor, floatArrayOf(20f, 20f, 20f, 20f), false
+        )
+
+        binding.btRecordVoice.setShape(
+            inputColor, floatArrayOf(20f, 20f, 20f, 20f), false
+        )
 
         binding.etMessage.setOnKeyListener(object : View.OnKeyListener {
             override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
@@ -236,9 +249,6 @@ class IMInputLayout : ConstraintLayout {
             msgSender?.setSelectMode(false, null)
         }
 
-        binding.vReplyLine.setShape(
-            Color.parseColor("#ff999999"), floatArrayOf(2f, 2f, 2f, 2f), false
-        )
 
         binding.ivReplyClose.setOnClickListener {
             clearReplyMessage()

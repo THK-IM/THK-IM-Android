@@ -28,10 +28,9 @@ class IMReplyMsgContainerView : LinearLayout {
         val view =
             LayoutInflater.from(context).inflate(R.layout.view_reply_msg_container, this, true)
         binding = ViewReplyMsgContainerBinding.bind(view)
-        binding.tvReplyMsgUserNick.setTextColor(Color.parseColor("#ff08AAFF"))
-        binding.vReplyMsgLine.setShape(
-            Color.parseColor("#ff08AAFF"), floatArrayOf(2f, 2f, 2f, 2f), false
-        )
+        val color = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#08AAFF")
+        binding.tvReplyMsgUserNick.setTextColor(color)
+        binding.vReplyMsgLine.setShape(color, floatArrayOf(2f, 2f, 2f, 2f), false)
     }
 
     fun setMessage(user: User, message: Message, session: Session, delegate: IMMsgVHOperator?) {

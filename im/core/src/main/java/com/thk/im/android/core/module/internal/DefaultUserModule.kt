@@ -18,6 +18,14 @@ open class DefaultUserModule : UserModule {
         return Flowable.just(user)
     }
 
+    open fun queryServerUsers(ids: Set<Long>): Flowable<Map<Long, User>> {
+        val userMap = mutableMapOf<Long, User>()
+        for (id in ids) {
+            userMap[id] = User(id)
+        }
+        return Flowable.just(userMap)
+    }
+
 
     override fun queryUser(id: Long): Flowable<User> {
         return Flowable.create<User>({
@@ -42,13 +50,34 @@ open class DefaultUserModule : UserModule {
     override fun queryUsers(ids: Set<Long>): Flowable<Map<Long, User>> {
         return Flowable.create<Map<Long, User>?>({
             val users = IMCoreManager.getImDataBase().userDao().findByIds(ids)
-            val userMap = mutableMapOf<Long, User>()
+            val dbUserMap = mutableMapOf<Long, User>()
             for (u in users) {
-                userMap[u.id] = u
+                dbUserMap[u.id] = u
             }
-            it.onNext(userMap)
+            it.onNext(dbUserMap)
             it.onComplete()
-        }, BackpressureStrategy.LATEST)
+        }, BackpressureStrategy.LATEST).flatMap { dbUserMap ->
+            val notFoundIds = mutableSetOf<Long>()
+            for (id in ids) {
+                if (dbUserMap[id] == null) {
+                    notFoundIds.add(id)
+                }
+            }
+            if (notFoundIds.isEmpty()) {
+                return@flatMap Flowable.just(dbUserMap)
+            } else {
+                return@flatMap queryServerUsers(notFoundIds).flatMap { serverUserMap ->
+                    val fullUserMap = mutableMapOf<Long, User>()
+                    for ((k, v) in serverUserMap) {
+                        fullUserMap[k] = v
+                    }
+                    for ((k, v) in dbUserMap) {
+                        fullUserMap[k] = v
+                    }
+                    Flowable.just(fullUserMap)
+                }
+            }
+        }
     }
 
     override fun onUserInfoUpdate(user: User) {

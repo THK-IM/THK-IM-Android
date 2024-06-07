@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.protocol
 
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
@@ -17,4 +18,10 @@ interface IMUIResourceProvider {
     fun msgContainer(posType: IMMsgPosType): Int?
 
     fun msgBubble(fromUId: Long, session: Session?): Drawable?
+
+    fun tintColor(): Int?
+
+    fun inputBgColor(): Int?
+
+    fun inputLayoutBgColor(): Int?
 }

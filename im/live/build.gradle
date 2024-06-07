@@ -9,7 +9,7 @@ plugins {
 def moduleName = "live"
 
 android {
-    namespace "${rootProject.ext.android.applicationId}.${moduleName}"
+    namespace "com.thk.im.android.${moduleName}"
     compileSdk rootProject.ext.android.compileSdkVersion
 
     defaultConfig {

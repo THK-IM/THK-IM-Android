@@ -317,7 +317,8 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         val readUIds = this.message.getReadUIds()
         val progress = readUIds.count().toFloat()/memberCount.toFloat()
         this.readStatusView?.visibility = View.VISIBLE
-        this.readStatusView?.updateStatus(Color.parseColor("#17a121"), 4f, progress)
+        val color = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#17a121")
+        this.readStatusView?.updateStatus(color, 4f, progress)
     }
 
     private fun renderReplyMsg() {
@@ -393,7 +394,9 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
             return
         }
         if (times % 2 == 0) {
-            itemView.setBackgroundColor(Color.parseColor("#2008AAFF"))
+            val tintColor =
+                IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#2008AAFF")
+            itemView.setBackgroundColor(tintColor)
         } else {
             itemView.setBackgroundColor(Color.TRANSPARENT)
         }

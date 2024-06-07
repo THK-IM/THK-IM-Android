@@ -57,6 +57,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignBottom="@id/et_message"
             android:layout_marginRight="4dp"
+            android:layout_marginBottom="5dp"
             android:scaleType="fitXY"
             android:src="@drawable/selector_voice_msg" />
 
@@ -66,6 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/et_message"
             android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp"
             android:layout_marginHorizontal="4dp">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -94,6 +96,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginLeft="4dp"
+            android:layout_marginBottom="5dp"
             android:layout_alignBottom="@id/et_message"
             android:layout_toLeftOf="@id/fl_right"
             android:scaleType="fitXY"
@@ -126,6 +129,7 @@
             android:background="@drawable/bg_msg_input"
             android:padding="8dp"
             android:text="@string/tip_for_voice_forward"
+            android:gravity="center"
             android:textColor="@color/font_main"
             android:textSize="16sp"
             android:visibility="gone" />

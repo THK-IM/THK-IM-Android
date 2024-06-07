@@ -13,7 +13,7 @@ def core_snapshot_version = String.format("%s-SNAPSHOT", rootProject.ext.android
 def core_version = core_snapshot_version
 
 android {
-    namespace "${rootProject.ext.android.applicationId}.ui"
+    namespace "com.thk.im.android.${moduleName}"
     compileSdk rootProject.ext.android.compileSdkVersion
 
     defaultConfig {

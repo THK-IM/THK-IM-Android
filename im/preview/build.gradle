@@ -18,7 +18,7 @@ def ui_snapshot_version = String.format("%s-SNAPSHOT", rootProject.ext.android.v
 def ui_version = ui_snapshot_version
 
 android {
-    namespace "${rootProject.ext.android.applicationId}.${moduleName}"
+    namespace "com.thk.im.android.${moduleName}"
     compileSdk rootProject.ext.android.compileSdkVersion
 
     defaultConfig {

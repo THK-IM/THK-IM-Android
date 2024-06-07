@@ -22,7 +22,7 @@ import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 import io.reactivex.disposables.CompositeDisposable
 
 
-class IMSessionFragment : Fragment(), IMSessionVHOperator {
+open class IMSessionFragment : Fragment(), IMSessionVHOperator {
 
     interface OnSessionClick {
         fun onSessionClick(session: Session)

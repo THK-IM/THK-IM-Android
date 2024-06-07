@@ -11,6 +11,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
+import com.thk.im.android.ui.manager.IMUIManager
 
 abstract class IMBaseMessageIVProvider {
 
@@ -79,15 +80,18 @@ abstract class IMBaseMessageIVProvider {
         val msgType = messageType()
         return when (viewType) {
             3 * msgType + 1 -> {
-                R.layout.itemview_msg_left_container
+                IMUIManager.uiResourceProvider?.msgContainer(IMMsgPosType.Left)
+                    ?: R.layout.itemview_msg_left_container
             }
 
             3 * msgType + 2 -> {
-                R.layout.itemview_msg_right_container
+                IMUIManager.uiResourceProvider?.msgContainer(IMMsgPosType.Right)
+                    ?: R.layout.itemview_msg_right_container
             }
 
             else -> {
-                R.layout.itemview_msg_mid_container
+                IMUIManager.uiResourceProvider?.msgContainer(IMMsgPosType.Mid)
+                    ?: R.layout.itemview_msg_mid_container
             }
         }
     }

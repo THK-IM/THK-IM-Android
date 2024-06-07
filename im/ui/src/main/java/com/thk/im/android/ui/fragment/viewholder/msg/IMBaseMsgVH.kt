@@ -88,25 +88,40 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         if (hasBubble()) {
             when (getPositionType()) {
                 IMMsgPosType.Left.value -> {
-                    msgContentView.setShape(
-                        Color.parseColor("#ffdddddd"),
-                        floatArrayOf(0f, 10f, 0f, 10f)
-                    )
+                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message.fUid, session)
+                    if (bubble != null) {
+                        msgContentView.background = bubble
+                    } else {
+                        msgContentView.setShape(
+                            Color.parseColor("#ffdddddd"),
+                            floatArrayOf(0f, 10f, 0f, 10f)
+                        )
+                    }
                 }
 
                 IMMsgPosType.Right.value -> {
-                    msgContentView.setShape(
-                        Color.parseColor("#d1e3fe"),
-                        floatArrayOf(10f, 0f, 10f, 0f)
-                    )
+                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message.fUid, session)
+                    if (bubble != null) {
+                        msgContentView.background = bubble
+                    } else {
+                        msgContentView.setShape(
+                            Color.parseColor("#d1e3fe"),
+                            floatArrayOf(10f, 0f, 10f, 0f)
+                        )
+                    }
                 }
 
                 else -> {
-                    msgContentView.setShape(
-                        Color.parseColor("#20000000"),
-                        floatArrayOf(10f, 10f, 10f, 10f),
-                        false
-                    )
+                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message.fUid, session)
+                    if (bubble != null) {
+                        msgContentView.background = bubble
+                    } else {
+                        msgContentView.setShape(
+                            Color.parseColor("#20000000"),
+                            floatArrayOf(10f, 10f, 10f, 10f),
+                            false
+                        )
+                    }
                 }
             }
         }

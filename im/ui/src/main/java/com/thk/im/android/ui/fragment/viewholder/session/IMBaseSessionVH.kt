@@ -26,11 +26,11 @@ abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
     val lastTimeView: AppCompatTextView = itemView.findViewById(R.id.tv_last_time)
     val unReadCountView: AppCompatTextView = itemView.findViewById(R.id.tv_unread_count)
 
-    private val statusView: AppCompatImageView = itemView.findViewById(R.id.iv_session_status)
-    private val deleteView = itemView.findViewById<TextView>(R.id.tv_session_delete)
-    private val topView = itemView.findViewById<TextView>(R.id.tv_session_top)
-    private val muteView = itemView.findViewById<TextView>(R.id.tv_session_mute)
-    private val container = itemView.findViewById<ConstraintLayout>(R.id.cl_container)
+    val statusView: AppCompatImageView = itemView.findViewById(R.id.iv_session_status)
+    val deleteView = itemView.findViewById<TextView>(R.id.tv_session_delete)
+    val topView = itemView.findViewById<TextView>(R.id.tv_session_top)
+    val muteView = itemView.findViewById<TextView>(R.id.tv_session_mute)
+    val container = itemView.findViewById<ConstraintLayout>(R.id.cl_container)
 
     lateinit var session: Session
     private var sessionVHOperator: IMSessionVHOperator? = null

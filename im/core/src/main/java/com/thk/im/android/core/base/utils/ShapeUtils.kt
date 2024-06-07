@@ -1,5 +1,6 @@
 package com.thk.im.android.core.base.utils
 
+import android.graphics.Color
 import android.graphics.Path
 import android.graphics.drawable.GradientDrawable
 import androidx.annotation.ColorInt
@@ -28,6 +29,32 @@ object ShapeUtils {
         radiusBg.setColor(color)
         //设置线条粗心和颜色,px
         radiusBg.setStroke(strokeWidth, strokeColor)
+        //每连续的两个数值表示是一个角度,四组:左上,右上,右下,左下
+        if (radius != null && radius.size == 4) {
+            radiusBg.cornerRadii = floatArrayOf(
+                radius[0], radius[0],
+                radius[1], radius[1],
+                radius[2], radius[2],
+                radius[3], radius[3]
+            )
+        }
+        return radiusBg
+    }
+
+    fun createGradientRectangleDrawable(
+        @ColorInt startColor: Int,
+        @ColorInt endColor: Int,
+        strokeWidth: Int,
+        radius: FloatArray?
+    ): GradientDrawable {
+        val radiusBg = GradientDrawable()
+        //设置Shape类型
+        radiusBg.shape = GradientDrawable.RECTANGLE
+        //设置填充颜色
+        radiusBg.colors = intArrayOf(startColor, endColor)
+        radiusBg.orientation = GradientDrawable.Orientation.LEFT_RIGHT
+        //设置线条粗心和颜色,px
+        radiusBg.setStroke(strokeWidth, Color.TRANSPARENT)
         //每连续的两个数值表示是一个角度,四组:左上,右上,右下,左下
         if (radius != null && radius.size == 4) {
             radiusBg.cornerRadii = floatArrayOf(

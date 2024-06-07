@@ -20,6 +20,21 @@ fun View.setShapeWithStroke(color: Int, strokeColor: Int, strokeWidth: Int, radi
     background = default
 }
 
+fun View.setGradientShape(startColor: Int, endColor: Int, strokeWidth: Int, radius: FloatArray) {
+    val scale = Resources.getSystem().displayMetrics.density
+    val scalePx = FloatArray(radius.size)
+    var i = 0
+    radius.forEach {
+        scalePx[i] = it * scale
+        i++
+    }
+    val default = ShapeUtils.createGradientRectangleDrawable(
+        startColor, endColor, (strokeWidth * scale).toInt(), scalePx
+    )
+
+    background = default
+}
+
 fun View.setShape(color: Int, radius: FloatArray, autoSelected: Boolean = true) {
     val scale = Resources.getSystem().displayMetrics.density
     val scalePx = FloatArray(radius.size)

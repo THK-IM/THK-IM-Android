@@ -365,10 +365,10 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
             var popupWidth = 20.dp2px()
             val operators = IMUIManager.getMsgOperators(message, this.session!!)
             val rowCount = 5
-            if (operators.size < 5) {
-                popupWidth += operators.size * (60.dp2px())
+            popupWidth += if (operators.size < 5) {
+                operators.size * (60.dp2px())
             } else {
-                popupWidth += 300.dp2px()
+                300.dp2px()
             }
             var popupHeight = ((operators.size / rowCount) * 60 + 30).dp2px()
             if (operators.size % rowCount > 0) {

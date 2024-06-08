@@ -2,7 +2,7 @@
 <resources>
     <string name="new_message">新消息</string>
     <string name="your_are_banned_by_admin">你已经被管理员禁言</string>
-    <string name="send_message_ddd">发消息…</string>
+    <string name="send_message_ddd">说点什么..</string>
     <string name="tip_for_voice_forward">按住 说话</string>
     <string name="release_to_send_voice">松开 结束</string>
     <string name="send">发送</string>
@@ -11,7 +11,7 @@
     <string name="cancel">取消</string>
     <string name="album">相册</string>
     <string name="voice_call">语音通话</string>
-    <string name="plz_get_premission_and_send_voice">请授予权限后再使用发送语音功能</string>
+    <string name="plz_get_permission_and_send_voice">请授予权限后再使用发送语音功能</string>
     <string name="record_too_short">录音时长少于1秒</string>
     <string name="all_emoji">全部表情</string>
     <string name="latest_emoji">最近表情</string>

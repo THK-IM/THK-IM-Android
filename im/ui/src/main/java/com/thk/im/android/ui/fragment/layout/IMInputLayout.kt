@@ -22,6 +22,8 @@ import androidx.emoji2.widget.EmojiEditText
 import androidx.lifecycle.LifecycleOwner
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
+import com.lxj.xpopup.XPopup
+import com.lxj.xpopup.core.BasePopupView
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.MsgType
@@ -36,6 +38,7 @@ import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
+import com.thk.im.android.ui.fragment.popup.IMRecordDbPopup
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMChatFunction
 import com.thk.im.android.ui.manager.IMReeditMsgData
@@ -55,6 +58,8 @@ class IMInputLayout : ConstraintLayout {
 
     private val binding: LayoutMessageInputBinding
     private val disposables = CompositeDisposable()
+    private val recordPopup: IMRecordDbPopup
+    private val recordPopupView: BasePopupView
 
     private lateinit var lifecycleOwner: LifecycleOwner
     private lateinit var session: Session
@@ -76,6 +81,10 @@ class IMInputLayout : ConstraintLayout {
     )
 
     init {
+        recordPopup = IMRecordDbPopup(context)
+        recordPopupView =
+            XPopup.Builder(context).isViewMode(true).isDestroyOnDismiss(false).hasShadowBg(false)
+                .asCustom(recordPopup)
         val view = LayoutInflater.from(context).inflate(R.layout.layout_message_input, this, true)
         binding = LayoutMessageInputBinding.bind(view)
         binding.etMessage.isFocusable = true
@@ -97,8 +106,10 @@ class IMInputLayout : ConstraintLayout {
             inputColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )
 
+        val inputLayoutColor =
+            IMUIManager.uiResourceProvider?.inputLayoutBgColor() ?: Color.parseColor("#EEEEEE")
         binding.btRecordVoice.setShape(
-            inputColor, floatArrayOf(20f, 20f, 20f, 20f), false
+            inputLayoutColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )
 
         binding.etMessage.setOnKeyListener(object : View.OnKeyListener {
@@ -220,10 +231,14 @@ class IMInputLayout : ConstraintLayout {
                     val cancel = abs(p1.y - audioEventY) > 180
                     if (audioCancel != cancel) {
                         audioCancel = cancel
-                        if (audioCancel) {
-                            binding.btRecordVoice.text = "松开 取消"
+                        val tips = if (audioCancel) {
+                            "松开 取消"
                         } else {
-                            binding.btRecordVoice.text = "松开 发送"
+                            "松开 发送"
+                        }
+                        binding.btRecordVoice.text = tips
+                        if (recordPopupView.isShow) {
+                            recordPopup.setTips(tips)
                         }
                     }
                 }
@@ -259,6 +274,8 @@ class IMInputLayout : ConstraintLayout {
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         disposables.clear()
+        recordPopup.destroy()
+        recordPopupView.destroy()
     }
 
     fun init(
@@ -397,6 +414,11 @@ class IMInputLayout : ConstraintLayout {
     private fun startRecordingAudio() {
         val contentProvider = IMUIManager.mediaProvider ?: return
 
+        val inputBgColor =
+            IMUIManager.uiResourceProvider?.inputBgColor() ?: Color.parseColor("#EEEEEE")
+        binding.btRecordVoice.setShape(
+            inputBgColor, floatArrayOf(20f, 20f, 20f, 20f), false
+        )
         if (!contentProvider.isRecordingAudio()) {
             binding.btRecordVoice.text = "松开 发送"
             val path = IMCoreManager.storageModule.allocSessionFilePath(
@@ -427,12 +449,20 @@ class IMInputLayout : ConstraintLayout {
     }
 
     private fun onAudioCallback(path: String, second: Int, db: Double, state: AudioStatus) {
+        if (recordPopupView.isShow) {
+            recordPopup.setDb(db)
+        }
         when (state) {
             AudioStatus.Ing, AudioStatus.Waiting -> {
-                ToastUtils.show("录音时长:$second, db: $db")
+                if (!recordPopupView.isShow) {
+                    recordPopupView.show()
+                }
             }
 
             AudioStatus.Finished -> {
+                if (recordPopupView.isShow) {
+                    recordPopupView.dismiss()
+                }
                 if (!audioCancel) {
                     val audioMsgData = IMAudioMsgData()
                     audioMsgData.duration = second
@@ -443,6 +473,9 @@ class IMInputLayout : ConstraintLayout {
             }
 
             AudioStatus.Exited -> {
+                if (recordPopupView.isShow) {
+                    recordPopupView.dismiss()
+                }
                 val file = File(path)
                 if (file.exists()) {
                     if (!file.delete()) {
@@ -455,6 +488,14 @@ class IMInputLayout : ConstraintLayout {
     }
 
     private fun stopAudioRecording() {
+        if (recordPopupView.isShow) {
+            recordPopupView.dismiss()
+        }
+        val inputLayoutBgColor =
+            IMUIManager.uiResourceProvider?.inputLayoutBgColor() ?: Color.parseColor("#EEEEEE")
+        binding.btRecordVoice.setShape(
+            inputLayoutBgColor, floatArrayOf(20f, 20f, 20f, 20f), false
+        )
         binding.btRecordVoice.text = "按住 说话"
         val contentProvider = IMUIManager.mediaProvider ?: return
         contentProvider.stopRecordAudio()

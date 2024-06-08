@@ -119,7 +119,7 @@ class IMSessionChoosePopup constructor(
             return@flatMap IMCoreManager.userModule.queryUser(IMCoreManager.uId)
                 .flatMap { user ->
                     it.title = user.nickname
-                    return@flatMap Flowable.just(it)
+                    Flowable.just(it)
                 }
         }.flatMap {
             val title = if (session.type == SessionType.Group.value || session.type == SessionType.SuperGroup.value) {

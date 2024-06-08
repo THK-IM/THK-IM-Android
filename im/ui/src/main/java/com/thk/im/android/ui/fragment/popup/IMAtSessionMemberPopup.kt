@@ -87,7 +87,7 @@ class IMAtSessionMemberPopup constructor(
                             }
                         }
                     }
-                    return@flatMap Flowable.just(memberMap)
+                    Flowable.just(memberMap)
                 }
             }.compose(RxTransform.flowableToMain())
             .subscribe(subscriber)

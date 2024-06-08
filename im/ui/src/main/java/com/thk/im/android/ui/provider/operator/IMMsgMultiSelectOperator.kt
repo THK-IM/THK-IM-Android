@@ -16,7 +16,7 @@ class IMMsgMultiSelectOperator: IMMessageOperator() {
     }
 
     override fun resId(): Int {
-        return R.drawable.ic_msg_opr_mulit_select
+        return R.drawable.ic_msg_opr_multi_select
     }
 
     override fun onClick(sender: IMMsgSender, message: Message) {

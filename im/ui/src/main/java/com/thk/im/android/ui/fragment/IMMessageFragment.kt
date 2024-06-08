@@ -328,9 +328,6 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         session?.let {
             IMCoreManager.messageModule.deleteMessages(it.id, messages.toList(), true)
                 .compose(RxTransform.flowableToMain()).subscribe(object : BaseSubscriber<Void>() {
-                    override fun onComplete() {
-                        super.onComplete()
-                    }
 
                     override fun onNext(t: Void?) {}
 
@@ -365,14 +362,21 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
         view.getLocationOnScreen(locations)
         context?.let {
             val point = PointF()
-            val popupWidth = 320.dp2px()
+            var popupWidth = 20.dp2px()
             val operators = IMUIManager.getMsgOperators(message, this.session!!)
             val rowCount = 5
-            val popupHeight =
-                ((operators.size / rowCount + operators.size % rowCount) * 60 + 30).dp2px()
+            if (operators.size < 5) {
+                popupWidth += operators.size * (60.dp2px())
+            } else {
+                popupWidth += 300.dp2px()
+            }
+            var popupHeight = ((operators.size / rowCount) * 60 + 30).dp2px()
+            if (operators.size % rowCount > 0) {
+                popupHeight += 60.dp2px()
+            }
             point.x =
                 (AppUtils.instance().screenWidth / 2).toFloat()
-            if (locations[1] <= 300.dp2px() && (locations[1] + view.height) >= (com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight - 300.dp2px())) {
+            if (locations[1] <= 300.dp2px() && (locations[1] + view.height) >= (AppUtils.instance().screenHeight - 300.dp2px())) {
                 point.y =
                     ((AppUtils.instance().screenHeight - popupHeight) / 2).toFloat()
             } else if (locations[1] > (300.dp2px())) {
@@ -387,7 +391,8 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
             XPopup.Builder(context).popupAnimation(PopupAnimation.ScaleAlphaFromCenter)
                 .shadowBgColor(Color.TRANSPARENT).hasShadowBg(false).isViewMode(true)
                 .isCenterHorizontal(true).isDestroyOnDismiss(true).popupWidth(popupWidth)
-                .popupHeight(popupHeight).hasBlurBg(false).atPoint(point).asCustom(popupView).show()
+                .popupHeight(popupHeight).hasBlurBg(false).atPoint(point)
+                .asCustom(popupView).show()
         }
     }
 

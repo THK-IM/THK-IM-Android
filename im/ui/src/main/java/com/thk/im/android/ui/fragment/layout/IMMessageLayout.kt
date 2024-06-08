@@ -60,7 +60,6 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         this.msgSender = sender
         this.msgPreviewer = previewer
         initUI()
-        loadMessages()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -130,7 +129,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
 
     }
 
-    private fun loadMessages() {
+    fun loadMessages() {
         if (!hasMore || isLoading) return
         val messages = getMessages()
         val endTime = if (messages.isEmpty()) {

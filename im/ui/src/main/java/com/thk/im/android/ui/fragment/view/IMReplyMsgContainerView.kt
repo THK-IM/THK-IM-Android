@@ -39,7 +39,7 @@ class IMReplyMsgContainerView : LinearLayout {
             binding.flReplyContent.removeView(it)
         }
         val view = IMUIManager.getMsgIVProviderByMsgType(message.type).replyMsgView(context)
-        view.setMessage(positionType, message, session, delegate, true)
         binding.flReplyContent.addView(view.contentView())
+        view.setMessage(positionType, message, session, delegate, true)
     }
 }

@@ -89,7 +89,7 @@
                 android:layout_gravity="end"
                 android:ellipsize="end"
                 android:lines="1"
-                android:textColor="#999999"
+                android:textColor="#666666"
                 android:textSize="12sp" />
 
             <LinearLayout

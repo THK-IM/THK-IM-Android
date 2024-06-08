@@ -117,11 +117,13 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                     updateSessionMember(it)
                 }
                 disposables.remove(this)
+                binding.rcvMessage.loadMessages()
             }
 
             override fun onError(t: Throwable?) {
                 super.onError(t)
                 disposables.remove(this)
+                binding.rcvMessage.loadMessages()
             }
         }
         IMCoreManager.messageModule.querySessionMembers(session!!.id, false)

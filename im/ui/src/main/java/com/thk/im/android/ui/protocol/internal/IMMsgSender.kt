@@ -82,6 +82,9 @@ interface IMMsgSender {
     /// dismiss Loading
     fun dismissLoading()
 
+    /// 显示toast
+    fun showToast(text: String)
+
     /// show message
     fun showMessage(text: String, success: Boolean)
 

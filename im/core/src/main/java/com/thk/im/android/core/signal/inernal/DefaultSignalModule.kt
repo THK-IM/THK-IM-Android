@@ -167,11 +167,6 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         val success = webSocket?.send(encryptSignal)
         if (success == false) {
             LLog.e("DefaultSignalModule, Send Signal failed $webSocket $status ${Thread.currentThread().name}")
-        } else {
-            LLog.d(
-                "DefaultSignalModule",
-                "Send Signal $webSocket $status ${Thread.currentThread().name}"
-            )
         }
     }
 

@@ -8,7 +8,7 @@ import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMTimeLineMsgView
-import com.thk.im.android.ui.provider.msg.viewholder.IMTimeLineMsgVHIM
+import com.thk.im.android.ui.provider.msg.viewholder.IMTimeLineMsgVH
 
 class IMTimeLineMsgIVProvider : IMBaseMessageIVProvider() {
 
@@ -33,6 +33,6 @@ class IMTimeLineMsgIVProvider : IMBaseMessageIVProvider() {
         itemView: View,
         viewType: Int
     ): IMBaseMsgVH {
-        return IMTimeLineMsgVHIM(lifecycleOwner, itemView, messageType())
+        return IMTimeLineMsgVH(lifecycleOwner, itemView, messageType())
     }
 }

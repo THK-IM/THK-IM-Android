@@ -36,6 +36,7 @@ class IMUnSupportMsgView : LinearLayout, IMsgBodyView {
     }
 
     override fun setMessage(
+        positionType: Int,
         message: Message,
         session: Session?,
         delegate: IMMsgVHOperator?,
@@ -46,20 +47,20 @@ class IMUnSupportMsgView : LinearLayout, IMsgBodyView {
             0L -> {
                 if (isReply) {
                     binding.tvMsgContent.textSize = 12.0f
-                    binding.tvMsgContent.setTextColor(Color.parseColor("#ff999999"))
+                    binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
                 } else {
-                    binding.tvMsgContent.textSize = 14.0f
-                    binding.tvMsgContent.setTextColor(Color.WHITE)
+                    binding.tvMsgContent.textSize = 12.0f
+                    binding.tvMsgContent.setTextColor(Color.parseColor("#FFFFFF"))
                 }
             }
 
             else -> {
                 if (isReply) {
                     binding.tvMsgContent.textSize = 12.0f
-                    binding.tvMsgContent.setTextColor(Color.parseColor("#ff999999"))
+                    binding.tvMsgContent.setTextColor(Color.parseColor("#FFFFFF"))
                 } else {
                     binding.tvMsgContent.textSize = 16.0f
-                    binding.tvMsgContent.setTextColor(Color.parseColor("#333333"))
+                    binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
                 }
             }
         }

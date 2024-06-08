@@ -8,7 +8,7 @@ import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMVideoMsgView
-import com.thk.im.android.ui.provider.msg.viewholder.IMVideoMsgVHIM
+import com.thk.im.android.ui.provider.msg.viewholder.IMVideoMsgVH
 
 class IMVideoMsgIVProvider : IMBaseMessageIVProvider() {
 
@@ -33,6 +33,6 @@ class IMVideoMsgIVProvider : IMBaseMessageIVProvider() {
         itemView: View,
         viewType: Int
     ): IMBaseMsgVH {
-        return IMVideoMsgVHIM(lifecycleOwner, itemView, viewType)
+        return IMVideoMsgVH(lifecycleOwner, itemView, viewType)
     }
 }

@@ -144,10 +144,14 @@ object OggOpusRecorder {
     private fun callback(db: Double, status: AudioStatus = AudioStatus.Ing) {
         audioCallback?.let {
             audioPath?.let { path ->
-                val end = System.currentTimeMillis()
-                val duration = (end - startAtTimestampMs) / 1000 + 1
                 handler.post {
-                    it.audioData(path, duration.toInt(), db, status)
+                    val durationMs = System.currentTimeMillis() - startAtTimestampMs
+                    if (durationMs < 500) {
+                        it.audioData(path, 0, db, status)
+                    } else {
+                        val duration = durationMs / 1000 + 1
+                        it.audioData(path, duration.toInt(), db, status)
+                    }
                 }
             }
         }

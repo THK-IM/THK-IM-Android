@@ -80,7 +80,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
 
     override fun onViewAttached() {
         super.onViewAttached()
-        readMessage()
+        onMessageShow()
     }
 
     private fun attachLayout() {
@@ -200,7 +200,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         return IMUIManager.getMsgIVProviderByMsgType(message.type).canSelect()
     }
 
-    private fun readMessage() {
+    open fun onMessageShow() {
         if (message.msgId <= 0) {
             return
         }
@@ -329,7 +329,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
                     t?.let { user ->
                         message.referMsg?.let {
                             msgReplyContentView.setMessage(
-                                user, it, session, msgVHOperator
+                                getPositionType(), user, it, session, msgVHOperator
                             )
                         }
                     }
@@ -385,7 +385,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         }
     }
 
-    private fun getPositionType(): Int {
+    protected fun getPositionType(): Int {
         return viewType % 3
     }
 

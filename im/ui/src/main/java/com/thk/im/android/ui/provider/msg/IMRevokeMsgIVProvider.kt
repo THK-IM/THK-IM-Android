@@ -10,7 +10,7 @@ import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMRevokeMsgView
-import com.thk.im.android.ui.provider.msg.viewholder.IMRevokeMsgVHIM
+import com.thk.im.android.ui.provider.msg.viewholder.IMRevokeMsgVH
 
 class IMRevokeMsgIVProvider : IMBaseMessageIVProvider() {
 
@@ -40,6 +40,6 @@ class IMRevokeMsgIVProvider : IMBaseMessageIVProvider() {
         itemView: View,
         viewType: Int
     ): IMBaseMsgVH {
-        return IMRevokeMsgVHIM(lifecycleOwner, itemView, viewType)
+        return IMRevokeMsgVH(lifecycleOwner, itemView, viewType)
     }
 }

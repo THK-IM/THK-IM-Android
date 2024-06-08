@@ -8,7 +8,7 @@ import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMAudioMsgView
-import com.thk.im.android.ui.provider.msg.viewholder.IMAudioMsgVHIM
+import com.thk.im.android.ui.provider.msg.viewholder.IMAudioMsgVH
 
 class IMAudioMsgIVProvider : IMBaseMessageIVProvider() {
 
@@ -33,6 +33,6 @@ class IMAudioMsgIVProvider : IMBaseMessageIVProvider() {
         itemView: View,
         viewType: Int
     ): IMBaseMsgVH {
-        return IMAudioMsgVHIM(lifecycleOwner, itemView, viewType)
+        return IMAudioMsgVH(lifecycleOwner, itemView, viewType)
     }
 }

@@ -31,7 +31,6 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
-import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
@@ -403,7 +402,7 @@ class IMInputLayout : ConstraintLayout {
         if (!granted) {
             XXPermissions.with(context).permission(Permission.RECORD_AUDIO).request { _, all ->
                 if (!all) {
-                    ToastUtils.show("请开启录音权限")
+                    msgSender?.showToast("请开启录音权限")
                 }
             }
         } else {
@@ -464,6 +463,10 @@ class IMInputLayout : ConstraintLayout {
                     recordPopupView.dismiss()
                 }
                 if (!audioCancel) {
+                    if (second == 0) {
+                        msgSender?.showToast("录音时间太短")
+                        return
+                    }
                     val audioMsgData = IMAudioMsgData()
                     audioMsgData.duration = second
                     audioMsgData.path = path
@@ -482,7 +485,7 @@ class IMInputLayout : ConstraintLayout {
                         return
                     }
                 }
-                ToastUtils.show("录音失败")
+                msgSender?.showToast("录音失败")
             }
         }
     }
@@ -539,9 +542,11 @@ class IMInputLayout : ConstraintLayout {
     private fun renderInputText(content: Editable) {
         val regex = AtStringUtils.atRegex
         val sequence = regex.findAll(content)
+        val highlightColor =
+            IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#1390f4")
         sequence.forEach { matchResult ->
             val range = matchResult.range
-            val atSpan = ForegroundColorSpan(Color.parseColor("#1390f4"))
+            val atSpan = ForegroundColorSpan(highlightColor)
             binding.etMessage.text.setSpan(
                 atSpan,
                 range.first - 1,

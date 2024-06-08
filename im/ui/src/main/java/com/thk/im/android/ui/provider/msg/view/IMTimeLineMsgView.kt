@@ -1,12 +1,12 @@
 package com.thk.im.android.ui.provider.msg.view
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
@@ -38,19 +38,13 @@ class IMTimeLineMsgView : LinearLayout, IMsgBodyView {
     }
 
     override fun setMessage(
+        positionType: Int,
         message: Message,
         session: Session?,
         delegate: IMMsgVHOperator?,
         isReply: Boolean
     ) {
-        if (isReply) {
-            binding.tvMsgContent.textSize = 12.0f
-            binding.tvMsgContent.setTextColor(Color.parseColor("#ff999999"))
-        } else {
-            binding.tvMsgContent.textSize = 14.0f
-            binding.tvMsgContent.setTextColor(Color.WHITE)
-        }
-        binding.tvMsgContent.text =
-            DateUtils.timeToMsgTime(message.cTime, IMCoreManager.severTime)
+        val timeText = DateUtils.timeToMsgTime(message.cTime, IMCoreManager.severTime)
+        binding.tvMsgContent.text = timeText
     }
 }

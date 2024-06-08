@@ -7,16 +7,12 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
-import com.thk.im.android.ui.provider.msg.view.IMUnSupportMsgView
+import com.thk.im.android.ui.provider.msg.view.IMRevokeMsgView
 
-class IMUnSupportMsgVHIM(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
+class IMRevokeMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     IMBaseMsgVH(liftOwner, itemView, viewType) {
 
-    private val view: IMUnSupportMsgView
-
-    init {
-        view = IMUnSupportMsgView(itemView.context)
-    }
+    private val view: IMRevokeMsgView = IMRevokeMsgView(itemView.context)
 
     override fun msgBodyView(): IMsgBodyView {
         return view
@@ -29,6 +25,7 @@ class IMUnSupportMsgVHIM(liftOwner: LifecycleOwner, itemView: View, viewType: In
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-        view.setMessage(message, session, msgVHOperator)
+        view.setMessage(getPositionType(), message, session, msgVHOperator)
     }
+
 }

@@ -24,6 +24,7 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.IMSendMsgCallback
+import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
@@ -57,7 +58,7 @@ import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 
-class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
+open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow
     private lateinit var binding: FragmentMessageBinding
     private var keyboardShowing = false
@@ -297,13 +298,21 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
                 msg.data?.let {
                     val data = Gson().fromJson(it, IMAudioMsgData::class.java)
                     data.path?.let { path ->
-                        IMUIManager.mediaProvider?.startPlayAudio(path, object : AudioCallback {
+                        val success =
+                            IMUIManager.mediaProvider?.startPlayAudio(path, object : AudioCallback {
                             override fun audioData(
                                 path: String, second: Int, db: Double, state: AudioStatus
                             ) {
-                                ToastUtils.show("play: $second, $db")
+
                             }
                         })
+                        if (success == true) {
+                            if (msg.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) {
+                                readMessage(msg)
+                            }
+                        } else {
+                            showToast("播放失败")
+                        }
                     }
                 }
             }
@@ -401,6 +410,10 @@ class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemb
 
     override fun dismissLoading() {
 
+    }
+
+    override fun showToast(text: String) {
+        ToastUtils.show(text)
     }
 
     override fun showMessage(text: String, success: Boolean) {

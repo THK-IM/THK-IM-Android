@@ -7,19 +7,19 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
-import com.thk.im.android.ui.provider.msg.view.IMVideoMsgView
+import com.thk.im.android.ui.provider.msg.view.IMAudioMsgView
 
-class IMVideoMsgVHIM(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
+class IMAudioMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     IMBaseMsgVH(liftOwner, itemView, viewType) {
 
-    private val view: IMVideoMsgView
-
-    init {
-        view = IMVideoMsgView(itemView.context)
-    }
+    private val view: IMAudioMsgView = IMAudioMsgView(itemView.context)
 
     override fun msgBodyView(): IMsgBodyView {
         return view
+    }
+
+    override fun onMessageShow() {
+
     }
 
     override fun onViewBind(
@@ -29,6 +29,7 @@ class IMVideoMsgVHIM(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-        view.setMessage(message, session, msgVHOperator)
+        view.setMessage(getPositionType(), message, session, msgVHOperator)
     }
+
 }

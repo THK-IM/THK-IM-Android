@@ -8,7 +8,7 @@ import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMUnSupportMsgView
-import com.thk.im.android.ui.provider.msg.viewholder.IMUnSupportMsgVHIM
+import com.thk.im.android.ui.provider.msg.viewholder.IMUnSupportMsgVH
 
 class IMUnSupportMsgIVProvider : IMBaseMessageIVProvider() {
 
@@ -33,6 +33,6 @@ class IMUnSupportMsgIVProvider : IMBaseMessageIVProvider() {
         itemView: View,
         viewType: Int
     ): IMBaseMsgVH {
-        return IMUnSupportMsgVHIM(lifecycleOwner, itemView, viewType)
+        return IMUnSupportMsgVH(lifecycleOwner, itemView, viewType)
     }
 }

@@ -15,6 +15,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgTextBinding
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import com.thk.im.android.ui.utils.AtStringUtils
@@ -41,6 +42,7 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
     }
 
     override fun setMessage(
+        positionType: Int,
         message: Message,
         session: Session?,
         delegate: IMMsgVHOperator?,
@@ -49,10 +51,15 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         this.delegate = WeakReference(delegate)
         if (isReply) {
             binding.tvMsgContent.textSize = 12.0f
-            binding.tvMsgContent.setTextColor(Color.parseColor("#ff999999"))
+            binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
         } else {
-            binding.tvMsgContent.textSize = 16.0f
-            binding.tvMsgContent.setTextColor(Color.parseColor("#333333"))
+            if (positionType == IMMsgPosType.Mid.value) {
+                binding.tvMsgContent.textSize = 12.0f
+                binding.tvMsgContent.setTextColor(Color.parseColor("#FFFFFF"))
+            } else {
+                binding.tvMsgContent.textSize = 16.0f
+                binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
+            }
         }
         var content = message.content ?: return
         if (!message.atUsers.isNullOrBlank()) {
@@ -80,10 +87,12 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
     private fun render(content: String, updated: Boolean) {
         val regex = AtStringUtils.atRegex
         val sequence = regex.findAll(content)
+        val highlightColor =
+            IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#1390f4")
         val contentSpannable = SpannableStringBuilder(content)
         sequence.forEach { matchResult ->
             val range = matchResult.range
-            val atSpan = ForegroundColorSpan(Color.parseColor("#1390f4"))
+            val atSpan = ForegroundColorSpan(highlightColor)
             contentSpannable.setSpan(
                 atSpan,
                 range.first - 1,

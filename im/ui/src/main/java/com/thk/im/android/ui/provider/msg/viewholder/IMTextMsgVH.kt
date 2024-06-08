@@ -7,16 +7,12 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
-import com.thk.im.android.ui.provider.msg.view.IMRecordMsgView
+import com.thk.im.android.ui.provider.msg.view.IMTextMsgView
 
-class IMRecordMsgVHIM(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
+class IMTextMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
     IMBaseMsgVH(liftOwner, itemView, viewType) {
 
-    private val view: IMRecordMsgView
-
-    init {
-        view = IMRecordMsgView(itemView.context)
-    }
+    private val view: IMTextMsgView = IMTextMsgView(itemView.context)
 
     override fun msgBodyView(): IMsgBodyView {
         return view
@@ -29,7 +25,6 @@ class IMRecordMsgVHIM(liftOwner: LifecycleOwner, itemView: View, viewType: Int) 
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-        view.setMessage(message, session, msgVHOperator)
+        view.setMessage(getPositionType(), message, session, msgVHOperator)
     }
-
 }

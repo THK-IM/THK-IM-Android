@@ -149,6 +149,10 @@ class IMMediaPreviewActivity : AppCompatActivity() {
                 }
             }
         })
+
+        XEventBus.observe(this, ExitPreviewEvent, Observer<String> {
+            exit()
+        })
     }
 
     private fun intercept(event: MotionEvent) {

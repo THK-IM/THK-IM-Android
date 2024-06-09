@@ -3,18 +3,26 @@ package com.thk.im.preview.viewholder
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
-import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMMsgResourceType
+import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.preview.R
 import com.thk.im.android.ui.manager.IMImageMsgData
+import com.thk.im.preview.ExitPreviewEvent
 import com.thk.im.preview.view.ZoomableImageView
 
 class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
     PreviewVH(liftOwner, itemView) {
 
     private val iVMedia = itemView.findViewById<ZoomableImageView>(R.id.iv_media)
+
+    init {
+        iVMedia.setOnClickListener {
+            XEventBus.post(ExitPreviewEvent, "")
+        }
+    }
 
     override fun bindMessage(message: Message) {
         super.bindMessage(message)

@@ -187,4 +187,8 @@ public class AppUtils {
             }
         }
     }
+
+    public void vibrate(long ms) {
+        VibrateUtils.INSTANCE.vibrate(getApp(), ms);
+    }
 }

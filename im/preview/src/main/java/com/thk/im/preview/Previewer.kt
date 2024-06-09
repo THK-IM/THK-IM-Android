@@ -42,7 +42,8 @@ class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer
         intent.putExtra("origin_rect", rect)
         intent.putExtra("defaultId", defaultId)
         activity.startActivity(intent)
-        if (Build.VERSION.SDK_INT >= 34) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             activity.overrideActivityTransition(Activity.OVERRIDE_TRANSITION_OPEN, 0, 0)
         } else {
             activity.overridePendingTransition(0, 0)

@@ -18,4 +18,11 @@ internal interface ContactDao {
     @Query("select * from contact")
     fun findAll(): List<Contact>
 
+    @Query("select * from contact where id= :entityId")
+    fun findByUserId(entityId: Long): Contact?
+
+
+    @Query("select * from contact where (relation & :relation ) != 0")
+    fun findByRelation(relation: Int): List<Contact>
+
 }

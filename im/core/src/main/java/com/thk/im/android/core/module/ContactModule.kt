@@ -9,4 +9,10 @@ interface ContactModule : BaseModule {
 
     fun queryAllContact(): Flowable<List<Contact>>
 
+    fun queryContactByUserId(entityId: Long): Flowable<Contact>
+
+    fun updateContact(contact: Contact): Flowable<Void>
+
+    fun queryContactsByRelation(relation: Int): Flowable<List<Contact>>
+
 }

@@ -9,4 +9,8 @@ interface IMContactDao {
     fun insertOrIgnore(contacts: List<Contact>)
 
     fun findAll(): List<Contact>
+
+    fun findByUserId(entityId: Long): Contact?
+
+    fun findByRelation(relation: Int): List<Contact>
 }

@@ -29,12 +29,15 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
     }
 
     private lateinit var sessionRecyclerView: RecyclerView
-    private lateinit var IMSessionAdapter: IMSessionAdapter
+    private lateinit var sessionAdapter: IMSessionAdapter
     private val disposables = CompositeDisposable()
     private var hasMore = true
     private val count = 10
     private var isLoading = false
     private var parentId: Long = 0L
+
+    private val updateSessions = mutableSetOf<Session>()
+    private var removeSessions = mutableSetOf<Session>()
 
     private var sessionClick: OnSessionClick? = null
 
@@ -62,7 +65,7 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
 
     private fun initSessionRecyclerView(rootView: View) {
         sessionRecyclerView = rootView.findViewById(R.id.rcv_session)
-        IMSessionAdapter = IMSessionAdapter(this, this)
+        sessionAdapter = IMSessionAdapter(this, this)
         sessionRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -75,31 +78,47 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
         })
 
         sessionRecyclerView.layoutManager = LinearLayoutManager(context)
-        sessionRecyclerView.adapter = IMSessionAdapter
+        sessionRecyclerView.adapter = sessionAdapter
     }
 
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.SessionNew.value, Observer<Session> {
             it?.let {
                 if (it.parentId == parentId) {
-                    IMSessionAdapter.onNewSession(it)
+                    updateSessions.add(it)
+
                 }
             }
         })
         XEventBus.observe(this, IMEvent.SessionUpdate.value, Observer<Session> {
             it?.let {
                 if (it.parentId == parentId) {
-                    IMSessionAdapter.onSessionUpdate(it)
+                    updateSessions.add(it)
                 }
             }
         })
         XEventBus.observe(this, IMEvent.SessionDelete.value, Observer<Session> {
             it?.let {
                 if (it.parentId == parentId) {
-                    IMSessionAdapter.onSessionRemove(it)
+                    removeSessions.add(it)
                 }
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        for (s in updateSessions) {
+            sessionAdapter.onSessionUpdate(s)
+        }
+        if (updateSessions.isNotEmpty()) {
+            sessionRecyclerView.scrollToPosition(0)
+        }
+        updateSessions.clear()
+        for (s in removeSessions) {
+            sessionAdapter.onSessionRemove(s)
+        }
+        removeSessions.clear()
     }
 
     override fun onDestroyView() {
@@ -111,10 +130,10 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
         isLoading = true
         val subscriber = object : BaseSubscriber<List<Session>>() {
             override fun onNext(t: List<Session>) {
-                if (IMSessionAdapter.itemCount == 0) {
-                    IMSessionAdapter.setData(t)
+                if (sessionAdapter.itemCount == 0) {
+                    sessionAdapter.setData(t)
                 } else {
-                    IMSessionAdapter.addData(t)
+                    sessionAdapter.addData(t)
                 }
                 hasMore = t.size >= count
             }
@@ -125,8 +144,8 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
             }
         }
         var current = IMCoreManager.severTime
-        if (IMSessionAdapter.getSessionList().isNotEmpty()) {
-            current = IMSessionAdapter.getSessionList().last().mTime
+        if (sessionAdapter.getSessionList().isNotEmpty()) {
+            current = sessionAdapter.getSessionList().last().mTime
         }
         IMCoreManager.messageModule.queryLocalSessions(parentId, 10, current)
             .compose(RxTransform.flowableToMain()).subscribe(subscriber)

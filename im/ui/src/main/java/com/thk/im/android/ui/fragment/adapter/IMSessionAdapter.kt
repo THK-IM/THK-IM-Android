@@ -60,11 +60,11 @@ class IMSessionAdapter(
         }
     }
 
-    fun onNewSession(session: Session) {
-        onSessionUpdate(session)
+    fun onNewSession(session: Session): Int {
+        return onSessionUpdate(session)
     }
 
-    fun onSessionUpdate(session: Session) {
+    fun onSessionUpdate(session: Session): Int {
         // 当前位置
         val oldPos = findPosition(session)
         if (oldPos >= 0 && oldPos < sessionList.size) {
@@ -83,10 +83,12 @@ class IMSessionAdapter(
 //                notifyItemRemoved(oldPos)
 //                notifyItemInserted(newPos)
 //            }
+            return newPos
         } else {
             val newPos = findInsertPosition(session)
             sessionList.add(newPos, session)
             notifyItemInserted(newPos)
+            return newPos
         }
     }
 

@@ -38,6 +38,7 @@ interface IMSessionDao {
 
     fun findByParentId(parentId: Long, count: Int, mTime: Long): List<Session>
 
-
     fun findAll(type: Int): List<Session>
+
+    fun findUnreadSessions(parentId: Long): List<Session>
 }

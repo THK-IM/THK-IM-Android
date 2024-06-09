@@ -263,7 +263,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
             val subscriber = object : BaseSubscriber<User>() {
                 override fun onNext(t: User?) {
                     t?.let {
-                        IMUIManager.pageRouter?.openContactUserPage(context, it)
+                        IMUIManager.pageRouter?.openUserPage(context, it, session)
                     }
                 }
 
@@ -281,7 +281,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgReadStatusClick(message: Message) {
-        // TODO
+        IMUIManager.pageRouter?.openMsgReadStatusPage(context, session, message)
     }
 
     override fun onMsgSenderLongClick(message: Message, pos: Int, it: View) {

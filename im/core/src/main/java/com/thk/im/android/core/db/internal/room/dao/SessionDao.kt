@@ -62,4 +62,7 @@ internal interface SessionDao {
 
     @Query("select * from session where id = :sId")
     fun findById(sId: Long): Session?
+
+    @Query("select * from session where parent_id = :parentId and unread_count > 0 and deleted = 0")
+    fun findUnreadSessions(parentId: Long): List<Session>
 }

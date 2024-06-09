@@ -55,6 +55,10 @@ internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSes
         return roomDatabase.sessionDao().updateMsgSyncTime(id, time)
     }
 
+    override fun findById(id: Long): Session? {
+        return roomDatabase.sessionDao().findById(id)
+    }
+
     override fun findMemberSyncTimeById(id: Long): Long {
         return roomDatabase.sessionDao().findMemberSyncTime(id)
     }
@@ -75,8 +79,8 @@ internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSes
         return roomDatabase.sessionDao().findAll(type)
     }
 
-    override fun findById(id: Long): Session? {
-        return roomDatabase.sessionDao().findById(id)
+    override fun findUnreadSessions(parentId: Long): List<Session> {
+        return roomDatabase.sessionDao().findUnreadSessions(parentId)
     }
 
 }

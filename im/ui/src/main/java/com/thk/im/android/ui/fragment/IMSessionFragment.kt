@@ -40,6 +40,7 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
     private var removeSessions = mutableSetOf<Session>()
 
     private var sessionClick: OnSessionClick? = null
+    private var isTop = false
 
     fun setSessionClick(sessionClick: OnSessionClick) {
         this.sessionClick = sessionClick
@@ -85,22 +86,39 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
         XEventBus.observe(this, IMEvent.SessionNew.value, Observer<Session> {
             it?.let {
                 if (it.parentId == parentId) {
-                    updateSessions.add(it)
-
+                    if (this.isTop) {
+                        val pos = sessionAdapter.onNewSession(it)
+                        sessionRecyclerView.postDelayed({
+                            sessionRecyclerView.smoothScrollToPosition(pos)
+                        }, 500)
+                    } else {
+                        updateSessions.add(it)
+                    }
                 }
             }
         })
         XEventBus.observe(this, IMEvent.SessionUpdate.value, Observer<Session> {
             it?.let {
                 if (it.parentId == parentId) {
-                    updateSessions.add(it)
+                    if (this.isTop) {
+                        val pos = sessionAdapter.onSessionUpdate(it)
+                        sessionRecyclerView.postDelayed({
+                            sessionRecyclerView.smoothScrollToPosition(pos)
+                        }, 500)
+                    } else {
+                        updateSessions.add(it)
+                    }
                 }
             }
         })
         XEventBus.observe(this, IMEvent.SessionDelete.value, Observer<Session> {
             it?.let {
                 if (it.parentId == parentId) {
-                    removeSessions.add(it)
+                    if (this.isTop) {
+                        sessionAdapter.onSessionRemove(it)
+                    } else {
+                        updateSessions.add(it)
+                    }
                 }
             }
         })
@@ -108,17 +126,25 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
 
     override fun onResume() {
         super.onResume()
+        this.isTop = true
         for (s in updateSessions) {
             sessionAdapter.onSessionUpdate(s)
         }
         if (updateSessions.isNotEmpty()) {
-            sessionRecyclerView.scrollToPosition(0)
+            sessionRecyclerView.postDelayed({
+                sessionRecyclerView.smoothScrollToPosition(0)
+            }, 500)
         }
         updateSessions.clear()
         for (s in removeSessions) {
             sessionAdapter.onSessionRemove(s)
         }
         removeSessions.clear()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        this.isTop = false
     }
 
     override fun onDestroyView() {

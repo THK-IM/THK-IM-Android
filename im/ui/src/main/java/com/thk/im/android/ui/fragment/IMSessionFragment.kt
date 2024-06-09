@@ -30,7 +30,7 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
 
     private lateinit var sessionRecyclerView: RecyclerView
     private lateinit var sessionAdapter: IMSessionAdapter
-    private val disposables = CompositeDisposable()
+    protected val disposables = CompositeDisposable()
     private var hasMore = true
     private val count = 10
     private var isLoading = false

@@ -94,7 +94,8 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
                     } else {
                         msgContentView.setShape(
                             Color.parseColor("#ffdddddd"),
-                            floatArrayOf(0f, 10f, 0f, 10f)
+                            floatArrayOf(0f, 10f, 0f, 10f),
+                            false
                         )
                     }
                 }
@@ -106,7 +107,8 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
                     } else {
                         msgContentView.setShape(
                             Color.parseColor("#d1e3fe"),
-                            floatArrayOf(10f, 0f, 10f, 0f)
+                            floatArrayOf(10f, 0f, 10f, 0f),
+                            false
                         )
                     }
                 }

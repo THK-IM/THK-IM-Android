@@ -15,7 +15,8 @@ open class IMRecordDbPopup(context: Context) : BasePopupView(context) {
         super.onCreate()
         findViewById<LinearLayout>(R.id.layout_container).setShape(
             Color.parseColor("#A0000000"),
-            floatArrayOf(20f, 20f, 20f, 20f)
+            floatArrayOf(20f, 20f, 20f, 20f),
+            false
         )
     }
 

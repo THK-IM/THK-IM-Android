@@ -26,6 +26,7 @@ import com.thk.im.android.ui.fragment.view.IMReadStatusView
 import com.thk.im.android.ui.fragment.view.IMReplyMsgContainerView
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
+import com.thk.im.android.ui.manager.IMChatFunction
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
@@ -289,6 +290,9 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
 
     private fun queryReadStatus() {
         if (session.type == SessionType.MsgRecord.value || session.type == SessionType.SuperGroup.value) {
+            return
+        }
+        if (session.functionFlag.and(IMChatFunction.Read.value) == 0L) {
             return
         }
 

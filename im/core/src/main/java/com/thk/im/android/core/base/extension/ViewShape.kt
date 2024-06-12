@@ -97,7 +97,7 @@ fun View.setShape(color: Int, selectColor: Int, radius: FloatArray) {
         color, color, 0, scalePx
     )
     val selected = ShapeUtils.createRectangleDrawable(
-        selectColor, selectColor, (scale).toInt(), scalePx
+        selectColor, selectColor, 0, scalePx
     )
     val drawable = StateListDrawable()
     drawable.addState(intArrayOf(android.R.attr.state_pressed), selected)

@@ -24,4 +24,6 @@ interface IMUIResourceProvider {
     fun inputBgColor(): Int?
 
     fun inputLayoutBgColor(): Int?
+
+    fun messageSelectImageResource(): Int?
 }

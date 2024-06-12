@@ -55,6 +55,12 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     protected val msgReplyContentView: IMReplyMsgContainerView =
         itemView.findViewById(R.id.msg_reply_content)
 
+    init {
+        IMUIManager.uiResourceProvider?.messageSelectImageResource()?.let {
+            selectView.setImageResource(it)
+        }
+    }
+
 
     abstract fun msgBodyView(): IMsgBodyView
 

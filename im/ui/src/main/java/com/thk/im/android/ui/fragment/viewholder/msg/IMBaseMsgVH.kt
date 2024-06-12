@@ -404,6 +404,8 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
                 if (canSelect()) {
                     selectView.visibility = View.VISIBLE
                     selectView.isSelected = it.isItemSelected(message)
+                } else {
+                    selectView.visibility = View.GONE
                 }
                 cardAvatarContainerView?.visibility = View.GONE
             } else {

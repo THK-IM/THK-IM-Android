@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,8 +29,10 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
         fun onSessionClick(session: Session)
     }
 
-    private lateinit var sessionRecyclerView: RecyclerView
-    private lateinit var sessionAdapter: IMSessionAdapter
+    lateinit var sessionRecyclerView: RecyclerView
+    lateinit var sessionAdapter: IMSessionAdapter
+    lateinit var bgLayout: FrameLayout
+
     protected val disposables = CompositeDisposable()
     private var hasMore = true
     private val count = 10
@@ -59,10 +62,12 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
         } else {
             requireArguments().getLong("parentId")
         }
+        bgLayout = view.findViewById(R.id.ly_session_bg)
         initSessionRecyclerView(view)
         loadSessions()
         initEventBus()
     }
+
 
     private fun initSessionRecyclerView(rootView: View) {
         sessionRecyclerView = rootView.findViewById(R.id.rcv_session)

@@ -560,7 +560,13 @@ open class DefaultMessageModule : MessageModule {
                     t.unReadCount = unReadCount
                     sessionDao.insertOrReplace(listOf(t))
                     XEventBus.post(IMEvent.SessionNew.value, t)
-                    notifyNewMessage(t, msg)
+                    if (
+                        (msg.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) &&
+                        (msg.oprStatus.and(MsgOperateStatus.ServerRead.value) == 0) &&
+                        !getMsgProcessor(msg.type).needReprocess(msg)
+                    ) {
+                        notifyNewMessage(t, msg)
+                    }
                 }
             }
 

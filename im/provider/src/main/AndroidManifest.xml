@@ -3,9 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application>
-        <activity
-            android:name="com.thk.im.preview.MediaPreviewActivity"
-            android:theme="@style/AppThemeMediaPreview" />
         <provider
             android:name="com.thk.im.android.media.picker.FileProvider"
             android:authorities="${applicationId}.IMFileProvider"

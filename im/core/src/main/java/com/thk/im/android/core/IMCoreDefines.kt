@@ -1,5 +1,6 @@
 package com.thk.im.android.core
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import com.thk.im.android.core.db.entity.Message
 
@@ -7,6 +8,7 @@ import com.thk.im.android.core.db.entity.Message
 /**
  * 信令状态
  */
+@Keep
 enum class SignalStatus(val value: Int) {
     Init(0),
     Connecting(1),
@@ -18,6 +20,7 @@ enum class SignalStatus(val value: Int) {
 /**
  * session状态
  */
+@Keep
 enum class SessionStatus(val value: Int) {
     Reject(1),
     Silence(2),
@@ -26,6 +29,7 @@ enum class SessionStatus(val value: Int) {
 /**
  * IM事件
  */
+@Keep
 enum class IMEvent(val value: String) {
     OnlineStatusUpdate("IMEventOnlineStatusUpdate"),
     BatchMsgNew("IMEventBatchMsgNew"),
@@ -39,6 +43,7 @@ enum class IMEvent(val value: String) {
     MsgLoadStatusUpdate("IMEventMsgLoadStatusUpdate"),
 }
 
+@Keep
 enum class IMFileFormat(val value: String) {
     Image("image"),
     Video("video"),
@@ -47,6 +52,7 @@ enum class IMFileFormat(val value: String) {
     Other("other"),
 }
 
+@Keep
 data class IMLoadProgress(
     @SerializedName("type")
     var type: String,
@@ -59,12 +65,12 @@ data class IMLoadProgress(
     @SerializedName("progress")
     var progress: Int
 )
-
+@Keep
 enum class IMLoadType(val value: String) {
     Upload("upload"),
     Download("download"),
 }
-
+@Keep
 enum class IMMsgResourceType(val value: String) {
     Thumbnail("thumbnail"),
     Source("source"),

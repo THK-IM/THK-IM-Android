@@ -1,6 +1,7 @@
 package com.thk.im.android.ui.manager
 
 import android.app.Application
+import androidx.annotation.Keep
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import com.thk.im.android.core.IMCoreManager
@@ -50,6 +51,7 @@ import com.thk.im.android.ui.provider.session.provider.GroupSessionIVProvider
 import com.thk.im.android.ui.provider.session.provider.SingleSessionIVProvider
 import com.thk.im.android.ui.provider.session.provider.SuperGroupSessionIVProvider
 
+@Keep
 object IMUIManager {
 
     private val messageIVProviders = HashMap<Int, IMBaseMessageIVProvider>()

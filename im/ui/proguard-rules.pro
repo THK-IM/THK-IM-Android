@@ -31,3 +31,10 @@
 
 -dontwarn com.lxj.xpopup.widget.**
 -keep class com.lxj.xpopup.widget.**{*;}
+
+
+-keep public class * extends kotlinx.parcelize.Parcelize { *; }
+-keep class com.thk.im.android.ui.protocol.** { *; }
+-keep class com.thk.im.android.ui.** { *; }
+-dontwarn com.thk.im.android.ui**
+

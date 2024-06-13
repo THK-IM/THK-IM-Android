@@ -1,9 +1,10 @@
 package com.thk.im.android.ui.manager
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import com.thk.im.android.core.db.entity.Message
 
-
+@Keep
 class IMAudioMsgData(
     @SerializedName("path")
     var path: String? = null,
@@ -12,7 +13,7 @@ class IMAudioMsgData(
     @SerializedName("played")
     var played: Boolean = false,
 )
-
+@Keep
 class IMImageMsgData(
     @SerializedName("path")
     var path: String? = null,
@@ -23,7 +24,7 @@ class IMImageMsgData(
     @SerializedName("height")
     var height: Int? = null,
 )
-
+@Keep
 class IMVideoMsgData(
     @SerializedName("duration")
     var duration: Int? = null,
@@ -36,7 +37,7 @@ class IMVideoMsgData(
     @SerializedName("thumbnail_path")
     var thumbnailPath: String? = null,
 )
-
+@Keep
 class IMAudioMsgBody(
     @SerializedName("url")
     var url: String? = null,
@@ -45,7 +46,7 @@ class IMAudioMsgBody(
     @SerializedName("name")
     var name: String? = null,
 )
-
+@Keep
 class IMImageMsgBody(
     @SerializedName("url")
     var url: String? = null,
@@ -58,7 +59,7 @@ class IMImageMsgBody(
     @SerializedName("name")
     var name: String? = null,
 )
-
+@Keep
 class IMVideoMsgBody(
     @SerializedName("duration")
     var duration: Int? = null,
@@ -73,7 +74,7 @@ class IMVideoMsgBody(
     @SerializedName("name")
     var name: String? = null,
 )
-
+@Keep
 class IMRevokeMsgData(
     @SerializedName("nick")
     var nick: String,
@@ -85,7 +86,7 @@ class IMRevokeMsgData(
     var data: String? = null
 )
 
-
+@Keep
 data class IMRecordMsgBody(
     @SerializedName("title")
     var title: String,
@@ -94,7 +95,7 @@ data class IMRecordMsgBody(
     @SerializedName("content")
     var content: String
 )
-
+@Keep
 data class IMReeditMsgData(
     @SerializedName("session_id")
     val sessionId: Long,

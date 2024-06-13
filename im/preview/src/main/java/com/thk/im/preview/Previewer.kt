@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Build
 import android.view.View
+import androidx.annotation.Keep
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionType
@@ -16,7 +17,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.manager.IMRecordMsgBody
 import com.thk.im.android.ui.protocol.IMPreviewer
 import io.reactivex.Flowable
-
+@Keep
 class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer {
 
     init {

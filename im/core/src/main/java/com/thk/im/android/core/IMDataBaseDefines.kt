@@ -1,8 +1,11 @@
 package com.thk.im.android.core
 
+import androidx.annotation.Keep
+
 /**
  * 会话类型
  */
+@Keep
 enum class SessionType(val value: Int) {
     Single(1),
     Group(2),
@@ -13,6 +16,7 @@ enum class SessionType(val value: Int) {
 /**
  * session 禁言
  */
+@Keep
 enum class SessionMuted(val value: Int) {
     Normal(0),
     All(1),
@@ -22,6 +26,7 @@ enum class SessionMuted(val value: Int) {
 /**
  * session  消息提示
  */
+@Keep
 enum class SessionPrompt(val value: Int) {
     Normal(0),
     Reject(1),
@@ -31,6 +36,7 @@ enum class SessionPrompt(val value: Int) {
 /**
  * 消息发送状态
  */
+@Keep
 enum class MsgSendStatus(val value: Int) {
     Init(0),                // 初始
     Uploading(1),             // 上传中
@@ -42,6 +48,7 @@ enum class MsgSendStatus(val value: Int) {
 /**
  * 消息操作状态
  */
+@Keep
 enum class MsgOperateStatus(var value: Int) {
     Init(0),
     Ack(1),        // 用户已接收
@@ -53,6 +60,7 @@ enum class MsgOperateStatus(var value: Int) {
 /**
  * 消息类型
  */
+@Keep
 enum class MsgType(var value: Int) {
     Reedit(-3),     // 重编辑消息
     Read(-2),       // 读消息消息
@@ -72,6 +80,7 @@ enum class MsgType(var value: Int) {
 /**
  * 性别
  */
+@Keep
 enum class SexType(var value: Int) {
     Unknown(0),
     Man(1),

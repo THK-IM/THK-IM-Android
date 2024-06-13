@@ -1,6 +1,7 @@
 package com.thk.im.android.core
 
 import android.app.Application
+import androidx.annotation.Keep
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.thk.im.android.core.api.IMApi
 import com.thk.im.android.core.base.LLog
@@ -22,6 +23,8 @@ import com.thk.im.android.core.signal.SignalType
 import com.thk.im.android.core.storage.StorageModule
 import com.thk.im.android.core.storage.internal.DefaultStorageModule
 
+
+@Keep
 object IMCoreManager {
 
     private var debug: Boolean = false

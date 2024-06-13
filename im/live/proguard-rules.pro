@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep public class * extends kotlinx.parcelize.Parcelize { *; }
+-keep class com.thk.im.android.live.** { *; }
+-dontwarn com.thk.im.android.live.**

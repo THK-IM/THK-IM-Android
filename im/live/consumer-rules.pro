@@ -1,0 +1,3 @@
+-keep public class * extends kotlinx.parcelize.Parcelize { *; }
+-keep class com.thk.im.android.live.** { *; }
+-dontwarn com.thk.im.android.live.**

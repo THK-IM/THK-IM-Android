@@ -122,7 +122,7 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
                     if (this.isTop) {
                         sessionAdapter.onSessionRemove(it)
                     } else {
-                        updateSessions.add(it)
+                        removeSessions.add(it)
                     }
                 }
             }

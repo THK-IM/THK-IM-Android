@@ -185,10 +185,6 @@ open class DefaultMessageModule : MessageModule {
                 t?.printStackTrace()
             }
 
-            override fun onComplete() {
-                super.onComplete()
-                this@DefaultMessageModule.disposes.remove(this)
-            }
         }
         IMCoreManager.imApi.queryUserLatestMessages(IMCoreManager.uId, lastTime, count)
             .compose(RxTransform.flowableToIo()).subscribe(disposable)
@@ -260,11 +256,6 @@ open class DefaultMessageModule : MessageModule {
                 super.onError(t)
                 t?.printStackTrace()
             }
-
-            override fun onComplete() {
-                super.onComplete()
-                this@DefaultMessageModule.disposes.remove(this)
-            }
         }
         IMCoreManager.imApi.queryUserLatestSessions(IMCoreManager.uId, count, lastTime, null)
             .compose(RxTransform.flowableToIo()).subscribe(disposable)
@@ -288,11 +279,6 @@ open class DefaultMessageModule : MessageModule {
                 }
             }
 
-            override fun onComplete() {
-                super.onComplete()
-                this@DefaultMessageModule.disposes.remove(this)
-            }
-
         }
         IMCoreManager.imApi.querySessionMessages(session.id, session.msgSyncTime, 0, count, 1)
             .compose(RxTransform.flowableToIo())
@@ -310,10 +296,6 @@ open class DefaultMessageModule : MessageModule {
                 }
             }
 
-            override fun onComplete() {
-                super.onComplete()
-                this@DefaultMessageModule.disposes.remove(this)
-            }
         }
         Flowable.just("")
             .flatMap {
@@ -334,7 +316,6 @@ open class DefaultMessageModule : MessageModule {
             } else {
                 it.onNext(session)
             }
-            it.onComplete()
         }, BackpressureStrategy.LATEST).flatMap { session ->
             if (session.id > 0) {
                 return@flatMap Flowable.just(session)
@@ -357,7 +338,6 @@ open class DefaultMessageModule : MessageModule {
             } else {
                 it.onNext(session)
             }
-            it.onComplete()
         }, BackpressureStrategy.LATEST).flatMap { session ->
             if (session.id > 0) {
                 return@flatMap Flowable.just(session)
@@ -380,7 +360,6 @@ open class DefaultMessageModule : MessageModule {
             val sessions =
                 IMCoreManager.getImDataBase().sessionDao().findByParentId(parentId, count, mTime)
             it.onNext(sessions)
-            it.onComplete()
         }, BackpressureStrategy.LATEST)
     }
 
@@ -391,7 +370,6 @@ open class DefaultMessageModule : MessageModule {
             val sessions = IMCoreManager.getImDataBase().messageDao()
                 .findByTimeRange(sessionId, startTime, endTime, count)
             it.onNext(sessions)
-            it.onComplete()
         }, BackpressureStrategy.LATEST)
     }
 
@@ -575,10 +553,6 @@ open class DefaultMessageModule : MessageModule {
                 LLog.e("processSessionByMessage error $t")
             }
 
-            override fun onComplete() {
-                super.onComplete()
-                disposes.remove(this)
-            }
         }
         getSession(msg.sid).compose(RxTransform.flowableToIo()).subscribe(dispose)
         disposes.add(dispose)
@@ -603,7 +577,6 @@ open class DefaultMessageModule : MessageModule {
         return Flowable.create<List<SessionMember>?>({
             val sessionMembers = IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
             it.onNext(sessionMembers)
-            it.onComplete()
         }, BackpressureStrategy.LATEST).flatMap {
             if (it.isEmpty()) {
                 return@flatMap queryLastSessionMember(sessionId, getSessionMemberCountPerRequest())
@@ -638,11 +611,6 @@ open class DefaultMessageModule : MessageModule {
         val subscriber = object : BaseSubscriber<List<SessionMember>>() {
             override fun onNext(t: List<SessionMember>?) {
 
-            }
-
-            override fun onComplete() {
-                super.onComplete()
-                disposes.remove(this)
             }
         }
         val count = getSessionMemberCountPerRequest()
@@ -762,7 +730,6 @@ open class DefaultMessageModule : MessageModule {
                     sessionId, msgIds, MsgOperateStatus.Ack.value
                 )
                 ackMessagesSuccess(sessionId, msgIds)
-                disposes.remove(this)
             }
 
             override fun onNext(t: Void?) {}

@@ -4,6 +4,7 @@ import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
+import com.thk.im.android.ui.manager.IMChatFunction
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
@@ -25,6 +26,9 @@ class IMMsgReplyOperator: IMMessageOperator() {
     }
 
     override fun supportMessage(message: Message, session: Session): Boolean {
+        if (session.functionFlag.and(IMChatFunction.BaseInput.value) == 0L) {
+            return false
+        }
         return message.type != MsgType.Revoke.value && message.fUid != 0L
     }
 }

@@ -50,6 +50,7 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
     ) {
         this.delegate = WeakReference(delegate)
         if (isReply) {
+            binding.tvMsgContent.setPadding(0, 0, 0, 0)
             binding.tvMsgContent.textSize = 12.0f
             binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
         } else {

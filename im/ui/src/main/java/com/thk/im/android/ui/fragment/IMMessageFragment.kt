@@ -121,7 +121,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                 binding.rcvMessage.loadMessages()
             }
         }
-        IMCoreManager.messageModule.querySessionMembers(session!!.id, false)
+        IMCoreManager.messageModule.querySessionMembers(session!!.id, true)
             .flatMap { members ->
                 val uIds = mutableSetOf<Long>()
                 for (m in members) {

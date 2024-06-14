@@ -596,7 +596,7 @@ class IMInputLayout : ConstraintLayout {
         }
         Flowable.just(replyMsg)
             .flatMap { msg ->
-                val content = IMCoreManager.messageModule.getMsgProcessor(msg.type).getSessionDesc(msg)
+                val content = IMCoreManager.messageModule.getMsgProcessor(msg.type).sessionDesc(msg)
                 return@flatMap Flowable.just(content)
             }
             .compose(RxTransform.flowableToMain())

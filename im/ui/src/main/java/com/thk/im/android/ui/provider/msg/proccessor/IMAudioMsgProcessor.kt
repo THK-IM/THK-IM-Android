@@ -28,8 +28,8 @@ class IMAudioMsgProcessor : IMBaseMsgProcessor() {
         return MsgType.Audio.value
     }
 
-    override fun getSessionDesc(msg: Message): String {
-        return super.getSessionDesc(msg) + "[语音消息]"
+    override fun sessionDesc(msg: Message): String {
+        return super.sessionDesc(msg) + "[语音消息]"
     }
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {

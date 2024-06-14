@@ -29,8 +29,8 @@ open class IMVideoMsgProcessor : IMBaseMsgProcessor() {
         return MsgType.Video.value
     }
 
-    override fun getSessionDesc(msg: Message): String {
-        return super.getSessionDesc(msg) + "[视频]"
+    override fun sessionDesc(msg: Message): String {
+        return super.sessionDesc(msg) + "[视频]"
     }
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {

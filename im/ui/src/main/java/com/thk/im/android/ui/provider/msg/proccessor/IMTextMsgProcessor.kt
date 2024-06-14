@@ -15,7 +15,7 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
         return MsgType.Text.value
     }
 
-    override fun getSessionDesc(msg: Message): String {
+    override fun sessionDesc(msg: Message): String {
         return if (msg.content != null) {
             var body = msg.content
             if (!msg.atUsers.isNullOrBlank()) {
@@ -39,9 +39,9 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
             if (msg.oprStatus.and(MsgOperateStatus.Update.value) > 0) {
                 editFlag = "[已编辑]"
             }
-            return super.getSessionDesc(msg) + editFlag + body
+            return super.sessionDesc(msg) + editFlag + body
         } else {
-            return super.getSessionDesc(msg)
+            return super.sessionDesc(msg)
         }
     }
 }

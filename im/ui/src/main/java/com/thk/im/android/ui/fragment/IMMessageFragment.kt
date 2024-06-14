@@ -295,6 +295,10 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {
         LLog.v("previewMessage ${msg.type} $position, $msg")
+        onMsgClick(msg, position, originView)
+    }
+
+    open fun onMsgClick(msg: Message, position: Int, originView: View) {
         when (msg.type) {
             MsgType.Audio.value -> {
                 msg.data?.let {
@@ -302,12 +306,12 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                     data.path?.let { path ->
                         val success =
                             IMUIManager.mediaProvider?.startPlayAudio(path, object : AudioCallback {
-                            override fun audioData(
-                                path: String, second: Int, db: Double, state: AudioStatus
-                            ) {
+                                override fun audioData(
+                                    path: String, second: Int, db: Double, state: AudioStatus
+                                ) {
 
-                            }
-                        })
+                                }
+                            })
                         if (success == true) {
                             if (msg.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) {
                                 readMessage(msg)

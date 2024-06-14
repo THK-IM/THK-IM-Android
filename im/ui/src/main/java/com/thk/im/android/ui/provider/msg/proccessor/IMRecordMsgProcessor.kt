@@ -59,7 +59,7 @@ class IMRecordMsgProcessor : IMBaseMsgProcessor() {
         return true
     }
 
-    override fun getSessionDesc(msg: Message): String {
-        return super.getSessionDesc(msg) + "[会话记录]"
+    override fun sessionDesc(msg: Message): String {
+        return super.sessionDesc(msg) + "[会话记录]"
     }
 }

@@ -12,6 +12,7 @@ import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMUIManager
+import com.thk.im.android.ui.provider.msg.view.IMTextMsgView
 
 abstract class IMBaseMessageIVProvider {
 
@@ -67,7 +68,10 @@ abstract class IMBaseMessageIVProvider {
         return createViewHolder(lifecycleOwner, itemView, viewType)
     }
 
-    abstract fun replyMsgView(context: Context): IMsgBodyView
+    open fun replyMsgView(context: Context): IMsgBodyView {
+        val view = IMTextMsgView(context)
+        return view
+    }
 
     abstract fun createViewHolder(
         lifecycleOwner: LifecycleOwner,

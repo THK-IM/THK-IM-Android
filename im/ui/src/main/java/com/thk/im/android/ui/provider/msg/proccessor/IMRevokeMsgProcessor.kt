@@ -112,7 +112,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
         return true
     }
 
-    override fun getSessionDesc(msg: Message): String {
+    override fun sessionDesc(msg: Message): String {
         return if (msg.data != null) {
             val revokeData = Gson().fromJson(msg.data!!, IMRevokeMsgData::class.java)
             "${revokeData.nick}撤回了一条消息"

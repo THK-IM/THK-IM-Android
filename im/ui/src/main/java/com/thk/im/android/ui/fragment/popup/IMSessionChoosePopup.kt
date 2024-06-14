@@ -106,7 +106,7 @@ class IMSessionChoosePopup constructor(
             for (subMessage in messages) {
                 val userName = it[subMessage.fUid]?.nickname ?: "XX"
                 val subContent = IMCoreManager.messageModule
-                    .getMsgProcessor(subMessage.type).getSessionDesc(subMessage)
+                    .getMsgProcessor(subMessage.type).sessionDesc(subMessage)
                 content = content.plus("${userName}:${subContent}")
                 i++
                 if (i <= messages.size - 1) {

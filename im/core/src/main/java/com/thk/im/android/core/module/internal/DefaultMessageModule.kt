@@ -555,7 +555,7 @@ open class DefaultMessageModule : MessageModule {
                     } else if (msg.sendStatus == MsgSendStatus.SendFailed.value) {
                         statusText = "❗"
                     }
-                    t.lastMsg = "$statusText${processor.getSessionDesc(msg)}"
+                    t.lastMsg = "$statusText${processor.sessionDesc(msg)}"
                     t.mTime = msg.mTime
                     t.unReadCount = unReadCount
                     sessionDao.insertOrReplace(listOf(t))

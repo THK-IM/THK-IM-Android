@@ -298,7 +298,7 @@ abstract class IMBaseMsgProcessor {
     }
 
 
-    open fun getSessionDesc(msg: Message): String {
+    open fun sessionDesc(msg: Message): String {
         var desc = ""
         if (msg.atUsers.isNullOrBlank()) {
             return desc

@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <application>
         <activity
             android:name="com.thk.im.preview.IMMediaPreviewActivity"
-            android:theme="@style/AppThemeMediaPreview" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeMediaPreview"
+            tools:ignore="DiscouragedApi" />
 
         <activity
             android:name="com.thk.im.preview.IMRecordPreviewActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="DiscouragedApi"
             android:theme="@style/Common"/>
     </application>
 </manifest>

@@ -17,12 +17,14 @@ import com.thk.im.android.ui.fragment.IMSessionFragment
 import com.thk.im.android.ui.manager.IMRecordMsgBody
 import io.reactivex.Flowable
 
-class IMSessionChoosePopup constructor(
+class IMSessionChoosePopup(
     context: Context,
-    private val session: Session,
-    private val messages: List<Message>,
-    private val forwardType: Int // 0 单条转发，1合并转发
 ) : BottomPopupView(context) {
+
+    var session: Session? = null
+    var messages: List<Message>? = null
+    var forwardType: Int = 0 // 0 单条转发，1合并转发
+
 
     private val fragmentTag = "ChooseSession"
     override fun getImplLayoutId(): Int {
@@ -31,6 +33,10 @@ class IMSessionChoosePopup constructor(
 
     override fun onCreate() {
         super.onCreate()
+        if (session == null || messages == null) {
+            dismiss()
+            return
+        }
         initToolbar()
         val supportFragmentManager = (context as FragmentActivity).supportFragmentManager
         var sessionFragment =
@@ -67,8 +73,11 @@ class IMSessionChoosePopup constructor(
     }
 
     private fun forward(session: Session) {
+        if (messages == null) {
+            return
+        }
         if (forwardType == 0) {
-            for (m in messages) {
+            for (m in messages!!) {
                 IMCoreManager.messageModule.getMsgProcessor(m.type)
                     .forwardMessage(m, session.id)
             }
@@ -89,13 +98,13 @@ class IMSessionChoosePopup constructor(
                         .sendMessage(session.id, MsgType.Record.value, body, null)
                 }
             }
-            buildRecordBody().compose(RxTransform.flowableToMain())
+            buildRecordBody(messages!!).compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
         }
         dismiss()
     }
 
-    private fun buildRecordBody(): Flowable<IMRecordMsgBody> {
+    private fun buildRecordBody(messages: List<Message>): Flowable<IMRecordMsgBody> {
         val uIds = mutableSetOf<Long>()
         for (subMessage in messages) {
             uIds.add(subMessage.fUid)
@@ -122,7 +131,8 @@ class IMSessionChoosePopup constructor(
                     Flowable.just(it)
                 }
         }.flatMap {
-            val title = if (session.type == SessionType.Group.value || session.type == SessionType.SuperGroup.value) {
+            val title =
+                if (session?.type == SessionType.Group.value || session?.type == SessionType.SuperGroup.value) {
                 "的群聊记录"
             } else {
                 "的会话记录"

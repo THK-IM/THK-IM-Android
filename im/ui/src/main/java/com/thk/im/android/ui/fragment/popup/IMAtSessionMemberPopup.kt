@@ -1,6 +1,5 @@
 package com.thk.im.android.ui.fragment.popup
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,12 +18,12 @@ import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 
-@SuppressLint("ViewConstructor")
 class IMAtSessionMemberPopup(
     context: Context,
-    private val session: Session,
-    private val sessionMemberAtDelegate: IMSessionMemberAtDelegate,
 ) : BottomPopupView(context) {
+
+    var session: Session? = null
+    var sessionMemberAtDelegate: IMSessionMemberAtDelegate? = null
 
     private val compositeDisposable = CompositeDisposable()
     private lateinit var rcvSessionMember: RecyclerView
@@ -37,6 +36,10 @@ class IMAtSessionMemberPopup(
 
     override fun onCreate() {
         super.onCreate()
+        if (session == null || sessionMemberAtDelegate == null) {
+            dismiss()
+            return
+        }
         toolbar = findViewById(R.id.tb_session_member_choose)
         toolbar.title = "选择提醒的人"
         rcvSessionMember = findViewById(R.id.rcv_session_member)
@@ -45,7 +48,7 @@ class IMAtSessionMemberPopup(
         sessionMemberAdapter.onSessionMemberClick = object : IMOnSessionMemberClick {
             override fun onSessionMemberClick(user: User, sessionMember: SessionMember?) {
                 dismiss()
-                sessionMemberAtDelegate.onSessionMemberAt(user, sessionMember)
+                sessionMemberAtDelegate?.onSessionMemberAt(user, sessionMember)
             }
         }
         rcvSessionMember.adapter = sessionMemberAdapter
@@ -57,6 +60,9 @@ class IMAtSessionMemberPopup(
     }
 
     private fun fetchSessionMembers() {
+        if (session == null) {
+            return
+        }
         val subscriber = object : BaseSubscriber<Map<Long, Pair<User, SessionMember?>>>() {
             override fun onNext(t: Map<Long, Pair<User, SessionMember?>>?) {
                 t?.let {
@@ -70,7 +76,7 @@ class IMAtSessionMemberPopup(
                 compositeDisposable.remove(this)
             }
         }
-        IMCoreManager.messageModule.querySessionMembers(session.id, false)
+        IMCoreManager.messageModule.querySessionMembers(session!!.id, false)
             .flatMap { members ->
                 val uIds = mutableSetOf<Long>()
                 for (m in members) {

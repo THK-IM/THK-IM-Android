@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cl_content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tb_record"
+        android:fitsSystemWindows="true"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -16,11 +16,10 @@
 
     <com.thk.im.android.ui.fragment.layout.IMMessageLayout
         android:id="@+id/rcv_message"
-        android:background="#eeeeee"
+        android:background="#FFFFFF"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:overScrollMode="ifContentScrolls"
-        android:scrollbars="vertical"
+        android:overScrollMode="never"
         app:layout_constraintTop_toBottomOf="@id/tb_record"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

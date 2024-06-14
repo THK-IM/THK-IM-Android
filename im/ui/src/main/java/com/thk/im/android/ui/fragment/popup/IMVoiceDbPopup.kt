@@ -9,7 +9,7 @@ import com.lxj.xpopup.core.BasePopupView
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.ui.R
 
-open class IMRecordDbPopup(context: Context) : BasePopupView(context) {
+open class IMVoiceDbPopup(context: Context) : BasePopupView(context) {
 
     override fun onCreate() {
         super.onCreate()

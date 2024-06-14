@@ -23,6 +23,12 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRecordPreviewBinding.inflate(layoutInflater)
+        IMUIManager.uiResourceProvider?.inputLayoutBgColor()?.let {
+            binding.clContent.setBackgroundColor(it)
+        }
+        IMUIManager.uiResourceProvider?.inputBgColor()?.let {
+            binding.rcvMessage.setBackgroundColor(it)
+        }
         setContentView(binding.root)
         initEventBus()
         initToolbar()
@@ -57,11 +63,6 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
             intent.getParcelableExtra("session")
         }
 
-        val originSession: Session? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("originSession", Session::class.java)
-        } else {
-            intent.getParcelableExtra("originSession")
-        }
         session?.let {
             binding.rcvMessage.init(this, it, null, this)
             recordMessages?.let { messages ->

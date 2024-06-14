@@ -44,7 +44,6 @@ import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
 import com.thk.im.android.ui.fragment.popup.IMMessageOperatorPopup
 import com.thk.im.android.ui.fragment.popup.IMSessionChoosePopup
 import com.thk.im.android.ui.manager.IMAudioMsgData
-import com.thk.im.android.ui.manager.IMChatFunction
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.android.ui.manager.IMUIManager
@@ -430,13 +429,17 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
     override fun forwardMessageToSession(messages: List<Message>, forwardType: Int) {
         context?.let { ctx ->
             session?.let {
+                val popup = IMSessionChoosePopup(ctx)
+                popup.session = it
+                popup.messages = messages
+                popup.forwardType = forwardType
                 XPopup.Builder(ctx).isDestroyOnDismiss(true)
                     .isLightStatusBar(false)
                     .hasShadowBg(false)
                     .isViewMode(true)
                     .moveUpToKeyboard(false)
                     .enableDrag(false)
-                    .asCustom(IMSessionChoosePopup(ctx, it, messages, forwardType))
+                    .asCustom(popup)
                     .show()
             }
         }
@@ -446,13 +449,17 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         val messages = binding.rcvMessage.getSelectMessages().toList()
         context?.let { ctx ->
             session?.let {
+                val popup = IMSessionChoosePopup(ctx)
+                popup.session = it
+                popup.messages = messages
+                popup.forwardType = forwardType
                 XPopup.Builder(ctx).isDestroyOnDismiss(true)
                     .isLightStatusBar(false)
                     .hasShadowBg(false)
                     .isViewMode(true)
                     .moveUpToKeyboard(false)
                     .enableDrag(false)
-                    .asCustom(IMSessionChoosePopup(ctx, it, messages, forwardType))
+                    .asCustom(popup)
                     .show()
             }
         }
@@ -610,13 +617,16 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                     return
                 }
                 closeKeyboard()
+                val popup = IMAtSessionMemberPopup(it)
+                popup.session = session
+                popup.sessionMemberAtDelegate = this
                 XPopup.Builder(it).isDestroyOnDismiss(true)
                     .hasShadowBg(false)
                     .isViewMode(true)
                     .maxHeight((AppUtils.instance().screenHeight * 0.6).toInt())
                     .moveUpToKeyboard(true)
                     .enableDrag(false)
-                    .asCustom(IMAtSessionMemberPopup(it, session, this))
+                    .asCustom(popup)
                     .show()
             }
         }

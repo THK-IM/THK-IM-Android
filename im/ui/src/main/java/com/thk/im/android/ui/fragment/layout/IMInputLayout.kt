@@ -37,7 +37,7 @@ import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.LayoutMessageInputBinding
-import com.thk.im.android.ui.fragment.popup.IMRecordDbPopup
+import com.thk.im.android.ui.fragment.popup.IMVoiceDbPopup
 import com.thk.im.android.ui.manager.IMAudioMsgData
 import com.thk.im.android.ui.manager.IMChatFunction
 import com.thk.im.android.ui.manager.IMReeditMsgData
@@ -57,7 +57,7 @@ class IMInputLayout : ConstraintLayout {
 
     private val binding: LayoutMessageInputBinding
     private val disposables = CompositeDisposable()
-    private val recordPopup: IMRecordDbPopup = IMRecordDbPopup(context)
+    private val recordPopup: IMVoiceDbPopup = IMVoiceDbPopup(context)
     private val recordPopupView: BasePopupView =
         XPopup.Builder(context).isViewMode(true).isDestroyOnDismiss(false).hasShadowBg(false)
             .asCustom(recordPopup)

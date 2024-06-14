@@ -432,6 +432,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                 val popup = IMSessionChoosePopup(ctx)
                 popup.session = it
                 popup.messages = messages
+                popup.sender = this
                 popup.forwardType = forwardType
                 XPopup.Builder(ctx).isDestroyOnDismiss(true)
                     .isLightStatusBar(false)
@@ -452,6 +453,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                 val popup = IMSessionChoosePopup(ctx)
                 popup.session = it
                 popup.messages = messages
+                popup.sender = this
                 popup.forwardType = forwardType
                 XPopup.Builder(ctx).isDestroyOnDismiss(true)
                     .isLightStatusBar(false)

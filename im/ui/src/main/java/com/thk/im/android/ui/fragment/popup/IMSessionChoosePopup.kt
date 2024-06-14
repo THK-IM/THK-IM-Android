@@ -6,6 +6,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentActivity
 import com.lxj.xpopup.core.BottomPopupView
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.MsgOperateStatus
+import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
@@ -15,6 +17,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.IMSessionFragment
 import com.thk.im.android.ui.manager.IMRecordMsgBody
+import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import io.reactivex.Flowable
 
 class IMSessionChoosePopup(
@@ -23,6 +26,7 @@ class IMSessionChoosePopup(
 
     var session: Session? = null
     var messages: List<Message>? = null
+    var sender: IMMsgSender? = null
     var forwardType: Int = 0 // 0 单条转发，1合并转发
 
 
@@ -33,7 +37,7 @@ class IMSessionChoosePopup(
 
     override fun onCreate() {
         super.onCreate()
-        if (session == null || messages == null) {
+        if (session == null || messages == null || sender == null) {
             dismiss()
             return
         }
@@ -87,8 +91,10 @@ class IMSessionChoosePopup(
                     val cleanMessages = mutableListOf<Message>()
                     for (m in t.messages) {
                         val msg = m.copy()
-                        msg.sendStatus = 0
-                        msg.oprStatus = 0
+                        msg.sendStatus = MsgSendStatus.Success.value
+                        msg.oprStatus =
+                            MsgOperateStatus.Ack.value.or(MsgOperateStatus.ClientRead.value)
+                                .or(MsgOperateStatus.ServerRead.value)
                         msg.rUsers = null
                         msg.data = null
                         cleanMessages.add(msg)
@@ -105,31 +111,41 @@ class IMSessionChoosePopup(
     }
 
     private fun buildRecordBody(messages: List<Message>): Flowable<IMRecordMsgBody> {
-        val uIds = mutableSetOf<Long>()
-        for (subMessage in messages) {
-            uIds.add(subMessage.fUid)
-        }
-        return IMCoreManager.userModule.queryUsers(uIds).flatMap {
-            var content = ""
-            var i = 0
-            for (subMessage in messages) {
-                val userName = it[subMessage.fUid]?.nickname ?: "XX"
-                val subContent = IMCoreManager.messageModule
-                    .getMsgProcessor(subMessage.type).sessionDesc(subMessage)
-                content = content.plus("${userName}:${subContent}")
-                i++
-                if (i <= messages.size - 1) {
-                    content = content.plus("\n")
+        return Flowable.just(IMRecordMsgBody("", messages, ""))
+            .flatMap {
+                var content = ""
+                var i = 0
+                for (subMessage in messages) {
+                    var userName = "XX"
+                    val memberInfo = sender!!.syncGetSessionMemberInfo(subMessage.fUid)
+                    memberInfo?.let { info ->
+                        userName =
+                            if (info.second?.noteName != null && info.second?.noteName != "") {
+                                info.second?.noteName!!
+                            } else {
+                                info.first.nickname
+                            }
+                    }
+                    val subContent = IMCoreManager.messageModule.getMsgProcessor(subMessage.type)
+                        .sessionDesc(subMessage)
+                    content = content.plus("${userName}:${subContent}")
+                    i++
+                    if (i <= messages.size - 1) {
+                        content = content.plus("\n")
+                    }
                 }
-            }
-            val recordMsgBody = IMRecordMsgBody("", messages.toList(), content)
-            return@flatMap Flowable.just(recordMsgBody)
-        }.flatMap {
-            return@flatMap IMCoreManager.userModule.queryUser(IMCoreManager.uId)
-                .flatMap { user ->
-                    it.title = user.nickname
-                    Flowable.just(it)
+                it.content = content
+                Flowable.just(it)
+            }.flatMap {
+                val memberInfo = sender!!.syncGetSessionMemberInfo(IMCoreManager.uId)
+                memberInfo?.let { info ->
+                    it.title = if (info.second?.noteName != null && info.second?.noteName != "") {
+                        info.second?.noteName!!
+                    } else {
+                        info.first.nickname
+                    }
                 }
+                Flowable.just(it)
         }.flatMap {
             val title =
                 if (session?.type == SessionType.Group.value || session?.type == SessionType.SuperGroup.value) {
@@ -140,5 +156,41 @@ class IMSessionChoosePopup(
             it.title = "${it.title}${title}"
             return@flatMap Flowable.just(it)
         }
+
+//        val uIds = mutableSetOf<Long>()
+//        for (subMessage in messages) {
+//            uIds.add(subMessage.fUid)
+//        }
+//        return IMCoreManager.userModule.queryUsers(uIds).flatMap {
+//            var content = ""
+//            var i = 0
+//            for (subMessage in messages) {
+//                val userName = it[subMessage.fUid]?.nickname ?: "XX"
+//                val subContent = IMCoreManager.messageModule
+//                    .getMsgProcessor(subMessage.type).sessionDesc(subMessage)
+//                content = content.plus("${userName}:${subContent}")
+//                i++
+//                if (i <= messages.size - 1) {
+//                    content = content.plus("\n")
+//                }
+//            }
+//            val recordMsgBody = IMRecordMsgBody("", messages.toList(), content)
+//            return@flatMap Flowable.just(recordMsgBody)
+//        }.flatMap {
+//            return@flatMap IMCoreManager.userModule.queryUser(IMCoreManager.uId)
+//                .flatMap { user ->
+//                    it.title = user.nickname
+//                    Flowable.just(it)
+//                }
+//        }.flatMap {
+//            val title =
+//                if (session?.type == SessionType.Group.value || session?.type == SessionType.SuperGroup.value) {
+//                "的群聊记录"
+//            } else {
+//                "的会话记录"
+//            }
+//            it.title = "${it.title}${title}"
+//            return@flatMap Flowable.just(it)
+//        }
     }
 }

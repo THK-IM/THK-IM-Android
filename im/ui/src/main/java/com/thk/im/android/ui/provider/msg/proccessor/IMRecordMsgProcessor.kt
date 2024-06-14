@@ -2,6 +2,8 @@ package com.thk.im.android.ui.provider.msg.proccessor
 
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.MsgOperateStatus
+import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
@@ -17,6 +19,11 @@ class IMRecordMsgProcessor : IMBaseMsgProcessor() {
         super.received(msg)
         if (msg.content != null) {
             val recordBody = Gson().fromJson(msg.content, IMRecordMsgBody::class.java)
+            for (m in recordBody.messages) {
+                m.oprStatus = MsgOperateStatus.Ack.value.or(MsgOperateStatus.ClientRead.value)
+                    .or(MsgOperateStatus.ServerRead.value)
+                m.sendStatus = MsgSendStatus.Success.value
+            }
             IMCoreManager.getImDataBase().messageDao().insertOrIgnore(recordBody.messages)
         }
     }

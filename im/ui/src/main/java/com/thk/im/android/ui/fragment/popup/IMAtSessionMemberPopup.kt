@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.fragment.popup
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,7 +19,8 @@ import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 
-class IMAtSessionMemberPopup constructor(
+@SuppressLint("ViewConstructor")
+class IMAtSessionMemberPopup(
     context: Context,
     private val session: Session,
     private val sessionMemberAtDelegate: IMSessionMemberAtDelegate,

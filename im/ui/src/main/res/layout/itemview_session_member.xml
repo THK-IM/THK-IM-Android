@@ -12,13 +12,12 @@
         android:id="@+id/avatar_container"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        app:cardCornerRadius="8dp"
+        app:cardCornerRadius="21dp"
         app:cardElevation="0dp"
         app:cardMaxElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_avatar"
             android:layout_height="42dp"
@@ -27,12 +26,14 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_nickname"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         android:layout_width="wrap_content"
         android:textColor="#0A0E10"
-        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:textSize="14sp"
+        android:textStyle="bold"
         app:layout_constraintLeft_toRightOf="@+id/avatar_container"
         app:layout_constraintTop_toTopOf="parent" />
 

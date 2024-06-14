@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.fragment.viewholder.sessionmember
 
+import android.text.TextUtils
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
@@ -13,15 +14,10 @@ import com.thk.im.android.ui.manager.IMUIManager
 
 class IMSessionMemberVH(itemView: View): RecyclerView.ViewHolder(itemView) {
 
-    private val avatarView: AppCompatImageView
-    private val nicknameView: AppCompatTextView
+    private val avatarView: AppCompatImageView = itemView.findViewById(R.id.iv_avatar)
+    private val nicknameView: AppCompatTextView = itemView.findViewById(R.id.tv_nickname)
     private var onSessionMemberClick: IMOnSessionMemberClick? = null
     private lateinit var member: Pair<User, SessionMember?>
-
-    init {
-        avatarView = itemView.findViewById(R.id.iv_avatar)
-        nicknameView = itemView.findViewById(R.id.tv_nickname)
-    }
 
     fun bindSessionMember(
         member: Pair<User, SessionMember?>,
@@ -37,8 +33,12 @@ class IMSessionMemberVH(itemView: View): RecyclerView.ViewHolder(itemView) {
 
     private fun showUser(user: User, sessionMember: SessionMember?) {
         val avatar = IMUIManager.avatarForSessionMember(user, sessionMember)
-        avatar?.let {
-            IMImageLoader.displayImageUrl(avatarView, it)
+        if (avatar != null && TextUtils.isEmpty(avatar)) {
+            IMImageLoader.displayImageUrl(avatarView, avatar)
+        } else {
+            IMUIManager.uiResourceProvider?.avatar(user)?.let {
+                avatarView.setImageResource(it)
+            }
         }
         nicknameView.text = IMUIManager.nicknameForSessionMember(user, sessionMember)
     }

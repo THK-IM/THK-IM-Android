@@ -594,26 +594,9 @@ class IMInputLayout : ConstraintLayout {
             binding.tvReplyUserNick.text = IMUIManager.nicknameForSessionMember(info.first, info.second)
         }
 
-        val subscriber = object : BaseSubscriber<String>() {
-            override fun onNext(t: String?) {
-                t?.let {
-                    binding.tvReplyContent.text = it
-                }
-            }
-
-            override fun onComplete() {
-                super.onComplete()
-                disposables.remove(this)
-            }
+        replyMsg?.let {
+            binding.tvReplyContent.text = IMCoreManager.messageModule.getMsgProcessor(it.type).msgDesc(it)
         }
-        Flowable.just(replyMsg)
-            .flatMap { msg ->
-                val content = IMCoreManager.messageModule.getMsgProcessor(msg.type).sessionDesc(msg)
-                return@flatMap Flowable.just(content)
-            }
-            .compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
-        disposables.add(subscriber)
     }
 
     fun setReeditMessage(message: Message) {

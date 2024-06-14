@@ -337,7 +337,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     private fun renderReplyMsg() {
         if (message.rMsgId != null && message.referMsg != null) {
             msgReplyContentView.visibility = View.VISIBLE
-            val userInfo = msgVHOperator?.msgSender()?.syncGetSessionMemberInfo(message.fUid)
+            val userInfo = msgVHOperator?.msgSender()?.syncGetSessionMemberInfo(message.referMsg!!.fUid)
             userInfo?.let { info ->
                 val user = info.first
                 info.second?.noteName?.let { noteName ->

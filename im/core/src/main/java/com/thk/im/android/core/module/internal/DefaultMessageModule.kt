@@ -322,7 +322,9 @@ open class DefaultMessageModule : MessageModule {
             } else {
                 val uId = IMCoreManager.uId
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, entityId, type).flatMap {
-                    IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
+                    if (it.id > 0) {
+                        IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
+                    }
                     Flowable.just(it)
                 }
             }
@@ -344,7 +346,9 @@ open class DefaultMessageModule : MessageModule {
             } else {
                 val uId = IMCoreManager.uId
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, sessionId).flatMap {
-                    IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
+                    if (it.id > 0) {
+                        IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
+                    }
                     Flowable.just(it)
                 }
             }
@@ -521,6 +525,9 @@ open class DefaultMessageModule : MessageModule {
         val sessionDao = IMCoreManager.getImDataBase().sessionDao()
         val dispose = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {
+                if (t.id <= 0) {
+                    return
+                }
                 val unReadCount = messageDao.getUnReadCount(t.id)
                 if (t.mTime < msg.mTime || t.unReadCount != unReadCount) {
                     val processor = getMsgProcessor(msg.type)

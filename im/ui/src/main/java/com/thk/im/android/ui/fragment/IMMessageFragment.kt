@@ -101,10 +101,6 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         initKeyboardWindow()
         initEventBus()
         fetchSessionMembers()
-
-        if (session?.functionFlag?.and(IMChatFunction.BaseInput.value) == 0L) {
-            binding.llInputLayout.visibility = View.GONE
-        }
     }
 
     private fun fetchSessionMembers() {

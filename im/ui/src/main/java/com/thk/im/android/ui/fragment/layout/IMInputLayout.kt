@@ -57,8 +57,10 @@ class IMInputLayout : ConstraintLayout {
 
     private val binding: LayoutMessageInputBinding
     private val disposables = CompositeDisposable()
-    private val recordPopup: IMRecordDbPopup
-    private val recordPopupView: BasePopupView
+    private val recordPopup: IMRecordDbPopup = IMRecordDbPopup(context)
+    private val recordPopupView: BasePopupView =
+        XPopup.Builder(context).isViewMode(true).isDestroyOnDismiss(false).hasShadowBg(false)
+            .asCustom(recordPopup)
 
     private lateinit var lifecycleOwner: LifecycleOwner
     private lateinit var session: Session
@@ -80,10 +82,6 @@ class IMInputLayout : ConstraintLayout {
     )
 
     init {
-        recordPopup = IMRecordDbPopup(context)
-        recordPopupView =
-            XPopup.Builder(context).isViewMode(true).isDestroyOnDismiss(false).hasShadowBg(false)
-                .asCustom(recordPopup)
         val view = LayoutInflater.from(context).inflate(R.layout.layout_message_input, this, true)
         binding = LayoutMessageInputBinding.bind(view)
         binding.etMessage.isFocusable = true
@@ -287,15 +285,29 @@ class IMInputLayout : ConstraintLayout {
         this.session = session
         this.msgSender = sender
         this.msgPreviewer = previewer
+        resetVisible()
+    }
 
+    private fun resetVisible() {
+        if (session.functionFlag.and(IMChatFunction.BaseInput.value) == 0L) {
+            binding.llMessageInput.visibility = GONE
+        } else {
+            binding.llMessageInput.visibility = VISIBLE
+        }
         if (session.functionFlag.and(IMChatFunction.Audio.value) == 0L) {
             binding.ivAudioRecord.visibility = GONE
+        } else {
+            binding.ivAudioRecord.visibility = VISIBLE
         }
         if (IMUIManager.getFunctionProvider(session).isEmpty()) {
             binding.ivAddMore.visibility = GONE
+        } else {
+            binding.ivAddMore.visibility = VISIBLE
         }
         if (session.functionFlag.and(IMChatFunction.Forward.value) == 0L) {
             binding.ivMsgOprForward.visibility = GONE
+        } else {
+            binding.ivMsgOprForward.visibility = VISIBLE
         }
     }
 
@@ -509,7 +521,7 @@ class IMInputLayout : ConstraintLayout {
             binding.llMessageInput.visibility = View.GONE
             binding.llMessageOperator.visibility = View.VISIBLE
         } else {
-            binding.llMessageInput.visibility = View.VISIBLE
+            resetVisible()
             binding.llMessageOperator.visibility = View.GONE
         }
     }

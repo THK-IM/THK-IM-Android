@@ -23,7 +23,8 @@
             android:singleLine="true"
             android:layout_height="20dp"
             android:textColor="#ff999999"
-            android:textSize="12sp" />
+            android:textStyle="bold"
+            android:textSize="14sp" />
 
         <FrameLayout
             android:id="@+id/fl_reply_content"

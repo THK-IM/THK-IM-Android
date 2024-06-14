@@ -53,6 +53,8 @@ class IMRecordMsgView : LinearLayout, IMsgBodyView {
             binding.tvRecordTitle.setTextColor(Color.parseColor("#ff999999"))
             binding.tvRecordContent.textSize = 12.0f
             binding.tvRecordContent.setTextColor(Color.parseColor("#ff999999"))
+            binding.tvDesc.textSize = 12.0f
+            binding.tvDesc.setTextColor(Color.parseColor("#ff999999"))
         }
     }
 }

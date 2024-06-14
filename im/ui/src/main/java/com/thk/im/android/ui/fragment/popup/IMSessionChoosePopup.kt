@@ -129,6 +129,9 @@ class IMSessionChoosePopup(
                     val subContent = IMCoreManager.messageModule.getMsgProcessor(subMessage.type)
                         .msgDesc(subMessage)
                     content = content.plus("${userName}:${subContent}")
+                    if (i > 5) {
+                        break
+                    }
                     i++
                     if (i <= messages.size - 1) {
                         content = content.plus("\n")

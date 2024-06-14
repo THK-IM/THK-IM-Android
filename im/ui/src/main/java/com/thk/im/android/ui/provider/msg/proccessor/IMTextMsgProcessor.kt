@@ -15,8 +15,8 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
         return MsgType.Text.value
     }
 
-    override fun sessionDesc(msg: Message): String {
-        return if (msg.content != null) {
+    override fun msgDesc(msg: Message): String {
+        if (msg.content != null) {
             var body = msg.content
             if (!msg.atUsers.isNullOrBlank()) {
                 body = AtStringUtils.replaceAtUIdsToNickname(msg.content!!, msg.getAtUIds()) { id ->
@@ -39,9 +39,8 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
             if (msg.oprStatus.and(MsgOperateStatus.Update.value) > 0) {
                 editFlag = "[已编辑]"
             }
-            return super.sessionDesc(msg) + editFlag + body
-        } else {
-            return super.sessionDesc(msg)
+            return editFlag + body
         }
+        return "[文本消息]"
     }
 }

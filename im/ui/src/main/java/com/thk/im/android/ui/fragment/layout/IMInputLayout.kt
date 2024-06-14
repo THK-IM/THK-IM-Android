@@ -314,7 +314,7 @@ class IMInputLayout : ConstraintLayout {
     private fun sendInputContent() {
         binding.etMessage.text?.let {
             val text = it.toString()
-            val (body, atUIds) = AtStringUtils.replaceAtNickNamesToUIds(text) { nickname ->
+            val (_, atUIds) = AtStringUtils.replaceAtNickNamesToUIds(text) { nickname ->
                 for ((k, v) in atMap) {
                     if (v == nickname) {
                         return@replaceAtNickNamesToUIds k.toLongOrNull()
@@ -324,11 +324,11 @@ class IMInputLayout : ConstraintLayout {
                 return@replaceAtNickNamesToUIds 0L
             }
             if (reeditMsg != null) {
-                val msg = IMReeditMsgData(reeditMsg!!.sid, reeditMsg!!.msgId, body)
+                val msg = IMReeditMsgData(reeditMsg!!.sid, reeditMsg!!.msgId, text)
                 msgSender?.sendMessage(MsgType.Reedit.value, msg, null, null)
                 reeditMsg = null
             } else {
-                msgSender?.sendMessage(MsgType.Text.value, body, null, atUIds)
+                msgSender?.sendMessage(MsgType.Text.value, text, null, atUIds)
             }
             atMap.clear()
             binding.etMessage.text.clearSpans()

@@ -99,6 +99,10 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
         this.disposables.add(subscriber)
     }
 
+    override fun msgDesc(msg: Message): String {
+        return "[已读消息]"
+    }
+
     override fun received(msg: Message) {
         val dbMsg =
             IMCoreManager.getImDataBase().messageDao().findById(msg.id, msg.fUid, msg.sid)

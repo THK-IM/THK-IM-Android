@@ -34,6 +34,7 @@ import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import java.lang.Integer.max
 
+
 abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val viewType: Int) :
     IMBaseVH(liftOwner, itemView) {
 
@@ -425,8 +426,15 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         }
         if (times % 2 == 0) {
             val tintColor =
-                IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#2008AAFF")
-            itemView.setBackgroundColor(tintColor)
+                IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#08AAFF")
+            val alphaValue = (255 * 0.2f).toInt()
+            val alphaColor = Color.argb(
+                alphaValue,
+                Color.red(tintColor),
+                Color.green(tintColor),
+                Color.blue(tintColor)
+            )
+            itemView.setBackgroundColor(alphaColor)
         } else {
             itemView.setBackgroundColor(Color.TRANSPARENT)
         }

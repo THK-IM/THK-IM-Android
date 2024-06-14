@@ -95,4 +95,8 @@ class IMReeditMessageProcessor : IMBaseMsgProcessor() {
         return true
     }
 
+    override fun msgDesc(msg: Message): String {
+        return "[重编辑消息]"
+    }
+
 }

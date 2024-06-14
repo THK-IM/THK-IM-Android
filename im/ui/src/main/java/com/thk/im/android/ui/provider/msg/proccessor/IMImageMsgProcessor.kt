@@ -28,8 +28,8 @@ class IMImageMsgProcessor : IMBaseMsgProcessor() {
         return MsgType.Image.value
     }
 
-    override fun sessionDesc(msg: Message): String {
-        return super.sessionDesc(msg) + "[图片]"
+    override fun msgDesc(msg: Message): String {
+        return "[图片消息]"
     }
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {

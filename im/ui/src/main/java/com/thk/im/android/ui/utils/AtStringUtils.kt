@@ -27,7 +27,7 @@ object AtStringUtils {
         val body = atRegex.replace(text) { result ->
             val id = result.value.toLongOrNull()
             if (id != null) {
-                if (!atUIds.contains(id)) return@replace ""
+                if (!atUIds.contains(id)) return@replace result.value
                 return@replace finder(id)
             }
             result.value

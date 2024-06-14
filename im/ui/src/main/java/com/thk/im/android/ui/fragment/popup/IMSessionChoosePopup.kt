@@ -127,7 +127,11 @@ class IMSessionChoosePopup(
                             }
                     }
                     val subContent = IMCoreManager.messageModule.getMsgProcessor(subMessage.type)
-                        .sessionDesc(subMessage)
+                        .msgDesc(subMessage)
+                    if (subMessage.type == MsgType.Text.value) {
+                        subMessage.content = subContent
+                        subMessage.data = subContent
+                    }
                     content = content.plus("${userName}:${subContent}")
                     i++
                     if (i <= messages.size - 1) {

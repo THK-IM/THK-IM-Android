@@ -15,6 +15,7 @@ import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Message

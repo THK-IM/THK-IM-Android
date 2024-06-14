@@ -250,12 +250,13 @@ class IMMessageAdapter(
             } else {
                 selectedMessages.clear()
             }
-            for (i in 0 until messageList.size) {
-                val viewHolder = imMessageLayout.findViewHolderForLayoutPosition(i)
-                viewHolder?.let {
-                    (it as IMBaseMsgVH).updateSelectMode()
-                }
-            }
+//            for (i in 0 until messageList.size) {
+//                val viewHolder = imMessageLayout.findViewHolderForLayoutPosition(i)
+//                viewHolder?.let {
+//                    (it as IMBaseMsgVH).updateSelectMode()
+//                }
+//            }
+            notifyDataSetChanged()
         }
     }
 
@@ -263,7 +264,7 @@ class IMMessageAdapter(
         for (i in 0 until messageList.size) {
             val viewHolder = imMessageLayout.findViewHolderForLayoutPosition(i)
             viewHolder?.let {
-                (it as IMBaseMsgVH).updateSelectMode()
+                (it as IMBaseMsgVH).fetchUserInfo()
             }
         }
     }

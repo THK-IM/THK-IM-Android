@@ -522,6 +522,7 @@ open class DefaultMessageModule : MessageModule {
             XEventBus.post(IMEvent.SessionMessageClear.value, session)
             session.unReadCount = 0
             session.lastMsg = ""
+            session.msgSyncTime = IMCoreManager.severTime
             IMCoreManager.getImDataBase().sessionDao().insertOrReplace(listOf(session))
             XEventBus.post(IMEvent.SessionUpdate.value, session)
             it.onComplete()

@@ -294,6 +294,24 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                 }
             }
         })
+
+        XEventBus.observe(this, IMEvent.SessionUpdate.value, Observer<Session> {
+            session?.let { session ->
+                if (it.id == session.id) {
+                    session.mute = it.mute
+                    session.status = it.status
+                    session.draft = it.draft
+                    session.deleted = it.deleted
+                    session.extData = it.extData
+                    session.functionFlag = it.functionFlag
+                    session.parentId = it.parentId
+                    session.lastMsg = it.lastMsg
+                    session.topTimestamp = it.topTimestamp
+                    session.unReadCount = it.unReadCount
+                    session.memberCount = it.memberCount
+                }
+            }
+        })
     }
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {

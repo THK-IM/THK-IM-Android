@@ -167,6 +167,7 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
                     sessionAdapter.addData(t)
                 }
                 hasMore = t.size >= count
+                isLoading = false
             }
 
             override fun onComplete() {

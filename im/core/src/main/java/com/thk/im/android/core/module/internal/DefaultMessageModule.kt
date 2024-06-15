@@ -280,7 +280,7 @@ open class DefaultMessageModule : MessageModule {
             }
 
         }
-        IMCoreManager.imApi.querySessionMessages(session.id, session.msgSyncTime, 0, count, 1)
+        IMCoreManager.imApi.querySessionMessages(session.id, session.msgSyncTime + 1, 0, count, 1)
             .compose(RxTransform.flowableToIo())
             .subscribe(subscriber)
         this.disposes.add(subscriber)

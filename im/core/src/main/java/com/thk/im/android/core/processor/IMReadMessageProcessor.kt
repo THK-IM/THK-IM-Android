@@ -119,15 +119,13 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
                     referMsg.oprStatus =
                         MsgOperateStatus.ServerRead.value.or(MsgOperateStatus.ClientRead.value)
                             .or(MsgOperateStatus.Ack.value)
-                    referMsg.mTime = msg.cTime
                     insertOrUpdateDb(referMsg, notify = true, notifySession = false)
                     val session = IMCoreManager.getImDataBase().sessionDao().findById(msg.sid)
                     if (session != null) {
                         val count =
                             IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
-                        if (session.unReadCount != count || session.mTime < msg.mTime) {
+                        if (session.unReadCount != count) {
                             session.unReadCount = count
-                            session.mTime = msg.mTime
                             IMCoreManager.getImDataBase().sessionDao().update(session)
                             XEventBus.post(IMEvent.SessionUpdate.value, session)
                         }
@@ -138,7 +136,6 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
                     } else {
                         referMsg.rUsers = "${msg.fUid}"
                     }
-                    referMsg.mTime = msg.cTime
                     insertOrUpdateDb(referMsg, notify = true, notifySession = false)
                     msg.sendStatus = MsgSendStatus.Success.value
                     // 状态操作消息对用户不可见，默认状态即位本身已读

@@ -556,7 +556,9 @@ open class DefaultMessageModule : MessageModule {
                         statusText = "❗"
                     }
                     t.lastMsg = "$statusText${processor.sessionDesc(msg)}"
-                    t.mTime = msg.mTime
+                    if (t.mTime < msg.cTime) {
+                        t.mTime = msg.cTime
+                    }
                     t.unReadCount = unReadCount
                     sessionDao.insertOrReplace(listOf(t))
                     XEventBus.post(IMEvent.SessionNew.value, t)

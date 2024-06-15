@@ -286,6 +286,14 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
             }
             binding.rcvMessage.deleteMessages(deleteMessages)
         })
+
+        XEventBus.observe(this, IMEvent.SessionMessageClear.value, Observer<Session> {
+            session?.let { session ->
+                if (it.id == session.id) {
+                    binding.rcvMessage.clearMessages()
+                }
+            }
+        })
     }
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {

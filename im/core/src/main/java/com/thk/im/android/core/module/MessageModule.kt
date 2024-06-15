@@ -124,6 +124,11 @@ interface MessageModule : BaseModule {
     ): Flowable<Void>
 
     /**
+     * 删除本地消息
+     */
+    fun deleteAllLocalSessionMessage(session: Session): Flowable<Void>
+
+    /**
      * 处理session
      */
     fun processSessionByMessage(msg: Message)

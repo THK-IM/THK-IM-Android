@@ -226,6 +226,12 @@ class IMMessageAdapter(
         }
     }
 
+    fun clear() {
+        val count = messageList.size
+        messageList.clear()
+        notifyItemRangeRemoved(0, count)
+    }
+
     fun getMessageCount(): Int {
         var count = 0
         for (msg in messageList) {
@@ -250,23 +256,12 @@ class IMMessageAdapter(
             } else {
                 selectedMessages.clear()
             }
-//            for (i in 0 until messageList.size) {
-//                val viewHolder = imMessageLayout.findViewHolderForLayoutPosition(i)
-//                viewHolder?.let {
-//                    (it as IMBaseMsgVH).updateSelectMode()
-//                }
-//            }
-            notifyDataSetChanged()
+            notifyItemRangeChanged(0, messageList.size)
         }
     }
 
     fun updateUserInfo() {
-        for (i in 0 until messageList.size) {
-            val viewHolder = imMessageLayout.findViewHolderForLayoutPosition(i)
-            viewHolder?.let {
-                (it as IMBaseMsgVH).fetchUserInfo()
-            }
-        }
+        notifyItemRangeChanged(0, messageList.size)
     }
 
     fun highlightFlashing(position: Int, times: Int, recyclerView: RecyclerView) {

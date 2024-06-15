@@ -516,6 +516,18 @@ open class DefaultMessageModule : MessageModule {
         }
     }
 
+    override fun deleteAllLocalSessionMessage(session: Session): Flowable<Void> {
+        return Flowable.create({
+            IMCoreManager.getImDataBase().messageDao().deleteBySessionId(session.id)
+            XEventBus.post(IMEvent.SessionMessageClear.value, session)
+            session.unReadCount = 0
+            session.lastMsg = ""
+            IMCoreManager.getImDataBase().sessionDao().insertOrReplace(listOf(session))
+            XEventBus.post(IMEvent.SessionUpdate.value, session)
+            it.onComplete()
+        }, BackpressureStrategy.LATEST)
+    }
+
     override fun processSessionByMessage(msg: Message) {
         // session为0的消息不直接显示给用户
         if (msg.sid == 0L) {

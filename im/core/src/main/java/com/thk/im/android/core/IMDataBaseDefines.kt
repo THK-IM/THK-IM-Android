@@ -34,6 +34,17 @@ enum class SessionPrompt(val value: Int) {
 }
 
 /**
+ * session 角色
+ */
+@Keep
+enum class SessionRole(val value: Int) {
+    Member(0),
+    Admin(1),
+    SuperAdmin(3),
+    Owner(4),
+}
+
+/**
  * 消息发送状态
  */
 @Keep

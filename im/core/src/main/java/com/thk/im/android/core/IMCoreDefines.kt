@@ -37,6 +37,7 @@ enum class IMEvent(val value: String) {
     MsgUpdate("IMEventMsgUpdate"),
     MsgDelete("IMEventMsgDelete"),
     BatchMsgDelete("IMEventBatchMsgDelete"),
+    SessionMessageClear("IMEventSessionMessageClear"),
     SessionNew("IMEventSessionNew"),
     SessionUpdate("IMEventSessionUpdate"),
     SessionDelete("IMEventSessionDelete"),

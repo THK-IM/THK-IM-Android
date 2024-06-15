@@ -207,6 +207,10 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         msgAdapter.batchDelete(deleteMessages)
     }
 
+    fun clearMessages() {
+        msgAdapter.clear()
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         disposables.clear()

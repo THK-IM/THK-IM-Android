@@ -81,9 +81,8 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
                 if (session != null) {
                     val count =
                         IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
-                    if (session.unReadCount != count || session.mTime < msg.mTime) {
+                    if (session.unReadCount != count) {
                         session.unReadCount = count
-                        session.mTime = msg.mTime
                         IMCoreManager.getImDataBase().sessionDao().update(session)
                         XEventBus.post(IMEvent.SessionUpdate.value, session)
                     }

@@ -291,7 +291,9 @@ open class DefaultMessageModule : MessageModule {
             override fun onNext(t: List<Session>?) {
                 t?.let {
                     for (s in it) {
-                        syncSessionMessage(s)
+                        if (s.deleted == 0 && s.id > 0) {
+                            syncSessionMessage(s)
+                        }
                     }
                 }
             }

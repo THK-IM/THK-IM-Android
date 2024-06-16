@@ -8,6 +8,8 @@ import com.thk.android.im.live.room.Room
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
+import com.thk.im.android.core.db.entity.Group
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.call.LiveCallActivity
@@ -26,9 +28,13 @@ class ExternalPageRouter: IMPageRouter {
         ctx.startActivity(intent)
     }
 
-    override fun openContactUserPage(ctx: Context, user: User) {
+    override fun openUserPage(ctx: Context, user: User, session: Session) {
         ContactUserActivity.startContactUserActivity(ctx, user)
     }
+
+    override fun openGroupPage(ctx: Context, group: Group, session: Session) {
+    }
+
 
     override fun openLiveCall(ctx: Context, session: Session) {
         if (session.type == SessionType.Single.value) {
@@ -45,6 +51,9 @@ class ExternalPageRouter: IMPageRouter {
                 .subscribe(subscriber)
             compositeDisposable.add(subscriber)
         }
+    }
+
+    override fun openMsgReadStatusPage(ctx: Context, session: Session, message: Message) {
     }
 
 }

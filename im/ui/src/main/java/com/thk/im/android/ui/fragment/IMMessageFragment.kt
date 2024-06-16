@@ -54,6 +54,7 @@ import com.thk.im.android.ui.protocol.IMContentResult
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
+import com.thk.im.android.ui.utils.ScreenUtils
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 
@@ -156,7 +157,12 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         keyboardPopupWindow = KeyboardPopupWindow(binding.root) {
             if (it > 0) {
                 keyboardShowing = true
-                moveLayout(true, it, 150)
+                val isMultiWindow = ScreenUtils.isMultiWindowMode(requireActivity())
+                if (isMultiWindow) {
+                    moveLayout(true, 0, 300)
+                } else {
+                    moveLayout(true, it, 150)
+                }
             } else {
                 keyboardShowing = false
                 val height = binding.llBottomLayout.getContentHeight()
@@ -166,7 +172,6 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
     }
 
     private fun moveLayout(isKeyboardShow: Boolean, bottomHeight: Int, duration: Long) {
-        LLog.v("KeyboardWindow", "$isKeyboardShow, $bottomHeight, $duration")
         val animators = AnimatorSet()
         val msgAnimator = ValueAnimator.ofInt(binding.rcvMessage.paddingTop, bottomHeight)
         msgAnimator.addUpdateListener {

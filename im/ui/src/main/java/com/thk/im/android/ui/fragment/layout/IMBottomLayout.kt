@@ -20,6 +20,7 @@ import com.thk.im.android.ui.fragment.adapter.IMEmojiTitleAdapter
 import com.thk.im.android.ui.fragment.adapter.IMFunctionAdapter
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
+import com.thk.im.android.ui.utils.ScreenUtils
 
 class IMBottomLayout : ConstraintLayout {
 
@@ -95,13 +96,22 @@ class IMBottomLayout : ConstraintLayout {
             binding.lyEmojiTab.visibility = VISIBLE
             binding.vpEmojiContent.visibility = VISIBLE
             binding.rcvFunctions.visibility = GONE
-            300.dp2px()
+            if (ScreenUtils.isMultiWindowMode(context)) {
+                180.dp2px()
+            } else {
+                300.dp2px()
+            }
         } else {
             binding.lyEmojiTab.visibility = GONE
             binding.vpEmojiContent.visibility = GONE
             binding.rcvFunctions.visibility = VISIBLE
-            200.dp2px()
+            if (ScreenUtils.isMultiWindowMode(context)) {
+                120.dp2px()
+            } else {
+                200.dp2px()
+            }
         }
+        this.layoutParams.height = contentHeight
         msgSender?.moveUpAlwaysShowView(false, contentHeight, 150)
     }
 

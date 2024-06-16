@@ -150,6 +150,7 @@ abstract class IMBaseMsgProcessor {
 
     open fun resend(msg: Message, callback: IMSendMsgCallback? = null) {
         msg.cTime = IMCoreManager.severTime
+        msg.mTime = IMCoreManager.severTime
         send(msg, true, callback)
     }
 

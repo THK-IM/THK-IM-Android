@@ -17,6 +17,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.text.getSpans
 import androidx.emoji2.widget.EmojiEditText
 import androidx.lifecycle.LifecycleOwner
@@ -87,8 +88,12 @@ class IMInputLayout : ConstraintLayout {
         binding.etMessage.isFocusable = true
         binding.etMessage.isFocusableInTouchMode = true
         binding.etMessage.requestFocus()
-        binding.ivSendMsg.setOnClickListener {
+        binding.tvSendMsg.setOnClickListener {
             sendInputContent()
+        }
+
+        IMUIManager.uiResourceProvider?.tintColor()?.let {
+            binding.tvSendMsg.setShape(it, floatArrayOf(15f, 15f, 15f, 15f), false)
         }
 
 
@@ -141,10 +146,10 @@ class IMInputLayout : ConstraintLayout {
                     }
                 }
                 if ((p0?.length ?: 0) > 0) {
-                    binding.ivSendMsg.visibility = View.VISIBLE
+                    binding.tvSendMsg.visibility = View.VISIBLE
                     binding.ivAddMore.visibility = View.GONE
                 } else {
-                    binding.ivSendMsg.visibility = View.GONE
+                    binding.tvSendMsg.visibility = View.GONE
                     binding.ivAddMore.visibility = View.VISIBLE
                     this@IMInputLayout.reeditMsg = null
                 }

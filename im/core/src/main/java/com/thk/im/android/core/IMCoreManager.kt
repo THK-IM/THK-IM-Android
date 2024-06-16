@@ -71,7 +71,6 @@ object IMCoreManager {
         if (this.uId != 0L) {
             shutdown()
         }
-
         this.uId = uId
         db = DefaultIMDataBase(app, uId, debug)
         storageModule = DefaultStorageModule(app, uId)

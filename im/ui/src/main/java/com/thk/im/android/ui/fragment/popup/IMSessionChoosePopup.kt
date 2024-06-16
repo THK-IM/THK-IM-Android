@@ -54,7 +54,7 @@ class IMSessionChoosePopup(
             }
         })
         supportFragmentManager.beginTransaction()
-            .add(R.id.fl_session, sessionFragment, fragmentTag)
+            .replace(R.id.fl_session, sessionFragment, fragmentTag)
             .commit()
     }
 

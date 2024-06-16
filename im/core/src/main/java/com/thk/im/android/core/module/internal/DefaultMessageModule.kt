@@ -1,6 +1,7 @@
 package com.thk.im.android.core.module.internal
 
 import android.content.Context.MODE_PRIVATE
+import android.text.TextUtils
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
@@ -531,7 +532,7 @@ open class DefaultMessageModule : MessageModule {
         }, BackpressureStrategy.LATEST)
     }
 
-    override fun processSessionByMessage(msg: Message) {
+    override fun processSessionByMessage(msg: Message, forceNotify: Boolean) {
         // session为0的消息不直接显示给用户
         if (msg.sid == 0L) {
             return
@@ -544,7 +545,9 @@ open class DefaultMessageModule : MessageModule {
                     return
                 }
                 val unReadCount = messageDao.getUnReadCount(t.id)
-                if (t.mTime < msg.mTime || t.unReadCount != unReadCount) {
+                if (forceNotify || t.mTime <= msg.mTime || t.unReadCount != unReadCount
+                    || TextUtils.isEmpty(t.lastMsg)
+                ) {
                     val processor = getMsgProcessor(msg.type)
                     var statusText = ""
                     if (msg.sendStatus == MsgSendStatus.Sending.value ||
@@ -739,6 +742,26 @@ open class DefaultMessageModule : MessageModule {
                 it.onError(e)
             }
             XEventBus.post(IMEvent.BatchMsgDelete.value, messages)
+            val sessionIds = mutableSetOf<Long>()
+            for (m in messages) {
+                sessionIds.add(m.sid)
+            }
+            for (sid in sessionIds) {
+                val lastSessionMsg =
+                    IMCoreManager.getImDataBase().messageDao().findLastMessageBySessionId(sid)
+                if (lastSessionMsg != null) {
+                    processSessionByMessage(lastSessionMsg, true)
+                } else {
+                    val session = IMCoreManager.getImDataBase().sessionDao().findById(sid)
+                    session?.let { s ->
+                        s.unReadCount = 0
+                        s.lastMsg = ""
+                        s.msgSyncTime = IMCoreManager.severTime
+                        IMCoreManager.getImDataBase().sessionDao().insertOrReplace(listOf(s))
+                        XEventBus.post(IMEvent.SessionUpdate.value, s)
+                    }
+                }
+            }
             it.onComplete()
         }, BackpressureStrategy.LATEST)
     }

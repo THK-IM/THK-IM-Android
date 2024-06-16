@@ -172,7 +172,6 @@ abstract class IMBaseMsgProcessor {
             override fun onError(t: Throwable?) {
                 super.onError(t)
                 LLog.e("Message Send err $t")
-                originMsg.mTime = IMCoreManager.severTime
                 originMsg.sendStatus = MsgSendStatus.SendFailed.value
                 insertOrUpdateDb(originMsg)
                 callback?.onResult(originMsg, Exception(t))
@@ -218,7 +217,6 @@ abstract class IMBaseMsgProcessor {
             // 消息发送到服务器
             it.sendStatus = MsgSendStatus.Sending.value
             if (resend) {
-                it.mTime = IMCoreManager.severTime
                 insertOrUpdateDb(
                     msg,
                     notify = true,
@@ -285,7 +283,6 @@ abstract class IMBaseMsgProcessor {
      * 【插入或更新消息状态】
      */
     open fun insertOrUpdateDb(msg: Message, notify: Boolean = true, notifySession: Boolean = true) {
-//        msg.mTime = IMCoreManager.severTime
         IMCoreManager.getImDataBase().messageDao().insertOrReplace(mutableListOf(msg))
         if (notify) {
             if (msg.rMsgId != null && msg.referMsg == null) {

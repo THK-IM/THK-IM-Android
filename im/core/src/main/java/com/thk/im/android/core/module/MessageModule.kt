@@ -131,7 +131,7 @@ interface MessageModule : BaseModule {
     /**
      * 处理session
      */
-    fun processSessionByMessage(msg: Message)
+    fun processSessionByMessage(msg: Message, forceNotify: Boolean = false)
 
     /**
      * session下有新消息，发出提示音/震动等通知

@@ -100,7 +100,7 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
     }
 
     override fun msgDesc(msg: Message): String {
-        return IMCoreManager.app.getString(R.string.msg_desc_read)
+        return IMCoreManager.app.getString(R.string.im_msg_desc_read)
     }
 
     override fun received(msg: Message) {

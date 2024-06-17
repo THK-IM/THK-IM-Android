@@ -16,15 +16,12 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
-import com.thk.im.android.core.exception.UnknownException
 import com.thk.im.android.ui.fragment.adapter.IMMessageAdapter
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
-import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 
 class IMMessageLayout : RecyclerView, IMMsgVHOperator {
@@ -347,30 +344,6 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     override fun msgSender(): IMMsgSender? {
         return msgSender
     }
-
-//    override fun readMessage(message: Message) {
-//        msgSender?.readMessage(message)
-//    }
-//
-//    override fun setEditText(text: String) {
-//        msgSender?.openKeyboard()
-//        msgSender?.addInputContent(text)
-//    }
-//
-//    override fun syncGetSessionMemberInfo(userId: Long): Pair<User, SessionMember?>? {
-//        return msgSender?.syncGetSessionMemberInfo(userId)
-//    }
-//
-//    override fun saveSessionMemberInfo(info: Pair<User, SessionMember?>) {
-//        msgSender?.saveSessionMemberInfo(info)
-//    }
-//
-//    override fun asyncGetSessionMemberInfo(userId: Long): Flowable<Pair<User, SessionMember?>> {
-//        if (msgSender == null) {
-//            return Flowable.error(UnknownException)
-//        }
-//        return msgSender!!.asyncGetSessionMemberInfo(userId)
-//    }
 
     fun getSelectMessages(): Set<Message> {
         return (adapter as IMMessageAdapter).getSelectedMessages()

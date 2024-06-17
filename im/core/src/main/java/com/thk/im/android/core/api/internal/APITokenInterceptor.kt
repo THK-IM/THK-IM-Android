@@ -3,9 +3,9 @@ package com.thk.im.android.core.api.internal
 
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.api.vo.CodeMessage
 import com.thk.im.android.core.base.utils.AppUtils
-import com.thk.im.android.core.exception.CodeMessage
-import com.thk.im.android.core.exception.HttpException
+import com.thk.im.android.core.exception.CodeMsgException
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
@@ -92,25 +92,20 @@ class APITokenInterceptor(private var token: String) : Interceptor {
             if (response.body != null) {
                 val content = response.body?.string()
                 if (content != null) {
-                    val contentType = response.body?.contentType()
-                    if (contentType == null) {
-                        val codeMessage = CodeMessage(response.code, content)
-                        throw HttpException(codeMessage)
-                    }
+                    val contentType = response.body?.contentType() ?: throw CodeMsgException(
+                        response.code, content
+                    )
                     if (contentType.toString().contains("application/json", true)) {
                         val codeMessage = gson.fromJson(content, CodeMessage::class.java)
-                        throw HttpException(codeMessage)
+                        throw CodeMsgException(codeMessage.code, codeMessage.message)
                     } else {
-                        val codeMessage = CodeMessage(response.code, "unknown error")
-                        throw HttpException(codeMessage)
+                        throw CodeMsgException(response.code, "unknown error")
                     }
                 } else {
-                    val codeMessage = CodeMessage(response.code, "unknown error")
-                    throw HttpException(codeMessage)
+                    throw CodeMsgException(response.code, "unknown error")
                 }
             } else {
-                val codeMessage = CodeMessage(response.code, "unknown error")
-                throw HttpException(codeMessage)
+                throw CodeMsgException(response.code, "unknown error")
             }
         }
     }

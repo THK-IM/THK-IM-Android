@@ -9,8 +9,6 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
-import com.thk.im.android.core.exception.DatabaseException
-import com.thk.im.android.core.exception.ParameterException
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.ui.manager.IMReeditMsgData
 import io.reactivex.Flowable
@@ -26,14 +24,9 @@ class IMReeditMessageProcessor : IMBaseMsgProcessor() {
 
     override fun send(msg: Message, resend: Boolean, callback: IMSendMsgCallback?) {
         if (msg.content == null) {
-            callback?.onResult(msg, ParameterException)
             return
         }
-        val reeditMsgData = Gson().fromJson(msg.content!!, IMReeditMsgData::class.java)
-        if (reeditMsgData == null) {
-            callback?.onResult(msg, ParameterException)
-            return
-        }
+        val reeditMsgData = Gson().fromJson(msg.content!!, IMReeditMsgData::class.java) ?: return
         val subscriber = object : BaseSubscriber<Boolean>() {
 
             override fun onComplete() {
@@ -53,8 +46,6 @@ class IMReeditMessageProcessor : IMBaseMsgProcessor() {
                 t?.let {
                     if (it) {
                         callback?.onResult(msg, null)
-                    } else {
-                        callback?.onResult(msg, DatabaseException)
                     }
                 }
             }

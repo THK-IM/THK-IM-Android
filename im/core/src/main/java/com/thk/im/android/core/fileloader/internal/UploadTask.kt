@@ -1,8 +1,7 @@
 package com.thk.im.android.core.fileloader.internal
 
 import com.google.gson.Gson
-import com.thk.im.android.core.exception.CodeMessage
-import com.thk.im.android.core.exception.HttpException
+import com.thk.im.android.core.exception.CodeMsgException
 import com.thk.im.android.core.fileloader.FileLoadState
 import okhttp3.Call
 import okhttp3.Callback
@@ -45,25 +44,25 @@ class UploadTask(
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     if (response.body == null) {
-                        val codeMessage = CodeMessage(response.code, "unknown")
-                        notify(0, FileLoadState.Failed.value, HttpException(codeMessage))
+                        notify(
+                            0,
+                            FileLoadState.Failed.value,
+                            CodeMsgException(response.code, "unknown")
+                        )
                     } else {
                         try {
                             val json = response.body?.string()
                             val uploadParams = Gson().fromJson(json, UploadParams::class.java)
                             startUpload(uploadParams)
                         } catch (e: Exception) {
-                            val codeMessage = CodeMessage(
-                                500,
+                            val error =
                                 if (e.message == null) "internal server error" else e.message!!
-                            )
-                            notify(0, FileLoadState.Failed.value, HttpException(codeMessage))
+                            notify(0, FileLoadState.Failed.value, CodeMsgException(500, error))
                         }
                     }
                 } else {
                     val msg = response.body?.string() ?: "unknown"
-                    val codeMessage = CodeMessage(response.code, msg)
-                    notify(0, FileLoadState.Failed.value, HttpException(codeMessage))
+                    notify(0, FileLoadState.Failed.value, CodeMsgException(response.code, msg))
                 }
             }
         })
@@ -105,9 +104,11 @@ class UploadTask(
                     keyUrl = "${uploadParams.id}"
                     notify(100, FileLoadState.Success.value, null)
                 } else {
-                    val msg = response.body?.string() ?: "unknown"
-                    val codeMessage = CodeMessage(response.code, msg)
-                    notify(0, FileLoadState.Failed.value, HttpException(codeMessage))
+                    notify(
+                        0,
+                        FileLoadState.Failed.value,
+                        CodeMsgException(response.code, response.body?.string() ?: "unknown")
+                    )
                 }
             }
         })

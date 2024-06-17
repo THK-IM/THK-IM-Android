@@ -1,8 +1,8 @@
-package com.thk.im.android.core.exception
+package com.thk.im.android.core.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class CodeMessage(
+class CodeMessage(
     @SerializedName("code")
     val code: Int,
     @SerializedName("message")

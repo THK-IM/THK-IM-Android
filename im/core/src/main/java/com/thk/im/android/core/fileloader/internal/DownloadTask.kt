@@ -2,8 +2,7 @@ package com.thk.im.android.core.fileloader.internal
 
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.StringUtils
-import com.thk.im.android.core.exception.CodeMessage
-import com.thk.im.android.core.exception.HttpException
+import com.thk.im.android.core.exception.CodeMsgException
 import com.thk.im.android.core.fileloader.FileLoadState
 import okhttp3.Call
 import okhttp3.Callback
@@ -56,8 +55,7 @@ class DownloadTask(
                 if (response.code !in 200..299) {
                     response.close()
                     val msg = response.body?.string() ?: "unknown"
-                    val codeMessage = CodeMessage(response.code, msg)
-                    notify(0, FileLoadState.Failed.value, HttpException(codeMessage))
+                    notify(0, FileLoadState.Failed.value, CodeMsgException(response.code, msg))
                     return
                 }
                 if (response.body == null) {

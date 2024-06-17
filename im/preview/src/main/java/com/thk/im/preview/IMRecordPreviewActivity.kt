@@ -39,7 +39,7 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
     private fun initToolbar() {
         val toolbar = binding.tbRecord
         toolbar.navigationIcon = AppCompatResources.getDrawable(this, R.drawable.icon_back)
-        toolbar.title = "选择一个聊天"
+        toolbar.title = getString(R.string.choose_one_session)
 
         val title = intent.getStringExtra("title")
         toolbar.setNavigationOnClickListener {

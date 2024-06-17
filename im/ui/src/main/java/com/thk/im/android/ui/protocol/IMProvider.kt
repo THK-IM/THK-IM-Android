@@ -13,7 +13,11 @@ interface IMProvider {
 
     fun pick(activity: Activity, formats: List<IMFileFormat>, imContentResult: IMContentResult)
 
-    fun startRecordAudio(path: String, duration: Int, audioCallback: AudioCallback): Boolean
+    fun startRecordAudio(
+        path: String,
+        duration: Int,
+        audioCallback: AudioCallback
+    ): Boolean
 
     fun stopRecordAudio()
 

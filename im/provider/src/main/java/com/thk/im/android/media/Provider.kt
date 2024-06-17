@@ -102,7 +102,6 @@ class Provider(app: Application, token: String) : IMProvider {
                         }).launch()
                 }
             }).isOriginalControl(true)
-//            .setSelectorUIStyle())
             .isDisplayCamera(false).isGif(true).isPreviewImage(true).isWithSelectVideoImage(true)
             .isPreviewZoomEffect(true).isPreviewFullScreenMode(false).isPreviewVideo(true)
             .forResult(object : OnResultCallbackListener<LocalMedia> {
@@ -116,9 +115,7 @@ class Provider(app: Application, token: String) : IMProvider {
             })
     }
 
-    override fun startRecordAudio(
-        path: String, duration: Int, audioCallback: AudioCallback
-    ): Boolean {
+    override fun startRecordAudio(path: String, duration: Int, audioCallback: AudioCallback): Boolean {
         return OggOpusRecorder.startRecord(path, duration, audioCallback)
     }
 

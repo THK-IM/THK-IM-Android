@@ -15,18 +15,19 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
-import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
-import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.preview.databinding.ActivityMediaPreviewBinding
 import com.thk.im.preview.adapter.MessagePreviewAdapter
 import com.thk.im.preview.view.VideoPlayerView
@@ -97,6 +98,12 @@ class IMMediaPreviewActivity : AppCompatActivity() {
         }
         initView()
         initEventBus()
+
+        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                exit()
+            }
+        })
     }
 
     private fun initView() {
@@ -370,10 +377,6 @@ class IMMediaPreviewActivity : AppCompatActivity() {
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         compositeDisposable.add(subscriber)
-    }
-
-    override fun onBackPressed() {
-        exit()
     }
 
     override fun finish() {

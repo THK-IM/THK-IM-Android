@@ -108,7 +108,7 @@ public class AppUtils {
     }
 
     private String capitalize(String str) {
-        if (str == null || str.length() == 0) {
+        if (str == null || str.isEmpty()) {
             return "";
         }
         char first = str.charAt(0);

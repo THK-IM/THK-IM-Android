@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.Path
 import android.graphics.drawable.GradientDrawable
 import androidx.annotation.ColorInt
+import kotlin.math.min
 
 
 object ShapeUtils {
@@ -68,10 +69,10 @@ object ShapeUtils {
     }
 
     fun roundedRect(
-        left: Float, top: Float, right: Float, bottom: Float, rx: Float, ry: Float,
+        left: Float, top: Float, right: Float, bottom: Float, rX: Float, rY: Float,
         tl: Boolean = true, tr: Boolean = true, br: Boolean = true, bl: Boolean = true): Path {
-        var rx = rx
-        var ry = ry
+        var rx = rX
+        var ry = rY
         val path = Path()
         if (rx < 0) rx = 0f
         if (ry < 0) ry = 0f
@@ -134,13 +135,12 @@ object ShapeUtils {
         if (bl < 0) bl = 0f
         val width = right - left
         val height = bottom - top
-        val min = Math.min(width, height)
+        val min = min(width, height)
         if (tl > min / 2) tl = min / 2
         if (tr > min / 2) tr = min / 2
         if (br > min / 2) br = min / 2
         if (bl > min / 2) bl = min / 2
-//        val widthMinusCorners = width - 2 * rx
-//        val heightMinusCorners = height - 2 * ry
+
         if (tl == tr && tr == br && br == bl && tl == min / 2) {
             val radius = min / 2F
             path.addCircle(left + radius, top + radius, radius, Path.Direction.CW)

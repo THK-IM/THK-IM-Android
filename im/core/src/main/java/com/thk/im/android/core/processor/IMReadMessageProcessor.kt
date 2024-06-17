@@ -6,6 +6,7 @@ import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.R
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
@@ -99,7 +100,7 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
     }
 
     override fun msgDesc(msg: Message): String {
-        return "[已读消息]"
+        return IMCoreManager.app.getString(R.string.msg_desc_read)
     }
 
     override fun received(msg: Message) {

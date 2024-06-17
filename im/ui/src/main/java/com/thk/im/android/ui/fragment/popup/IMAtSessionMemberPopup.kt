@@ -41,7 +41,7 @@ class IMAtSessionMemberPopup(
             return
         }
         toolbar = findViewById(R.id.tb_session_member_choose)
-        toolbar.title = "选择提醒的人"
+        toolbar.title = context.getString(R.string.choose_at_people)
         rcvSessionMember = findViewById(R.id.rcv_session_member)
         rcvSessionMember.layoutManager = LinearLayoutManager(context)
         sessionMemberAdapter = IMSessionMemberAdapter()

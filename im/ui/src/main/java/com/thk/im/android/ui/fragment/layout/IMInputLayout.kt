@@ -17,7 +17,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.text.getSpans
 import androidx.emoji2.widget.EmojiEditText
 import androidx.lifecycle.LifecycleOwner
@@ -28,9 +27,7 @@ import com.lxj.xpopup.core.BasePopupView
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.MsgType
-import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
@@ -48,7 +45,6 @@ import com.thk.im.android.ui.protocol.AudioStatus
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.utils.AtStringUtils
-import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 import kotlin.math.abs
@@ -234,9 +230,9 @@ class IMInputLayout : ConstraintLayout {
                     if (audioCancel != cancel) {
                         audioCancel = cancel
                         val tips = if (audioCancel) {
-                            "松开 取消"
+                            context.getString(R.string.press_for_record_voice)
                         } else {
-                            "松开 发送"
+                            context.getString(R.string.release_to_send_voice)
                         }
                         binding.btRecordVoice.text = tips
                         if (recordPopupView.isShow) {
@@ -419,7 +415,7 @@ class IMInputLayout : ConstraintLayout {
         if (!granted) {
             XXPermissions.with(context).permission(Permission.RECORD_AUDIO).request { _, all ->
                 if (!all) {
-                    msgSender?.showToast("请开启录音权限")
+                    msgSender?.showToast(context.getString(R.string.please_open_record_permisson))
                 }
             }
         } else {
@@ -436,7 +432,7 @@ class IMInputLayout : ConstraintLayout {
             inputBgColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )
         if (!contentProvider.isRecordingAudio()) {
-            binding.btRecordVoice.text = "松开 发送"
+            binding.btRecordVoice.text = context.getString(R.string.release_to_send_voice)
             val path = IMCoreManager.storageModule.allocSessionFilePath(
                 session.id,
                 "${System.currentTimeMillis() / 100}_audio.oga",
@@ -481,7 +477,7 @@ class IMInputLayout : ConstraintLayout {
                 }
                 if (!audioCancel) {
                     if (second == 0) {
-                        msgSender?.showToast("录音时间太短")
+                        msgSender?.showToast(context.getString(R.string.record_duration_too_short))
                         return
                     }
                     val audioMsgData = IMAudioMsgData()
@@ -502,7 +498,7 @@ class IMInputLayout : ConstraintLayout {
                         return
                     }
                 }
-                msgSender?.showToast("录音失败")
+                msgSender?.showToast(context.getString(R.string.record_failed))
             }
         }
     }
@@ -516,7 +512,7 @@ class IMInputLayout : ConstraintLayout {
         binding.btRecordVoice.setShape(
             inputLayoutBgColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )
-        binding.btRecordVoice.text = "按住 说话"
+        binding.btRecordVoice.text = context.getString(R.string.press_for_record_voice)
         val contentProvider = IMUIManager.mediaProvider ?: return
         contentProvider.stopRecordAudio()
     }

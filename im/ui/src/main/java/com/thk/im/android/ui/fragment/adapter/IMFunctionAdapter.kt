@@ -25,9 +25,7 @@ class IMFunctionAdapter(private val msgSender: IMMsgSender?) :
         holder.position = position
         holder.itemView.setOnClickListener {
             msgSender?.let { sender ->
-                IMUIManager.functionIVProviders[position]?.let { provider ->
-                    provider.click(sender)
-                }
+                IMUIManager.functionIVProviders[position]?.click(sender)
             }
 
         }

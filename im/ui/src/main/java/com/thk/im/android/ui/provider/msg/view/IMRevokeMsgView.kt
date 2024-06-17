@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.MsgType
@@ -16,6 +17,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgRevokeBinding
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.manager.IMRevokeMsgData
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMRevokeMsgView : LinearLayout, IMsgBodyView {
@@ -34,6 +36,8 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
         val view = LayoutInflater.from(context)
             .inflate(R.layout.view_msg_revoke, this, true)
         binding = ViewMsgRevokeBinding.bind(view)
+        val reeditColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#1988f0")
+        binding.tvReedit.setTextColor(reeditColor)
     }
 
     override fun contentView(): ViewGroup {

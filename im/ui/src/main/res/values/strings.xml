@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="new_message">新消息</string>
-    <string name="your_are_banned_by_admin">你已经被管理员禁言</string>
+<!--    <string name="new_message">新消息</string>-->
+<!--    <string name="your_are_banned_by_admin">你已经被管理员禁言</string>-->
     <string name="send_message_ddd">说点什么..</string>
-    <string name="tip_for_voice_forward">按住 说话</string>
+    <string name="press_for_record_voice">按住 说话</string>
     <string name="release_to_send_voice">松开 结束</string>
     <string name="send">发送</string>
-    <string name="take_camera_btn_text">拍照</string>
-    <string name="photo">拍照</string>
-    <string name="cancel">取消</string>
-    <string name="album">相册</string>
-    <string name="voice_call">语音通话</string>
-    <string name="plz_get_permission_and_send_voice">请授予权限后再使用发送语音功能</string>
-    <string name="record_too_short">录音时长少于1秒</string>
-    <string name="all_emoji">全部表情</string>
-    <string name="latest_emoji">最近表情</string>
-    <string name="you_revoke_a_message">你撤回了一条消息</string>
     <string name="chat_record">聊天记录</string>
+    <string name="you_revoke_a_message">你撤回了一条消息</string>
+    <string name="im_edit_again">重新编辑</string>
+    <string name="please_open_record_permisson">请开启录音权限</string>
+    <string name="record_duration_too_short">录音时间太短</string>
+    <string name="record_failed">录音失败</string>
+    <string name="choose_at_people">选择要提醒的人</string>
+    <string name="choose_one_session">选择一个聊天</string>
+    <string name="someone_s_group_chat_record">%s的群聊记录</string>
+    <string name="someone_s_chat_record">%s的会话记录</string>
+    <!--    <string name="take_camera_btn_text">拍照</string>-->
+<!--    <string name="photo">拍照</string>-->
+<!--    <string name="cancel">取消</string>-->
+<!--    <string name="album">相册</string>-->
+<!--    <string name="voice_call">语音通话</string>-->
+<!--    <string name="plz_get_permission_and_send_voice">请授予权限后再使用发送语音功能</string>-->
+<!--    <string name="record_too_short">录音时长少于1秒</string>-->
+<!--    <string name="all_emoji">全部表情</string>-->
+<!--    <string name="latest_emoji">最近表情</string>-->
 </resources>

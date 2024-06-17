@@ -19,6 +19,7 @@ import com.thk.im.android.ui.fragment.IMSessionFragment
 import com.thk.im.android.ui.manager.IMRecordMsgBody
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import io.reactivex.Flowable
+import java.util.Locale
 
 class IMSessionChoosePopup(
     context: Context,
@@ -70,7 +71,7 @@ class IMSessionChoosePopup(
     private fun initToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.tb_session_choose)
         toolbar.navigationIcon = AppCompatResources.getDrawable(context, R.drawable.icon_back)
-        toolbar.title = "选择一个聊天"
+        toolbar.title = context.getString(R.string.choose_one_session)
         toolbar.setNavigationOnClickListener {
             dismiss()
         }
@@ -150,50 +151,14 @@ class IMSessionChoosePopup(
                 }
                 Flowable.just(it)
         }.flatMap {
-            val title =
-                if (session?.type == SessionType.Group.value || session?.type == SessionType.SuperGroup.value) {
-                "的群聊记录"
-            } else {
-                "的会话记录"
-            }
-            it.title = "${it.title}${title}"
+                val title =
+                    if (session?.type == SessionType.Group.value || session?.type == SessionType.SuperGroup.value) {
+                        context.getString(R.string.someone_s_group_chat_record)
+                    } else {
+                        context.getString(R.string.someone_s_chat_record)
+                    }
+                it.title = String.format(Locale.getDefault(), title, it.title)
             return@flatMap Flowable.just(it)
         }
-
-//        val uIds = mutableSetOf<Long>()
-//        for (subMessage in messages) {
-//            uIds.add(subMessage.fUid)
-//        }
-//        return IMCoreManager.userModule.queryUsers(uIds).flatMap {
-//            var content = ""
-//            var i = 0
-//            for (subMessage in messages) {
-//                val userName = it[subMessage.fUid]?.nickname ?: "XX"
-//                val subContent = IMCoreManager.messageModule
-//                    .getMsgProcessor(subMessage.type).sessionDesc(subMessage)
-//                content = content.plus("${userName}:${subContent}")
-//                i++
-//                if (i <= messages.size - 1) {
-//                    content = content.plus("\n")
-//                }
-//            }
-//            val recordMsgBody = IMRecordMsgBody("", messages.toList(), content)
-//            return@flatMap Flowable.just(recordMsgBody)
-//        }.flatMap {
-//            return@flatMap IMCoreManager.userModule.queryUser(IMCoreManager.uId)
-//                .flatMap { user ->
-//                    it.title = user.nickname
-//                    Flowable.just(it)
-//                }
-//        }.flatMap {
-//            val title =
-//                if (session?.type == SessionType.Group.value || session?.type == SessionType.SuperGroup.value) {
-//                "的群聊记录"
-//            } else {
-//                "的会话记录"
-//            }
-//            it.title = "${it.title}${title}"
-//            return@flatMap Flowable.just(it)
-//        }
     }
 }

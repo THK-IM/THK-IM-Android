@@ -128,7 +128,7 @@
             android:layout_toLeftOf="@id/iv_emo"
             android:layout_toRightOf="@id/iv_audio_record"
             android:padding="8dp"
-            android:text="@string/tip_for_voice_forward"
+            android:text="@string/press_for_record_voice"
             android:gravity="center"
             android:textColor="@color/font_main"
             android:textSize="16sp"

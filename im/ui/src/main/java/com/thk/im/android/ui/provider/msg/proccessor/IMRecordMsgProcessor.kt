@@ -7,6 +7,7 @@ import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
+import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMRecordMsgBody
 import io.reactivex.Flowable
 
@@ -67,6 +68,6 @@ class IMRecordMsgProcessor : IMBaseMsgProcessor() {
     }
 
     override fun msgDesc(msg: Message): String {
-        return "[会话记录]"
+        return IMCoreManager.app.getString(R.string.im_record_msg)
     }
 }

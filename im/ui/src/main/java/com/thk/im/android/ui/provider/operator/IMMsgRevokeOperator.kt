@@ -15,7 +15,7 @@ class IMMsgRevokeOperator : IMMessageOperator() {
     }
 
     override fun title(): String {
-        return "撤回"
+        return IMCoreManager.app.getString(R.string.revoke)
     }
 
     override fun resId(): Int {

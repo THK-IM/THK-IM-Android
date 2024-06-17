@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--    <string name="new_message">新消息</string>-->
-<!--    <string name="your_are_banned_by_admin">你已经被管理员禁言</string>-->
     <string name="send_message_ddd">说点什么..</string>
     <string name="press_for_record_voice">按住 说话</string>
     <string name="release_to_send_voice">松开 结束</string>
@@ -9,20 +7,36 @@
     <string name="chat_record">聊天记录</string>
     <string name="you_revoke_a_message">你撤回了一条消息</string>
     <string name="im_edit_again">重新编辑</string>
-    <string name="please_open_record_permisson">请开启录音权限</string>
+    <string name="please_open_record_permission">请开启录音权限</string>
     <string name="record_duration_too_short">录音时间太短</string>
     <string name="record_failed">录音失败</string>
     <string name="choose_at_people">选择要提醒的人</string>
     <string name="choose_one_session">选择一个聊天</string>
     <string name="someone_s_group_chat_record">%s的群聊记录</string>
     <string name="someone_s_chat_record">%s的会话记录</string>
-    <!--    <string name="take_camera_btn_text">拍照</string>-->
-<!--    <string name="photo">拍照</string>-->
-<!--    <string name="cancel">取消</string>-->
-<!--    <string name="album">相册</string>-->
-<!--    <string name="voice_call">语音通话</string>-->
-<!--    <string name="plz_get_permission_and_send_voice">请授予权限后再使用发送语音功能</string>-->
-<!--    <string name="record_too_short">录音时长少于1秒</string>-->
-<!--    <string name="all_emoji">全部表情</string>-->
-<!--    <string name="latest_emoji">最近表情</string>-->
+    <string name="cancel_silence">取消静音</string>
+    <string name="silence">静音</string>
+    <string name="cancel_top">取消置顶</string>
+    <string name="top">置顶</string>
+    <string name="play_failed">播放失败</string>
+    <string name="album">相册</string>
+    <string name="camera">拍照</string>
+    <string name="im_audio_msg">[语音消息]</string>
+    <string name="im_image_msg">[图片消息]</string>
+    <string name="im_record_msg">[会话记录]</string>
+    <string name="im_reedit_msg">[重编辑消息]</string>
+    <string name="im_revoke_msg">[%s撤回了一条消息]</string>
+    <string name="im_text_msg">[文本消息]</string>
+    <string name="edited">[已编辑]</string>
+    <string name="im_unsupport_msg">[未知消息]</string>
+    <string name="im_video_msg">[视频消息]</string>
+    <string name="other_side">对方</string>
+    <string name="not_support_msg_update_client">不支持的消息类型，请尝试升级客户端</string>
+    <string name="copy">复制</string>
+    <string name="delete">删除</string>
+    <string name="edit">编辑</string>
+    <string name="forword">转发</string>
+    <string name="multi_select">多选</string>
+    <string name="reply">回复</string>
+    <string name="revoke">撤回</string>
 </resources>

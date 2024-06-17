@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.provider.operator
 
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
@@ -12,7 +13,7 @@ class IMMsgMultiSelectOperator: IMMessageOperator() {
     }
 
     override fun title(): String {
-        return "多选"
+        return IMCoreManager.app.getString(R.string.multi_select)
     }
 
     override fun resId(): Int {

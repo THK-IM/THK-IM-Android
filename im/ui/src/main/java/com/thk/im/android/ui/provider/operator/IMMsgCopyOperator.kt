@@ -17,7 +17,7 @@ class IMMsgCopyOperator: IMMessageOperator() {
     }
 
     override fun title(): String {
-        return "复制"
+        return IMCoreManager.app.getString(R.string.copy)
     }
 
     override fun resId(): Int {

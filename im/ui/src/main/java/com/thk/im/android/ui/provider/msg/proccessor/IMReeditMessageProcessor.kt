@@ -10,6 +10,7 @@ import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
+import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMReeditMsgData
 import io.reactivex.Flowable
 
@@ -87,7 +88,7 @@ class IMReeditMessageProcessor : IMBaseMsgProcessor() {
     }
 
     override fun msgDesc(msg: Message): String {
-        return "[重编辑消息]"
+        return IMCoreManager.app.getString(R.string.im_reedit_msg)
     }
 
 }

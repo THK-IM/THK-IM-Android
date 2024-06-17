@@ -39,6 +39,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
 import com.thk.im.android.ui.fragment.popup.IMMessageOperatorPopup
@@ -343,7 +344,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                                 readMessage(msg)
                             }
                         } else {
-                            showToast("播放失败")
+                            showToast(getString(R.string.play_failed))
                         }
                     }
                 }

@@ -42,7 +42,7 @@ class IMUnSupportMsgView : LinearLayout, IMsgBodyView {
         delegate: IMMsgVHOperator?,
         isReply: Boolean
     ) {
-        binding.tvMsgContent.text = "不支持的消息类型，请尝试升级客户端"
+        binding.tvMsgContent.text = context.getString(R.string.not_support_msg_update_client)
         when (message.fUid) {
             0L -> {
                 if (isReply) {

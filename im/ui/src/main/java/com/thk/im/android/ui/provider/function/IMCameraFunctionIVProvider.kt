@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.provider.function
 
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMChatFunction
@@ -16,7 +17,7 @@ class IMCameraFunctionIVProvider: IMBaseFunctionIVProvider() {
     }
 
     override fun title(): String {
-        return "拍照"
+        return IMCoreManager.app.getString(R.string.camera)
     }
 
     override fun click(sender: IMMsgSender) {

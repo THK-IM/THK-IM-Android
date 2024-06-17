@@ -15,7 +15,7 @@ class IMMsgDeleteOperator : IMMessageOperator() {
     }
 
     override fun title(): String {
-        return "删除"
+        return IMCoreManager.app.getString(R.string.delete)
     }
 
     override fun resId(): Int {

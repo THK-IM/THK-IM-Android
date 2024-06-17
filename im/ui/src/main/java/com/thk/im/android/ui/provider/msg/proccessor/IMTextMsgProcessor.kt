@@ -6,6 +6,7 @@ import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
+import com.thk.im.android.ui.R
 import com.thk.im.android.ui.utils.AtStringUtils
 
 
@@ -37,10 +38,10 @@ class IMTextMsgProcessor : IMBaseMsgProcessor() {
             }
             var editFlag = ""
             if (msg.oprStatus.and(MsgOperateStatus.Update.value) > 0) {
-                editFlag = "[已编辑]"
+                editFlag = IMCoreManager.app.getString(R.string.edited)
             }
             return editFlag + body
         }
-        return "[文本消息]"
+        return IMCoreManager.app.getString(R.string.im_text_msg)
     }
 }

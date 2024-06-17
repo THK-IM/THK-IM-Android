@@ -43,15 +43,15 @@ abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
         this.sessionVHOperator = sessionVHOperator
         if (session.status.and(SessionStatus.Silence.value) > 0) {
             statusView.visibility = View.VISIBLE
-            muteView.text = "取消静音"
+            muteView.text = itemView.context.getString(R.string.cancel_silence)
         } else {
             statusView.visibility = View.GONE
-            muteView.text = "静音"
+            muteView.text = itemView.context.getString(R.string.silence)
         }
         if (session.topTimestamp > 0) {
-            topView.text = "取消置顶"
+            topView.text = itemView.context.getString(R.string.cancel_top)
         } else {
-            topView.text = "置顶"
+            topView.text = itemView.context.getString(R.string.top)
         }
         deleteView.setOnClickListener {
             this.sessionVHOperator?.deleteSession(this.session)

@@ -415,7 +415,7 @@ class IMInputLayout : ConstraintLayout {
         if (!granted) {
             XXPermissions.with(context).permission(Permission.RECORD_AUDIO).request { _, all ->
                 if (!all) {
-                    msgSender?.showToast(context.getString(R.string.please_open_record_permisson))
+                    msgSender?.showToast(context.getString(R.string.please_open_record_permission))
                 }
             }
         } else {

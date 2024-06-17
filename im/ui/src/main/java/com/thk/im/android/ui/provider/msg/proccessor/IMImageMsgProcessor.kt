@@ -16,6 +16,7 @@ import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
+import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMImageMsgBody
 import com.thk.im.android.ui.manager.IMImageMsgData
 import io.reactivex.BackpressureStrategy
@@ -29,7 +30,7 @@ class IMImageMsgProcessor : IMBaseMsgProcessor() {
     }
 
     override fun msgDesc(msg: Message): String {
-        return "[图片消息]"
+        return IMCoreManager.app.getString(R.string.im_image_msg)
     }
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {

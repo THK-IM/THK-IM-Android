@@ -16,6 +16,7 @@ import com.thk.im.android.core.fileloader.FileLoadState
 import com.thk.im.android.core.fileloader.LoadListener
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.core.storage.StorageModule
+import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
 import io.reactivex.BackpressureStrategy
@@ -30,7 +31,7 @@ open class IMVideoMsgProcessor : IMBaseMsgProcessor() {
     }
 
     override fun msgDesc(msg: Message): String {
-        return "[视频消息]"
+        return IMCoreManager.app.getString(R.string.im_video_msg)
     }
 
     override fun reprocessingFlowable(message: Message): Flowable<Message> {

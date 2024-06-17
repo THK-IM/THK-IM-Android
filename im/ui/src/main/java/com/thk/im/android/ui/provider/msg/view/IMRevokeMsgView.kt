@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.MsgType
@@ -19,6 +18,7 @@ import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.manager.IMRevokeMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
+import java.util.Locale
 
 class IMRevokeMsgView : LinearLayout, IMsgBodyView {
 
@@ -59,7 +59,11 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
         }
         val revokeData = Gson().fromJson(message.data, IMRevokeMsgData::class.java)
         if (revokeData != null) {
-            binding.tvWhoRevoke.text = "${revokeData.nick}撤回了一条消息"
+            binding.tvWhoRevoke.text = String.format(
+                Locale.getDefault(),
+                context.getString(R.string.im_revoke_msg),
+                revokeData.nick
+            )
             if (message.fUid == IMCoreManager.uId
                 && revokeData.content != null
                 && revokeData.type != null && revokeData.type == MsgType.Text.value
@@ -74,7 +78,11 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
                 binding.tvReedit.visibility = View.GONE
             }
         } else {
-            binding.tvWhoRevoke.text = "对方撤回了一条消息"
+            binding.tvWhoRevoke.text = String.format(
+                Locale.getDefault(),
+                context.getString(R.string.im_revoke_msg),
+                context.getString(R.string.other_side),
+            )
             binding.tvReedit.visibility = View.GONE
         }
     }

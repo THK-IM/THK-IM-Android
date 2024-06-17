@@ -14,7 +14,7 @@ class IMMsgEditOperator : IMMessageOperator() {
     }
 
     override fun title(): String {
-        return "编辑"
+        return IMCoreManager.app.getString(R.string.edit)
     }
 
     override fun resId(): Int {

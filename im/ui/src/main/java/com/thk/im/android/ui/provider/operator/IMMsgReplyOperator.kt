@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.provider.operator
 
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
@@ -14,7 +15,7 @@ class IMMsgReplyOperator: IMMessageOperator() {
     }
 
     override fun title(): String {
-        return "回复"
+        return IMCoreManager.app.getString(R.string.reply)
     }
 
     override fun resId(): Int {

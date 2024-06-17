@@ -1,8 +1,10 @@
 package com.thk.im.android.ui.provider.function
 
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMChatFunction
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
@@ -16,7 +18,7 @@ class IMAlbumFunctionIVProvider : IMBaseFunctionIVProvider() {
     }
 
     override fun title(): String {
-        return "相册"
+        return IMCoreManager.app.getString(R.string.album)
     }
 
     override fun click(sender: IMMsgSender) {

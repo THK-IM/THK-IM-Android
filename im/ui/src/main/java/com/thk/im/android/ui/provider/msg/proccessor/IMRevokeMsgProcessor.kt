@@ -12,8 +12,10 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
+import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMRevokeMsgData
 import io.reactivex.Flowable
+import java.util.Locale
 
 open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
     override fun messageType(): Int {
@@ -113,7 +115,11 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
     override fun msgDesc(msg: Message): String {
         return if (msg.data != null) {
             val revokeData = Gson().fromJson(msg.data!!, IMRevokeMsgData::class.java)
-            "[${revokeData.nick}撤回了一条消息]"
+            return String.format(
+                Locale.getDefault(),
+                IMCoreManager.app.getString(R.string.im_revoke_msg),
+                revokeData.nick
+            )
         } else {
             ""
         }

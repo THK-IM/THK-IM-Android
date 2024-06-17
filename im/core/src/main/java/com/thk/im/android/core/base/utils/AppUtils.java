@@ -56,7 +56,7 @@ public class AppUtils {
         } else {
             soundPoll = new SoundPool(1, AudioManager.STREAM_ALARM, 0);
         }
-        newMsgSound = soundPoll.load(app, R.raw.new_message, 1);
+        newMsgSound = soundPoll.load(app, R.raw.im_new_msg_voice_tip, 1);
     }
 
     /**

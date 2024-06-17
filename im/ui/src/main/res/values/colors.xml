@@ -1,10 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg_main">#f3f3f3</color>
-    <color name="bg_operation">#F2F2F2</color>
-    <color name="bg_operation_main">#FFFFFF</color>
-    <color name="line">#A0DDDDDD</color>
-    <color name="font_main">#333333</color>
-    <color name="font_bg_main">#ffffff</color>
-    <color name="hint_font_main">#999999</color>
 </resources>

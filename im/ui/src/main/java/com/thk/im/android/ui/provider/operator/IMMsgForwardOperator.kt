@@ -15,7 +15,7 @@ class IMMsgForwardOperator : IMMessageOperator() {
     }
 
     override fun title(): String {
-        return IMCoreManager.app.getString(R.string.forword)
+        return IMCoreManager.app.getString(R.string.forward)
     }
 
     override fun resId(): Int {

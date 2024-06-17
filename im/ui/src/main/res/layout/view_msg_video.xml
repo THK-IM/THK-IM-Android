@@ -13,13 +13,13 @@
         app:cardElevation="0dp"
         app:cardMaxElevation="0dp">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_msg_video_thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY" />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_video_play"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -37,7 +37,8 @@
             android:background="@drawable/bg_tv_msg_tips"
             android:padding="2dp"
             android:textAlignment="center"
-            android:textColor="@color/font_bg_main"
-            android:textSize="@dimen/dp10" />
+            android:textColor="#ffffff"
+            android:textSize="10sp"
+            />
     </androidx.cardview.widget.CardView>
 </LinearLayout>

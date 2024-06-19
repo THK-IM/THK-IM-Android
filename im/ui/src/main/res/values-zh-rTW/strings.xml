@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="say_something">說點什麼..</string>
+    <string name="press_for_record_voice">按住 說話</string>
+    <string name="release_to_send_voice">放開 結束</string>
+    <string name="send">寄</string>
+    <string name="chat_record">聊天記錄</string>
+    <string name="you_revoke_a_message">你撤回了一則訊息</string>
+    <string name="im_edit_again">重新編輯</string>
+    <string name="please_open_record_permission">請開啟錄音權限</string>
+    <string name="record_duration_too_short">錄音時間太短</string>
+    <string name="record_failed">錄音失敗</string>
+    <string name="choose_at_people">選擇要提醒的人</string>
+    <string name="choose_one_session">選擇一個聊天</string>
+    <string name="someone_s_group_chat_record">%s的群組聊天記錄</string>
+    <string name="someone_s_chat_record">%s的會話記錄</string>
+    <string name="cancel_silence">取消靜音</string>
+    <string name="silence">靜音</string>
+    <string name="cancel_top">取消置頂</string>
+    <string name="top">置頂</string>
+    <string name="play_failed">播放失敗</string>
+    <string name="album">相簿</string>
+    <string name="camera">拍照</string>
+    <string name="im_audio_msg">[語音訊息]</string>
+    <string name="im_image_msg">[圖片訊息]</string>
+    <string name="im_record_msg">[會話記錄]</string>
+    <string name="im_reedit_msg">[重編輯訊息]</string>
+    <string name="im_revoke_msg">[%s撤回了一則訊息]</string>
+    <string name="im_text_msg">[文字訊息]</string>
+    <string name="edited">[已編輯]</string>
+    <string name="im_un_support_msg">[未知訊息]</string>
+    <string name="im_video_msg">[視訊訊息]</string>
+    <string name="other_side">對方</string>
+    <string name="not_support_msg_update_client">不支援的訊息類型，請嘗試升級客戶端</string>
+    <string name="copy">複製</string>
+    <string name="delete">刪除</string>
+    <string name="edit">編輯</string>
+    <string name="forward">轉寄</string>
+    <string name="multi_select">多選</string>
+    <string name="reply">回覆</string>
+    <string name="revoke">撤回</string>
+</resources>

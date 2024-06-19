@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="say_something">何か言ってください..</string>
+    <string name="press_for_record_voice">押して話す</string>
+    <string name="release_to_send_voice">リリース終了</string>
+    <string name="send">送信</string>
+    <string name="chat_record">チャット記録</string>
+    <string name="you_revoke_a_message">メッセージを取り消しました</string>
+    <string name="im_edit_again">再編集</string>
+    <string name="please_open_record_permission">録音許可を有効にしてください</string>
+    <string name="record_duration_too_short">録音時間が短すぎます</string>
+    <string name="record_failed">録音に失敗しました</string>
+    <string name="choose_at_people">リマインドする人を選択してください</string>
+    <string name="choose_one_session">チャットを選択してください</string>
+    <string name="someone_s_group_chat_record">%s のグループ チャット レコード</string>
+    <string name="someone_s_chat_record">%s の会話記録</string>
+    <string name="cancel_silence">ミュートをキャンセル</string>
+    <string name="silence">ミュート</string>
+    <string name="cancel_top">トップをキャンセル</string>
+    <string name="top">一番上まで選択</string>
+    <string name="play_failed">再生に失敗しました</string>
+    <string name="album">アルバム</string>
+    <string name="camera">写真を撮る</string>
+    <string name="im_audio_msg">[音声メッセージ]</string>
+    <string name="im_image_msg">[画像メッセージ]</string>
+    <string name="im_record_msg">[セッションレコード]</string>
+    <string name="im_reedit_msg">[メッセージを再編集]</string>
+    <string name="im_revoke_msg">[%s がメッセージを取り消しました]</string>
+    <string name="im_text_msg">[テキストメッセージ]</string>
+    <string name="edited">[編集済み]</string>
+    <string name="im_un_support_msg">[不明なメッセージ]</string>
+    <string name="im_video_msg">[ビデオメッセージ]</string>
+    <string name="other_side">その他</string>
+    <string name="not_support_msg_update_client">サポートされていないメッセージ タイプです。クライアントをアップグレードしてください</string>
+    <string name="copy">コピー</string>
+    <string name="delete">削除</string>
+    <string name="edit">編集</string>
+    <string name="forward">転送</string>
+    <string name="multi_select">複数選択</string>
+    <string name="reply">返信</string>
+    <string name="revoke">取り消し</string>
+</resources>

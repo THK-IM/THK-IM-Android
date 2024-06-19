@@ -104,6 +104,9 @@ object LanguageUtils {
             if (!TextUtils.isEmpty(spLanguage)) {
                 val locale = Locale(spLanguage, spCountry)
                 return setAppLanguage(it, locale)
+            } else {
+                val locale = Locale.getDefault()
+                return setAppLanguage(it, locale)
             }
         }
         return context

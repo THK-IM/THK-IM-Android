@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.base.LanguageUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
@@ -60,7 +61,7 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
         val revokeData = Gson().fromJson(message.data, IMRevokeMsgData::class.java)
         if (revokeData != null) {
             binding.tvWhoRevoke.text = String.format(
-                Locale.getDefault(),
+                LanguageUtils.getAppLocale(),
                 context.getString(R.string.im_revoke_msg),
                 revokeData.nick
             )
@@ -79,7 +80,7 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
             }
         } else {
             binding.tvWhoRevoke.text = String.format(
-                Locale.getDefault(),
+                LanguageUtils.getAppLocale(),
                 context.getString(R.string.im_revoke_msg),
                 context.getString(R.string.other_side),
             )

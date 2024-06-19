@@ -1,9 +1,10 @@
 package com.thk.im.android.core.base.utils;
 
+import com.thk.im.android.core.base.LanguageUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 
 public class DateUtils {
@@ -20,7 +21,7 @@ public class DateUtils {
 
         // 不是今年
         if (showDate.get(Calendar.YEAR) != nowData.get(Calendar.YEAR)) {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", LanguageUtils.INSTANCE.getAppLocale());
             Date date = new Date(ms);
             return format.format(date);
         }
@@ -28,12 +29,12 @@ public class DateUtils {
         if ((showDate.get(Calendar.YEAR) == nowData.get(Calendar.YEAR))
                 && (showDate.get(Calendar.MONTH) == nowData.get(Calendar.MONTH)
                 && (showDate.get(Calendar.DAY_OF_MONTH) == nowData.get(Calendar.DAY_OF_MONTH)))) {
-            SimpleDateFormat format = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm", LanguageUtils.INSTANCE.getAppLocale());
             Date date = new Date(ms);
             return format.format(date);
         }
 
-        SimpleDateFormat format = new SimpleDateFormat("MM-dd", Locale.getDefault());
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd", LanguageUtils.INSTANCE.getAppLocale());
         Date date = new Date(ms);
         return format.format(date);
     }
@@ -43,8 +44,8 @@ public class DateUtils {
         int h = seconds / 3600;
         int m = seconds / 60;
         int s = seconds % 60;
-        return h == 0 ? String.format(Locale.getDefault(), "%02d:%02d", m, s) :
-                String.format(Locale.getDefault(), "%02d:%02d:%02d", h, m, s);
+        return h == 0 ? String.format(LanguageUtils.INSTANCE.getAppLocale(), "%02d:%02d", m, s) :
+                String.format(LanguageUtils.INSTANCE.getAppLocale(), "%02d:%02d:%02d", h, m, s);
     }
 
 

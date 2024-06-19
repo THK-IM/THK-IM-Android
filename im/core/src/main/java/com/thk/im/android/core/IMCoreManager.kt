@@ -5,6 +5,7 @@ import androidx.annotation.Keep
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.thk.im.android.core.api.IMApi
 import com.thk.im.android.core.base.LLog
+import com.thk.im.android.core.base.LanguageUtils
 import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.db.IMDataBase
 import com.thk.im.android.core.db.internal.DefaultIMDataBase
@@ -54,6 +55,7 @@ object IMCoreManager {
         this.debug = debug
         LLog.init("THK-IM", if (debug) LLog.DEBUG else LLog.INFO)
         AppUtils.instance().init(app)
+        LanguageUtils.init(app)
         LiveEventBus.config().setContext(IMCoreManager.app)
             .autoClear(true)
             .lifecycleObserverAlwaysActive(true)

@@ -12,6 +12,7 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.thk.im.android.core.R;
+import com.thk.im.android.core.base.LanguageUtils;
 
 import java.util.Locale;
 import java.util.TimeZone;
@@ -23,7 +24,6 @@ public class AppUtils {
     private SoundPool soundPoll;
     private int newMsgSound;
 
-    private String language = Locale.getDefault().getLanguage();
 
     private AppUtils() {
 
@@ -120,11 +120,7 @@ public class AppUtils {
     }
 
     public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
+        return LanguageUtils.INSTANCE.getAppLocale().getLanguage();
     }
 
     public int getScreenWidth() {

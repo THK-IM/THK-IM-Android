@@ -11,6 +11,7 @@ import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LanguageUtils
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
@@ -19,7 +20,6 @@ import com.thk.im.android.ui.fragment.IMSessionFragment
 import com.thk.im.android.ui.manager.IMRecordMsgBody
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import io.reactivex.Flowable
-import java.util.Locale
 
 class IMSessionChoosePopup(
     context: Context,
@@ -157,7 +157,7 @@ class IMSessionChoosePopup(
                     } else {
                         context.getString(R.string.someone_s_chat_record)
                     }
-                it.title = String.format(Locale.getDefault(), title, it.title)
+                it.title = String.format(LanguageUtils.getAppLocale(), title, it.title)
             return@flatMap Flowable.just(it)
         }
     }

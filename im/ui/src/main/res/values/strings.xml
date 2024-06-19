@@ -12,8 +12,8 @@
     <string name="record_failed">Recording failed</string>
     <string name="choose_at_people">Choose people to remind</string>
     <string name="choose_one_session">Choose a chat</string>
-    <string name="someone_s_group_chat_record">%s's group chat record</string>
-    <string name="someone_s_chat_record">%s's conversation record</string>
+    <string name="someone_s_group_chat_record">s group chat record of %s</string>
+    <string name="someone_s_chat_record">conversation record of %s</string>
     <string name="cancel_silence">Cancel mute</string>
     <string name="silence">Mute</string>
     <string name="cancel_top">Cancel top</string>

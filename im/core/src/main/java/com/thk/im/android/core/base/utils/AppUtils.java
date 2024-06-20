@@ -120,7 +120,12 @@ public class AppUtils {
     }
 
     public String getLanguage() {
-        return LanguageUtils.INSTANCE.getAppLocale().getLanguage();
+        Locale locale = LanguageUtils.INSTANCE.getAppLocale();
+        if (locale.getCountry().isEmpty()) {
+            return locale.getLanguage();
+        } else {
+            return locale.getLanguage() + "-" + locale.getCountry();
+        }
     }
 
     public int getScreenWidth() {

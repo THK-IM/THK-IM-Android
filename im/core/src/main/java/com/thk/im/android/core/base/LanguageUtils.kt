@@ -63,14 +63,6 @@ object LanguageUtils {
      */
     fun changeLanguage(context: Context, language: String, area: String) {
         saveLanguageSetting(language, area)
-        if (TextUtils.isEmpty(language) && TextUtils.isEmpty(area)) {
-            //如果语言和地区都是空，那么跟随系统
-            setAppLanguage(context, Locale.getDefault())
-        } else {
-            //不为空，修改app语言，持久化语言选项信息
-            val newLocale = Locale(language, area)
-            setAppLanguage(context, newLocale)
-        }
     }
 
     /**

@@ -32,12 +32,6 @@ object LanguageUtils {
         return sp.getString(keyLanguage, "") ?: ""
     }
 
-    private fun putSpLanguage(language: String) {
-        val sp = mApp.getSharedPreferences(spLanguage, Context.MODE_PRIVATE)
-        val editor = sp.edit()
-        editor.putString(keyLanguage, language)
-        editor.apply()
-    }
 
     private fun getSpCountry(): String {
         val sp = mApp.getSharedPreferences(spLanguage, Context.MODE_PRIVATE)
@@ -49,20 +43,18 @@ object LanguageUtils {
         return sp.getString(keyCountry, "") ?: ""
     }
 
-    private fun putSpCountry(country: String) {
-        val sp = mApp.getSharedPreferences(spLanguage, Context.MODE_PRIVATE)
-        val editor = sp.edit()
-        editor.putString(keyCountry, country)
-        editor.apply()
-    }
 
     /**
      * 修改应用内语言设置
      * @param language  语言
      * @param area      地区
      */
-    fun changeLanguage(context: Context, language: String, area: String) {
-        saveLanguageSetting(language, area)
+    fun changeLanguage(context: Context, language: String, area: String): Boolean {
+        val sp = context.getSharedPreferences(spLanguage, Context.MODE_PRIVATE)
+        val editor = sp.edit()
+        editor.putString(keyLanguage, language)
+        editor.putString(keyCountry, area)
+        return editor.commit()
     }
 
     /**
@@ -101,15 +93,7 @@ object LanguageUtils {
                 return setAppLanguage(it, locale)
             }
         }
-        return context
-    }
-
-    /**
-     * 保存多语言信息到sp中
-     */
-    private fun saveLanguageSetting(language: String, area: String) {
-        putSpLanguage(language)
-        putSpCountry(area)
+        return null
     }
 
     fun getAppLocale(): Locale {

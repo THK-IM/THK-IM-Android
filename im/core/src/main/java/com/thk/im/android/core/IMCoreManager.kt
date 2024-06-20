@@ -17,7 +17,6 @@ import com.thk.im.android.core.module.internal.DefaultCustomModule
 import com.thk.im.android.core.module.internal.DefaultGroupModule
 import com.thk.im.android.core.module.internal.DefaultMessageModule
 import com.thk.im.android.core.module.internal.DefaultUserModule
-import com.thk.im.android.core.processor.IMReadMessageProcessor
 import com.thk.im.android.core.signal.SignalListener
 import com.thk.im.android.core.signal.SignalModule
 import com.thk.im.android.core.signal.SignalType
@@ -59,7 +58,6 @@ object IMCoreManager {
         LiveEventBus.config().setContext(IMCoreManager.app)
             .autoClear(true)
             .lifecycleObserverAlwaysActive(true)
-        messageModule.registerMsgProcessor(IMReadMessageProcessor())
     }
 
     fun initUser(uId: Long) {

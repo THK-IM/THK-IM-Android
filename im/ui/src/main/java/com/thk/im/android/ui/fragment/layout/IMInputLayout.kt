@@ -230,7 +230,7 @@ class IMInputLayout : ConstraintLayout {
                     if (audioCancel != cancel) {
                         audioCancel = cancel
                         val tips = if (audioCancel) {
-                            context.getString(R.string.press_for_record_voice)
+                            context.getString(R.string.release_to_cancel)
                         } else {
                             context.getString(R.string.release_to_send_voice)
                         }

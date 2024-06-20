@@ -34,6 +34,7 @@ import com.thk.im.android.ui.provider.msg.IMUnSupportMsgIVProvider
 import com.thk.im.android.ui.provider.msg.IMVideoMsgIVProvider
 import com.thk.im.android.ui.provider.msg.proccessor.IMAudioMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMImageMsgProcessor
+import com.thk.im.android.ui.provider.msg.proccessor.IMReadMessageProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMRecordMsgProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMReeditMessageProcessor
 import com.thk.im.android.ui.provider.msg.proccessor.IMRevokeMsgProcessor
@@ -114,6 +115,7 @@ object IMUIManager {
         ToastUtils.init(app)
         EmojiCompat.init(BundledEmojiCompatConfig(app))
 
+        IMCoreManager.messageModule.registerMsgProcessor(IMReadMessageProcessor())
         IMCoreManager.messageModule.registerMsgProcessor(IMUnSupportMsgProcessor())
         IMCoreManager.messageModule.registerMsgProcessor(IMTextMsgProcessor())
         IMCoreManager.messageModule.registerMsgProcessor(IMImageMsgProcessor())

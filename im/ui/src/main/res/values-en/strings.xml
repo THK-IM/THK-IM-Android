@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="im_msg_desc_read">[Read message]</string>
     <string name="say_something">Say something..</string>
     <string name="press_for_record_voice">Press and hold to speak</string>
-    <string name="release_to_send_voice">Release to end</string>
+    <string name="release_to_send_voice">Release to send</string>
+    <string name="release_to_cancel">Release to cancel</string>
     <string name="send">Send</string>
     <string name="chat_record">Chat record</string>
     <string name="you_revoke_a_message">You revoke a message</string>
@@ -12,12 +14,12 @@
     <string name="record_failed">Recording failed</string>
     <string name="choose_at_people">Choose people to remind</string>
     <string name="choose_one_session">Choose a chat</string>
-    <string name="someone_s_group_chat_record">s group chat record of %s</string>
-    <string name="someone_s_chat_record">conversation record of %s</string>
+    <string name="someone_s_group_chat_record">%s group chat record</string>
+    <string name="someone_s_chat_record">%s session record</string>
     <string name="cancel_silence">Cancel mute</string>
     <string name="silence">Mute</string>
-    <string name="cancel_top">Cancel top</string>
-    <string name="top">Top</string>
+    <string name="cancel_top">Cancel pinned</string>
+    <string name="top">Pinned</string>
     <string name="play_failed">Play failed</string>
     <string name="album">Album</string>
     <string name="camera">Take a photo</string>
@@ -30,7 +32,7 @@
     <string name="edited">[Edited]</string>
     <string name="im_un_support_msg">[Unknown message]</string>
     <string name="im_video_msg">[Video message]</string>
-    <string name="other_side">Other side</string>
+    <string name="other_side">The other party</string>
     <string name="not_support_msg_update_client">Unsupported message type, please try to upgrade the client</string>
     <string name="copy">Copy</string>
     <string name="delete">Delete</string>
@@ -39,4 +41,10 @@
     <string name="multi_select">Multi-select</string>
     <string name="reply">Reply</string>
     <string name="revoke">Revoke</string>
+    <string name="revoke_failed">Revoke failed</string>
+    <string name="revoke_success">Revoke successfully</string>
+    <string name="new_message_tips">New message ⬇️</string>
+    <string name="x_message_at_me">%s messages @ me</string>
+    <string name="do_not_allow_send_video">Do not allow sending videos</string>
+    <string name="do_not_allow_send_image">Do not allow sending images</string>
 </resources>

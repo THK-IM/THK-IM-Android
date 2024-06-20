@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="im_msg_desc_read">[読んだメッセージ]</string>
     <string name="say_something">何か言ってください..</string>
     <string name="press_for_record_voice">押して話す</string>
-    <string name="release_to_send_voice">リリース終了</string>
+    <string name="release_to_send_voice">送信するリリース</string>
+    <string name="release_to_cancel">手を放してキャンセルします</string>
     <string name="send">送信</string>
     <string name="chat_record">チャット記録</string>
     <string name="you_revoke_a_message">メッセージを取り消しました</string>
@@ -17,7 +19,7 @@
     <string name="cancel_silence">ミュートをキャンセル</string>
     <string name="silence">ミュート</string>
     <string name="cancel_top">トップをキャンセル</string>
-    <string name="top">一番上まで選択</string>
+    <string name="top">先頭に移動</string>
     <string name="play_failed">再生に失敗しました</string>
     <string name="album">アルバム</string>
     <string name="camera">写真を撮る</string>
@@ -31,7 +33,7 @@
     <string name="im_un_support_msg">[不明なメッセージ]</string>
     <string name="im_video_msg">[ビデオメッセージ]</string>
     <string name="other_side">その他</string>
-    <string name="not_support_msg_update_client">サポートされていないメッセージ タイプです。クライアントをアップグレードしてください</string>
+    <string name="not_support_msg_update_client">サポートされていないメッセージ タイプです。クライアントをアップグレードしてください。</string>
     <string name="copy">コピー</string>
     <string name="delete">削除</string>
     <string name="edit">編集</string>
@@ -39,4 +41,10 @@
     <string name="multi_select">複数選択</string>
     <string name="reply">返信</string>
     <string name="revoke">取り消し</string>
+    <string name="revoke_failed">取り消しに失敗しました</string>
+    <string name="revoke_success">正常に取り消しました</string>
+    <string name="new_message_tips">新しいメッセージ⬇️</string>
+    <string name="x_message_at_me">@me に %s メッセージがあります</string>
+    <string name="do_not_allow_send_video">ビデオの送信を許可しない</string>
+    <string name="do_not_allow_send_image">写真の送信を許可しない</string>
 </resources>

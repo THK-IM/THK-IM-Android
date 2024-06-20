@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="im_msg_desc_read">[已讀訊息]</string>
     <string name="say_something">說點什麼..</string>
-    <string name="press_for_record_voice">按住 說話</string>
-    <string name="release_to_send_voice">放開 結束</string>
+    <string name="press_for_record_voice">按住說話</string>
+    <string name="release_to_send_voice">松開發送</string>
+    <string name="release_to_cancel">鬆手取消</string>
     <string name="send">寄</string>
     <string name="chat_record">聊天記錄</string>
     <string name="you_revoke_a_message">你撤回了一則訊息</string>
@@ -36,7 +38,13 @@
     <string name="delete">刪除</string>
     <string name="edit">編輯</string>
     <string name="forward">轉寄</string>
-    <string name="multi_select">多選</string>
+    <string name="multi_select">多重選擇</string>
     <string name="reply">回覆</string>
     <string name="revoke">撤回</string>
+    <string name="revoke_failed">撤回失敗</string>
+    <string name="revoke_success">撤回成功</string>
+    <string name="new_message_tips">有新消息⬇️</string>
+    <string name="x_message_at_me">有%s訊息@我</string>
+    <string name="do_not_allow_send_video">不允許傳送影片</string>
+    <string name="do_not_allow_send_image">不允許傳送圖片</string>
 </resources>

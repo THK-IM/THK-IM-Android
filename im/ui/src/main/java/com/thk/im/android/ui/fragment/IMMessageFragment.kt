@@ -45,6 +45,7 @@ import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
 import com.thk.im.android.ui.fragment.popup.IMMessageOperatorPopup
 import com.thk.im.android.ui.fragment.popup.IMSessionChoosePopup
 import com.thk.im.android.ui.manager.IMAudioMsgData
+import com.thk.im.android.ui.manager.IMChatFunction
 import com.thk.im.android.ui.manager.IMFile
 import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.android.ui.manager.IMUIManager
@@ -238,10 +239,18 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         try {
             for (media in result) {
                 if (media.mimeType.startsWith("video", true)) {
+                    if (session?.functionFlag?.and(IMChatFunction.Video.value) == 0L) {
+                        showMessage(getString(R.string.do_not_allow_send_video), false)
+                        return
+                    }
                     val videoMsgData = IMVideoMsgData()
                     videoMsgData.path = media.path
                     sendMessage(MsgType.Video.value, null, videoMsgData)
                 } else if (media.mimeType.startsWith("image", true)) {
+                    if (session?.functionFlag?.and(IMChatFunction.Image.value) == 0L) {
+                        showMessage(getString(R.string.do_not_allow_send_image), false)
+                        return
+                    }
                     val imageMsgData = IMImageMsgData()
                     imageMsgData.path = media.path
                     sendMessage(MsgType.Image.value, null, imageMsgData)

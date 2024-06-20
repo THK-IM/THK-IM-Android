@@ -26,9 +26,9 @@ class IMMsgRevokeOperator : IMMessageOperator() {
         val callback = object : IMSendMsgCallback {
             override fun onResult(message: Message, e: Exception?) {
                 if (e != null) {
-                    sender.showMessage("撤回失败", false)
+                    sender.showMessage(IMCoreManager.app.getString(R.string.revoke_failed), false)
                 } else {
-                    sender.showMessage("撤回成功", false)
+                    sender.showMessage(IMCoreManager.app.getString(R.string.revoke_success), false)
                 }
             }
         }

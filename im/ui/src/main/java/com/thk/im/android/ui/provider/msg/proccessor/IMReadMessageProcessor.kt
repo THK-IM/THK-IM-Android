@@ -1,4 +1,4 @@
-package com.thk.im.android.core.processor
+package com.thk.im.android.ui.provider.msg.proccessor
 
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
@@ -6,13 +6,14 @@ import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
-import com.thk.im.android.core.R
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.core.processor.IMBaseMsgProcessor
+import com.thk.im.android.ui.R
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.functions.Consumer

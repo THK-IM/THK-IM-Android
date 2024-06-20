@@ -60,22 +60,25 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
         }
         val revokeData = Gson().fromJson(message.data, IMRevokeMsgData::class.java)
         if (revokeData != null) {
-            binding.tvWhoRevoke.text = String.format(
-                LanguageUtils.getAppLocale(),
-                context.getString(R.string.im_revoke_msg),
-                revokeData.nick
-            )
-            if (message.fUid == IMCoreManager.uId
-                && revokeData.content != null
-                && revokeData.type != null && revokeData.type == MsgType.Text.value
-            ) {
+            if (message.fUid == IMCoreManager.uId) {
                 binding.tvReedit.visibility = View.VISIBLE
                 binding.tvReedit.isClickable = true
                 binding.tvReedit.setOnClickListener {
-                    delegate?.msgSender()?.addInputContent(revokeData.content!!)
-                    delegate?.msgSender()?.openKeyboard()
+                    revokeData.content?.let { content ->
+                        delegate?.msgSender()?.addInputContent(content)
+                        delegate?.msgSender()?.openKeyboard()
+                    }
                 }
+                binding.tvWhoRevoke.text = String.format(
+                    LanguageUtils.getAppLocale(),
+                    context.getString(R.string.you_revoke_a_message),
+                )
             } else {
+                binding.tvWhoRevoke.text = String.format(
+                    LanguageUtils.getAppLocale(),
+                    context.getString(R.string.im_revoke_msg),
+                    revokeData.nick
+                )
                 binding.tvReedit.visibility = View.GONE
             }
         } else {

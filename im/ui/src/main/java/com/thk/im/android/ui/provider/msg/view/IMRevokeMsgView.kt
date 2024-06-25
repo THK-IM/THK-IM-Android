@@ -9,8 +9,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.MsgType
-import com.thk.im.android.core.base.LanguageUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
@@ -19,7 +17,6 @@ import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.manager.IMRevokeMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
-import java.util.Locale
 
 class IMRevokeMsgView : LinearLayout, IMsgBodyView {
 
@@ -69,13 +66,9 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
                         delegate?.msgSender()?.openKeyboard()
                     }
                 }
-                binding.tvWhoRevoke.text = String.format(
-                    LanguageUtils.getAppLocale(),
-                    context.getString(R.string.you_revoke_a_message),
-                )
+                binding.tvWhoRevoke.text = context.getString(R.string.you_revoke_a_message)
             } else {
                 binding.tvWhoRevoke.text = String.format(
-                    LanguageUtils.getAppLocale(),
                     context.getString(R.string.im_revoke_msg),
                     revokeData.nick
                 )
@@ -83,7 +76,6 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
             }
         } else {
             binding.tvWhoRevoke.text = String.format(
-                LanguageUtils.getAppLocale(),
                 context.getString(R.string.im_revoke_msg),
                 context.getString(R.string.other_side),
             )

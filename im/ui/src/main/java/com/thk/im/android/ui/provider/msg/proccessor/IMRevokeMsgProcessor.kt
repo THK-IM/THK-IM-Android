@@ -8,7 +8,6 @@ import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.LanguageUtils
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
@@ -116,7 +115,6 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
         return if (msg.data != null) {
             val revokeData = Gson().fromJson(msg.data!!, IMRevokeMsgData::class.java)
             return String.format(
-                LanguageUtils.getAppLocale(),
                 IMCoreManager.app.getString(R.string.im_revoke_msg),
                 revokeData.nick
             )

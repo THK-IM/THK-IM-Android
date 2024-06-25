@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.emoji2.widget.EmojiEditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -31,6 +32,7 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.dp2px
+import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.base.popup.KeyboardPopupWindow
 import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.base.utils.ToastUtils
@@ -67,6 +69,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
     private var session: Session? = null
     private val disposables = CompositeDisposable()
     private val memberMap = mutableMapOf<Long, Pair<User, SessionMember?>>()
+    private val atMessages = mutableSetOf<Message>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -103,6 +106,44 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         initKeyboardWindow()
         initEventBus()
         fetchSessionMembers()
+        initMsgTipsView()
+    }
+
+    private fun initMsgTipsView() {
+        val bgColor = IMUIManager.uiResourceProvider?.inputLayoutBgColor() ?:Color.parseColor("#DDDDDD")
+        val textColor = IMUIManager.uiResourceProvider?.tintColor() ?:Color.parseColor("#1390f4")
+        binding.tvNewMsgTip.setShape(bgColor, floatArrayOf(6f, 6f, 6f, 6f), false)
+        binding.tvNewMsgTip.setTextColor(textColor)
+        binding.tvNewMsgTip.text = getString(R.string.new_message_tips)
+        binding.tvNewMsgTip.setOnClickListener {
+            binding.rcvMessage.scrollToLatestMsg(true)
+        }
+
+        binding.tvAtMsgTip.setShape(bgColor, floatArrayOf(6f, 6f, 6f, 6f), false)
+        binding.tvAtMsgTip.setTextColor(textColor)
+        binding.tvAtMsgTip.setOnClickListener {
+            onAtTipsViewClick()
+        }
+    }
+
+    private fun updateAtTipsView() {
+        if (atMessages.size <= 0) {
+            binding.tvAtMsgTip.visibility = View.GONE
+        } else {
+            binding.tvAtMsgTip.text = String.format(getString(R.string.x_message_at_me), "${atMessages.size}")
+            binding.tvAtMsgTip.visibility = View.VISIBLE
+        }
+    }
+
+    private fun onAtTipsViewClick() {
+        if (atMessages.size > 0) {
+            val msg = atMessages.firstOrNull()
+            msg?.let {
+                atMessages.remove(it)
+                updateAtTipsView()
+                binding.rcvMessage.scrollToMsg(it)
+            }
+        }
     }
 
     private fun fetchSessionMembers() {
@@ -274,6 +315,18 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
             it?.let {
                 if (it.sid == session!!.id) {
+                    if (it.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0 && it.isAtMe()) {
+                        var contained = false
+                        atMessages.forEach { msg ->
+                            if (msg.msgId == it.msgId) {
+                                contained = true
+                            }
+                        }
+                        if (!contained) {
+                            atMessages.add(it)
+                            updateAtTipsView()
+                        }
+                    }
                     binding.rcvMessage.insertMessage(it)
                 }
             }
@@ -281,6 +334,18 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         XEventBus.observe(this, IMEvent.MsgUpdate.value, Observer<Message> {
             it?.let {
                 if (it.sid == session!!.id) {
+                    if (it.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0 && it.isAtMe()) {
+                        var contained = false
+                        atMessages.forEach { msg ->
+                            if (msg.msgId == it.msgId) {
+                                contained = true
+                            }
+                        }
+                        if (!contained) {
+                            atMessages.add(it)
+                            updateAtTipsView()
+                        }
+                    }
                     binding.rcvMessage.updateMessage(it)
                 }
             }
@@ -288,6 +353,10 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         XEventBus.observe(this, IMEvent.MsgDelete.value, Observer<Message> {
             it?.let {
                 if (it.sid == session!!.id) {
+                    atMessages.removeAll { atMsg ->
+                        atMsg.msgId == it.msgId
+                    }
+                    updateAtTipsView()
                     binding.rcvMessage.deleteMessage(it)
                 }
             }
@@ -547,6 +616,10 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                 IMUIManager.mediaPreviewer?.previewRecordMessage(it, session, msg)
             }
         }
+    }
+
+    override fun showNewMsgTipsView(isHidden: Boolean) {
+        binding.tvNewMsgTip.visibility = if (isHidden) View.GONE else View.VISIBLE
     }
 
     override fun context(): Context {

@@ -97,10 +97,10 @@ data class Message(
     }
 
     fun isAtMe(): Boolean {
-        if (this.rUsers.isNullOrBlank()) {
+        if (this.atUsers.isNullOrBlank()) {
             return false
         }
-        val strUIds = this.rUsers!!.split("#")
+        val strUIds = this.atUsers!!.split("#")
         strUIds.forEach { strUId ->
             strUId.toLongOrNull()?.let {
                 if (it == -1L || it == IMCoreManager.uId) {

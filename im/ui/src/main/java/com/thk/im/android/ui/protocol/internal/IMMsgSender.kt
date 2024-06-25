@@ -11,6 +11,10 @@ import io.reactivex.Flowable
 
 interface IMMsgSender {
 
+
+    /// 提示有新消息
+    fun showNewMsgTipsView(isHidden: Boolean)
+
     /// 获取Context
     fun context(): Context
 

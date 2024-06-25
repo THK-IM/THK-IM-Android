@@ -75,6 +75,9 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                         loadMessages()
                     }
                     hasScrollToBottom = !recyclerView.canScrollVertically(1)
+                    if (hasScrollToBottom) {
+                        msgSender?.showNewMsgTipsView(true)
+                    }
                 }
             }
         })
@@ -170,6 +173,20 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         }
     }
 
+    fun scrollToMsg(msg: Message) {
+        val messages = msgAdapter.getMessages()
+        var pos = 0
+        while (pos < messages.size) {
+            if (messages[pos].msgId == msg.msgId) {
+                break
+            }
+            pos++
+        }
+        if (pos < messages.size) {
+            scrollToRow(pos)
+        }
+    }
+
     private fun scrollToRow(row: Int) {
         scrollToPosition(row)
         postDelayed({
@@ -188,7 +205,11 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     fun insertMessage(message: Message) {
         val pos = msgAdapter.insertNew(message)
         if (pos == 0) {
-            scrollToLatestMsg()
+            if (hasScrollToBottom || message.fUid == IMCoreManager.uId) {
+                scrollToLatestMsg()
+            } else {
+                msgSender?.showNewMsgTipsView(false)
+            }
         }
     }
 

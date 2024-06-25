@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.core.content.ContextCompat
 import androidx.emoji2.widget.EmojiEditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -69,7 +68,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
     private var session: Session? = null
     private val disposables = CompositeDisposable()
     private val memberMap = mutableMapOf<Long, Pair<User, SessionMember?>>()
-    private val atMessages = mutableSetOf<Message>()
+    private val atMessages = mutableListOf<Message>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -124,6 +123,21 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         binding.tvAtMsgTip.setOnClickListener {
             onAtTipsViewClick()
         }
+
+        val subscriber = object : BaseSubscriber<List<Message>>() {
+            override fun onNext(t: List<Message>?) {
+                t?.let {
+                    atMessages.addAll(it)
+                    updateAtTipsView()
+                }
+            }
+
+        }
+        Flowable.just(session).flatMap {
+                val unReadAtMeMessages =
+                    IMCoreManager.getImDataBase().messageDao().findSessionAtMeUnreadMessages(it.id)
+                Flowable.just(unReadAtMeMessages)
+            }.compose(RxTransform.flowableToMain()).subscribe(subscriber)
     }
 
     private fun updateAtTipsView() {
@@ -139,7 +153,9 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         if (atMessages.size > 0) {
             val msg = atMessages.firstOrNull()
             msg?.let {
-                atMessages.remove(it)
+                atMessages.removeAll { atMsg ->
+                    atMsg.msgId == it.msgId
+                }
                 updateAtTipsView()
                 binding.rcvMessage.scrollToMsg(it)
             }

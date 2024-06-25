@@ -111,6 +111,13 @@ internal interface MessageDao {
     @Query("select * from message where session_id = :sid and type >= 0 order by m_time desc limit 0, 1")
     fun findLastMessageBySessionId(sid: Long): Message?
 
+    /**
+     * 查询session中At我的未读消息
+     */
+
+    @Query("select * from message where session_id = :sid and type >= 0 and opr_status & :oprStatus = 0 order by c_time asc ")
+    fun findSessionAtMeUnreadMessages(sid: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): List<Message>
+
     @Query("select * from message where session_id = :sid and type = :type and content like :keyword order by m_time desc limit :offset, :count")
     fun search(sid: Long, type: Int, keyword: String, count: Int, offset: Int): List<Message>
 

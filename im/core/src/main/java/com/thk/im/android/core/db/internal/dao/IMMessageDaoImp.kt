@@ -132,6 +132,17 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         return roomDatabase.messageDao().findLastMessageBySessionId(sid)
     }
 
+    override fun findSessionAtMeUnreadMessages(sessionId: Long): List<Message> {
+        val messages = roomDatabase.messageDao().findSessionAtMeUnreadMessages(sessionId)
+        val atMeMessages = mutableListOf<Message>()
+        messages.forEach {
+            if (it.isAtMe()) {
+                atMeMessages.add(it)
+            }
+        }
+        return atMeMessages
+    }
+
     override fun search(
         sid: Long,
         type: Int,

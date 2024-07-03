@@ -44,7 +44,8 @@
     <string name="revoke_failed">Revoke failed</string>
     <string name="revoke_success">Revoke successfully</string>
     <string name="new_message_tips">New message ⬇️</string>
-    <string name="x_message_at_me">%s messages @ me</string>
+    <string name="x_message_at_me">%d messages @ me</string>
     <string name="do_not_allow_send_video">Do not allow sending videos</string>
     <string name="do_not_allow_send_image">Do not allow sending images</string>
+    <string name="had_exited">(had exited)</string>
 </resources>

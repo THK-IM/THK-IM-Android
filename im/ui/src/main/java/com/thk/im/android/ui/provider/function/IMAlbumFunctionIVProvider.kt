@@ -26,7 +26,7 @@ class IMAlbumFunctionIVProvider : IMBaseFunctionIVProvider() {
     }
 
     override fun supportSession(session: Session): Boolean {
-        return (session.functionFlag.and(IMChatFunction.Image.value) != 0L) ||
-                (session.functionFlag.and(IMChatFunction.Video.value) != 0L)
+        return (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Image.value) ?: true) ||
+                (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Video.value) ?: true)
     }
 }

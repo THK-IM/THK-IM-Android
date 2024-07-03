@@ -251,7 +251,11 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     }
 
     open fun renderUserInfo(user: User, sessionMember: SessionMember?) {
-        tvNicknameView?.text = IMUIManager.nicknameForSessionMember(user, sessionMember)
+        var showNickname = IMUIManager.nicknameForSessionMember(user, sessionMember)
+        if (sessionMember?.deleted == 1) {
+            showNickname += itemView.context.getString(R.string.had_exited)
+        }
+        tvNicknameView?.text = showNickname
         val avatar = IMUIManager.avatarForSessionMember(user, sessionMember)
         ivAvatarView?.let { iv ->
             avatar?.let { avatar ->
@@ -299,7 +303,11 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         if (session.type == SessionType.MsgRecord.value || session.type == SessionType.SuperGroup.value) {
             return
         }
-        if (session.functionFlag.and(IMChatFunction.Read.value) == 0L) {
+        if (IMUIManager.uiResourceProvider?.supportFunction(
+                session,
+                IMChatFunction.Read.value
+            ) == false
+        ) {
             return
         }
 

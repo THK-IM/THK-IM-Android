@@ -44,7 +44,8 @@
     <string name="revoke_failed">撤回失败</string>
     <string name="revoke_success">撤回成功</string>
     <string name="new_message_tips">有新消息⬇️</string>
-    <string name="x_message_at_me">有%s条消息@我</string>
+    <string name="x_message_at_me">有%d条消息@我</string>
     <string name="do_not_allow_send_video">不允许发送视频</string>
     <string name="do_not_allow_send_image">不允许发送图片</string>
+    <string name="had_exited">(已退出)</string>
 </resources>

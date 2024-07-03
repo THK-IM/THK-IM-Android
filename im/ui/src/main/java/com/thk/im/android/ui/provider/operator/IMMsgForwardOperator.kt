@@ -6,6 +6,7 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMChatFunction
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
@@ -30,6 +31,6 @@ class IMMsgForwardOperator : IMMessageOperator() {
         if (message.type == MsgType.Revoke.value) {
             return false
         }
-        return session.functionFlag.and(IMChatFunction.Forward.value) != 0L
+        return IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Forward.value) ?: true
     }
 }

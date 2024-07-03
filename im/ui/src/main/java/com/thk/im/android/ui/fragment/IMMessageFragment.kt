@@ -144,7 +144,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         if (atMessages.size <= 0) {
             binding.tvAtMsgTip.visibility = View.GONE
         } else {
-            binding.tvAtMsgTip.text = String.format(getString(R.string.x_message_at_me), "${atMessages.size}")
+            binding.tvAtMsgTip.text = String.format(getString(R.string.x_message_at_me), atMessages.size)
             binding.tvAtMsgTip.visibility = View.VISIBLE
         }
     }
@@ -296,7 +296,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         try {
             for (media in result) {
                 if (media.mimeType.startsWith("video", true)) {
-                    if (session?.functionFlag?.and(IMChatFunction.Video.value) == 0L) {
+                    if (IMUIManager.uiResourceProvider?.supportFunction(session!!, IMChatFunction.Video.value) == false) {
                         showMessage(getString(R.string.do_not_allow_send_video), false)
                         return
                     }
@@ -304,7 +304,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                     videoMsgData.path = media.path
                     sendMessage(MsgType.Video.value, null, videoMsgData)
                 } else if (media.mimeType.startsWith("image", true)) {
-                    if (session?.functionFlag?.and(IMChatFunction.Image.value) == 0L) {
+                    if (IMUIManager.uiResourceProvider?.supportFunction(session!!, IMChatFunction.Image.value) == false) {
                         showMessage(getString(R.string.do_not_allow_send_image), false)
                         return
                     }

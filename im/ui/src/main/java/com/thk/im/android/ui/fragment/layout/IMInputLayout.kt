@@ -290,12 +290,12 @@ class IMInputLayout : ConstraintLayout {
     }
 
     private fun resetVisible() {
-        if (session.functionFlag.and(IMChatFunction.BaseInput.value) == 0L) {
+        if (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.BaseInput.value) == false) {
             binding.llMessageInput.visibility = GONE
         } else {
             binding.llMessageInput.visibility = VISIBLE
         }
-        if (session.functionFlag.and(IMChatFunction.Audio.value) == 0L) {
+        if (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Audio.value) == false) {
             binding.ivAudioRecord.visibility = GONE
         } else {
             binding.ivAudioRecord.visibility = VISIBLE
@@ -305,7 +305,7 @@ class IMInputLayout : ConstraintLayout {
         } else {
             binding.ivAddMore.visibility = VISIBLE
         }
-        if (session.functionFlag.and(IMChatFunction.Forward.value) == 0L) {
+        if (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Forward.value) == false) {
             binding.ivMsgOprForward.visibility = GONE
         } else {
             binding.ivMsgOprForward.visibility = VISIBLE

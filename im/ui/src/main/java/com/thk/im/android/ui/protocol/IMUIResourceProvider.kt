@@ -1,6 +1,5 @@
 package com.thk.im.android.ui.protocol
 
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
@@ -26,4 +25,6 @@ interface IMUIResourceProvider {
     fun inputLayoutBgColor(): Int?
 
     fun messageSelectImageResource(): Int?
+
+    fun supportFunction(session: Session, functionFlag: Long): Boolean
 }

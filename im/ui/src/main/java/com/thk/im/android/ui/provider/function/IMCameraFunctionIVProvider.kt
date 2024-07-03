@@ -4,6 +4,7 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMChatFunction
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
@@ -25,7 +26,7 @@ class IMCameraFunctionIVProvider: IMBaseFunctionIVProvider() {
     }
 
     override fun supportSession(session: Session): Boolean {
-        return (session.functionFlag.and(IMChatFunction.Image.value) != 0L) ||
-                (session.functionFlag.and(IMChatFunction.Video.value) != 0L)
+        return (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Image.value) ?: true) ||
+                (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Video.value) ?: true)
     }
 }

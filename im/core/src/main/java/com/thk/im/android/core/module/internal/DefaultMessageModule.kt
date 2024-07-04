@@ -541,7 +541,7 @@ open class DefaultMessageModule : MessageModule {
         val sessionDao = IMCoreManager.getImDataBase().sessionDao()
         val dispose = object : BaseSubscriber<Session>() {
             override fun onNext(t: Session) {
-                if (t.id <= 0) {
+                if (t.id <= 0 || t.deleted == 1) {
                     return
                 }
                 val unReadCount = messageDao.getUnReadCount(t.id)

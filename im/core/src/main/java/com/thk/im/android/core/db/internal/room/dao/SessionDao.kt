@@ -51,10 +51,10 @@ internal interface SessionDao {
     @Query("select msg_sync_time from session where id= :id ")
     fun findMsgSyncTime(id: Long): Long
 
-    @Query("select * from session where parent_id = :parentId and id != :parentId and m_time <= :mTime order by top_timestamp desc, m_time desc limit 0, :count")
+    @Query("select * from session where parent_id = :parentId and id != :parentId and m_time <= :mTime and deleted = 0 order by top_timestamp desc, m_time desc limit 0, :count")
     fun findByParentId(parentId: Long, count: Int, mTime: Long): List<Session>
 
-    @Query("select * from session where type = :type order by top_timestamp desc, m_time desc ")
+    @Query("select * from session where type = :type and deleted = 0 order by top_timestamp desc, m_time desc ")
     fun findAll(type: Int): List<Session>
 
     @Query("select * from session where entity_id = :entityId and type = :type")

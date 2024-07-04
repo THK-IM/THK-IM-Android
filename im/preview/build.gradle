@@ -69,7 +69,7 @@ dependencies {
     implementation rootProject.ext.dependencies["recyclerview"]
     implementation rootProject.ext.dependencies["viewpager2"]
     implementation rootProject.ext.dependencies["constraintlayout"]
-
+    implementation rootProject.ext.dependencies["immersionbar"]
     implementation rootProject.ext.dependencies["media3-exoplayer"]
     implementation rootProject.ext.dependencies["media3-exoplayer-ui"]
     implementation rootProject.ext.dependencies["videocache"]

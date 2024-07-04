@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.Observer
+import com.gyf.immersionbar.ImmersionBar
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.db.entity.Message
@@ -23,11 +24,9 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRecordPreviewBinding.inflate(layoutInflater)
+        ImmersionBar.with(this).transparentStatusBar().statusBarDarkFont(true).init()
         IMUIManager.uiResourceProvider?.inputLayoutBgColor()?.let {
             binding.clContent.setBackgroundColor(it)
-        }
-        IMUIManager.uiResourceProvider?.inputBgColor()?.let {
-            binding.rcvMessage.setBackgroundColor(it)
         }
         setContentView(binding.root)
         initEventBus()
@@ -39,8 +38,6 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
     private fun initToolbar() {
         val toolbar = binding.tbRecord
         toolbar.navigationIcon = AppCompatResources.getDrawable(this, R.drawable.icon_back)
-        toolbar.title = getString(R.string.choose_one_session)
-
         val title = intent.getStringExtra("title")
         toolbar.setNavigationOnClickListener {
             finish()

@@ -90,7 +90,7 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.SessionNew.value, Observer<Session> {
             it?.let {
-                if (it.parentId == parentId) {
+                if (it.parentId == parentId && it.deleted == 0) {
                     if (this.isTop) {
                         val pos = sessionAdapter.onNewSession(it)
                         sessionRecyclerView.postDelayed({
@@ -105,7 +105,7 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
         XEventBus.observe(this, IMEvent.SessionUpdate.value, Observer<Session> {
             it?.let {
                 if (it.parentId == parentId) {
-                    if (this.isTop) {
+                    if (this.isTop && it.deleted == 0) {
                         val pos = sessionAdapter.onSessionUpdate(it)
                         sessionRecyclerView.postDelayed({
                             sessionRecyclerView.smoothScrollToPosition(pos)

@@ -249,8 +249,10 @@ open class DefaultMessageModule : MessageModule {
                     val success = setSessionSyncTime(sessions.last().mTime)
                     if (success && sessions.size >= count) {
                         syncLatestSessionsFromServer()
+                        return
                     }
                 }
+                IMCoreManager.messageModule.syncSuperGroupMessages()
             }
 
             override fun onError(t: Throwable?) {
@@ -267,8 +269,7 @@ open class DefaultMessageModule : MessageModule {
         val count = getOfflineMsgCountPerRequest()
         val subscriber = object : BaseSubscriber<List<Message>>() {
             override fun onNext(t: List<Message>?) {
-                t?.let {
-                    batchProcessMessages(it, false)
+                t?.let {batchProcessMessages(it, false)
                     if (it.isNotEmpty()) {
                         val lastTime = it.last().cTime
                         IMCoreManager.db.sessionDao().updateMsgSyncTime(session.id, lastTime)

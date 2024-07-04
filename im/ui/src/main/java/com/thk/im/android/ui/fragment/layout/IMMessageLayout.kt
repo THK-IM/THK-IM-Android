@@ -173,17 +173,49 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         }
     }
 
-    fun scrollToMsg(msg: Message) {
+    private fun indexOfMessage(msg: Message): Int {
         val messages = msgAdapter.getMessages()
         var pos = 0
         while (pos < messages.size) {
             if (messages[pos].msgId == msg.msgId) {
-                break
+                return pos
             }
             pos++
         }
-        if (pos < messages.size) {
-            scrollToRow(pos)
+        return -1
+    }
+
+    fun scrollToMsg(msg: Message) {
+        var index = indexOfMessage(msg)
+        if (index != -1) {
+            scrollToRow(index)
+        } else {
+            val subscriber = object : BaseSubscriber<List<Message>>() {
+                override fun onNext(t: List<Message>?) {
+                    t?.let {
+                        msgAdapter.addData(it)
+                        index = indexOfMessage(msg)
+                        if (index != -1) {
+                            scrollToRow(index)
+                        }
+                    }
+                }
+            }
+            val startTime = msg.cTime
+            val messages = msgAdapter.getMessages()
+            var endTime = 0L
+            if (messages.isNotEmpty()) {
+                endTime = messages.last().cTime
+            }
+            IMCoreManager.messageModule.queryLocalMessages(
+                session.id,
+                startTime,
+                endTime,
+                Int.MAX_VALUE
+            )
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            this.disposables.add(subscriber)
         }
     }
 

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
@@ -23,13 +24,14 @@ import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
+import kotlin.math.abs
 
 class IMMessageLayout : RecyclerView, IMMsgVHOperator {
 
     private var hasMore: Boolean = true // 是否有更多消息
     private var count = 20        // 每次加载消息的数量
     private var isLoading = false // 是否正在加载中
-    private var hasScrollToBottom = false
+    private var hasScrollToBottom = true
     private val disposables = CompositeDisposable()
     private lateinit var msgAdapter: IMMessageAdapter
 
@@ -74,10 +76,11 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                     if (!recyclerView.canScrollVertically(-1)) {
                         loadMessages()
                     }
-                    hasScrollToBottom = !recyclerView.canScrollVertically(1)
-                    if (hasScrollToBottom) {
+                    val offset = recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset()
+                    if (abs(offset) < 50) {
                         msgSender?.showNewMsgTipsView(true)
                     }
+                    hasScrollToBottom = abs(offset) <= 200
                 }
             }
         })

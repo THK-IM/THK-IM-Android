@@ -40,6 +40,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.core.exception.CodeMsgException
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
@@ -647,12 +648,23 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
     }
 
     override fun resendMessage(msg: Message) {
-        IMCoreManager.messageModule.resend(msg)
+        val callback = object : IMSendMsgCallback {
+            override fun onResult(message: Message, e: Exception?) {
+                e?.let {
+                    showError(it)
+                }
+            }
+        }
+        IMCoreManager.messageModule.resend(msg, callback)
     }
 
     override fun sendMessage(type: Int, body: Any?, data: Any?, atUser: String?) {
         val callback = object : IMSendMsgCallback {
-            override fun onResult(message: Message, e: Exception?) {}
+            override fun onResult(message: Message, e: Exception?) {
+                e?.let {
+                    showError(it)
+                }
+            }
         }
         val referMsg = binding.llInputLayout.getReplyMessage()
         if (referMsg != null) {
@@ -807,6 +819,16 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                     return@flatMap Flowable.just(Pair(user, null))
                 }
             }
+    }
+
+    open fun showError(e: Exception) {
+        if (e is CodeMsgException) {
+            showToast(e.msg)
+        } else {
+            e.localizedMessage?.let {
+                showToast(it)
+            }
+        }
     }
 
 }

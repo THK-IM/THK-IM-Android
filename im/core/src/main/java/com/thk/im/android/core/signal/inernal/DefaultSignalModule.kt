@@ -118,7 +118,11 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
         }
         mHandler.postDelayed({
             if (NetworkUtils.isAvailable()) {
+                LLog.d("DefaultSignalModule", "reconnect NetworkUtils available")
                 startConnect()
+            } else {
+                LLog.d("DefaultSignalModule", "reconnect NetworkUtils not available")
+                reconnect()
             }
         }, reconnectInterval)
 
@@ -126,6 +130,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
 
     private fun startConnect() {
         synchronized(this) {
+            LLog.d("DefaultSignalModule", "startConnect: $status")
             if (status == SignalStatus.Connecting || status == SignalStatus.Connected) {
                 return
             }
@@ -177,7 +182,7 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     private fun onStatusChange(status: SignalStatus) {
         LLog.d(
             "DefaultSignalModule",
-            "status: ${this.status} $status ${Thread.currentThread().name}"
+            "onStatusChange, status: ${this.status} $status ${Thread.currentThread().name}"
         )
         if (this.status != status) {
             this.status = status
@@ -193,15 +198,19 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     }
 
     private fun heatBeat() {
+        LLog.d(
+            "DefaultSignalModule",
+            "heatBeat, status: ${this.status} $status ${Thread.currentThread().name}"
+        )
         if (status == SignalStatus.Connected) {
             try {
                 sendSignal(Signal.ping)
-            } catch (e: RuntimeException) {
+                mHandler.postDelayed({
+                    heatBeat()
+                }, heatBeatInterval)
+            } catch (e: Exception) {
                 LLog.e("IMException: ${e.message}")
             }
-            mHandler.postDelayed({
-                heatBeat()
-            }, heatBeatInterval)
         }
     }
 

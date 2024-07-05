@@ -269,7 +269,13 @@ open class DefaultMessageModule : MessageModule {
         val count = getOfflineMsgCountPerRequest()
         val subscriber = object : BaseSubscriber<List<Message>>() {
             override fun onNext(t: List<Message>?) {
-                t?.let {batchProcessMessages(it, false)
+                t?.let {
+                    for (m in it) {
+                        if (m.cTime <= session.mTime) {
+                            m.oprStatus = m.oprStatus.or(MsgOperateStatus.ClientRead.value).or(MsgOperateStatus.ServerRead.value)
+                        }
+                    }
+                    batchProcessMessages(it, false)
                     if (it.isNotEmpty()) {
                         val lastTime = it.last().cTime
                         IMCoreManager.db.sessionDao().updateMsgSyncTime(session.id, lastTime)

@@ -24,7 +24,7 @@ import okhttp3.WebSocketListener
 import java.util.concurrent.TimeUnit
 
 
-class DefaultSignalModule(app: Application, wsUrl: String, token: String) : SignalModule,
+class DefaultSignalModule(private var app: Application, wsUrl: String, token: String) : SignalModule,
     NetworkListener {
     private val mHandler = Handler(Looper.getMainLooper())
     private val heatBeatInterval = 10 * 1000L
@@ -32,13 +32,11 @@ class DefaultSignalModule(app: Application, wsUrl: String, token: String) : Sign
     private val connectTimeout = 5L
     private var token: String
     private var wsUrl: String
-    private var app: Application
     private var webSocket: WebSocket? = null
     private var status: SignalStatus = SignalStatus.Init
     private var signalListener: SignalListener? = null
 
     init {
-        this.app = app
         this.token = token
         this.wsUrl = wsUrl
         NetworkManager.getInstance().init(app)

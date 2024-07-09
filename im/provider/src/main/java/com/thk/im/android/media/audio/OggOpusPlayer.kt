@@ -65,7 +65,7 @@ object OggOpusPlayer {
                 return false
             }
             val attrBuilder = AudioAttributes.Builder()
-            attrBuilder.setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+            attrBuilder.setUsage(AudioAttributes.USAGE_MEDIA)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                 .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

@@ -483,7 +483,6 @@ class IMInputLayout : ConstraintLayout {
                     val audioMsgData = IMAudioMsgData()
                     audioMsgData.duration = second
                     audioMsgData.path = path
-                    audioMsgData.played = true
                     msgSender?.sendMessage(MsgType.Audio.value, null, audioMsgData)
                 }
             }

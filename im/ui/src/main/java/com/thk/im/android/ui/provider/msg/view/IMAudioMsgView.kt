@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMMsgResourceType
+import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
@@ -50,8 +51,8 @@ class IMAudioMsgView : LinearLayout, IMsgBodyView {
         isReply: Boolean
     ) {
         var duration = 0
-        var path = ""
-        var played = false
+        var path: String? = null
+        val played = message.oprStatus.and(MsgOperateStatus.ClientRead.value) != 0
         if (!message.data.isNullOrEmpty()) {
             val audioMsgData = Gson().fromJson(message.data, IMAudioMsgData::class.java)
             audioMsgData?.let {
@@ -61,7 +62,6 @@ class IMAudioMsgView : LinearLayout, IMsgBodyView {
                 if (it.path != null) {
                     path = it.path!!
                 }
-                played = it.played
             }
         }
 
@@ -75,7 +75,7 @@ class IMAudioMsgView : LinearLayout, IMsgBodyView {
         }
 
         render(duration, played)
-        if (path == "") {
+        if (path == null) {
             IMCoreManager.messageModule.getMsgProcessor(message.type)
                 .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
         }

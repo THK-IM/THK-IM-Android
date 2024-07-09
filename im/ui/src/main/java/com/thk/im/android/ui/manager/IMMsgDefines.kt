@@ -10,8 +10,6 @@ class IMAudioMsgData(
     var path: String? = null,
     @SerializedName("duration")
     var duration: Int? = null,
-    @SerializedName("played")
-    var played: Boolean = false,
 )
 @Keep
 class IMImageMsgData(

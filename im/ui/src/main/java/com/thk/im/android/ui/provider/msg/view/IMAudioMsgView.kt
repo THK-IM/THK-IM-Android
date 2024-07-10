@@ -52,7 +52,8 @@ class IMAudioMsgView : LinearLayout, IMsgBodyView {
     ) {
         var duration = 0
         var path: String? = null
-        val played = message.oprStatus.and(MsgOperateStatus.ClientRead.value) != 0
+        val played = (message.fUid == IMCoreManager.uId) ||
+                (message.oprStatus.and(MsgOperateStatus.ClientRead.value) != 0)
         if (!message.data.isNullOrEmpty()) {
             val audioMsgData = Gson().fromJson(message.data, IMAudioMsgData::class.java)
             audioMsgData?.let {

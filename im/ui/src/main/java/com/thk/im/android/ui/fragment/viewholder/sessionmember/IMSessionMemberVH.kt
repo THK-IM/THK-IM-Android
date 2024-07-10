@@ -33,7 +33,7 @@ class IMSessionMemberVH(itemView: View): RecyclerView.ViewHolder(itemView) {
 
     private fun showUser(user: User, sessionMember: SessionMember?) {
         val avatar = IMUIManager.avatarForSessionMember(user, sessionMember)
-        if (avatar != null && TextUtils.isEmpty(avatar)) {
+        if (avatar != null && !TextUtils.isEmpty(avatar)) {
             IMImageLoader.displayImageUrl(avatarView, avatar)
         } else {
             IMUIManager.uiResourceProvider?.avatar(user)?.let {

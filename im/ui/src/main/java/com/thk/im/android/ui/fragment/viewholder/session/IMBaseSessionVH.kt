@@ -10,8 +10,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionStatus
 import com.thk.im.android.core.db.entity.Session
-import com.thk.im.android.core.module.GroupModule
-import com.thk.im.android.core.module.UserModule
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
@@ -39,8 +37,12 @@ abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
      * ViewHolder 绑定数据触发设置界面ui
      */
     open fun onViewBind(session: Session, sessionVHOperator: IMSessionVHOperator) {
-        this.session = session
         this.sessionVHOperator = sessionVHOperator
+        updateSession(session)
+    }
+
+    open fun updateSession(session: Session) {
+        this.session = session
         if (session.status.and(SessionStatus.Silence.value) > 0) {
             statusView.visibility = View.VISIBLE
             muteView.text = itemView.context.getString(R.string.cancel_silence)
@@ -71,14 +73,6 @@ abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
         container.setOnClickListener {
             this.sessionVHOperator?.openSession(this.session)
         }
-    }
-
-    fun getUserModule(): UserModule {
-        return IMCoreManager.userModule
-    }
-
-    fun getGroupModule(): GroupModule {
-        return IMCoreManager.groupModule
     }
 
     override fun onViewRecycled() {

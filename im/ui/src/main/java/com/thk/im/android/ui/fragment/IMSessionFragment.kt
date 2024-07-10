@@ -71,7 +71,7 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
 
     private fun initSessionRecyclerView(rootView: View) {
         sessionRecyclerView = rootView.findViewById(R.id.rcv_session)
-        sessionAdapter = IMSessionAdapter(this, this)
+        sessionAdapter = IMSessionAdapter(this, this, sessionRecyclerView)
         sessionRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)

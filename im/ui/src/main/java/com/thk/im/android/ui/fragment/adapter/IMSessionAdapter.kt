@@ -9,10 +9,12 @@ import com.thk.im.android.ui.fragment.viewholder.session.IMBaseSessionVH
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 import kotlin.math.abs
+import kotlin.math.min
 
 class IMSessionAdapter(
     private val lifecycleOwner: LifecycleOwner,
-    private val sessionOperator: IMSessionVHOperator
+    private val sessionOperator: IMSessionVHOperator,
+    private val recyclerView: RecyclerView,
 ) :
     RecyclerView.Adapter<IMBaseSessionVH>() {
 
@@ -71,18 +73,17 @@ class IMSessionAdapter(
             sessionList.removeAt(oldPos)
             val newPos = findInsertPosition(session)
             sessionList.add(newPos, session)
-            val lessPos = if (newPos > oldPos) {
-                oldPos
+            val lessPos = min(oldPos, newPos)
+            if (newPos == oldPos) {
+                val vh = recyclerView.findViewHolderForAdapterPosition(newPos) as? IMBaseSessionVH
+                if (vh == null) {
+                    notifyItemChanged(newPos)
+                } else {
+                    vh.updateSession(session)
+                }
             } else {
-                newPos
+                notifyItemRangeChanged(lessPos, abs(newPos - oldPos) + 1)
             }
-            notifyItemRangeChanged(lessPos, abs(newPos - oldPos) + 1)
-//            if (newPos == oldPos) {
-//                notifyItemChanged(newPos)
-//            } else {
-//                notifyItemRemoved(oldPos)
-//                notifyItemInserted(newPos)
-//            }
             return newPos
         } else {
             val newPos = findInsertPosition(session)

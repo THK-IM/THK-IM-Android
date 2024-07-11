@@ -67,7 +67,7 @@ ext {
                     "room-compiler-annotationProcessor": "androidx.room:room-compiler:$version_room",
                     "room-compiler-kapt"               : "androidx.room:room-compiler:$version_room",
                     "sqlite-glance"                    : "com.guolindev.glance:glance:1.1.0",
-                    "live-event-bus"                   : "io.github.jeremyliao:live-event-bus-x:1.8.0",
+                    "live-event-bus"                   : "com.github.neo-turak:LiveEventBus:1.8.1",
                     "media3-exoplayer"                 : "androidx.media3:media3-exoplayer:$version_exoplayer",
                     "media3-exoplayer-dash"            : "androidx.media3:media3-exoplayer-dash:$version_exoplayer",
                     "media3-exoplayer-ui"              : "androidx.media3:media3-ui:$version_exoplayer",

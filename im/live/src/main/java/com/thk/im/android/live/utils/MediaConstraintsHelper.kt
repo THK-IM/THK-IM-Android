@@ -1,4 +1,4 @@
-package com.thk.android.im.live.utils
+package com.thk.im.android.live.utils
 
 import org.webrtc.MediaConstraints
 

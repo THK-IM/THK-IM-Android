@@ -8,10 +8,6 @@ plugins {
 
 def moduleName = "ui"
 
-def core_release_version = rootProject.ext.android.versionName
-def core_snapshot_version = String.format("%s-SNAPSHOT", rootProject.ext.android.versionName)
-def core_version = core_snapshot_version
-
 android {
     namespace "com.thk.im.android.${moduleName}"
     compileSdk rootProject.ext.android.compileSdkVersion
@@ -69,8 +65,8 @@ dependencies {
     implementation rootProject.ext.dependencies["XPopup"]
     implementation rootProject.ext.dependencies["flexbox"]
 
+//    implementation "io.github.thk-im:core:${rootProject.ext.android.versionName}"
     implementation project(":im:core")
-//    implementation "io.github.thk-im:core:${core_version}"
 }
 
 
@@ -87,8 +83,8 @@ dependencies {
 //                name "sonartype-Staging"
 //                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
 //                credentials {
-//                    username = System.getenv("ossrhUsername")
-//                    password = System.getenv("ossrhPassword")
+//                    username = System.getenv("ossrhToken")
+//                    password = System.getenv("ossrhTokenPassword")
 //                }
 //            }
 //            // 定义snapshot仓库
@@ -96,8 +92,8 @@ dependencies {
 //                name "sonatype-Snapshots"
 //                url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 //                credentials {
-//                    username = System.getenv("ossrhUsername")
-//                    password = System.getenv("ossrhPassword")
+//                    username = System.getenv("ossrhToken")
+//                    password = System.getenv("ossrhTokenPassword")
 //                }
 //            }
 //        }
@@ -149,7 +145,7 @@ dependencies {
 //                        implementation rootProject.ext.dependencies["SwipeMenuRecyclerView"]
 //                        implementation rootProject.ext.dependencies["XPopup"]
 //                        implementation rootProject.ext.dependencies["flexbox"]
-//                        implementation "io.github.thk-im:core:${core_version}"
+//                        implementation "io.github.thk-im:core:${rootProject.ext.android.versionName}"
 //                    }
 //                }
 //            }
@@ -200,7 +196,7 @@ dependencies {
 //                        implementation rootProject.ext.dependencies["SwipeMenuRecyclerView"]
 //                        implementation rootProject.ext.dependencies["XPopup"]
 //                        implementation rootProject.ext.dependencies["flexbox"]
-//                        implementation "io.github.thk-im:core:${core_version}"
+//                        implementation "io.github.thk-im:core:${rootProject.ext.android.versionName}"
 //                    }
 //                }
 //            }

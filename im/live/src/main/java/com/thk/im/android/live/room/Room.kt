@@ -1,10 +1,10 @@
-package com.thk.android.im.live.room
+package com.thk.im.android.live.room
 
-import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.Mode
-import com.thk.android.im.live.ParticipantVo
-import com.thk.android.im.live.Role
-import com.thk.android.im.live.RoomObserver
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.Mode
+import com.thk.im.android.live.ParticipantVo
+import com.thk.im.android.live.Role
+import com.thk.im.android.live.RoomObserver
 import com.thk.im.android.core.base.LLog
 import java.nio.ByteBuffer
 

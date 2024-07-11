@@ -1,4 +1,4 @@
-package com.thk.android.im.live.view
+package com.thk.im.android.live.view
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
@@ -8,11 +8,11 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.thk.android.im.live.room.BaseParticipant
-import com.thk.android.im.live.room.LocalParticipant
 import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.live.R
 import com.thk.im.android.live.databinding.ViewParticipantBinding
+import com.thk.im.android.live.room.BaseParticipant
+import com.thk.im.android.live.room.LocalParticipant
 import org.webrtc.RendererCommon
 import kotlin.math.abs
 

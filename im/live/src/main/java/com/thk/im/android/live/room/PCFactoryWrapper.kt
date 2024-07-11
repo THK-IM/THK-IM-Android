@@ -1,11 +1,11 @@
-package com.thk.android.im.live.room
+package com.thk.im.android.live.room
 
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
-import com.thk.android.im.live.IMLiveManager
+import com.thk.im.android.live.IMLiveManager
 import org.webrtc.EglBase
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.audio.JavaAudioDeviceModule

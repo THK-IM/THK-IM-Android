@@ -87,8 +87,8 @@ dependencies {
 //                name "sonartype-Staging"
 //                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
 //                credentials {
-//                    username = System.getenv("ossrhUsername")
-//                    password = System.getenv("ossrhPassword")
+//                    username = System.getenv("ossrhToken")
+//                    password = System.getenv("ossrhTokenPassword")
 //                }
 //            }
 //            // 定义snapshot仓库
@@ -96,8 +96,8 @@ dependencies {
 //                name "sonatype-Snapshots"
 //                url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 //                credentials {
-//                    username = System.getenv("ossrhUsername")
-//                    password = System.getenv("ossrhPassword")
+//                    username = System.getenv("ossrhToken")
+//                    password = System.getenv("ossrhTokenPassword")
 //                }
 //            }
 //        }

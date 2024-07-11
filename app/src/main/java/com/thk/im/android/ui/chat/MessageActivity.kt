@@ -6,9 +6,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.Mode
-import com.thk.android.im.live.room.Room
 import com.thk.im.android.R
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionType
@@ -19,7 +16,6 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActivityMessageBinding
 import com.thk.im.android.ui.base.BaseActivity
-import com.thk.im.android.ui.call.LiveCallActivity
 import com.thk.im.android.ui.contact.ContactUserActivity
 import com.thk.im.android.ui.fragment.IMMessageFragment
 import com.thk.im.android.ui.group.GroupActivity

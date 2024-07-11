@@ -3,8 +3,8 @@ package com.thk.im.android
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.api.DefaultLiveApi
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.api.DefaultLiveApi
 import com.thk.im.android.api.DataRepository
 import com.thk.im.android.constant.Host
 import com.thk.im.android.core.IMCoreManager

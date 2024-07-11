@@ -1,13 +1,13 @@
-package com.thk.android.im.live.room
+package com.thk.im.android.live.room
 
 import android.util.Base64
 import com.google.gson.Gson
-import com.thk.android.im.live.DataChannelMsg
-import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.Role
-import com.thk.android.im.live.utils.MediaConstraintsHelper
-import com.thk.android.im.live.vo.PublishStreamReqVo
-import com.thk.android.im.live.vo.PublishStreamResVo
+import com.thk.im.android.live.DataChannelMsg
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.Role
+import com.thk.im.android.live.utils.MediaConstraintsHelper
+import com.thk.im.android.live.vo.PublishStreamReqVo
+import com.thk.im.android.live.vo.PublishStreamResVo
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform

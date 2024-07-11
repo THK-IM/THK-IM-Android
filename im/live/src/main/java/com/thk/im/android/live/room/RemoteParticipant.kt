@@ -1,10 +1,10 @@
-package com.thk.android.im.live.room
+package com.thk.im.android.live.room
 
 import android.util.Base64
-import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.Role
-import com.thk.android.im.live.vo.PlayStreamReqVo
-import com.thk.android.im.live.vo.PlayStreamResVo
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.Role
+import com.thk.im.android.live.vo.PlayStreamReqVo
+import com.thk.im.android.live.vo.PlayStreamResVo
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import org.webrtc.MediaStreamTrack

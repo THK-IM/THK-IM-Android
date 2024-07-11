@@ -2,9 +2,9 @@ package com.thk.im.android.module
 
 import android.content.Context
 import android.content.Intent
-import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.Mode
-import com.thk.android.im.live.room.Room
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.Mode
+import com.thk.im.android.live.room.Room
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform

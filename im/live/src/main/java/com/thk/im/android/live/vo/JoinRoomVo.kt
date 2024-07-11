@@ -1,7 +1,7 @@
-package com.thk.android.im.live.vo
+package com.thk.im.android.live.vo
 
 import com.google.gson.annotations.SerializedName
-import com.thk.android.im.live.ParticipantVo
+import com.thk.im.android.live.ParticipantVo
 
 data class JoinRoomReqVo(
     @SerializedName("room_id")

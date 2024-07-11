@@ -7,11 +7,11 @@ import android.view.View
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.RoomObserver
-import com.thk.android.im.live.room.BaseParticipant
-import com.thk.android.im.live.room.RemoteParticipant
-import com.thk.android.im.live.room.Room
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.RoomObserver
+import com.thk.im.android.live.room.BaseParticipant
+import com.thk.im.android.live.room.RemoteParticipant
+import com.thk.im.android.live.room.Room
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog

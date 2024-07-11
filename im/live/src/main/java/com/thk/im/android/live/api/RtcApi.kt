@@ -1,9 +1,9 @@
-package com.thk.android.im.live.api
+package com.thk.im.android.live.api
 
-import com.thk.android.im.live.vo.PlayStreamReqVo
-import com.thk.android.im.live.vo.PlayStreamResVo
-import com.thk.android.im.live.vo.PublishStreamReqVo
-import com.thk.android.im.live.vo.PublishStreamResVo
+import com.thk.im.android.live.vo.PlayStreamReqVo
+import com.thk.im.android.live.vo.PlayStreamResVo
+import com.thk.im.android.live.vo.PublishStreamReqVo
+import com.thk.im.android.live.vo.PublishStreamResVo
 import io.reactivex.Flowable
 import retrofit2.http.Body
 import retrofit2.http.POST

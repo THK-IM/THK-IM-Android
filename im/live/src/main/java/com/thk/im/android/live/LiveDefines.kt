@@ -1,7 +1,7 @@
-package com.thk.android.im.live
+package com.thk.im.android.live
 
 import com.google.gson.annotations.SerializedName
-import com.thk.android.im.live.room.BaseParticipant
+import com.thk.im.android.live.room.BaseParticipant
 import java.nio.ByteBuffer
 
 

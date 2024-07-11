@@ -3,9 +3,9 @@ package com.thk.im.android.module
 import android.app.Application
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.Role
-import com.thk.android.im.live.room.Room
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.Role
+import com.thk.im.android.live.room.Room
 import com.thk.im.android.IMApplication
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog

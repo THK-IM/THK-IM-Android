@@ -1,17 +1,17 @@
-package com.thk.android.im.live.room
+package com.thk.im.android.live.room
 
 import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
-import com.thk.android.im.live.DataChannelMsg
-import com.thk.android.im.live.IMLiveManager
-import com.thk.android.im.live.Mode
-import com.thk.android.im.live.NewStreamNotify
-import com.thk.android.im.live.NotifyBean
-import com.thk.android.im.live.NotifyType
-import com.thk.android.im.live.RemoveStreamNotify
-import com.thk.android.im.live.Role
-import com.thk.android.im.live.utils.MediaConstraintsHelper
+import com.thk.im.android.live.DataChannelMsg
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.Mode
+import com.thk.im.android.live.NewStreamNotify
+import com.thk.im.android.live.NotifyBean
+import com.thk.im.android.live.NotifyType
+import com.thk.im.android.live.RemoveStreamNotify
+import com.thk.im.android.live.Role
+import com.thk.im.android.live.utils.MediaConstraintsHelper
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.StringUtils
 import io.reactivex.disposables.CompositeDisposable

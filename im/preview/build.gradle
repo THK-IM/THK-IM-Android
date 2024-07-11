@@ -9,14 +9,6 @@ plugins {
 
 def moduleName = "preview"
 
-def core_release_version = rootProject.ext.android.versionName
-def core_snapshot_version = String.format("%s-SNAPSHOT", rootProject.ext.android.versionName)
-def core_version = core_snapshot_version
-
-def ui_release_version = rootProject.ext.android.versionName
-def ui_snapshot_version = String.format("%s-SNAPSHOT", rootProject.ext.android.versionName)
-def ui_version = ui_snapshot_version
-
 android {
     namespace "com.thk.im.android.${moduleName}"
     compileSdk rootProject.ext.android.compileSdkVersion
@@ -77,8 +69,8 @@ dependencies {
     implementation project(":im:core")
     implementation project(":im:ui")
 
-//    implementation "io.github.thk-im:core:${core_version}"
-//    implementation "io.github.thk-im:ui:${ui_version}"
+//    implementation "io.github.thk-im:core:${rootProject.ext.android.versionName}"
+//    implementation "io.github.thk-im:ui:${rootProject.ext.android.versionName}"
 }
 
 
@@ -93,8 +85,8 @@ dependencies {
 //                name "sonartype-Staging"
 //                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
 //                credentials {
-//                    username = System.getenv("ossrhUsername")
-//                    password = System.getenv("ossrhPassword")
+//                    username = System.getenv("ossrhToken")
+//                    password = System.getenv("ossrhTokenPassword")
 //                }
 //            }
 //            // 定义snapshot仓库
@@ -102,8 +94,8 @@ dependencies {
 //                name "sonatype-Snapshots"
 //                url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 //                credentials {
-//                    username = System.getenv("ossrhUsername")
-//                    password = System.getenv("ossrhPassword")
+//                    username = System.getenv("ossrhToken")
+//                    password = System.getenv("ossrhTokenPassword")
 //                }
 //            }
 //        }
@@ -154,8 +146,8 @@ dependencies {
 //                        implementation rootProject.ext.dependencies["media3-exoplayer"]
 //                        implementation rootProject.ext.dependencies["media3-exoplayer-ui"]
 //                        implementation rootProject.ext.dependencies["videocache"]
-//                        implementation "io.github.thk-im:core:${core_version}"
-//                        implementation "io.github.thk-im:ui:${ui_version}"
+//                        implementation "io.github.thk-im:core:${version}"
+//                        implementation "io.github.thk-im:ui:${version}"
 //                    }
 //                }
 //            }
@@ -206,8 +198,8 @@ dependencies {
 //                        implementation rootProject.ext.dependencies["media3-exoplayer"]
 //                        implementation rootProject.ext.dependencies["media3-exoplayer-ui"]
 //                        implementation rootProject.ext.dependencies["videocache"]
-//                        implementation "io.github.thk-im:core:${core_version}"
-//                        implementation "io.github.thk-im:ui:${ui_version}"
+//                        implementation "io.github.thk-im:core:${version}"
+//                        implementation "io.github.thk-im:ui:${version}"
 //                    }
 //                }
 //            }

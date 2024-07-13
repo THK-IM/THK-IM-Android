@@ -170,4 +170,8 @@ object OggOpusPlayer {
     fun stopPlaying() {
         playing = false
     }
+
+    fun currentPlayingPath(): String? {
+        return audioPath
+    }
 }

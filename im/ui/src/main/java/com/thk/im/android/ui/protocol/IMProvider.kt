@@ -27,5 +27,7 @@ interface IMProvider {
 
     fun stopPlayAudio()
 
+    fun currentPlayingPath(): String?
+
     fun isPlayingAudio(): Boolean
 }

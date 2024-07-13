@@ -426,6 +426,11 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                 msg.data?.let {
                     val data = Gson().fromJson(it, IMAudioMsgData::class.java)
                     data.path?.let { path ->
+                        val currentPath = IMUIManager.mediaProvider?.currentPlayingPath()
+                        if (path == currentPath) {
+                            IMUIManager.mediaProvider?.stopPlayAudio()
+                            return
+                        }
                         val success =
                             IMUIManager.mediaProvider?.startPlayAudio(path, object : AudioCallback {
                                 override fun audioData(

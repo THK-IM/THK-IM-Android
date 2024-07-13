@@ -135,6 +135,10 @@ class Provider(app: Application, token: String) : IMProvider {
         return OggOpusPlayer.stopPlaying()
     }
 
+    override fun currentPlayingPath(): String? {
+        return OggOpusPlayer.currentPlayingPath()
+    }
+
     override fun isPlayingAudio(): Boolean {
         return OggOpusPlayer.isPlaying()
     }

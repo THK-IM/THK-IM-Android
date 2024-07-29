@@ -73,6 +73,10 @@ abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
         container.setOnClickListener {
             this.sessionVHOperator?.openSession(this.session)
         }
+
+        container.setOnLongClickListener {
+            this.sessionVHOperator?.longClickSession(this.session) ?: false
+        }
     }
 
     override fun onViewRecycled() {

@@ -10,4 +10,6 @@ interface IMSessionVHOperator {
 
     fun openSession(session: Session)
 
+    fun longClickSession(session: Session): Boolean
+
 }

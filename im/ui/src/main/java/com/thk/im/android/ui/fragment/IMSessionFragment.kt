@@ -156,6 +156,7 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
         super.onDestroyView()
         disposables.clear()
     }
+
     private fun loadSessions() {
         if (!hasMore || isLoading) return
         isLoading = true
@@ -226,5 +227,9 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
         } else {
             sessionClick?.onSessionClick(session)
         }
+    }
+
+    override fun longClickSession(session: Session): Boolean {
+        return false
     }
 }

@@ -38,6 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginRight="4dp"
+        android:layout_marginTop="6dp"
         android:layout_toLeftOf="@+id/avatar_container"
         android:layout_toRightOf="@+id/iv_msg_select"
         android:gravity="end"
@@ -50,7 +51,7 @@
             android:layout_marginLeft="4dp"
             android:layout_gravity="bottom"
             >
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_msg_resend"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

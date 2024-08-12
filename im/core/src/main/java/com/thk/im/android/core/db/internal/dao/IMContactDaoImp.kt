@@ -17,6 +17,10 @@ internal class IMContactDaoImp(private val roomDatabase: IMRoomDataBase) : IMCon
         return roomDatabase.contactDao().findAll()
     }
 
+    override fun findByUserIds(ids: List<Long>): List<Contact> {
+        return roomDatabase.contactDao().findByUserIds(ids)
+    }
+
     override fun findByUserId(entityId: Long): Contact? {
         return roomDatabase.contactDao().findByUserId(entityId)
     }

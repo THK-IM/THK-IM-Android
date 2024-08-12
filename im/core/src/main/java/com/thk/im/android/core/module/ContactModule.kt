@@ -13,6 +13,8 @@ interface ContactModule : BaseModule {
 
     fun updateContact(contact: Contact): Flowable<Void>
 
+    fun queryContactsByUserIds(ids: List<Long>): Flowable<List<Contact>>
+
     fun queryContactsByRelation(relation: Int): Flowable<List<Contact>>
 
 }

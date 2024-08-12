@@ -68,9 +68,24 @@ object ShapeUtils {
         return radiusBg
     }
 
+    fun createGradientRectangleDrawable(
+        @ColorInt startColor: Int,
+        @ColorInt endColor: Int,
+        orientation: GradientDrawable.Orientation,
+    ): GradientDrawable {
+        val radiusBg = GradientDrawable()
+        //设置Shape类型
+        radiusBg.shape = GradientDrawable.RECTANGLE
+        //设置填充颜色
+        radiusBg.colors = intArrayOf(startColor, endColor)
+        radiusBg.orientation = orientation
+        return radiusBg
+    }
+
     fun roundedRect(
         left: Float, top: Float, right: Float, bottom: Float, rX: Float, rY: Float,
-        tl: Boolean = true, tr: Boolean = true, br: Boolean = true, bl: Boolean = true): Path {
+        tl: Boolean = true, tr: Boolean = true, br: Boolean = true, bl: Boolean = true
+    ): Path {
         var rx = rX
         var ry = rY
         val path = Path()
@@ -123,7 +138,8 @@ object ShapeUtils {
 
     fun roundedRect(
         left: Float, top: Float, right: Float, bottom: Float,
-        ttl: Float, ttr: Float, btr: Float, btl: Float): Path {
+        ttl: Float, ttr: Float, btr: Float, btl: Float
+    ): Path {
         var tl = ttl
         var tr = ttr
         var br = btr

@@ -24,4 +24,8 @@ internal interface ContactDao {
     @Query("select * from contact where (relation & :relation ) != 0")
     fun findByRelation(relation: Int): List<Contact>
 
+
+    @Query("select * from contact where id in (:ids)")
+    fun findByUserIds(ids: List<Long>): List<Contact>
+
 }

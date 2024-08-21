@@ -124,6 +124,15 @@ class IMSessionAdapter(
         }
     }
 
+    fun setAllRead() {
+        for ((pos, s) in sessionList.withIndex()) {
+            if (s.unReadCount > 0) {
+                s.unReadCount = 0
+                notifyItemChanged(pos)
+            }
+        }
+    }
+
     fun getSessionList(): List<Session> {
         return sessionList
     }

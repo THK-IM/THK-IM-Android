@@ -71,6 +71,10 @@ internal class IMSessionDaoImp(private val roomDatabase: IMRoomDataBase) : IMSes
         return roomDatabase.sessionDao().updateMemberCount(id, count)
     }
 
+    override fun updateAllMsgRead() {
+        return roomDatabase.sessionDao().updateAllMsgRead()
+    }
+
     override fun findByParentId(parentId: Long, count: Int, mTime: Long): List<Session> {
         return roomDatabase.sessionDao().findByParentId(parentId, count, mTime)
     }

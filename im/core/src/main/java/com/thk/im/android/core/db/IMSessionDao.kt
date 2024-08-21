@@ -28,6 +28,8 @@ interface IMSessionDao {
 
     fun updateMemberCount(id: Long, count: Int)
 
+    fun updateAllMsgRead()
+
     fun findByEntityId(entityId: Long, type: Int): Session?
 
     fun findById(id: Long): Session?

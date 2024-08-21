@@ -148,4 +148,8 @@ interface MessageModule : BaseModule {
      */
     fun syncSessionMembers(sessionId: Long)
 
+    /**
+     * 清除所有已读消息
+     */
+    fun setAllMessageRead() : Flowable<Void>
 }

@@ -139,7 +139,8 @@ open class DefaultMessageModule : MessageModule {
                 }
             }
             if (replyMsgIds.isNotEmpty()) {
-                val replyMessages = IMCoreManager.db.messageDao().findByMsgIds(replyMsgIds, sessionMessage.key)
+                val replyMessages =
+                    IMCoreManager.db.messageDao().findByMsgIds(replyMsgIds, sessionMessage.key)
                 for (msg in sessionMessage.value) {
                     msg.rMsgId?.let {
                         for (replyMessage in replyMessages) {
@@ -151,7 +152,10 @@ open class DefaultMessageModule : MessageModule {
                     }
                 }
             }
-            XEventBus.post(IMEvent.BatchMsgNew.value, Pair(sessionMessage.key, sessionMessage.value))
+            XEventBus.post(
+                IMEvent.BatchMsgNew.value,
+                Pair(sessionMessage.key, sessionMessage.value)
+            )
             // 更新每个session的最后一条消息
             val lastMsg = IMCoreManager.getImDataBase().messageDao()
                 .findLastMessageBySessionId(sessionMessage.key)
@@ -272,7 +276,8 @@ open class DefaultMessageModule : MessageModule {
                 t?.let {
                     for (m in it) {
                         if (m.cTime <= session.mTime) {
-                            m.oprStatus = m.oprStatus.or(MsgOperateStatus.ClientRead.value).or(MsgOperateStatus.ServerRead.value)
+                            m.oprStatus = m.oprStatus.or(MsgOperateStatus.ClientRead.value)
+                                .or(MsgOperateStatus.ServerRead.value)
                         }
                     }
                     batchProcessMessages(it, false)
@@ -603,7 +608,10 @@ open class DefaultMessageModule : MessageModule {
         AppUtils.instance().notifyNewMessage()
     }
 
-    override fun querySessionMembers(sessionId: Long, forceServer: Boolean): Flowable<List<SessionMember>> {
+    override fun querySessionMembers(
+        sessionId: Long,
+        forceServer: Boolean
+    ): Flowable<List<SessionMember>> {
         if (forceServer) {
             return queryLastSessionMember(sessionId, getSessionMemberCountPerRequest())
         }
@@ -797,5 +805,18 @@ open class DefaultMessageModule : MessageModule {
             .compose(RxTransform.flowableToIo())
             .subscribe(disposable)
         this.disposes.add(disposable)
+    }
+
+
+    override fun setAllMessageRead(): Flowable<Void> {
+        return Flowable.create({
+            try {
+                IMCoreManager.getImDataBase().messageDao().updateAllMsgRead()
+                IMCoreManager.getImDataBase().sessionDao().updateAllMsgRead()
+            } catch (e: Exception) {
+                it.onError(e)
+            }
+            it.onComplete()
+        }, BackpressureStrategy.LATEST)
     }
 }

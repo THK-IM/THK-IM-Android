@@ -1,6 +1,11 @@
 package com.thk.im.android.core.db.internal.room.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
 import com.thk.im.android.core.db.entity.Message
@@ -62,6 +67,9 @@ internal interface MessageDao {
     @Update
     fun update(messages: List<Message>)
 
+    @Query("update message set opr_status = :oprStatus where opr_status & :oprStatus = 0")
+    fun updateAllMsgRead(oprStatus: Int = MsgOperateStatus.ClientRead.value)
+
     @Query("update message set send_status = :status where send_status < :successStatus")
     fun resetSendingMsg(
         status: Int = MsgSendStatus.SendFailed.value,
@@ -116,7 +124,10 @@ internal interface MessageDao {
      */
 
     @Query("select * from message where session_id = :sid and type >= 0 and opr_status & :oprStatus = 0 order by c_time asc ")
-    fun findSessionAtMeUnreadMessages(sid: Long, oprStatus: Int = MsgOperateStatus.ClientRead.value): List<Message>
+    fun findSessionAtMeUnreadMessages(
+        sid: Long,
+        oprStatus: Int = MsgOperateStatus.ClientRead.value
+    ): List<Message>
 
     @Query("select * from message where session_id = :sid and type = :type and content like :keyword order by m_time desc limit :offset, :count")
     fun search(sid: Long, type: Int, keyword: String, count: Int, offset: Int): List<Message>

@@ -54,6 +54,10 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         roomDatabase.messageDao().updateOperationStatus(sid, msgIds, oprStatus)
     }
 
+    override fun updateAllMsgRead() {
+        roomDatabase.messageDao().updateAllMsgRead()
+    }
+
     override fun resetSendingMessage(status: Int, successStatus: Int) {
         roomDatabase.messageDao().resetSendingMsg(status, successStatus)
     }

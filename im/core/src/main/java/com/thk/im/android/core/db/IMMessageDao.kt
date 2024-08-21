@@ -48,6 +48,11 @@ interface IMMessageDao {
         oprStatus: Int
     )
 
+    /**
+     * 设置所有消息已读
+     */
+    fun updateAllMsgRead()
+
     fun resetSendingMessage(
         status: Int = MsgSendStatus.SendFailed.value,
         successStatus: Int = MsgSendStatus.Success.value

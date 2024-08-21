@@ -45,6 +45,9 @@ internal interface SessionDao {
     @Query("update session set member_count = :count where id = :id")
     fun updateMemberCount(id: Long, count: Int)
 
+    @Query("update session set unread_count = 0 where unread_count != 0")
+    fun updateAllMsgRead()
+
     @Query("select member_sync_time from session where id= :id ")
     fun findMemberSyncTime(id: Long): Long
 

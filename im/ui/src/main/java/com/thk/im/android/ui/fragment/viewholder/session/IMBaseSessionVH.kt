@@ -18,7 +18,7 @@ import com.thk.im.android.ui.protocol.internal.IMSessionVHOperator
 abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
     IMBaseVH(liftOwner, itemView) {
 
-    val nickView: AppCompatTextView = itemView.findViewById(R.id.tv_nickname)
+    val nickView: EmojiTextView = itemView.findViewById(R.id.tv_nickname)
     val avatarView: AppCompatImageView = itemView.findViewById(R.id.iv_avatar)
     val lastMsgView: EmojiTextView = itemView.findViewById(R.id.tv_last_message)
     val lastTimeView: AppCompatTextView = itemView.findViewById(R.id.tv_last_time)

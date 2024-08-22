@@ -37,7 +37,6 @@ data class Session(
     @SerializedName("note_name")
     @ColumnInfo(name = "note_name")
     var noteName: String?,
-    @SerializedName("note_name")
     @ColumnInfo(name = "note_avatar")
     var noteAvatar: String?,
     @SerializedName("remark")

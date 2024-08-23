@@ -28,6 +28,7 @@
     <string name="im_record_msg">[Conversation record]</string>
     <string name="im_reedit_msg">[Re-edit message]</string>
     <string name="im_revoke_msg">[%s withdrew a message]</string>
+    <string name="x_revoke_a_msg">%s撤回了一条消息</string>
     <string name="im_text_msg">[Text message]</string>
     <string name="edited">[Edited]</string>
     <string name="im_un_support_msg">[Unknown message]</string>

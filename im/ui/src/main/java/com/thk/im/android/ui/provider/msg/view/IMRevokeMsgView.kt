@@ -69,14 +69,14 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
                 binding.tvWhoRevoke.text = context.getString(R.string.you_revoke_a_message)
             } else {
                 binding.tvWhoRevoke.text = String.format(
-                    context.getString(R.string.im_revoke_msg),
+                    context.getString(R.string.x_revoke_a_msg),
                     revokeData.nick
                 )
                 binding.tvReedit.visibility = View.GONE
             }
         } else {
             binding.tvWhoRevoke.text = String.format(
-                context.getString(R.string.im_revoke_msg),
+                context.getString(R.string.x_revoke_a_msg),
                 context.getString(R.string.other_side),
             )
             binding.tvReedit.visibility = View.GONE

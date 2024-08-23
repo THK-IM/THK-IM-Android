@@ -28,6 +28,7 @@
     <string name="im_record_msg">[會話記錄]</string>
     <string name="im_reedit_msg">[重編輯訊息]</string>
     <string name="im_revoke_msg">[%s撤回了一則訊息]</string>
+    <string name="x_revoke_a_msg">%s撤回了一則訊息</string>
     <string name="im_text_msg">[文字訊息]</string>
     <string name="edited">[已編輯]</string>
     <string name="im_un_support_msg">[未知訊息]</string>

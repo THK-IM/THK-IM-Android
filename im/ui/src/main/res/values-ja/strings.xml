@@ -29,6 +29,7 @@
     <string name="im_reedit_msg">[メッセージを再編集]</string>
     <string name="im_revoke_msg">[%s がメッセージを取り消しました]</string>
     <string name="im_text_msg">[テキストメッセージ]</string>
+    <string name="x_revoke_a_msg">%s がメッセージを取り消しました</string>
     <string name="edited">[編集済み]</string>
     <string name="im_un_support_msg">[不明なメッセージ]</string>
     <string name="im_video_msg">[ビデオメッセージ]</string>

@@ -96,7 +96,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         if (hasBubble()) {
             when (getPositionType()) {
                 IMMsgPosType.Left.value -> {
-                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message.fUid, session)
+                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
                     if (bubble != null) {
                         msgContentView.background = bubble
                     } else {
@@ -109,7 +109,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
                 }
 
                 IMMsgPosType.Right.value -> {
-                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message.fUid, session)
+                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
                     if (bubble != null) {
                         msgContentView.background = bubble
                     } else {
@@ -122,7 +122,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
                 }
 
                 else -> {
-                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message.fUid, session)
+                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
                     if (bubble != null) {
                         msgContentView.background = bubble
                     } else {
@@ -193,7 +193,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         }
     }
 
-    private fun onLongClickContent(view: View): Boolean{
+    private fun onLongClickContent(view: View): Boolean {
         return if (canSelect()) {
             msgVHOperator?.onMsgCellLongClick(message, pos, view)
             true
@@ -334,9 +334,9 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     }
 
     private fun showReadStatus(count: Int) {
-        val memberCount = max(count-1, 1)
+        val memberCount = max(count - 1, 1)
         val readUIds = this.message.getReadUIds()
-        val progress = readUIds.count().toFloat()/memberCount.toFloat()
+        val progress = readUIds.count().toFloat() / memberCount.toFloat()
         this.readStatusView?.visibility = View.VISIBLE
         val color = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#17a121")
         this.readStatusView?.updateStatus(color, 4f, progress)
@@ -345,7 +345,8 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     private fun renderReplyMsg() {
         if (message.rMsgId != null && message.referMsg != null) {
             msgReplyContentView.visibility = View.VISIBLE
-            val userInfo = msgVHOperator?.msgSender()?.syncGetSessionMemberInfo(message.referMsg!!.fUid)
+            val userInfo =
+                msgVHOperator?.msgSender()?.syncGetSessionMemberInfo(message.referMsg!!.fUid)
             userInfo?.let { info ->
                 val user = info.first
                 info.second?.noteName?.let { noteName ->

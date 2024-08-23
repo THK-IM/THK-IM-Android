@@ -191,7 +191,8 @@ class IMMediaPreviewActivity : AppCompatActivity() {
     }
 
     private fun translatePreview(transitionX: Float, transitionY: Float) {
-        val alpha = 1 - abs(transitionY) / com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight
+        val alpha =
+            1 - abs(transitionY) / com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight
         val scale = maxOf(minOf(1f, alpha), 0.7f)
         binding.vpMediaPreview.translationX = transitionX / binding.clContent.scaleX
         binding.vpMediaPreview.translationY = transitionY / binding.clContent.scaleX
@@ -225,7 +226,8 @@ class IMMediaPreviewActivity : AppCompatActivity() {
     }
 
     private fun startEnterAnimation() {
-        val scaleStart = originRect.width().toFloat() / com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth
+        val scaleStart = originRect.width()
+            .toFloat() / com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth
         val startLocation = floatArrayOf(
             (originRect.left).toFloat() + (originRect.width() / 2) - com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth / 2,
             (originRect.top).toFloat() + (originRect.height() / 2) - com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight / 2,
@@ -275,7 +277,8 @@ class IMMediaPreviewActivity : AppCompatActivity() {
         if (binding.vpMediaPreview.currentItem != defaultPosition) {
             finish()
         } else {
-            val scaleStart = originRect.width().toFloat() / com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth
+            val scaleStart = originRect.width()
+                .toFloat() / com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth
             val startLocation = floatArrayOf(
                 (originRect.left).toFloat() + (originRect.width() / 2) - com.thk.im.android.core.base.utils.AppUtils.instance().screenWidth / 2,
                 (originRect.top).toFloat() + (originRect.height() / 2) - com.thk.im.android.core.base.utils.AppUtils.instance().screenHeight / 2,
@@ -303,8 +306,14 @@ class IMMediaPreviewActivity : AppCompatActivity() {
             )
             scaleAnimation.interpolator = LinearInterpolator()
 
+            val colorAnim = ObjectAnimator.ofInt(
+                binding.clContent, "backgroundColor", Color.BLACK, Color.TRANSPARENT
+            )
+            colorAnim.setEvaluator(ArgbEvaluator())
+            colorAnim.duration = animationDuration
+
             val animatorSet = AnimatorSet()
-            animatorSet.playTogether(animator, scaleAnimation)
+            animatorSet.playTogether(animator, scaleAnimation, colorAnim)
             animatorSet.duration = animationDuration
             animatorSet.start()
             animatorSet.addListener(object : AnimatorListener {

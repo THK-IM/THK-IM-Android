@@ -361,6 +361,9 @@ abstract class IMBaseMsgProcessor {
      * 获取session下用户昵称
      */
     open fun getSenderName(msg: Message): String? {
+        if (msg.fUid == 0L) {
+            return null
+        }
         var sender: String? = null
         val sessionMember = IMCoreManager.db.sessionMemberDao()
             .findSessionMember(msg.sid, msg.fUid)

@@ -34,6 +34,8 @@
     <string name="im_un_support_msg">[未知消息]</string>
     <string name="im_video_msg">[视频消息]</string>
     <string name="other_side">对方</string>
+    <string name="yourself">你</string>
+    <string name="someone_at_me">"[有人@我]</string>
     <string name="not_support_msg_update_client">不支持的消息类型，请尝试升级客户端</string>
     <string name="copy">复制</string>
     <string name="delete">删除</string>

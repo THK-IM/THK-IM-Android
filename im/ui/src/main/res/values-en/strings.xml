@@ -34,6 +34,8 @@
     <string name="im_un_support_msg">[Unknown message]</string>
     <string name="im_video_msg">[Video message]</string>
     <string name="other_side">The other party</string>
+    <string name="yourself">you</string>
+    <string name="someone_at_me">[Someone @ me]</string>
     <string name="not_support_msg_update_client">Unsupported message type, please try to upgrade the client</string>
     <string name="copy">Copy</string>
     <string name="delete">Delete</string>

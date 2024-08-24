@@ -14,7 +14,6 @@ import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMRevokeMsgData
-import io.reactivex.Flowable
 
 open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
     override fun messageType(): Int {
@@ -48,62 +47,45 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
     }
 
     override fun received(msg: Message) {
-        val subscriber = object : BaseSubscriber<Message>() {
-            override fun onNext(t: Message?) {
-            }
-
-            override fun onComplete() {
-                super.onComplete()
-                disposables.remove(this)
-            }
-        }
-        getRevokeMsg(msg)
-            .compose(RxTransform.flowableToIo())
-            .subscribe(subscriber)
-        disposables.add(subscriber)
+        processRevokeMsg(msg)
         if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
             IMCoreManager.messageModule.ackMessageToCache(msg)
         }
     }
 
-    open fun getRevokeMsg(msg: Message): Flowable<Message> {
-        return getNickname(msg).flatMap {
-            val data = IMRevokeMsgData(it)
-            var existed = false
-            if (msg.rMsgId != null) {
-                val dbMsg = IMCoreManager.getImDataBase().messageDao()
-                    .findByMsgId(msg.rMsgId!!, msg.sid)
-                if (dbMsg != null) {
-                    IMCoreManager.getImDataBase().messageDao().delete(listOf(dbMsg))
-                    XEventBus.post(IMEvent.MsgDelete.value, dbMsg)
-                    if (dbMsg.fUid == IMCoreManager.uId) {
-                        data.content = dbMsg.content
-                        data.data = dbMsg.data
-                        data.type = dbMsg.type
-                    }
-                    existed = true
+    open fun processRevokeMsg(msg: Message) {
+        val sender = getSenderName(msg)
+        val data = IMRevokeMsgData(sender)
+        var existed = false
+        if (msg.rMsgId != null) {
+            val dbMsg = IMCoreManager.getImDataBase().messageDao()
+                .findByMsgId(msg.rMsgId!!, msg.sid)
+            if (dbMsg != null) {
+                IMCoreManager.getImDataBase().messageDao().delete(listOf(dbMsg))
+                XEventBus.post(IMEvent.MsgDelete.value, dbMsg)
+                if (dbMsg.fUid == IMCoreManager.uId) {
+                    data.content = dbMsg.content
+                    data.data = dbMsg.data
+                    data.type = dbMsg.type
                 }
+                existed = true
             }
+        }
+        if (existed) {
             msg.data = Gson().toJson(data)
             msg.oprStatus = MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
             msg.sendStatus = MsgSendStatus.Success.value
-            if (existed) {
-                IMCoreManager.getImDataBase().messageDao().insertOrIgnore(listOf(msg))
-                XEventBus.post(IMEvent.MsgNew.value, msg)
-                IMCoreManager.messageModule.processSessionByMessage(msg)
-            }
-            return@flatMap Flowable.just(msg)
+            IMCoreManager.getImDataBase().messageDao().insertOrIgnore(listOf(msg))
+            XEventBus.post(IMEvent.MsgNew.value, msg)
+            IMCoreManager.messageModule.processSessionByMessage(msg)
         }
     }
 
-    open fun getNickname(msg: Message): Flowable<String> {
-        if (msg.fUid == IMCoreManager.uId) {
-            return Flowable.just("你")
+    override fun getSenderName(msg: Message): String {
+        return if (msg.fUid == IMCoreManager.uId) {
+            IMCoreManager.app.getString(R.string.yourself)
         } else {
-            return IMCoreManager.userModule.queryUser(msg.fUid)
-                .flatMap {
-                    return@flatMap Flowable.just(it.nickname)
-                }
+            super.getSenderName(msg) ?: ""
         }
     }
 

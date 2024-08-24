@@ -34,6 +34,8 @@
     <string name="im_un_support_msg">[不明なメッセージ]</string>
     <string name="im_video_msg">[ビデオメッセージ]</string>
     <string name="other_side">その他</string>
+    <string name="yourself">あなた</string>
+    <string name="someone_at_me">"[誰か@私]</string>
     <string name="not_support_msg_update_client">サポートされていないメッセージ タイプです。クライアントをアップグレードしてください。</string>
     <string name="copy">コピー</string>
     <string name="delete">削除</string>

@@ -66,7 +66,7 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         if (!message.atUsers.isNullOrBlank()) {
             content = replaceIdToNickname(content, message.getAtUIds())
         }
-        val updated = message.oprStatus.and(MsgOperateStatus.Update.value) > 0
+        val updated = message.oprStatus.and(MsgOperateStatus.Update.value) != 0
         render(content, updated)
     }
 

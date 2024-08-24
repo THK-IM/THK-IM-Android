@@ -34,6 +34,8 @@
     <string name="im_un_support_msg">[未知訊息]</string>
     <string name="im_video_msg">[視訊訊息]</string>
     <string name="other_side">對方</string>
+    <string name="yourself">你</string>
+    <string name="someone_at_me">"[有人@我]</string>
     <string name="not_support_msg_update_client">不支援的訊息類型，請嘗試升級客戶端</string>
     <string name="copy">複製</string>
     <string name="delete">刪除</string>

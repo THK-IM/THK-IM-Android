@@ -574,13 +574,7 @@ open class DefaultMessageModule : MessageModule {
                     var sender: String? = null
                     if (t.type != SessionType.Single.value) {
                         if (msg.fUid > 0) {
-                            val sessionMember = IMCoreManager.db.sessionMemberDao()
-                                .findSessionMember(t.id, msg.fUid)
-                            sender = sessionMember?.noteName
-                            if (sender == null) {
-                                val user = IMCoreManager.db.userDao().findById(msg.fUid)
-                                sender = user?.nickname
-                            }
+                            sender = processor.getSenderName(msg)
                         }
                     }
                     var senderText = ""
@@ -599,6 +593,11 @@ open class DefaultMessageModule : MessageModule {
                         (msg.oprStatus.and(MsgOperateStatus.ServerRead.value) == 0) &&
                         !getMsgProcessor(msg.type).needReprocess(msg)
                     ) {
+                        LLog.d("processSessionByMessage", "notifyNewMessage")
+                        val sessionLog = Gson().toJson(t)
+                        val messageLog = Gson().toJson(msg)
+                        LLog.d("processSessionByMessage", "session: $sessionLog")
+                        LLog.d("processSessionByMessage", "message: $messageLog")
                         notifyNewMessage(t, msg)
                     }
                 }
@@ -621,7 +620,6 @@ open class DefaultMessageModule : MessageModule {
         if (session.status.and(SessionStatus.Silence.value) > 0) {
             return
         }
-        LLog.d("notifyNewMessage ${message.type}")
         AppUtils.instance().notifyNewMessage()
     }
 

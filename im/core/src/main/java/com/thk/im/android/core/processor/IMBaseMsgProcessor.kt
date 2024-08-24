@@ -298,13 +298,17 @@ abstract class IMBaseMsgProcessor {
 
     abstract fun msgDesc(msg: Message): String
 
+    open fun atMeDesc(msg: Message): String {
+        return ""
+    }
+
     open fun sessionDesc(msg: Message): String {
         var desc = ""
         val uIds = msg.getAtUIds()
         for (id in uIds) {
             if (id == IMCoreManager.uId) {
                 if (msg.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) {
-                    desc += "[有人@我]"
+                    desc += atMeDesc(msg)
                 }
                 break
             }
@@ -351,6 +355,21 @@ abstract class IMBaseMsgProcessor {
      */
     open fun reset() {
         disposables.clear()
+    }
+
+    /**
+     * 获取session下用户昵称
+     */
+    open fun getSenderName(msg: Message): String? {
+        var sender: String? = null
+        val sessionMember = IMCoreManager.db.sessionMemberDao()
+            .findSessionMember(msg.sid, msg.fUid)
+        sender = sessionMember?.noteName
+        if (sender == null) {
+            val user = IMCoreManager.db.userDao().findById(msg.fUid)
+            sender = user?.nickname
+        }
+        return sender
     }
 
 }

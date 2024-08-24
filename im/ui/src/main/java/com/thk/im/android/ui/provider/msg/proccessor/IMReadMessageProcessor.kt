@@ -115,11 +115,11 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
             val referMsg =
                 IMCoreManager.getImDataBase().messageDao().findByMsgId(it, msg.sid)
             if (referMsg != null) {
+                referMsg.oprStatus = referMsg.oprStatus.or(MsgOperateStatus.ServerRead.value)
+                    .or(MsgOperateStatus.ClientRead.value)
+                    .or(MsgOperateStatus.Ack.value)
                 if (msg.fUid == IMCoreManager.uId) {
                     // 自己发的已读消息不插入数据库，更新rMsgId的消息状态为服务端已读
-                    referMsg.oprStatus =
-                        MsgOperateStatus.ServerRead.value.or(MsgOperateStatus.ClientRead.value)
-                            .or(MsgOperateStatus.Ack.value)
                     insertOrUpdateDb(referMsg, notify = true, notifySession = false)
                     val session = IMCoreManager.getImDataBase().sessionDao().findById(msg.sid)
                     if (session != null) {

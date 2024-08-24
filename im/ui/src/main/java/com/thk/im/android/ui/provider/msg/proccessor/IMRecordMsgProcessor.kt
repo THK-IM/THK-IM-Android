@@ -16,6 +16,10 @@ class IMRecordMsgProcessor : IMBaseMsgProcessor() {
         return MsgType.Record.value
     }
 
+    override fun atMeDesc(msg: Message): String {
+        return IMCoreManager.app.getString(R.string.someone_at_me)
+    }
+
     override fun received(msg: Message) {
         super.received(msg)
         if (msg.content != null) {

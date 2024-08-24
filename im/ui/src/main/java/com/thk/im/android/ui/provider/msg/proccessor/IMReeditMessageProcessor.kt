@@ -6,7 +6,6 @@ import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
@@ -69,7 +68,6 @@ class IMReeditMessageProcessor : IMBaseMsgProcessor() {
         }
         val reeditMsgData = Gson().fromJson(msg.content!!, IMReeditMsgData::class.java) ?: return
         val success = updateOriginMsg(reeditMsgData)
-        LLog.d("IMReeditMessageProcessor updateOriginMsg $success")
         if (success) {
             if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0 && msg.fUid != IMCoreManager.uId) {
                 IMCoreManager.messageModule.ackMessageToCache(msg)

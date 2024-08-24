@@ -94,7 +94,7 @@ data class Session(
         id, 0, 0, 0, "", null, null, "",
         0, 0, 0, 0, null, 0, null,
         null, 0, 0, 0, 0L,
-        0,0, 0
+        0, 0, 0
     )
 
     @Ignore
@@ -102,7 +102,7 @@ data class Session(
         0, 0, 0, 0, "", null, null, "",
         0, 0, 0, 0, null, 0, null,
         null, 0, 0, 0, 0L,
-        0,0, 0
+        0, 0, 0
     )
 
     @Ignore
@@ -110,7 +110,22 @@ data class Session(
         0, 0, type, entityId, "", null, null, "",
         0, 0, 0, 0, null, 0, null,
         null, 0, 0, 0, 0L,
-        0,0, 0
+        0, 0, 0
     )
+
+    fun mergeServerSession(serverSession: Session) {
+        this.parentId = serverSession.parentId
+        this.entityId = serverSession.entityId
+        this.name = serverSession.name
+        this.noteName = serverSession.noteName
+        this.functionFlag = serverSession.functionFlag
+        this.remark = serverSession.remark
+        this.type = serverSession.type
+        this.role = serverSession.role
+        this.status = serverSession.status
+        this.mute = serverSession.mute
+        this.extData = serverSession.extData
+        this.topTimestamp = serverSession.topTimestamp
+    }
 
 }

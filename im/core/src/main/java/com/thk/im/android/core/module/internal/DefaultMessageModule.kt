@@ -233,17 +233,7 @@ open class DefaultMessageModule : MessageModule {
                         val dbSession = IMCoreManager.db.sessionDao().findById(new.id)
                         // 更新session中的在线数据信息
                         if (dbSession != null) {
-                            dbSession.parentId = new.parentId
-                            dbSession.entityId = new.entityId
-                            dbSession.name = new.name
-                            dbSession.noteName = new.noteName
-                            dbSession.type = new.type
-                            dbSession.remark = new.remark
-                            dbSession.role = new.role
-                            dbSession.status = new.status
-                            dbSession.mute = new.mute
-                            dbSession.extData = new.extData
-                            dbSession.topTimestamp = new.topTimestamp
+                            dbSession.mergeServerSession(new)
                             IMCoreManager.db.sessionDao().update(dbSession)
                         }
                     }

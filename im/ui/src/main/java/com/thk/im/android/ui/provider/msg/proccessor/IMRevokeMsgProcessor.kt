@@ -85,7 +85,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
         return if (msg.fUid == IMCoreManager.uId) {
             IMCoreManager.app.getString(R.string.yourself)
         } else {
-            super.getSenderName(msg) ?: ""
+            super.getSenderName(msg) ?: "xxx"
         }
     }
 

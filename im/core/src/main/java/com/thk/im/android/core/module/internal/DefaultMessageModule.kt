@@ -96,8 +96,9 @@ open class DefaultMessageModule : MessageModule {
         val needProcessMessages = mutableListOf<Message>()
         for (m in messages) {
             if (m.fUid == IMCoreManager.uId) {
-                m.oprStatus =
-                    m.oprStatus or MsgOperateStatus.Ack.value or MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
+                m.oprStatus = m.oprStatus.or(MsgOperateStatus.Ack.value)
+                    .or(MsgOperateStatus.ClientRead.value)
+                    .or(MsgOperateStatus.ServerRead.value)
             }
             m.sendStatus = MsgSendStatus.Success.value
             if (getMsgProcessor(m.type).needReprocess(m)) {
@@ -570,7 +571,23 @@ open class DefaultMessageModule : MessageModule {
                     } else if (msg.sendStatus == MsgSendStatus.SendFailed.value) {
                         statusText = "❗"
                     }
-                    t.lastMsg = "$statusText${processor.sessionDesc(msg)}"
+                    var sender: String? = null
+                    if (t.type != SessionType.Single.value) {
+                        if (msg.fUid > 0) {
+                            val sessionMember = IMCoreManager.db.sessionMemberDao()
+                                .findSessionMember(t.id, msg.fUid)
+                            sender = sessionMember?.noteName
+                            if (sender == null) {
+                                val user = IMCoreManager.db.userDao().findById(msg.fUid)
+                                sender = user?.nickname
+                            }
+                        }
+                    }
+                    var senderText = ""
+                    if (sender != null) {
+                        senderText = "${sender}:"
+                    }
+                    t.lastMsg = "$statusText$senderText${processor.sessionDesc(msg)}"
                     if (t.mTime < msg.cTime) {
                         t.mTime = msg.cTime
                     }

@@ -94,14 +94,6 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
     }
 
     override fun msgDesc(msg: Message): String {
-        return if (msg.data != null) {
-            val revokeData = Gson().fromJson(msg.data!!, IMRevokeMsgData::class.java)
-            return String.format(
-                IMCoreManager.app.getString(R.string.im_revoke_msg),
-                revokeData.nick
-            )
-        } else {
-            ""
-        }
+        return IMCoreManager.app.getString(R.string.im_revoke_msg)
     }
 }

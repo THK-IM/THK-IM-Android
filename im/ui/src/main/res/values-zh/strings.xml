@@ -27,7 +27,7 @@
     <string name="im_image_msg">[图片消息]</string>
     <string name="im_record_msg">[会话记录]</string>
     <string name="im_reedit_msg">[重编辑消息]</string>
-    <string name="im_revoke_msg">[%s撤回了一条消息]</string>
+    <string name="im_revoke_msg">[撤回消息]</string>
     <string name="x_revoke_a_msg">%s撤回了一条消息</string>
     <string name="im_text_msg">[文本消息]</string>
     <string name="edited">[已编辑]</string>

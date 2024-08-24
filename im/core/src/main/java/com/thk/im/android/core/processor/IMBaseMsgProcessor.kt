@@ -365,7 +365,7 @@ abstract class IMBaseMsgProcessor {
         val sessionMember = IMCoreManager.db.sessionMemberDao()
             .findSessionMember(msg.sid, msg.fUid)
         sender = sessionMember?.noteName
-        if (sender == null) {
+        if (sender.isNullOrEmpty()) {
             val user = IMCoreManager.db.userDao().findById(msg.fUid)
             sender = user?.nickname
         }

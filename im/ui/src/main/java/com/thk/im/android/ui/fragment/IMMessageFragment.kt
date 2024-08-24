@@ -84,6 +84,24 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         super.onDestroyView()
         keyboardPopupWindow.dismiss()
         disposables.clear()
+        saveDraft()
+    }
+
+    open fun saveDraft() {
+        val session = session ?: return
+        val content = binding.llInputLayout.getEditText().text.toString()
+        Thread {
+            kotlin.run {
+                if (content != session.draft) {
+                    if (session.draft != null || content.isNotEmpty()) {
+                        IMCoreManager.db.sessionDao().updateDraft(session.id, content)
+                        val updatedSession =
+                            IMCoreManager.db.sessionDao().findById(session.id) ?: return@run
+                        XEventBus.post(IMEvent.SessionUpdate.value, updatedSession)
+                    }
+                }
+            }
+        }.start()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,11 +125,21 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         initEventBus()
         fetchSessionMembers()
         initMsgTipsView()
+
+        session?.draft?.let { draft ->
+            binding.llInputLayout.postDelayed(
+                {
+                    binding.llInputLayout.addInputContent(draft)
+                }, 200
+            )
+        }
+
     }
 
     private fun initMsgTipsView() {
-        val bgColor = IMUIManager.uiResourceProvider?.inputLayoutBgColor() ?:Color.parseColor("#DDDDDD")
-        val textColor = IMUIManager.uiResourceProvider?.tintColor() ?:Color.parseColor("#1390f4")
+        val bgColor =
+            IMUIManager.uiResourceProvider?.inputLayoutBgColor() ?: Color.parseColor("#DDDDDD")
+        val textColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#1390f4")
         binding.tvNewMsgTip.setShape(bgColor, floatArrayOf(6f, 6f, 6f, 6f), false)
         binding.tvNewMsgTip.setTextColor(textColor)
         binding.tvNewMsgTip.text = getString(R.string.new_message_tips)
@@ -135,17 +163,18 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
         }
         Flowable.just(session).flatMap {
-                val unReadAtMeMessages =
-                    IMCoreManager.getImDataBase().messageDao().findSessionAtMeUnreadMessages(it.id)
-                Flowable.just(unReadAtMeMessages)
-            }.compose(RxTransform.flowableToMain()).subscribe(subscriber)
+            val unReadAtMeMessages =
+                IMCoreManager.getImDataBase().messageDao().findSessionAtMeUnreadMessages(it.id)
+            Flowable.just(unReadAtMeMessages)
+        }.compose(RxTransform.flowableToMain()).subscribe(subscriber)
     }
 
     private fun updateAtTipsView() {
         if (atMessages.size <= 0) {
             binding.tvAtMsgTip.visibility = View.GONE
         } else {
-            binding.tvAtMsgTip.text = String.format(getString(R.string.x_message_at_me), atMessages.size)
+            binding.tvAtMsgTip.text =
+                String.format(getString(R.string.x_message_at_me), atMessages.size)
             binding.tvAtMsgTip.visibility = View.VISIBLE
         }
     }
@@ -297,7 +326,11 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         try {
             for (media in result) {
                 if (media.mimeType.startsWith("video", true)) {
-                    if (IMUIManager.uiResourceProvider?.supportFunction(session!!, IMChatFunction.Video.value) == false) {
+                    if (IMUIManager.uiResourceProvider?.supportFunction(
+                            session!!,
+                            IMChatFunction.Video.value
+                        ) == false
+                    ) {
                         showMessage(getString(R.string.do_not_allow_send_video), false)
                         return
                     }
@@ -305,7 +338,11 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                     videoMsgData.path = media.path
                     sendMessage(MsgType.Video.value, null, videoMsgData)
                 } else if (media.mimeType.startsWith("image", true)) {
-                    if (IMUIManager.uiResourceProvider?.supportFunction(session!!, IMChatFunction.Image.value) == false) {
+                    if (IMUIManager.uiResourceProvider?.supportFunction(
+                            session!!,
+                            IMChatFunction.Image.value
+                        ) == false
+                    ) {
                         showMessage(getString(R.string.do_not_allow_send_image), false)
                         return
                     }

@@ -332,9 +332,6 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, entityId, type).flatMap {
                     if (it.id > 0 && it.deleted == 0) {
                         IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
-                        if (session.type == SessionType.SuperGroup.value) {
-                            syncSessionMessage(session)
-                        }
                     }
                     Flowable.just(it)
                 }
@@ -359,9 +356,6 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, sessionId).flatMap {
                     if (it.id > 0 && it.deleted == 0) {
                         IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
-                        if (session.type == SessionType.SuperGroup.value) {
-                            syncSessionMessage(session)
-                        }
                     }
                     Flowable.just(it)
                 }

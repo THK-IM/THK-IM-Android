@@ -315,6 +315,12 @@ open class DefaultMessageModule : MessageModule {
         this.disposes.add(disposable)
     }
 
+    override fun syncSuperGroupMessages(session: Session) {
+        if (session.deleted == 0 && session.id > 0 && session.type == SessionType.SuperGroup.value) {
+            syncSessionMessage(session)
+        }
+    }
+
     override fun getSession(entityId: Long, type: Int): Flowable<Session> {
         return Flowable.create<Session>({
             val session =

@@ -36,6 +36,11 @@ interface MessageModule : BaseModule {
     fun syncSuperGroupMessages()
 
     /**
+     * 同步超级群消息
+     */
+    fun syncSuperGroupMessages(session: Session)
+
+    /**
      * 获取session, 先查本地数据库后查服务端
      */
     fun getSession(entityId: Long, type: Int): Flowable<Session>

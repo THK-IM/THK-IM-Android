@@ -222,7 +222,9 @@ open class DefaultMessageModule : MessageModule {
                 }
                 // 删除掉该删除的session
                 if (needDelSessions.isNotEmpty()) {
-                    IMCoreManager.db.sessionDao().delete(needUpdateSessions)
+                    IMCoreManager.db.sessionDao().delete(needDelSessions)
+                }
+                if (needDelSIds.isNotEmpty()) {
                     IMCoreManager.db.messageDao().deleteBySessionIds(needDelSIds)
                 }
                 if (needDelGroups.isNotEmpty()) {
@@ -328,8 +330,11 @@ open class DefaultMessageModule : MessageModule {
             } else {
                 val uId = IMCoreManager.uId
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, entityId, type).flatMap {
-                    if (it.id > 0) {
+                    if (it.id > 0 && it.deleted == 0) {
                         IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
+                        if (session.type == SessionType.SuperGroup.value) {
+                            syncSessionMessage(session)
+                        }
                     }
                     Flowable.just(it)
                 }
@@ -352,8 +357,11 @@ open class DefaultMessageModule : MessageModule {
             } else {
                 val uId = IMCoreManager.uId
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, sessionId).flatMap {
-                    if (it.id > 0) {
+                    if (it.id > 0 && it.deleted == 0) {
                         IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
+                        if (session.type == SessionType.SuperGroup.value) {
+                            syncSessionMessage(session)
+                        }
                     }
                     Flowable.just(it)
                 }

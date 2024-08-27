@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
@@ -76,7 +75,8 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                     if (!recyclerView.canScrollVertically(-1)) {
                         loadMessages()
                     }
-                    val offset = recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset()
+                    val offset =
+                        recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent() - recyclerView.computeVerticalScrollOffset()
                     if (abs(offset) < 50) {
                         msgSender?.showNewMsgTipsView(true)
                     }
@@ -315,26 +315,23 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgSenderClick(message: Message, position: Int, view: View) {
-        val fromUId = message.fUid
-        if (fromUId > 0 && fromUId != IMCoreManager.uId) {
-            val subscriber = object : BaseSubscriber<User>() {
-                override fun onNext(t: User?) {
-                    t?.let {
-                        IMUIManager.pageRouter?.openUserPage(context, it, session)
-                    }
+        val subscriber = object : BaseSubscriber<User>() {
+            override fun onNext(t: User?) {
+                t?.let {
+                    IMUIManager.pageRouter?.openUserPage(context, it, session)
                 }
-
-                override fun onComplete() {
-                    super.onComplete()
-                    disposables.remove(this)
-                }
-
             }
-            IMCoreManager.userModule.queryUser(fromUId)
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            disposables.add(subscriber)
+
+            override fun onComplete() {
+                super.onComplete()
+                disposables.remove(this)
+            }
+
         }
+        IMCoreManager.userModule.queryUser(message.fUid)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposables.add(subscriber)
     }
 
     override fun onMsgReadStatusClick(message: Message) {

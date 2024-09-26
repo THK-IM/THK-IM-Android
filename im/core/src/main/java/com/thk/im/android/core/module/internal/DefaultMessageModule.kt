@@ -317,7 +317,7 @@ open class DefaultMessageModule : MessageModule {
 
     override fun syncSuperGroupMessages(session: Session) {
         if (session.deleted == 0 && session.id > 0 && session.type == SessionType.SuperGroup.value) {
-            syncSessionMessage(session)
+            this.syncSessionMessage(session)
         }
     }
 

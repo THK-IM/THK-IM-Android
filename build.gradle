@@ -32,7 +32,7 @@ plugins {
 ext {
     def version_emoji2 = "1.4.0"
     def version_room = "2.5.0"
-    def version_exoplayer = "1.1.1"
+    def version_exoplayer = "1.4.1"
     android = [applicationId    : "com.thk.im.android",
                compileSdkVersion: 34,
                minSdkVersion    : 21,

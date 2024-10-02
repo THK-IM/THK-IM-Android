@@ -39,4 +39,12 @@ data class Contact(
     @SerializedName("m_time")
     @ColumnInfo(name = "m_time")
     var mTime: Long,
-) : Parcelable
+) : Parcelable {
+
+    companion object {
+        fun newContact() : Contact {
+            return Contact(0L, 0L, "", 0, "", 0, 0)
+        }
+    }
+
+}

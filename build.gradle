@@ -58,6 +58,7 @@ ext {
                     "permission"                       : "com.github.getActivity:XXPermissions:18.3",
                     "glide"                            : "com.github.bumptech.glide:glide:4.16.0",
                     "glide-gifencoder-integration"     : 'com.github.bumptech.glide:gifencoder-integration:4.16.0',
+                    "glide-compile"                    : 'com.github.bumptech.glide:compiler:4.9.0'
                     "android-gif-drawable"             : "pl.droidsonroids.gif:android-gif-drawable:1.2.28",
                     "pictureselector"                  : "io.github.lucksiege:pictureselector:v3.11.1",
                     "pictureselector-compress"         : "io.github.lucksiege:compress:v3.11.1",

@@ -60,6 +60,8 @@ dependencies {
     implementation rootProject.ext.dependencies["glide"]
     implementation rootProject.ext.dependencies["glide-gifencoder-integration"]
     implementation rootProject.ext.dependencies["android-gif-drawable"]
+    kapt rootProject.ext.dependencies['glide-compile']
+    kapt 'androidx.annotation:annotation:1.0.0'
 
     implementation rootProject.ext.dependencies["rxjava"]
     implementation rootProject.ext.dependencies["rxandroid"]

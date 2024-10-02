@@ -7,6 +7,7 @@
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/vp_media_preview"
+        android:overScrollMode="never"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

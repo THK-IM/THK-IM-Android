@@ -1,9 +1,17 @@
 package com.thk.im.android.core.base
 
+import android.content.Context
 import android.content.res.Resources
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.thk.im.android.core.base.utils.CompressUtils
+import io.reactivex.Flowable
+import io.reactivex.subscribers.DisposableSubscriber
 import java.io.File
 
 object IMImageLoader {
@@ -24,6 +32,65 @@ object IMImageLoader {
 
     fun displayImageUrl(imageView: ImageView, url: String) {
         Glide.with(imageView.context.applicationContext).load(url).into(imageView)
+    }
+
+    fun preloadFile(
+        imageView: ImageView,
+        url: String,
+        listener: (file: File?, e: Exception?) -> Unit
+    ) {
+        Glide.with(imageView.context).asFile().load(url)
+            .addListener(object : RequestListener<File> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<File>,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    listener(null, e)
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: File,
+                    model: Any,
+                    target: Target<File>?,
+                    dataSource: DataSource,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    listener(resource, null)
+                    return true
+                }
+            }).preload()
+    }
+
+    fun isCacheExisted(ctx: Context, url: String, listener: (existed: Boolean) -> Unit) {
+
+        Flowable.just(false).flatMap {
+            val file: File? = try {
+                Glide.with(ctx).downloadOnly().load(url)
+                    .apply(RequestOptions().onlyRetrieveFromCache(true)).submit().get()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+            Flowable.just((file != null))
+        }.compose(RxTransform.flowableToMain())
+            .subscribe(object : DisposableSubscriber<Boolean>() {
+                override fun onNext(t: Boolean?) {
+                    t?.let {
+                        listener.invoke(it)
+                    }
+                }
+
+                override fun onError(t: Throwable?) {
+                    dispose()
+                }
+
+                override fun onComplete() {
+                    dispose()
+                }
+            })
     }
 
 

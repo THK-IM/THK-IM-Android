@@ -1,6 +1,5 @@
 package com.thk.im.android.core.glide
 
-import com.thk.im.android.core.base.LLog
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import okio.Buffer

@@ -657,6 +657,16 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap queryLastSessionMember(sessionId, count)
             } else {
                 val sessionMembers = IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
+                val memberCount =
+                    IMCoreManager.db.sessionMemberDao().findSessionMemberCount(sessionId)
+                val session = IMCoreManager.db.sessionDao().findById(sessionId)
+                session?.let { s ->
+                    if (s.memberCount != memberCount) {
+                        s.memberCount = memberCount
+                        IMCoreManager.db.sessionDao().update(s)
+                        XEventBus.post(IMEvent.SessionUpdate.value, s)
+                    }
+                }
                 return@flatMap Flowable.just(sessionMembers)
             }
         }

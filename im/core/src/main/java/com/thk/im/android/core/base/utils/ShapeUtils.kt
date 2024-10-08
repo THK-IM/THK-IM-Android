@@ -54,7 +54,7 @@ object ShapeUtils {
         radiusBg.shape = GradientDrawable.RECTANGLE
         //设置填充颜色
         radiusBg.colors = intArrayOf(startColor, endColor)
-        radiusBg.orientation = GradientDrawable.Orientation.LEFT_RIGHT
+        radiusBg.orientation = Orientation.LEFT_RIGHT
         //设置线条粗心和颜色,px
         radiusBg.setStroke(strokeWidth, Color.TRANSPARENT)
         //每连续的两个数值表示是一个角度,四组:左上,右上,右下,左下

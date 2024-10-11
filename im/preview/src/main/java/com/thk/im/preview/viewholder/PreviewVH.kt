@@ -2,6 +2,7 @@ package com.thk.im.preview.viewholder
 
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
+import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
 import com.thk.im.preview.player.THKVideoPlayerView
@@ -18,11 +19,9 @@ open class PreviewVH(liftOwner: LifecycleOwner, itemView: View) :
 
     }
 
-    open fun hide() {
-    }
+    open fun hide() {}
 
-    open fun show() {
+    open fun show() {}
 
-
-    }
+    open fun onIMLoadProgress(progress: IMLoadProgress) {}
 }

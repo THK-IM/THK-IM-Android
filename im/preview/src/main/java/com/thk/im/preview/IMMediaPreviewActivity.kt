@@ -23,6 +23,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
+import com.thk.im.android.core.IMLoadProgress
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
@@ -166,6 +167,14 @@ class IMMediaPreviewActivity : AppCompatActivity() {
         }
     }
 
+    private fun onItemLoadUpdate(loadProgress: IMLoadProgress) {
+        val recyclerView = binding.vpMediaPreview.getChildAt(0) as? RecyclerView ?: return
+        for (i in 0 until adapter.itemCount) {
+            val itemVH = recyclerView.findViewHolderForLayoutPosition(i) ?: continue
+            (itemVH as? PreviewVH)?.onIMLoadProgress(loadProgress)
+        }
+    }
+
     private fun findPosition(id: Long): Int {
         val messages = adapter.getMessages()
         for (i in messages.indices) {
@@ -196,6 +205,10 @@ class IMMediaPreviewActivity : AppCompatActivity() {
 
         XEventBus.observe(this, ExitPreviewEvent, Observer<String> {
             exit()
+        })
+
+        XEventBus.observe(this, IMEvent.MsgLoadStatusUpdate.value, Observer<IMLoadProgress> {
+            onItemLoadUpdate(it)
         })
     }
 

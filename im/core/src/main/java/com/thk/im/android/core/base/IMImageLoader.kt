@@ -64,8 +64,7 @@ object IMImageLoader {
             }).preload()
     }
 
-    fun isCacheExisted(ctx: Context, url: String, listener: (existed: Boolean) -> Unit) {
-
+    fun isCacheExisted(ctx: Context, url: String, listener: (path: String?) -> Unit) {
         Flowable.just(false).flatMap {
             val file: File? = try {
                 Glide.with(ctx).downloadOnly().load(url)
@@ -74,17 +73,16 @@ object IMImageLoader {
                 e.printStackTrace()
                 null
             }
-            Flowable.just((file != null))
+            Flowable.just((file?.absolutePath))
         }.compose(RxTransform.flowableToMain())
-            .subscribe(object : DisposableSubscriber<Boolean>() {
-                override fun onNext(t: Boolean?) {
-                    t?.let {
-                        listener.invoke(it)
-                    }
+            .subscribe(object : DisposableSubscriber<String?>() {
+                override fun onNext(t: String?) {
+                    listener.invoke(t)
                 }
 
                 override fun onError(t: Throwable?) {
                     dispose()
+                    listener.invoke(null)
                 }
 
                 override fun onComplete() {

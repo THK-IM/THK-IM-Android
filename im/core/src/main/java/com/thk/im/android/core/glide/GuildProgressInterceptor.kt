@@ -7,8 +7,8 @@ import okhttp3.Response
 import java.io.IOException
 import java.lang.ref.WeakReference
 
-
 class GuildProgressInterceptor : Interceptor {
+
     @Throws(IOException::class)
     override fun intercept(chain: Chain): Response {
         val request: Request = chain.request()
@@ -22,8 +22,7 @@ class GuildProgressInterceptor : Interceptor {
 
     companion object {
 
-        val LISTENER_MAP: MutableMap<String, WeakReference<GlideProgressListener>> =
-            HashMap<String, WeakReference<GlideProgressListener>>()
+        val LISTENER_MAP: MutableMap<String, WeakReference<GlideProgressListener>> = HashMap()
 
         fun addListener(url: String, listener: GlideProgressListener) {
             LISTENER_MAP[url] = WeakReference(listener)

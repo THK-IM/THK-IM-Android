@@ -1,5 +1,6 @@
 package com.thk.im.android.core.glide
 
+import android.util.Log
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import okio.Buffer
@@ -28,24 +29,22 @@ class ProgressResponseBody(private val url: String, private val responseBody: Re
     private inner class ProgressSource(source: Source) : ForwardingSource(source) {
 
         var totalBytesRead: Long = 0
-        var currentProgress: Int = 0
+        var progress = 0
 
         @Throws(IOException::class)
         override fun read(sink: Buffer, byteCount: Long): Long {
             val bytesRead = super.read(sink, byteCount)
-            val fullLength = responseBody.contentLength()
-            if (bytesRead == -1L) {
-                totalBytesRead = fullLength
-            } else {
+            if (bytesRead > 0 ) {
+                val fullLength = responseBody.contentLength()
                 totalBytesRead += bytesRead
-            }
-            val progress = (100f * totalBytesRead / fullLength).toInt()
-            GuildProgressInterceptor.LISTENER_MAP[url]?.get()?.let {
-                if (progress != currentProgress) {
-                    it.onLoadProgress(url, progress == 100, progress)
+                val progress = (100 * totalBytesRead / fullLength).toInt()
+                if (this.progress != progress) {
+                    this.progress = progress
+                    val listener = GuildProgressInterceptor.LISTENER_MAP[url]?.get()
+                    Log.v("LoadProgress", "${url} ${totalBytesRead} ${fullLength} ${progress} ${listener==null}")
+                    listener?.onLoadProgress(url, progress == 100, progress)
                 }
             }
-            currentProgress = progress
             return bytesRead
         }
     }

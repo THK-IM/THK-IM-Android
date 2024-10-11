@@ -326,14 +326,14 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         try {
             for (media in result) {
                 if (media.mimeType.startsWith("video", true)) {
-                    if (IMUIManager.uiResourceProvider?.supportFunction(
-                            session!!,
-                            IMChatFunction.Video.value
-                        ) == false
-                    ) {
-                        showMessage(getString(R.string.do_not_allow_send_video), false)
-                        return
-                    }
+//                    if (IMUIManager.uiResourceProvider?.supportFunction(
+//                            session!!,
+//                            IMChatFunction.Video.value
+//                        ) == false
+//                    ) {
+//                        showMessage(getString(R.string.do_not_allow_send_video), false)
+//                        return
+//                    }
                     val videoMsgData = IMVideoMsgData()
                     videoMsgData.path = media.path
                     sendMessage(MsgType.Video.value, null, videoMsgData)

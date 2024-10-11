@@ -60,19 +60,6 @@ class MessagePreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: L
         holder.onViewDetached()
     }
 
-    fun onPageSelected(position: Int, recyclerView: RecyclerView) {
-        for (i in 0 until messages.size) {
-            val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)
-            viewHolder?.let {
-                if (position == i) {
-                    (viewHolder as PreviewVH).startPreview()
-                } else {
-                    (viewHolder as PreviewVH).stopPreview()
-                }
-            }
-        }
-    }
-
     fun hideChildren(currentItem: Int, recyclerView: RecyclerView) {
         for (i in 0 until messages.size) {
             val viewHolder = recyclerView.findViewHolderForLayoutPosition(i)

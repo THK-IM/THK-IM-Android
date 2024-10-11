@@ -31,13 +31,19 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.preview.databinding.ActivityMediaPreviewBinding
 import com.thk.im.preview.adapter.MessagePreviewAdapter
+import com.thk.im.preview.player.THKVideoPlayerView
 import com.thk.im.preview.view.VideoPlayerView
 import com.thk.im.preview.view.ZoomableImageView
+import com.thk.im.preview.viewholder.PreviewVH
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import kotlin.math.abs
 
 class IMMediaPreviewActivity : AppCompatActivity() {
+
+    val videoPlayer by lazy {
+        THKVideoPlayerView(this)
+    }
 
     private lateinit var binding: ActivityMediaPreviewBinding
     private lateinit var adapter: MessagePreviewAdapter
@@ -107,6 +113,22 @@ class IMMediaPreviewActivity : AppCompatActivity() {
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        videoPlayer.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        videoPlayer.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        videoPlayer.onDestroy()
+        compositeDisposable.clear()
+    }
+
     private fun initView() {
         binding.vpMediaPreview.adapter = adapter
         binding.vpMediaPreview.offscreenPageLimit = 1
@@ -120,14 +142,28 @@ class IMMediaPreviewActivity : AppCompatActivity() {
 
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                val recyclerView = binding.vpMediaPreview.getChildAt(0) as RecyclerView
-                adapter.onPageSelected(position, recyclerView)
+                onItemShow(position)
                 onPreviewPageSelected(position)
             }
         })
 
-        binding.vpMediaPreview.setCurrentItem(findPosition(defaultId), false)
+        val defaultPos = findPosition(defaultId)
+        binding.vpMediaPreview.setCurrentItem(defaultPos, false)
+        val recyclerView = binding.vpMediaPreview.getChildAt(0) as? RecyclerView ?: return
+        recyclerView.overScrollMode = View.OVER_SCROLL_NEVER
+        binding.vpMediaPreview.postDelayed({
+            onItemShow(defaultPos)
+        }, 500)
+    }
 
+    private fun onItemShow(position: Int) {
+        val recyclerView = binding.vpMediaPreview.getChildAt(0) as? RecyclerView ?: return
+        for (i in 0 until adapter.itemCount) {
+            val itemVH = recyclerView.findViewHolderForLayoutPosition(position) ?: continue
+            if (i == position) {
+                (itemVH as? PreviewVH)?.startPreview(videoPlayer)
+            }
+        }
     }
 
     private fun findPosition(id: Long): Int {
@@ -396,10 +432,5 @@ class IMMediaPreviewActivity : AppCompatActivity() {
         } else {
             overridePendingTransition(0, 0)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.clear()
     }
 }

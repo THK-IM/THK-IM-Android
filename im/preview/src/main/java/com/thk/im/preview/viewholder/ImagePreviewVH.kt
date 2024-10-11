@@ -11,6 +11,7 @@ import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.preview.R
 import com.thk.im.android.ui.manager.IMImageMsgData
 import com.thk.im.preview.ExitPreviewEvent
+import com.thk.im.preview.player.THKVideoPlayerView
 import com.thk.im.preview.view.ZoomableImageView
 
 class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
@@ -26,12 +27,7 @@ class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
 
     override fun bindMessage(message: Message) {
         super.bindMessage(message)
-        startPreview()
-    }
-
-    override fun startPreview() {
-        super.startPreview()
-        message?.let {
+        this.message?.let {
             if (it.data != null) {
                 val data = Gson().fromJson(it.data, IMImageMsgData::class.java)
                 if (data.path != null) {
@@ -53,13 +49,7 @@ class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
         }
     }
 
-    override fun stopPreview() {
-        super.stopPreview()
-        iVMedia.reset()
-    }
-
-    override fun onViewRecycled() {
-        super.onViewRecycled()
-        stopPreview()
+    override fun startPreview(playerView: THKVideoPlayerView) {
+        playerView.stopPlay()
     }
 }

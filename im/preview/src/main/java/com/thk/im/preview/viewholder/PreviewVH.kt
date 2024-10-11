@@ -4,6 +4,7 @@ import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
+import com.thk.im.preview.player.THKVideoPlayerView
 
 open class PreviewVH(liftOwner: LifecycleOwner, itemView: View) :
     IMBaseVH(liftOwner, itemView) {
@@ -13,11 +14,7 @@ open class PreviewVH(liftOwner: LifecycleOwner, itemView: View) :
         this.message = message
     }
 
-    open fun startPreview() {
-
-    }
-
-    open fun stopPreview() {
+    open fun startPreview(playerView: THKVideoPlayerView) {
 
     }
 
@@ -26,6 +23,6 @@ open class PreviewVH(liftOwner: LifecycleOwner, itemView: View) :
 
     open fun show() {
 
-    }
 
+    }
 }

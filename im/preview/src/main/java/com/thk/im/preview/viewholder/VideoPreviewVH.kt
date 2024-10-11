@@ -6,34 +6,43 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.lifecycle.LifecycleOwner
 import com.danikula.videocache.CacheListener
 import com.google.gson.Gson
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.IMFileFormat
+import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.IMFileFormat
-import com.thk.im.android.core.IMMsgResourceType
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.preview.R
 import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
 import com.thk.im.preview.VideoCache
-import com.thk.im.preview.view.VideoPlayerView
+import com.thk.im.preview.player.THKVideoPlayerView
 import io.reactivex.Flowable
 import java.io.File
 
 
 class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
     PreviewVH(liftOwner, itemView), CacheListener {
-    private val pvVideo = itemView.findViewById<VideoPlayerView>(R.id.pv_video)
-    private val lyCover = itemView.findViewById<RelativeLayout>(R.id.ly_cover)
-    private val ivCover = itemView.findViewById<AppCompatImageView>(R.id.iv_cover)
-    private val ivPlay = itemView.findViewById<AppCompatImageView>(R.id.iv_play)
+
+    private val lyVideoParent = itemView.findViewById<RelativeLayout>(R.id.ly_video_parent)
+    private val ivCover = itemView.findViewById<AppCompatImageView>(R.id.iv_image)
 
     override fun bindMessage(message: Message) {
         super.bindMessage(message)
-        pvVideo.visibility = View.GONE
-        startPreview()
+        this.message?.let {
+            if (it.data != null) {
+                val data = Gson().fromJson(it.data, IMVideoMsgData::class.java)
+                if (data != null) {
+                    if (data.thumbnailPath != null) {
+                        IMImageLoader.displayImageByPath(ivCover, data.thumbnailPath!!)
+                    } else {
+                        downloadCover()
+                    }
+                }
+            }
+        }
     }
 
     private fun downloadCover() {
@@ -52,38 +61,19 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
         }
     }
 
-    override fun startPreview() {
-        super.startPreview()
-        message?.let {
-            if (it.data != null) {
-                val data = Gson().fromJson(it.data, IMVideoMsgData::class.java)
-                if (data?.thumbnailPath != null) {
-                    IMImageLoader.displayImageByPath(ivCover, data.thumbnailPath!!)
-                } else {
-                    downloadCover()
-                }
-            }
-            pvVideo.visibility = View.GONE
-            lyCover.visibility = View.VISIBLE
-            ivPlay.setOnClickListener {
-                loadVideo()
-                lyCover.visibility = View.GONE
-            }
-        }
-    }
-
-    private fun loadVideo() {
-        pvVideo.visibility = View.VISIBLE
+    override fun startPreview(playerView: THKVideoPlayerView) {
         message?.let {
             var played = false
+            playerView.hideControllers(false)
+            playerView.attachToParent(lyVideoParent)
             if (it.data != null) {
                 val data = Gson().fromJson(it.data, IMVideoMsgData::class.java)
                 if (data?.path != null) {
                     played = true
-                    pvVideo.initPlay(data.path!!)
-                    pvVideo.play()
+                    playerView.playWithUrl(data.path!!)
                 }
             }
+
             if (!played) {
                 if (it.content != null) {
                     val body = Gson().fromJson(it.content, IMVideoMsgBody::class.java)
@@ -92,12 +82,10 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                         val cachePath = VideoCache.getCachePath(realUrl)
                         if (cachePath == null) {
                             VideoCache.registerCacheListener(this, realUrl)
-                            pvVideo.initPlay(realUrl)
-                            pvVideo.play()
+                            playerView.playWithUrl(realUrl)
                         } else {
                             updateDb(it, File(cachePath), realUrl)
-                            pvVideo.initPlay(cachePath)
-                            pvVideo.play()
+                            playerView.playWithUrl(cachePath)
                         }
                     }
                 }
@@ -113,28 +101,6 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
         return realUrl
     }
 
-    override fun stopPreview() {
-        super.stopPreview()
-        VideoCache.unregister(this)
-        pvVideo.releasePlay()
-        lyCover.visibility = View.VISIBLE
-        pvVideo.visibility = View.GONE
-    }
-
-    override fun hide() {
-        super.hide()
-        pvVideo.visibility = View.GONE
-    }
-
-    override fun show() {
-        super.show()
-        pvVideo.visibility = View.VISIBLE
-    }
-
-    override fun onViewRecycled() {
-        super.onViewRecycled()
-        stopPreview()
-    }
 
     override fun onCacheAvailable(cacheFile: File?, url: String?, percentsAvailable: Int) {
         LLog.d("onCacheAvailable $percentsAvailable")

@@ -139,9 +139,8 @@
     <RelativeLayout
         android:id="@+id/layout_reply"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:paddingHorizontal="10dp"
-        android:paddingVertical="2dp"
+        android:layout_height="60dp"
+        android:paddingHorizontal="12dp"
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -151,7 +150,8 @@
         <View
             android:id="@+id/v_reply_line"
             android:layout_width="4dp"
-            android:layout_alignParentLeft="true"
+            android:layout_marginVertical="4dp"
+            android:layout_alignParentStart="true"
             android:layout_height="match_parent" />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -175,20 +175,21 @@
                 android:id="@+id/tv_reply_user_nick"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:layout_marginVertical="4dp"
                 android:textAlignment="textStart"
-                android:textSize="12sp"
-                android:textColor="#ff999999"
+                android:textSize="14sp"
+                android:textColor="#333333"
                 />
             <androidx.emoji2.widget.EmojiTextView
                 android:id="@+id/tv_reply_content"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="textStart"
-                android:textSize="12sp"
-                android:singleLine="true"
+                android:layout_height="match_parent"
+                android:gravity="left|center_vertical"
+                android:textSize="14sp"
+                android:maxLines="2"
                 android:ellipsize="end"
-                android:textColor="#ff999999"
-                android:layout_marginTop="2dp"
+                android:textColor="#666666"
                 />
         </LinearLayout>
 

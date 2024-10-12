@@ -1,6 +1,5 @@
 package com.thk.im.preview.viewholder
 
-import android.text.TextUtils
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
@@ -35,16 +34,21 @@ class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
         message?.let {
             val body = Gson().fromJson(it.content, IMImageMsgBody::class.java)
             if (body.url == progress.url) {
-                if (progress.progress < 100) {
+                if (progress.state == FileLoadState.Success.value) {
+                    progressView.visibility = View.GONE
+                    IMImageLoader.displayImageByPath(ivImage, progress.path)
+                    val data = Gson().fromJson(it.data, IMImageMsgData::class.java) ?: IMImageMsgData()
+                    data.height = body.height
+                    data.width = body.width
+                    data.path = progress.path
+                    it.data = Gson().toJson(data)
+                } else if (progress.state == FileLoadState.Ing.value
+                    || (progress.state == FileLoadState.Init.value)
+                ) {
                     progressView.setProgress(progress.progress)
                     progressView.visibility = View.VISIBLE
                 } else {
                     progressView.visibility = View.GONE
-                }
-                if (progress.state == FileLoadState.Success.value) {
-                    if (!TextUtils.isEmpty(progress.path)) {
-                        IMImageLoader.displayImageByPath(ivImage, progress.path)
-                    }
                 }
 
             }
@@ -64,7 +68,7 @@ class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                     }
                     downloadOriginImage()
                 }
-            } else  {
+            } else {
                 downloadOriginImage()
             }
         }

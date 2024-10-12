@@ -14,8 +14,7 @@ import com.thk.im.preview.viewholder.VideoPreviewVH
 class MessagePreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: List<Message>) :
     RecyclerView.Adapter<PreviewVH>() {
 
-
-    private val messages = mutableListOf<Message>()
+    val messages = mutableListOf<Message>()
 
     init {
         messages.addAll(items)
@@ -82,14 +81,9 @@ class MessagePreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: L
         }
     }
 
-    fun updateMessage(message: Message) {
-        for (i in 0 until messages.size) {
-            if (messages[i].id == message.id) {
-                messages[i] = message
-                notifyItemChanged(i)
-                break
-            }
-        }
+    fun updateMessage(message: Message, index: Int) {
+        messages[index] = message
+        notifyItemChanged(index)
     }
 
     fun getMessage(position: Int): Message? {
@@ -107,9 +101,5 @@ class MessagePreviewAdapter(private val lifecycleOwner: LifecycleOwner, items: L
         }
         this.messages.addAll(pos, messages)
         notifyItemRangeInserted(pos, messages.size)
-    }
-
-    fun getMessages(): List<Message> {
-        return this.messages
     }
 }

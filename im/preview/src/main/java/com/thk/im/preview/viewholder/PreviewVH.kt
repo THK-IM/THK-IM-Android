@@ -15,9 +15,7 @@ open class PreviewVH(liftOwner: LifecycleOwner, itemView: View) :
         this.message = message
     }
 
-    open fun startPreview(playerView: THKVideoPlayerView) {
-
-    }
+    open fun startPreview(playerView: THKVideoPlayerView) {}
 
     open fun hide() {}
 

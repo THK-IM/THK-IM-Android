@@ -10,7 +10,7 @@ import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class IMMsgReplyOperator: IMMessageOperator() {
+class IMMsgReplyOperator : IMMessageOperator() {
     override fun id(): String {
         return "Reply"
     }
@@ -34,7 +34,10 @@ class IMMsgReplyOperator: IMMessageOperator() {
         if (message.fUid == 0L) {
             return false
         }
-        return IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Image.value)
+        return IMUIManager.uiResourceProvider?.supportFunction(
+            session,
+            IMChatFunction.BaseInput.value
+        )
             ?: true
     }
 }

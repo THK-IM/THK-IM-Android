@@ -13,7 +13,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMReeditMsgData
 import io.reactivex.Flowable
 
-class IMReeditMessageProcessor : IMBaseMsgProcessor() {
+open class IMReeditMessageProcessor : IMBaseMsgProcessor() {
     override fun messageType(): Int {
         return MsgType.Reedit.value
     }

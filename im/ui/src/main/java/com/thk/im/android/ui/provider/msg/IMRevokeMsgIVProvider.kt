@@ -12,7 +12,7 @@ import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMRevokeMsgView
 import com.thk.im.android.ui.provider.msg.viewholder.IMRevokeMsgVH
 
-class IMRevokeMsgIVProvider : IMBaseMessageIVProvider() {
+open class IMRevokeMsgIVProvider : IMBaseMessageIVProvider() {
 
     override fun messageType(): Int {
         return MsgType.Revoke.value

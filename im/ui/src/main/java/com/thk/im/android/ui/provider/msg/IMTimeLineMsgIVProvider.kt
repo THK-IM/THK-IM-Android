@@ -10,7 +10,7 @@ import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMTimeLineMsgView
 import com.thk.im.android.ui.provider.msg.viewholder.IMTimeLineMsgVH
 
-class IMTimeLineMsgIVProvider : IMBaseMessageIVProvider() {
+open class IMTimeLineMsgIVProvider : IMBaseMessageIVProvider() {
 
     override fun messageType(): Int {
         return MsgType.TimeLine.value

@@ -10,7 +10,7 @@ import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMTextMsgView
 import com.thk.im.android.ui.provider.msg.viewholder.IMTextMsgVH
 
-class IMTextMsgIVProvider : IMBaseMessageIVProvider() {
+open class IMTextMsgIVProvider : IMBaseMessageIVProvider() {
 
     override fun messageType(): Int {
         return MsgType.Text.value

@@ -586,6 +586,12 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         ToastUtils.show(text)
     }
 
+    override fun showError(throwable: Throwable) {
+        throwable.message?.let {
+            showToast(it)
+        }
+    }
+
     override fun showMessage(text: String, success: Boolean) {
         dismissLoading()
         activity?.let {

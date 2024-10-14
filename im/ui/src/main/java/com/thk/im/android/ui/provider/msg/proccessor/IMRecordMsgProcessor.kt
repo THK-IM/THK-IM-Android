@@ -11,7 +11,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.manager.IMRecordMsgBody
 import io.reactivex.Flowable
 
-class IMRecordMsgProcessor : IMBaseMsgProcessor() {
+open class IMRecordMsgProcessor : IMBaseMsgProcessor() {
     override fun messageType(): Int {
         return MsgType.Record.value
     }

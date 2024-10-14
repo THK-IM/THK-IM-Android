@@ -10,7 +10,7 @@ import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMAudioMsgView
 import com.thk.im.android.ui.provider.msg.viewholder.IMAudioMsgVH
 
-class IMAudioMsgIVProvider : IMBaseMessageIVProvider() {
+open class IMAudioMsgIVProvider : IMBaseMessageIVProvider() {
 
     override fun messageType(): Int {
         return MsgType.Audio.value

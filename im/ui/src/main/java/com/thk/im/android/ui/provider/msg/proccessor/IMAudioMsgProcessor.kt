@@ -23,7 +23,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.FileNotFoundException
 
-class IMAudioMsgProcessor : IMBaseMsgProcessor() {
+open class IMAudioMsgProcessor : IMBaseMsgProcessor() {
 
     override fun messageType(): Int {
         return MsgType.Audio.value

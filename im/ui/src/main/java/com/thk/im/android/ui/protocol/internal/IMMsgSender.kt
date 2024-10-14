@@ -8,6 +8,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import io.reactivex.Flowable
+import java.lang.Error
 
 interface IMMsgSender {
 
@@ -88,6 +89,9 @@ interface IMMsgSender {
 
     /// 显示toast
     fun showToast(text: String)
+
+    /// 显示错误
+    fun showError(throwable: Throwable)
 
     /// show message
     fun showMessage(text: String, success: Boolean)

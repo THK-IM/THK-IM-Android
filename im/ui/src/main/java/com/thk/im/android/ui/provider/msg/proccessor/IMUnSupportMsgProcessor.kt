@@ -6,7 +6,7 @@ import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.processor.IMBaseMsgProcessor
 import com.thk.im.android.ui.R
 
-class IMUnSupportMsgProcessor : IMBaseMsgProcessor() {
+open class IMUnSupportMsgProcessor : IMBaseMsgProcessor() {
 
     override fun messageType(): Int {
         return MsgType.UnSupport.value

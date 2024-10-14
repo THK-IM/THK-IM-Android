@@ -23,7 +23,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.FileNotFoundException
 
-class IMImageMsgProcessor : IMBaseMsgProcessor() {
+open class IMImageMsgProcessor : IMBaseMsgProcessor() {
 
     override fun messageType(): Int {
         return MsgType.Image.value

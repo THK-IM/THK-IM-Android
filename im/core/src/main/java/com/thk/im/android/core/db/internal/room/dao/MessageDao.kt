@@ -129,6 +129,9 @@ internal interface MessageDao {
         oprStatus: Int = MsgOperateStatus.ClientRead.value
     ): List<Message>
 
+    @Query("select * from message where type = :msgType order by c_time desc limit :offset, :count ")
+    fun findLatestMessagesByType(msgType: Int, offset: Int, count: Int): List<Message>
+
     @Query("select * from message where session_id = :sid and type = :type and content like :keyword order by m_time desc limit :offset, :count")
     fun search(sid: Long, type: Int, keyword: String, count: Int, offset: Int): List<Message>
 

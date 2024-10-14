@@ -10,7 +10,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.utils.AtStringUtils
 
 
-class IMTextMsgProcessor : IMBaseMsgProcessor() {
+open class IMTextMsgProcessor : IMBaseMsgProcessor() {
 
     override fun messageType(): Int {
         return MsgType.Text.value

@@ -10,7 +10,7 @@ import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMUnSupportMsgView
 import com.thk.im.android.ui.provider.msg.viewholder.IMUnSupportMsgVH
 
-class IMUnSupportMsgIVProvider : IMBaseMessageIVProvider() {
+open class IMUnSupportMsgIVProvider : IMBaseMessageIVProvider() {
 
     override fun messageType(): Int {
         return MsgType.UnSupport.value

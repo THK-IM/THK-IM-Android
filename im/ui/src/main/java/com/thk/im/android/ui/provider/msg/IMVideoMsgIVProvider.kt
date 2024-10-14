@@ -10,7 +10,7 @@ import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMVideoMsgView
 import com.thk.im.android.ui.provider.msg.viewholder.IMVideoMsgVH
 
-class IMVideoMsgIVProvider : IMBaseMessageIVProvider() {
+open class IMVideoMsgIVProvider : IMBaseMessageIVProvider() {
 
     override fun messageType(): Int {
         return MsgType.Video.value

@@ -129,6 +129,7 @@ class DownloadTask(
     }
 
     override fun cancel() {
+        running.set(false)
         call?.let {
             if (!it.isCanceled()) {
                 it.cancel()

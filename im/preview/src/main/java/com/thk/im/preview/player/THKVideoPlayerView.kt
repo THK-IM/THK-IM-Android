@@ -23,7 +23,6 @@ class THKVideoPlayerView : RelativeLayout {
     private val binding: LayoutVideoPlayerBinding
 
     private var attached = false
-    private var lastVolume = 0.0f
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -46,8 +45,8 @@ class THKVideoPlayerView : RelativeLayout {
         binding.playerView.player?.playWhenReady = true
         binding.playerView.useController = false
         binding.playerView.setBackgroundColor(Color.BLACK)
-        lastVolume = binding.playerView.player?.volume ?: 0.0f
-        binding.bottomController.setMuted(lastVolume == 0f)
+        binding.playerView.player?.volume = 0f
+        binding.bottomController.setMuted(true)
     }
 
     private fun setupEvent() {
@@ -85,10 +84,9 @@ class THKVideoPlayerView : RelativeLayout {
             if (it.id == R.id.iv_mute) {
                 it.isSelected = !it.isSelected
                 if (it.isSelected) {
-                    lastVolume = binding.playerView.player?.volume ?: 0.0f
                     binding.playerView.player?.volume = 0f
                 } else {
-                    binding.playerView.player?.volume = lastVolume
+                    binding.playerView.player?.volume = 1f
                 }
             } else if (it.id == R.id.iv_play_pause) {
                 it.isSelected = !it.isSelected

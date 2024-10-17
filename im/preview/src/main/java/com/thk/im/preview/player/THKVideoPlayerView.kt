@@ -49,6 +49,11 @@ class THKVideoPlayerView : RelativeLayout {
         binding.bottomController.setMuted(true)
     }
 
+    fun setVolume(volume: Float) {
+        binding.playerView.player?.volume = volume
+        binding.bottomController.setMuted(volume <= 0f)
+    }
+
     private fun setupEvent() {
         binding.playerView.player?.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {

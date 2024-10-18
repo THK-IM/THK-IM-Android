@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="2dp"
-    >
+    android:padding="2dp">
 
     <androidx.emoji2.widget.EmojiTextView
         android:id="@+id/tv_record_title"
@@ -12,8 +11,7 @@
         android:layout_height="wrap_content"
         android:textColor="#222222"
         android:textSize="14sp"
-        android:textStyle="bold"
-        />
+        android:textStyle="bold" />
 
     <androidx.emoji2.widget.EmojiTextView
         android:id="@+id/tv_record_content"
@@ -21,16 +19,14 @@
         android:layout_height="wrap_content"
         android:textColor="#666666"
         android:textSize="13sp"
-        android:layout_marginTop="2dp"
-        />
+        android:layout_marginTop="2dp" />
 
     <View
         android:id="@+id/v_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#999999"
-        android:layout_marginTop="4dp"
-        />
+        android:layout_marginTop="4dp" />
 
     <TextView
         android:id="@+id/tv_desc"
@@ -39,7 +35,6 @@
         android:textColor="#444444"
         android:textSize="12sp"
         android:text="@string/chat_record"
-        android:layout_marginTop="4dp"
-        />
+        android:layout_marginTop="4dp" />
 
 </LinearLayout>

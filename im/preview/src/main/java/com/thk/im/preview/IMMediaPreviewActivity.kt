@@ -194,7 +194,8 @@ class IMMediaPreviewActivity : AppCompatActivity() {
                             val recyclerView = binding.vpMediaPreview.getChildAt(0) as? RecyclerView
                             val itemVH = recyclerView?.findViewHolderForLayoutPosition(i)
                             if (itemVH == null) {
-                                val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
+                                val adapter =
+                                    binding.vpMediaPreview.adapter as MessagePreviewAdapter
                                 adapter.updateMessage(it, i)
                             }
                             break
@@ -211,7 +212,8 @@ class IMMediaPreviewActivity : AppCompatActivity() {
                             val recyclerView = binding.vpMediaPreview.getChildAt(0) as? RecyclerView
                             val itemVH = recyclerView?.findViewHolderForLayoutPosition(i)
                             if (itemVH == null) {
-                                val adapter = binding.vpMediaPreview.adapter as MessagePreviewAdapter
+                                val adapter =
+                                    binding.vpMediaPreview.adapter as MessagePreviewAdapter
                                 adapter.updateMessage(it, i)
                             }
                             break

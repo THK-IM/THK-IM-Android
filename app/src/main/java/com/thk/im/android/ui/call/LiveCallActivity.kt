@@ -7,17 +7,17 @@ import android.view.View
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import com.thk.im.android.live.IMLiveManager
-import com.thk.im.android.live.RoomObserver
-import com.thk.im.android.live.room.BaseParticipant
-import com.thk.im.android.live.room.RemoteParticipant
-import com.thk.im.android.live.room.Room
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActvitiyLiveCallBinding
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.RoomObserver
+import com.thk.im.android.live.room.BaseParticipant
+import com.thk.im.android.live.room.RemoteParticipant
+import com.thk.im.android.live.room.Room
 import com.thk.im.android.ui.base.BaseActivity
 import java.nio.ByteBuffer
 

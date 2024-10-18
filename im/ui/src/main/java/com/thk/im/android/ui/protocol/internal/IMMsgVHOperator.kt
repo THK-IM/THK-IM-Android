@@ -2,9 +2,6 @@ package com.thk.im.android.ui.protocol.internal
 
 import android.view.View
 import com.thk.im.android.core.db.entity.Message
-import com.thk.im.android.core.db.entity.SessionMember
-import com.thk.im.android.core.db.entity.User
-import io.reactivex.Flowable
 
 interface IMMsgVHOperator {
 

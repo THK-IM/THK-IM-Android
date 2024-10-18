@@ -42,7 +42,7 @@ data class Contact(
 ) : Parcelable {
 
     companion object {
-        fun newContact() : Contact {
+        fun newContact(): Contact {
             return Contact(0L, 0L, "", 0, "", 0, 0)
         }
     }

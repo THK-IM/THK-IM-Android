@@ -12,7 +12,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.adapter.IMOnSessionMemberClick
 import com.thk.im.android.ui.manager.IMUIManager
 
-class IMSessionMemberVH(itemView: View): RecyclerView.ViewHolder(itemView) {
+class IMSessionMemberVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val avatarView: AppCompatImageView = itemView.findViewById(R.id.iv_avatar)
     private val nicknameView: AppCompatTextView = itemView.findViewById(R.id.tv_nickname)

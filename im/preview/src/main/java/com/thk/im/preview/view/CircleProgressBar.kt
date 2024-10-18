@@ -10,9 +10,9 @@ import android.view.View
 import com.thk.im.android.core.base.utils.AppUtils
 import kotlin.math.min
 
-class CircleProgressBar: View {
+class CircleProgressBar : View {
 
-    private val circlePaint  = Paint()
+    private val circlePaint = Paint()
     private val progressPaint = Paint()
     private val textPaint = Paint()
     private val bounds = Rect()

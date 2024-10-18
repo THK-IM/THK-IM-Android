@@ -156,5 +156,5 @@ interface MessageModule : BaseModule {
     /**
      * 清除所有已读消息
      */
-    fun setAllMessageRead() : Flowable<Void>
+    fun setAllMessageRead(): Flowable<Void>
 }

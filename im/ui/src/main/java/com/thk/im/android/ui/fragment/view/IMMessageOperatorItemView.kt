@@ -20,11 +20,17 @@ class IMMessageOperatorItemView : LinearLayout {
             : super(context, attrs, defStyleAttr)
 
     init {
-        val view = LayoutInflater.from(context).inflate(R.layout.item_view_message_operator, this, true)
+        val view =
+            LayoutInflater.from(context).inflate(R.layout.item_view_message_operator, this, true)
         binding = ItemViewMessageOperatorBinding.bind(view)
     }
 
-    fun setOperator(operator: IMMessageOperator, sender: IMMsgSender, message: Message, clickListener: OnClickListener) {
+    fun setOperator(
+        operator: IMMessageOperator,
+        sender: IMMsgSender,
+        message: Message,
+        clickListener: OnClickListener
+    ) {
         binding.ivMsgOpr.setImageResource(operator.resId())
         binding.tvMsgOpr.text = operator.title()
         binding.root.setOnClickListener {

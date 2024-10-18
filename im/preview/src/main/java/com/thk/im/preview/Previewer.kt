@@ -17,6 +17,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.manager.IMRecordMsgBody
 import com.thk.im.android.ui.protocol.IMPreviewer
 import io.reactivex.Flowable
+
 @Keep
 class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer {
 
@@ -51,7 +52,11 @@ class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer
         }
     }
 
-    override fun previewRecordMessage(activity: Activity, originSession: Session, message: Message) {
+    override fun previewRecordMessage(
+        activity: Activity,
+        originSession: Session,
+        message: Message
+    ) {
         if (message.content != null) {
             val recordBody =
                 Gson().fromJson(message.content!!, IMRecordMsgBody::class.java) ?: return

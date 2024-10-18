@@ -8,11 +8,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.core.db.entity.Contact
 import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.databinding.FragmentGroupBinding
 import com.thk.im.android.ui.base.BaseFragment
-import com.thk.im.android.ui.main.fragment.adapter.ContactAdapter
 import com.thk.im.android.ui.main.fragment.adapter.GroupAdapter
 
 class GroupFragment : BaseFragment() {

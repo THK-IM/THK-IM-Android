@@ -1,4 +1,5 @@
 <resources>
+
     <style name="activityAnimation" parent="@android:style/Animation">
         <item name="android:activityOpenEnterAnimation">@anim/activity_slide_right_in</item>
         <item name="android:activityOpenExitAnimation">@anim/activity_slide_left_out</item>

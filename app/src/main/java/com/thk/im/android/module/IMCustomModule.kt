@@ -3,14 +3,14 @@ package com.thk.im.android.module
 import android.app.Application
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.thk.im.android.live.IMLiveManager
-import com.thk.im.android.live.Role
-import com.thk.im.android.live.room.Room
 import com.thk.im.android.IMApplication
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.module.internal.DefaultCustomModule
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.Role
+import com.thk.im.android.live.room.Room
 import com.thk.im.android.ui.call.LiveCallActivity
 import io.reactivex.disposables.CompositeDisposable
 

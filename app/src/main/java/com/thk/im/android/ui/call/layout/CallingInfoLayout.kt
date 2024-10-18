@@ -8,7 +8,6 @@ import com.thk.im.android.R
 import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.LayoutCallingInfoBinding
-import com.thk.im.android.ui.call.LiveCallProtocol
 
 class CallingInfoLayout : ConstraintLayout {
 

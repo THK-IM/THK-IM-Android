@@ -14,8 +14,8 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="8dp"
         app:cardElevation="0dp"
-        app:cardMaxElevation="0dp"
-        >
+        app:cardMaxElevation="0dp">
+
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_avatar"
             android:layout_width="42dp"
@@ -31,7 +31,6 @@
         android:textAlignment="center"
         android:textColor="#333333"
         android:textSize="12sp"
-        android:maxLines="1"
-        />
+        android:maxLines="1" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

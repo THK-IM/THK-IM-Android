@@ -1,6 +1,9 @@
 package com.thk.im.android.live.api
 
+import com.thk.im.android.core.api.internal.APITokenInterceptor
 import com.thk.im.android.live.LiveApi
+import com.thk.im.android.live.vo.CreateRoomReqVo
+import com.thk.im.android.live.vo.CreateRoomResVo
 import com.thk.im.android.live.vo.DelRoomVo
 import com.thk.im.android.live.vo.JoinRoomReqVo
 import com.thk.im.android.live.vo.JoinRoomResVo
@@ -9,9 +12,6 @@ import com.thk.im.android.live.vo.PlayStreamResVo
 import com.thk.im.android.live.vo.PublishStreamReqVo
 import com.thk.im.android.live.vo.PublishStreamResVo
 import com.thk.im.android.live.vo.RefuseJoinRoomVo
-import com.thk.im.android.core.api.internal.APITokenInterceptor
-import com.thk.im.android.live.vo.CreateRoomReqVo
-import com.thk.im.android.live.vo.CreateRoomResVo
 import io.reactivex.Flowable
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient

@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
-abstract class BaseFragment: Fragment() {
+abstract class BaseFragment : Fragment() {
     private val compositeDisposable = CompositeDisposable()
 
 

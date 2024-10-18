@@ -3,8 +3,6 @@ package com.thk.im.android
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import com.thk.im.android.live.IMLiveManager
-import com.thk.im.android.live.api.DefaultLiveApi
 import com.thk.im.android.api.DataRepository
 import com.thk.im.android.constant.Host
 import com.thk.im.android.core.IMCoreManager
@@ -14,6 +12,8 @@ import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule
+import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.api.DefaultLiveApi
 import com.thk.im.android.media.Provider
 import com.thk.im.android.module.CipherCrypto
 import com.thk.im.android.module.ExternalPageRouter

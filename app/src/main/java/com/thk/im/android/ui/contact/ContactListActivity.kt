@@ -76,7 +76,7 @@ class ContactListActivity : BaseActivity() {
     override fun menuIcon(id: Int): Drawable? {
         return if (id == R.id.tb_menu2) {
             ContextCompat.getDrawable(this, R.drawable.ic_add)
-        } else  {
+        } else {
             ContextCompat.getDrawable(this, R.drawable.ic_choose)
         }
     }

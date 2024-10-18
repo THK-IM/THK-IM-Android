@@ -10,7 +10,6 @@ import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.thk.im.android.core.base.LLog
-import com.thk.im.android.core.base.utils.ToastUtils
 import com.thk.im.android.databinding.ActivityMediaTestBinding
 import com.thk.im.android.media.audio.OggOpusPlayer
 import com.thk.im.android.media.audio.OggOpusRecorder

@@ -11,8 +11,8 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.databinding.ActivitySearchBinding
 import com.thk.im.android.ui.base.BaseActivity
-import com.thk.im.android.ui.group.GroupActivity
 import com.thk.im.android.ui.contact.ContactUserActivity
+import com.thk.im.android.ui.group.GroupActivity
 
 class SearchActivity : BaseActivity() {
 
@@ -79,7 +79,10 @@ class SearchActivity : BaseActivity() {
             val subscriber = object : BaseSubscriber<UserBasicInfoVo>() {
                 override fun onNext(t: UserBasicInfoVo?) {
                     t?.let {
-                        ContactUserActivity.startContactUserActivity(this@SearchActivity, it.toUser())
+                        ContactUserActivity.startContactUserActivity(
+                            this@SearchActivity,
+                            it.toUser()
+                        )
                     }
                 }
 

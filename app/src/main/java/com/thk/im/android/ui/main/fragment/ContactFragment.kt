@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.thk.im.android.api.DataRepository
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
@@ -42,7 +41,7 @@ class ContactFragment : BaseFragment() {
     }
 
     private fun queryAllContacts() {
-        val subscriber = object :BaseSubscriber<List<Contact>>() {
+        val subscriber = object : BaseSubscriber<List<Contact>>() {
             override fun onNext(t: List<Contact>?) {
                 t?.let {
                     setContactList(it)

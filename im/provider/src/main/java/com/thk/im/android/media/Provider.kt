@@ -115,7 +115,11 @@ class Provider(app: Application, token: String) : IMProvider {
             })
     }
 
-    override fun startRecordAudio(path: String, duration: Int, audioCallback: AudioCallback): Boolean {
+    override fun startRecordAudio(
+        path: String,
+        duration: Int,
+        audioCallback: AudioCallback
+    ): Boolean {
         return OggOpusRecorder.startRecord(path, duration, audioCallback)
     }
 

@@ -5,7 +5,6 @@ import com.thk.im.android.core.db.entity.Contact
 import com.thk.im.android.core.module.ContactModule
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import java.util.concurrent.Flow
 
 open class DefaultContactModule : ContactModule {
 

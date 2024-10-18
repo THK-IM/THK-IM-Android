@@ -37,7 +37,8 @@ class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                 if (progress.state == FileLoadState.Success.value) {
                     progressView.visibility = View.GONE
                     IMImageLoader.displayImageByPath(ivImage, progress.path)
-                    val data = Gson().fromJson(it.data, IMImageMsgData::class.java) ?: IMImageMsgData()
+                    val data =
+                        Gson().fromJson(it.data, IMImageMsgData::class.java) ?: IMImageMsgData()
                     data.height = body.height
                     data.width = body.width
                     data.path = progress.path

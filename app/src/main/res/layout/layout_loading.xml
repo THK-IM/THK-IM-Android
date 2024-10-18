@@ -19,8 +19,7 @@
             style="@style/SpinKitView.Small.Wave"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            app:SpinKit_Color="@color/purple_500"
-            />
+            app:SpinKit_Color="@color/purple_500" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

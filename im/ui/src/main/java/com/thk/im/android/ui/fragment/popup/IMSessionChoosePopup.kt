@@ -149,7 +149,7 @@ class IMSessionChoosePopup(
                     }
                 }
                 Flowable.just(it)
-        }.flatMap {
+            }.flatMap {
                 val title =
                     if (session?.type == SessionType.Group.value || session?.type == SessionType.SuperGroup.value) {
                         context.getString(R.string.someone_s_group_chat_record)
@@ -157,7 +157,7 @@ class IMSessionChoosePopup(
                         context.getString(R.string.someone_s_chat_record)
                     }
                 it.title = String.format(title, it.title)
-            return@flatMap Flowable.just(it)
-        }
+                return@flatMap Flowable.just(it)
+            }
     }
 }

@@ -18,8 +18,7 @@
         android:padding="15dp"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/btn_register"
@@ -35,8 +34,7 @@
         android:padding="15dp"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
 
     <TextView
@@ -53,7 +51,6 @@
         android:padding="15dp"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

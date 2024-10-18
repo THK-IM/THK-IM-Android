@@ -33,7 +33,13 @@ class IMReplyMsgContainerView : LinearLayout {
         binding.vReplyMsgLine.setShape(color, floatArrayOf(2f, 2f, 2f, 2f), false)
     }
 
-    fun setMessage(positionType: Int, user: User, message: Message, session: Session, delegate: IMMsgVHOperator?) {
+    fun setMessage(
+        positionType: Int,
+        user: User,
+        message: Message,
+        session: Session,
+        delegate: IMMsgVHOperator?
+    ) {
         binding.tvReplyMsgUserNick.text = user.nickname
         binding.flReplyContent.children.forEach {
             binding.flReplyContent.removeView(it)

@@ -11,6 +11,7 @@ enum class IMMsgPosType(val value: Int) {
     Left(1),
     Right(2)
 }
+
 @Keep
 data class IMFile(
     @SerializedName("path")
@@ -18,9 +19,11 @@ data class IMFile(
     @SerializedName("mime_type")
     var mimeType: String,
 )
+
 @Keep
 @Parcelize
 open class MediaItem : Parcelable
+
 @Keep
 @Parcelize
 data class ImageMediaItem(
@@ -30,7 +33,8 @@ data class ImageMediaItem(
     var thumbnailUrl: String?,
     var sourcePath: String?,
     var sourceUrl: String?,
-) :MediaItem(),  Parcelable
+) : MediaItem(), Parcelable
+
 @Keep
 @Parcelize
 data class VideoMediaItem(

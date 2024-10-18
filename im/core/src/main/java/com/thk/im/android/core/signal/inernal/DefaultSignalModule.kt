@@ -24,7 +24,8 @@ import okhttp3.WebSocketListener
 import java.util.concurrent.TimeUnit
 
 
-class DefaultSignalModule(private var app: Application, wsUrl: String, token: String) : SignalModule,
+class DefaultSignalModule(private var app: Application, wsUrl: String, token: String) :
+    SignalModule,
     NetworkListener {
     private val mHandler = Handler(Looper.getMainLooper())
     private val heatBeatInterval = 10 * 1000L

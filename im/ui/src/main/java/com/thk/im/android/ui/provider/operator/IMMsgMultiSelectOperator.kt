@@ -7,7 +7,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class IMMsgMultiSelectOperator: IMMessageOperator() {
+class IMMsgMultiSelectOperator : IMMessageOperator() {
     override fun id(): String {
         return "MultiSelect"
     }

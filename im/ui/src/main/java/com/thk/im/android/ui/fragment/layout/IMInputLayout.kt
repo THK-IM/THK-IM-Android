@@ -290,12 +290,20 @@ class IMInputLayout : ConstraintLayout {
     }
 
     private fun resetVisible() {
-        if (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.BaseInput.value) == false) {
+        if (IMUIManager.uiResourceProvider?.supportFunction(
+                session,
+                IMChatFunction.BaseInput.value
+            ) == false
+        ) {
             binding.llMessageInput.visibility = GONE
         } else {
             binding.llMessageInput.visibility = VISIBLE
         }
-        if (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Audio.value) == false) {
+        if (IMUIManager.uiResourceProvider?.supportFunction(
+                session,
+                IMChatFunction.Audio.value
+            ) == false
+        ) {
             binding.ivAudioRecord.visibility = GONE
         } else {
             binding.ivAudioRecord.visibility = VISIBLE
@@ -305,7 +313,11 @@ class IMInputLayout : ConstraintLayout {
         } else {
             binding.ivAddMore.visibility = VISIBLE
         }
-        if (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Forward.value) == false) {
+        if (IMUIManager.uiResourceProvider?.supportFunction(
+                session,
+                IMChatFunction.Forward.value
+            ) == false
+        ) {
             binding.ivMsgOprForward.visibility = GONE
         } else {
             binding.ivMsgOprForward.visibility = VISIBLE
@@ -591,11 +603,13 @@ class IMInputLayout : ConstraintLayout {
 
         val info = msgSender?.syncGetSessionMemberInfo(replyMsg!!.fUid)
         if (info != null) {
-            binding.tvReplyUserNick.text = IMUIManager.nicknameForSessionMember(info.first, info.second)
+            binding.tvReplyUserNick.text =
+                IMUIManager.nicknameForSessionMember(info.first, info.second)
         }
 
         replyMsg?.let {
-            binding.tvReplyContent.text = IMCoreManager.messageModule.getMsgProcessor(it.type).msgDesc(it)
+            binding.tvReplyContent.text =
+                IMCoreManager.messageModule.getMsgProcessor(it.type).msgDesc(it)
         }
     }
 
@@ -604,14 +618,15 @@ class IMInputLayout : ConstraintLayout {
         if (message.content != null) {
             var content = message.content!!
             if (message.atUsers != null) {
-                content = AtStringUtils.replaceAtUIdsToNickname(content, message.getAtUIds()) { id ->
-                    val member = msgSender?.syncGetSessionMemberInfo(id)
-                    if (member != null) {
-                        addAtMap(member.first, member.second)
-                        return@replaceAtUIdsToNickname atNickname(id) ?: "$id"
+                content =
+                    AtStringUtils.replaceAtUIdsToNickname(content, message.getAtUIds()) { id ->
+                        val member = msgSender?.syncGetSessionMemberInfo(id)
+                        if (member != null) {
+                            addAtMap(member.first, member.second)
+                            return@replaceAtUIdsToNickname atNickname(id) ?: "$id"
+                        }
+                        return@replaceAtUIdsToNickname "$id"
                     }
-                    return@replaceAtUIdsToNickname "$id"
-                }
             }
             addInputContent(content)
 

@@ -34,14 +34,17 @@ class ProgressResponseBody(private val url: String, private val responseBody: Re
         @Throws(IOException::class)
         override fun read(sink: Buffer, byteCount: Long): Long {
             val bytesRead = super.read(sink, byteCount)
-            if (bytesRead > 0 ) {
+            if (bytesRead > 0) {
                 val fullLength = responseBody.contentLength()
                 totalBytesRead += bytesRead
                 val progress = (100 * totalBytesRead / fullLength).toInt()
                 if (this.progress != progress) {
                     this.progress = progress
                     val listener = GuildProgressInterceptor.LISTENER_MAP[url]?.get()
-                    Log.v("LoadProgress", "${url} ${totalBytesRead} ${fullLength} ${progress} ${listener==null}")
+                    Log.v(
+                        "LoadProgress",
+                        "${url} ${totalBytesRead} ${fullLength} ${progress} ${listener == null}"
+                    )
                     listener?.onLoadProgress(url, progress == 100, progress)
                 }
             }

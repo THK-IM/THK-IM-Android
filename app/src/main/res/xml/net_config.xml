@@ -4,8 +4,8 @@
         <!-- Make sure your URL Server here -->
         <domain includeSubdomains="true">your_domain</domain>
         <trust-anchors>
-            <certificates src="user"/>
-            <certificates src="system"/>
+            <certificates src="user" />
+            <certificates src="system" />
         </trust-anchors>
     </domain-config>
 

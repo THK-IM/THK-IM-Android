@@ -6,7 +6,7 @@ import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.module.internal.DefaultUserModule
 import io.reactivex.Flowable
 
-class IMUserModule: DefaultUserModule() {
+class IMUserModule : DefaultUserModule() {
 
     override fun queryServerUser(id: Long): Flowable<User> {
         return DataRepository.userApi.queryUser(id).flatMap {

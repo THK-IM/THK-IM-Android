@@ -66,11 +66,13 @@ data class IMLoadProgress(
     @SerializedName("progress")
     var progress: Int
 )
+
 @Keep
 enum class IMLoadType(val value: String) {
     Upload("upload"),
     Download("download"),
 }
+
 @Keep
 enum class IMMsgResourceType(val value: String) {
     Thumbnail("thumbnail"),

@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <androidx.cardview.widget.CardView
         android:id="@+id/card_other"
         android:layout_width="60dp"
@@ -13,13 +14,12 @@
         app:layout_constraintRight_toRightOf="parent"
         app:cardCornerRadius="6dp"
         app:cardElevation="0dp"
-        app:cardMaxElevation="0dp"
-        >
+        app:cardMaxElevation="0dp">
+
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_other"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="match_parent" />
     </androidx.cardview.widget.CardView>
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -30,8 +30,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="wrap_content" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_request_call_desc"
@@ -41,6 +40,5 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        />
+        android:layout_marginTop="100dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

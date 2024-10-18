@@ -8,7 +8,6 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import io.reactivex.Flowable
-import java.lang.Error
 
 interface IMMsgSender {
 

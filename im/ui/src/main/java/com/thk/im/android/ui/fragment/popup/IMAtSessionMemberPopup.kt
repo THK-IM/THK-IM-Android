@@ -27,7 +27,7 @@ class IMAtSessionMemberPopup(
 
     private val compositeDisposable = CompositeDisposable()
     private lateinit var rcvSessionMember: RecyclerView
-    private lateinit var toolbar : Toolbar
+    private lateinit var toolbar: Toolbar
     private lateinit var sessionMemberAdapter: IMSessionMemberAdapter
 
     override fun getImplLayoutId(): Int {

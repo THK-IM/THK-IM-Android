@@ -18,6 +18,7 @@ open class PopupLoading(context: Context) : BasePopupView(context) {
             floatArrayOf(6f, 6f, 6f, 6f)
         )
     }
+
     override fun getInnerLayoutId(): Int {
         return R.layout.layout_loading
     }

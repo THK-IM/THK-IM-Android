@@ -57,7 +57,7 @@ data class User(
     constructor(id: Long) : this(id, "", "", null, null, null, null, 0L, 0L)
 
     @Ignore
-    constructor(id: Long, nickname: String): this(id, "", nickname, null, null, null, null, 0, 0)
+    constructor(id: Long, nickname: String) : this(id, "", nickname, null, null, null, null, 0, 0)
 
 
 }

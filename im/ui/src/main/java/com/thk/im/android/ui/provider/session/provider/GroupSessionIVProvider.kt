@@ -7,7 +7,7 @@ import com.thk.im.android.ui.fragment.viewholder.session.IMBaseSessionVH
 import com.thk.im.android.ui.protocol.IMBaseSessionIVProvider
 import com.thk.im.android.ui.provider.session.viewholder.GroupSessionVH
 
-class GroupSessionIVProvider: IMBaseSessionIVProvider() {
+class GroupSessionIVProvider : IMBaseSessionIVProvider() {
     override fun sessionType(): Int {
         return SessionType.Group.value
     }

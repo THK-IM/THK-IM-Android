@@ -21,7 +21,7 @@ abstract class IMBaseMessageIVProvider {
      */
     abstract fun messageType(): Int
 
-    open fun hasBubble() : Boolean {
+    open fun hasBubble(): Boolean {
         return false
     }
 

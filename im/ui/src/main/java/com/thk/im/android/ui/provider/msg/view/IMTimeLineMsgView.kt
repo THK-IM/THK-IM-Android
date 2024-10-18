@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.thk.im.android.core.IMCoreManager
-import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session

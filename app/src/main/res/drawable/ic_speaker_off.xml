@@ -3,7 +3,7 @@
     android:height="48dp"
     android:viewportWidth="1024"
     android:viewportHeight="1024">
-  <path
-      android:fillColor="#FF000000"
-      android:pathData="M692,512L563.7,383.7l70,-70L762,442l128.3,-128.3 70,70L832,512l128.3,128.3 -70,70L762,582 633.7,710.3l-70,-70L692,512zM64,362.7h198.3L512,113v798L262.3,661.3H64V362.7z"/>
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M692,512L563.7,383.7l70,-70L762,442l128.3,-128.3 70,70L832,512l128.3,128.3 -70,70L762,582 633.7,710.3l-70,-70L692,512zM64,362.7h198.3L512,113v798L262.3,661.3H64V362.7z" />
 </vector>

@@ -23,7 +23,7 @@ object AtStringUtils {
         return Pair(body, atUIdsStr)
     }
 
-    fun replaceAtUIdsToNickname(text: String, atUIds: Set<Long> , finder: NicknameFinder): String {
+    fun replaceAtUIdsToNickname(text: String, atUIds: Set<Long>, finder: NicknameFinder): String {
         val body = atRegex.replace(text) { result ->
             val id = result.value.toLongOrNull()
             if (id != null) {

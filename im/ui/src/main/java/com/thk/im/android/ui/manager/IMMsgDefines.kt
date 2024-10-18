@@ -11,6 +11,7 @@ class IMAudioMsgData(
     @SerializedName("duration")
     var duration: Int? = null,
 )
+
 @Keep
 class IMImageMsgData(
     @SerializedName("path")
@@ -22,6 +23,7 @@ class IMImageMsgData(
     @SerializedName("height")
     var height: Int? = null,
 )
+
 @Keep
 class IMVideoMsgData(
     @SerializedName("duration")
@@ -35,6 +37,7 @@ class IMVideoMsgData(
     @SerializedName("thumbnail_path")
     var thumbnailPath: String? = null,
 )
+
 @Keep
 class IMAudioMsgBody(
     @SerializedName("url")
@@ -44,6 +47,7 @@ class IMAudioMsgBody(
     @SerializedName("name")
     var name: String? = null,
 )
+
 @Keep
 class IMImageMsgBody(
     @SerializedName("url")
@@ -57,6 +61,7 @@ class IMImageMsgBody(
     @SerializedName("name")
     var name: String? = null,
 )
+
 @Keep
 class IMVideoMsgBody(
     @SerializedName("duration")
@@ -72,6 +77,7 @@ class IMVideoMsgBody(
     @SerializedName("name")
     var name: String? = null,
 )
+
 @Keep
 class IMRevokeMsgData(
     @SerializedName("nick")
@@ -93,6 +99,7 @@ data class IMRecordMsgBody(
     @SerializedName("content")
     var content: String
 )
+
 @Keep
 data class IMReeditMsgData(
     @SerializedName("session_id")

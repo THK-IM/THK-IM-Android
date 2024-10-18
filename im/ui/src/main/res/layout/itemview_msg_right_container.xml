@@ -49,15 +49,15 @@
             android:layout_height="20dp"
             android:layout_marginRight="2dp"
             android:layout_marginLeft="4dp"
-            android:layout_gravity="bottom"
-            >
+            android:layout_gravity="bottom">
+
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_msg_resend"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="true"
-                android:src="@drawable/ic_msg_failed"/>
+                android:src="@drawable/ic_msg_failed" />
 
             <ProgressBar
                 android:id="@+id/pb_sending"
@@ -65,22 +65,20 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="true"
-                android:indeterminateDrawable="@drawable/ic_anim_loading"/>
+                android:indeterminateDrawable="@drawable/ic_anim_loading" />
 
             <com.thk.im.android.ui.fragment.view.IMReadStatusView
                 android:id="@+id/read_status"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                />
+                android:layout_alignParentRight="true" />
         </RelativeLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <androidx.emoji2.widget.EmojiTextView
                 android:id="@+id/tv_nickname"
@@ -112,8 +110,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="5dp"
-                    />
+                    android:padding="5dp" />
             </LinearLayout>
 
             <TextView

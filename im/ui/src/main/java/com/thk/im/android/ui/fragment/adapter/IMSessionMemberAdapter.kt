@@ -8,12 +8,13 @@ import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.sessionmember.IMSessionMemberVH
 
-class IMSessionMemberAdapter: RecyclerView.Adapter<IMSessionMemberVH>() {
+class IMSessionMemberAdapter : RecyclerView.Adapter<IMSessionMemberVH>() {
 
     private val sessionMembers = mutableListOf<Pair<User, SessionMember?>>()
     var onSessionMemberClick: IMOnSessionMemberClick? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IMSessionMemberVH {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.itemview_session_member, parent, false)
+        val itemView = LayoutInflater.from(parent.context)
+            .inflate(R.layout.itemview_session_member, parent, false)
         return IMSessionMemberVH(itemView)
     }
 

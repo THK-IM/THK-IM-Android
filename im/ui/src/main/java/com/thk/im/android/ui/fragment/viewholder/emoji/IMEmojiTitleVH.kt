@@ -20,6 +20,7 @@ class IMEmojiTitleVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
             floatArrayOf(4f, 4f, 4f, 4f)
         )
     }
+
     private fun setIcon(resId: Int) {
         menuView.setImageResource(resId)
     }

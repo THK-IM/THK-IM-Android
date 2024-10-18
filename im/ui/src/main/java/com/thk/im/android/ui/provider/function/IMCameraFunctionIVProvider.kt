@@ -8,7 +8,7 @@ import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.IMBaseFunctionIVProvider
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class IMCameraFunctionIVProvider: IMBaseFunctionIVProvider() {
+class IMCameraFunctionIVProvider : IMBaseFunctionIVProvider() {
     override fun position(): Int {
         return 0
     }
@@ -26,7 +26,11 @@ class IMCameraFunctionIVProvider: IMBaseFunctionIVProvider() {
     }
 
     override fun supportSession(session: Session): Boolean {
-        return (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Image.value) ?: true) ||
-                (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Video.value) ?: true)
+        return (IMUIManager.uiResourceProvider?.supportFunction(session, IMChatFunction.Image.value)
+            ?: true) ||
+                (IMUIManager.uiResourceProvider?.supportFunction(
+                    session,
+                    IMChatFunction.Video.value
+                ) ?: true)
     }
 }

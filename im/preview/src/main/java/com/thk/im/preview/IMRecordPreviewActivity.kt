@@ -120,11 +120,12 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
                 this, mediaMessages, originView, msg.msgId
             )
         } else if (msg.type == MsgType.Record.value) {
-            val originSession: Session? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra("originSession", Session::class.java)
-            } else {
-                intent.getParcelableExtra("originSession")
-            }
+            val originSession: Session? =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra("originSession", Session::class.java)
+                } else {
+                    intent.getParcelableExtra("originSession")
+                }
             originSession?.let {
                 IMUIManager.mediaPreviewer?.previewRecordMessage(this, it, msg)
             }

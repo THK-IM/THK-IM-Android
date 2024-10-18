@@ -22,7 +22,7 @@ data class UserBasicInfoVo(
 
     fun toUser(): User {
         val now = IMCoreManager.severTime
-        return User(id, displayId, nickname?:"", avatar, sex, null, null, now, now)
+        return User(id, displayId, nickname ?: "", avatar, sex, null, null, now, now)
     }
 
 }

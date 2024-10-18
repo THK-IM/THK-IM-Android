@@ -11,7 +11,7 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
-class IMMsgCopyOperator: IMMessageOperator() {
+class IMMsgCopyOperator : IMMessageOperator() {
     override fun id(): String {
         return "Copy"
     }

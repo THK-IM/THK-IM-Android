@@ -9,16 +9,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        />
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <com.thk.im.android.live.view.ParticipantView
         android:id="@+id/participant_local"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        />
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <com.thk.im.android.ui.call.layout.CallingInfoLayout
         android:id="@+id/ll_calling_info"
@@ -26,8 +24,7 @@
         android:layout_height="300dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
+        app:layout_constraintRight_toRightOf="parent" />
 
 
     <com.thk.im.android.ui.call.layout.RequestCallLayout
@@ -37,8 +34,7 @@
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <com.thk.im.android.ui.call.layout.BeCallingLayout
         android:id="@+id/ll_be_calling"
@@ -47,8 +43,7 @@
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <com.thk.im.android.ui.call.layout.CallingLayout
         android:id="@+id/ll_calling"
@@ -57,7 +52,6 @@
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

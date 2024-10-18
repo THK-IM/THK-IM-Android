@@ -5,13 +5,13 @@
     android:layout_height="wrap_content"
     app:cardCornerRadius="6dp"
     app:cardUseCompatPadding="true"
-    app:cardElevation="8dp"
-    >
+    app:cardElevation="8dp">
+
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/layout_operators"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:flexWrap="wrap"
         app:alignItems="stretch"
-        app:alignContent="stretch"/>
+        app:alignContent="stretch" />
 </androidx.cardview.widget.CardView>

@@ -2,8 +2,9 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/progress">
         <shape android:shape="ring">
-            <gradient android:startColor="#FFFFFF"
-                android:endColor="#FFFFFF"/>
+            <gradient
+                android:startColor="#FFFFFF"
+                android:endColor="#FFFFFF" />
         </shape>
     </item>
 </layer-list>

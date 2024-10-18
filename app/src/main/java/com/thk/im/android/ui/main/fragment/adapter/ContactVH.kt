@@ -14,7 +14,6 @@ import com.thk.im.android.core.db.entity.Contact
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
 import io.reactivex.disposables.CompositeDisposable
-import java.lang.StringBuilder
 
 
 class ContactVH(liftOwner: LifecycleOwner, itemView: View) :

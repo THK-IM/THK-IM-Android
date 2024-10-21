@@ -37,7 +37,7 @@ object IMImageLoader {
     fun preloadFile(
         imageView: ImageView,
         url: String,
-        listener: (file: File?, e: Exception?) -> Unit
+        listener: (url: String, file: File?, e: Exception?) -> Unit
     ) {
         Glide.with(imageView.context).asFile().load(url)
             .addListener(object : RequestListener<File> {
@@ -47,7 +47,7 @@ object IMImageLoader {
                     target: Target<File>,
                     isFirstResource: Boolean
                 ): Boolean {
-                    listener(null, e)
+                    listener(url, null, e)
                     return false
                 }
 
@@ -58,7 +58,7 @@ object IMImageLoader {
                     dataSource: DataSource,
                     isFirstResource: Boolean
                 ): Boolean {
-                    listener(resource, null)
+                    listener(url, resource, null)
                     return true
                 }
             }).preload()

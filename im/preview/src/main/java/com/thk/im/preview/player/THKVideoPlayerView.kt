@@ -60,6 +60,8 @@ class THKVideoPlayerView : RelativeLayout {
                 super.onPlaybackStateChanged(playbackState)
                 if (playbackState == Player.STATE_READY) {
                     updatePlayTime()
+                } else if (playbackState == Player.STATE_ENDED) {
+                    seekTo(0)
                 }
                 binding.middleController.showLoading(playbackState == Player.STATE_BUFFERING)
             }
@@ -112,7 +114,7 @@ class THKVideoPlayerView : RelativeLayout {
     private fun updatePlayTime() {
         val player = binding.playerView.player ?: return
         if (!attached) return
-        if (player.duration < 0) {
+        if (player.duration >= 0) {
             val total = (player.duration / 1000)
             val buffered = player.bufferedPosition / 1000
             val current = player.currentPosition / 1000

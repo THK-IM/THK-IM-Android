@@ -34,13 +34,13 @@ class THKPlayerBottomController : RelativeLayout {
             GradientDrawable.Orientation.TOP_BOTTOM
         )
 
-        binding.tvRemainTime.text = String.format(Locale.CHINESE, "00:00")
+        binding.tvCurrentTime.text = String.format(Locale.CHINESE, "00:00")
         binding.tvTotalTime.text = String.format(Locale.CHINESE, "00:00")
     }
 
     fun updateTime(total: Long, buffered: Long, current: Long) {
         binding.tvTotalTime.text = DateUtils.secondToDuration((total).toInt())
-        binding.tvRemainTime.text = DateUtils.secondToDuration((total - current).toInt())
+        binding.tvCurrentTime.text = DateUtils.secondToDuration((current).toInt())
         if (total > 0) {
             binding.seekbar.progress = (current * 100 / total).toInt()
             binding.seekbar.secondaryProgress = (buffered * 100 / total).toInt()

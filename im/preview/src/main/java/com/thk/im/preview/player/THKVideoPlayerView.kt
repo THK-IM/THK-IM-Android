@@ -112,11 +112,13 @@ class THKVideoPlayerView : RelativeLayout {
     private fun updatePlayTime() {
         val player = binding.playerView.player ?: return
         if (!attached) return
-        val total = (player.duration / 1000)
-        val buffered = player.bufferedPosition / 1000
-        val current = player.currentPosition / 1000
-        Log.v("Player", "$total, $buffered, $current ")
-        binding.bottomController.updateTime(total, buffered, current)
+        if (player.duration < 0) {
+            val total = (player.duration / 1000)
+            val buffered = player.bufferedPosition / 1000
+            val current = player.currentPosition / 1000
+            Log.v("Player", "$total, $buffered, $current ")
+            binding.bottomController.updateTime(total, buffered, current)
+        }
         binding.playerView.postDelayed({
             updatePlayTime()
         }, 200)

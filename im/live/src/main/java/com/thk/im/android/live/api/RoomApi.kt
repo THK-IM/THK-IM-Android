@@ -23,7 +23,7 @@ interface RoomApi {
         @Body req: JoinRoomReqVo
     ): Flowable<JoinRoomResVo>
 
-    @POST("/room/member/hangup")
+    @POST("/room/member/refuse_join")
     fun refuseJoinRoom(
         @Body req: RefuseJoinRoomVo
     ): Flowable<Void>

@@ -8,13 +8,18 @@ import android.media.AudioManager
 import android.os.Build
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
+import com.thk.im.android.live.api.vo.CallRoomMemberReqVo
+import com.thk.im.android.live.api.vo.CreateRoomReqVo
+import com.thk.im.android.live.api.vo.DelRoomVo
+import com.thk.im.android.live.api.vo.InviteMemberReqVo
+import com.thk.im.android.live.api.vo.JoinRoomReqVo
+import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
 import com.thk.im.android.live.room.PCFactoryWrapper
-import com.thk.im.android.live.room.Room
-import com.thk.im.android.live.vo.CreateRoomReqVo
-import com.thk.im.android.live.vo.DelRoomVo
-import com.thk.im.android.live.vo.JoinRoomReqVo
-import com.thk.im.android.live.vo.RefuseJoinRoomVo
+import com.thk.im.android.live.room.RTCRoom
+import com.thk.im.android.live.signal.LiveSignal
+import com.thk.im.android.live.signal.LiveSignalProtocol
 import io.reactivex.Flowable
+import io.reactivex.disposables.CompositeDisposable
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
@@ -38,9 +43,11 @@ class IMLiveManager private constructor() {
 
     var app: Application? = null
     var selfId: Long = 0L
+    var liveSignalProtocol: LiveSignalProtocol? = null
     lateinit var liveApi: LiveApi
     private var pcFactoryWrapper: PCFactoryWrapper? = null
-    private var room: Room? = null
+    private var rtcRoom: RTCRoom? = null
+    private var disposes = CompositeDisposable()
 
     fun init(app: Application) {
         this.app = app
@@ -84,7 +91,7 @@ class IMLiveManager private constructor() {
         audioManager.mode = AudioManager.MODE_NORMAL
     }
 
-    fun joinRoom(roomId: String, role: Role): Flowable<Room> {
+    fun joinRoom(roomId: String, role: Role): Flowable<RTCRoom> {
         return liveApi.joinRoom(JoinRoomReqVo(roomId, this.selfId, role.value))
             .flatMap {
                 val participantVos = mutableListOf<ParticipantVo>()
@@ -102,16 +109,16 @@ class IMLiveManager private constructor() {
                     3 -> Mode.Video
                     else -> Mode.Chat
                 }
-                val room = Room(
+                val rtcRoom = RTCRoom(
                     roomId, selfId, mode, it.members.toMutableSet(),
                     it.ownerId, it.createTime, role, participantVos
                 )
-                this@IMLiveManager.room = room
-                Flowable.just(room)
+                this@IMLiveManager.rtcRoom = rtcRoom
+                Flowable.just(rtcRoom)
             }
     }
 
-    fun createRoom(ids: Set<Long>, mode: Mode): Flowable<Room> {
+    fun createRoom(ids: Set<Long>, mode: Mode): Flowable<RTCRoom> {
         return liveApi.createRoom(CreateRoomReqVo(this.selfId, mode.value, ids))
             .flatMap {
                 val createMode = when (it.mode) {
@@ -120,68 +127,94 @@ class IMLiveManager private constructor() {
                     3 -> Mode.Video
                     else -> Mode.Chat
                 }
-                val room = Room(
+                val rtcRoom = RTCRoom(
                     it.id, selfId, createMode, it.members.toMutableSet(),
                     it.ownerId, it.createTime, Role.Broadcaster, it.participantVos
                 )
-                this@IMLiveManager.room = room
-                Flowable.just(room)
+                this@IMLiveManager.rtcRoom = rtcRoom
+                Flowable.just(rtcRoom)
             }
     }
 
-    fun leaveRoom() {
-        if (room == null) {
-            return
-        }
+    fun callRoomMember(msg: String, duration: Long): Flowable<Void>? {
+        val room = this.rtcRoom ?: return null
+        val req = CallRoomMemberReqVo(room.id, selfId, duration, msg)
+        return liveApi.callRoomMember(req)
+    }
 
+    fun inviteMember(uIds: Set<Long>, msg: String, duration: Long): Flowable<Void>? {
+        val room = this.rtcRoom ?: return null
+        val req = InviteMemberReqVo(room.id, selfId, uIds, duration, msg)
+        return liveApi.inviteMember(req)
+    }
+
+    fun refuseToJoinRoom(roomId: String) {
         val subscriber = object : BaseSubscriber<Void>() {
             override fun onError(t: Throwable?) {
                 super.onError(t)
-                destroyRoom()
             }
 
             override fun onComplete() {
                 super.onComplete()
-                destroyRoom()
             }
 
             override fun onNext(t: Void?) {
             }
         }
-        if (room!!.ownerId == selfId) {
-            liveApi.delRoom(DelRoomVo(room!!.id, selfId))
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-        } else {
-            liveApi.refuseJoinRoom(RefuseJoinRoomVo(room!!.id, selfId))
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-        }
+        val req = RefuseJoinRoomVo(roomId, selfId)
+        liveApi.refuseJoinRoom(req)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposes.add(subscriber)
     }
 
-    fun onMemberHangup(roomId: String, uId: Long) {
-        room?.let {
-            if (it.id == roomId) {
-                it.onMemberHangup(uId)
+    fun leaveRoom() {
+        if (rtcRoom == null) {
+            return
+        }
+        val subscriber = object : BaseSubscriber<Void>() {
+            override fun onNext(t: Void?) {
             }
         }
-    }
-
-    fun onEndCall(roomId: String) {
-        room?.let {
-            if (it.id == roomId) {
-                it.onEndCall()
-            }
+        if (rtcRoom!!.ownerId == selfId) {
+            liveApi.delRoom(DelRoomVo(rtcRoom!!.id, selfId))
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            disposes.add(subscriber)
         }
+        destroyRoom()
     }
 
-    fun getRoom(): Room? {
-        return room
+    fun getRoom(): RTCRoom? {
+        return rtcRoom
     }
 
     fun destroyRoom() {
-        room?.destroy()
-        room = null
+        rtcRoom?.destroy()
+        rtcRoom = null
+        disposes.clear()
+    }
+
+    fun onLiveSignalReceived(signal: LiveSignal) {
+        val delegate = this.liveSignalProtocol ?: return
+        signal.beingRequestedSignal()?.let {
+            delegate.onCallBeingRequested(it)
+        }
+        signal.cancelRequestedSignal()?.let {
+            delegate.onCallCancelRequested(it)
+        }
+        signal.rejectRequestSignal()?.let {
+            delegate.onCallRequestBeRejected(it)
+        }
+        signal.acceptRequestSignal()?.let {
+            delegate.onCallRequestBeAccepted(it)
+        }
+        signal.hangupSignal()?.let {
+            delegate.onCallingBeHangup(it)
+        }
+        signal.endCallSignal()?.let {
+            delegate.onCallingBeEnded(it)
+        }
     }
 
     fun getPCFactoryWrapper(): PCFactoryWrapper {
@@ -196,7 +229,8 @@ class IMLiveManager private constructor() {
                     .setSamplesReadyCallback { }
                     .createAudioDeviceModule()
                 val peerConnectionFactory = PeerConnectionFactory.builder().setOptions(options)
-                    .setVideoEncoderFactory(encoderFactory).setVideoDecoderFactory(decoderFactory)
+                    .setVideoEncoderFactory(encoderFactory)
+                    .setVideoDecoderFactory(decoderFactory)
                     .setAudioDeviceModule(audioDeviceModule)
                     .createPeerConnectionFactory()
                 audioDeviceModule.setSpeakerMute(false)

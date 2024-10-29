@@ -11,7 +11,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.Mode
-import com.thk.im.android.live.room.Room
+import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.ui.call.LiveCallActivity
 import com.thk.im.android.ui.chat.MessageActivity
 import com.thk.im.android.ui.contact.ContactUserActivity
@@ -39,8 +39,8 @@ class ExternalPageRouter : IMPageRouter {
     override fun openLiveCall(ctx: Context, session: Session) {
         if (session.type == SessionType.Single.value) {
             val ids = mutableSetOf(session.entityId, IMLiveManager.shared().selfId)
-            val subscriber = object : BaseSubscriber<Room>() {
-                override fun onNext(t: Room?) {
+            val subscriber = object : BaseSubscriber<RTCRoom>() {
+                override fun onNext(t: RTCRoom?) {
                     t?.let {
                         LiveCallActivity.startCallActivity(ctx)
                     }

@@ -14,14 +14,14 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActvitiyLiveCallBinding
 import com.thk.im.android.live.IMLiveManager
-import com.thk.im.android.live.RoomObserver
 import com.thk.im.android.live.room.BaseParticipant
+import com.thk.im.android.live.room.RTCRoom
+import com.thk.im.android.live.room.RTCRoomProtocol
 import com.thk.im.android.live.room.RemoteParticipant
-import com.thk.im.android.live.room.Room
 import com.thk.im.android.ui.base.BaseActivity
 import java.nio.ByteBuffer
 
-class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
+class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
 
     companion object {
         fun startCallActivity(ctx: Context) {
@@ -37,7 +37,7 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         val room = IMLiveManager.shared().getRoom() ?: return
-        room.registerObserver(this)
+        room.rtcRoomProtocol = this
         initUserInfo(room)
 
         binding.llRequestCall.initCall(this)
@@ -68,8 +68,8 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         checkPermission()
     }
 
-    private fun initUserInfo(room: Room) {
-        room.members.forEach {
+    private fun initUserInfo(RTCRoom: RTCRoom) {
+        RTCRoom.members.forEach {
             if (it != IMLiveManager.shared().selfId) {
                 val subscriber = object : BaseSubscriber<User>() {
                     override fun onNext(t: User?) {
@@ -139,16 +139,6 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
         binding.llBeCalling.visibility = View.GONE
     }
 
-    override fun onHangup(uId: Long) {
-        IMLiveManager.shared().leaveRoom()
-        finish()
-    }
-
-    override fun onEndCall() {
-        IMLiveManager.shared().leaveRoom()
-        finish()
-    }
-
     private fun initParticipant(p: BaseParticipant) {
         if (p is RemoteParticipant) {
             binding.participantLocal.setFullscreenMode(false)
@@ -163,23 +153,6 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
                 binding.participantLocal.startPeerConnection()
             }
         }
-    }
-
-    override fun join(p: BaseParticipant) {
-        LLog.v("LiveCallActivity join")
-        showCallingView()
-        initParticipant(p)
-    }
-
-    override fun leave(p: BaseParticipant) {
-        IMLiveManager.shared().leaveRoom()
-        finish()
-    }
-
-    override fun onTextMsgReceived(uId: Long, text: String) {
-    }
-
-    override fun onBufferMsgReceived(bb: ByteBuffer) {
     }
 
     override fun onDestroy() {
@@ -254,6 +227,28 @@ class LiveCallActivity : BaseActivity(), RoomObserver, LiveCallProtocol {
     override fun hangup() {
         IMLiveManager.shared().leaveRoom()
         finish()
+    }
+
+    override fun onParticipantJoin(p: BaseParticipant) {
+        showCallingView()
+        initParticipant(p)
+    }
+
+    override fun onParticipantLeave(p: BaseParticipant) {
+        IMLiveManager.shared().leaveRoom()
+        finish()
+    }
+
+    override fun onTextMsgReceived(uId: Long, text: String) {
+    }
+
+    override fun onDataMsgReceived(uId: Long, data: ByteBuffer) {
+    }
+
+    override fun onParticipantVoice(uId: Long, volume: Double) {
+    }
+
+    override fun onError(function: String, ex: Exception) {
     }
 
 }

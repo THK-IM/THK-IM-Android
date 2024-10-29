@@ -5,10 +5,9 @@ import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.Mode
 import com.thk.im.android.live.ParticipantVo
 import com.thk.im.android.live.Role
-import com.thk.im.android.live.RoomObserver
 import java.nio.ByteBuffer
 
-class Room(
+class RTCRoom(
     val id: String,
     val uId: Long,
     val mode: Mode,
@@ -18,7 +17,7 @@ class Room(
     role: Role,
     participantVos: List<ParticipantVo>? // 当前参与人
 ) {
-    private val observers: MutableList<RoomObserver> = ArrayList()
+    var rtcRoomProtocol: RTCRoomProtocol? = null
     private var localParticipant: LocalParticipant? = null
     private var remoteParticipants: MutableList<RemoteParticipant> = ArrayList()
 
@@ -131,7 +130,7 @@ class Room(
         for (p in remoteParticipants) {
             p.leave()
         }
-        observers.clear()
+        rtcRoomProtocol = null
         remoteParticipants.clear()
         localParticipant?.leave()
         localParticipant = null
@@ -171,26 +170,12 @@ class Room(
         return this.localParticipant?.role
     }
 
-    fun registerObserver(observer: RoomObserver) {
-        observers.add(observer)
-    }
-
-    fun unRegisterObserver(observer: RoomObserver) {
-        observers.remove(observer)
-    }
-
     private fun notifyJoin(p: BaseParticipant) {
-        LLog.d("notifyJoin, ${p.uId}")
-        for (o in observers) {
-            o.join(p)
-        }
+        rtcRoomProtocol?.onParticipantJoin(p)
     }
 
     private fun notifyLeave(p: BaseParticipant) {
-        LLog.d("notifyLeave, ${p.uId}")
-        for (o in observers) {
-            o.leave(p)
-        }
+        rtcRoomProtocol?.onParticipantLeave(p)
     }
 
     fun sendMessage(text: String): Boolean {
@@ -222,32 +207,15 @@ class Room(
     }
 
     fun receivedDcMsg(uId: Long, text: String) {
-        observers.forEach {
-            it.onTextMsgReceived(uId, text)
-        }
+        rtcRoomProtocol?.onTextMsgReceived(uId, text)
     }
 
     fun receivedDcMsg(bb: ByteBuffer) {
-        observers.forEach {
-            it.onBufferMsgReceived(bb)
-        }
+        rtcRoomProtocol?.onDataMsgReceived(uId, bb)
     }
 
     fun switchCamera() {
         localParticipant?.switchCamera()
-    }
-
-    fun onMemberHangup(uId: Long) {
-        for (o in observers) {
-            o.onHangup(uId)
-        }
-    }
-
-    fun onEndCall() {
-        for (o in observers) {
-            o.onEndCall()
-        }
-
     }
 
 }

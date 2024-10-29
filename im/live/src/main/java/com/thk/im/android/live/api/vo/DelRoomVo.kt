@@ -1,8 +1,8 @@
-package com.thk.im.android.live.vo
+package com.thk.im.android.live.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class RefuseJoinRoomVo(
+data class DelRoomVo(
     @SerializedName("room_id")
     var roomId: String,
     @SerializedName("u_id")

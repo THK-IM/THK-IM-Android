@@ -1,15 +1,17 @@
 package com.thk.im.android.live
 
-import com.thk.im.android.live.vo.CreateRoomReqVo
-import com.thk.im.android.live.vo.CreateRoomResVo
-import com.thk.im.android.live.vo.DelRoomVo
-import com.thk.im.android.live.vo.JoinRoomReqVo
-import com.thk.im.android.live.vo.JoinRoomResVo
-import com.thk.im.android.live.vo.PlayStreamReqVo
-import com.thk.im.android.live.vo.PlayStreamResVo
-import com.thk.im.android.live.vo.PublishStreamReqVo
-import com.thk.im.android.live.vo.PublishStreamResVo
-import com.thk.im.android.live.vo.RefuseJoinRoomVo
+import com.thk.im.android.live.api.vo.CallRoomMemberReqVo
+import com.thk.im.android.live.api.vo.CreateRoomReqVo
+import com.thk.im.android.live.api.vo.CreateRoomResVo
+import com.thk.im.android.live.api.vo.DelRoomVo
+import com.thk.im.android.live.api.vo.InviteMemberReqVo
+import com.thk.im.android.live.api.vo.JoinRoomReqVo
+import com.thk.im.android.live.api.vo.JoinRoomResVo
+import com.thk.im.android.live.api.vo.PlayStreamReqVo
+import com.thk.im.android.live.api.vo.PlayStreamResVo
+import com.thk.im.android.live.api.vo.PublishStreamReqVo
+import com.thk.im.android.live.api.vo.PublishStreamResVo
+import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
 import io.reactivex.Flowable
 
 interface LiveApi {
@@ -22,7 +24,11 @@ interface LiveApi {
 
     fun createRoom(req: CreateRoomReqVo): Flowable<CreateRoomResVo>
 
+    fun callRoomMember(req: CallRoomMemberReqVo): Flowable<Void>
+
     fun joinRoom(req: JoinRoomReqVo): Flowable<JoinRoomResVo>
+
+    fun inviteMember(req: InviteMemberReqVo): Flowable<Void>
 
     fun refuseJoinRoom(req: RefuseJoinRoomVo): Flowable<Void>
 

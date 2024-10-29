@@ -2,16 +2,18 @@ package com.thk.im.android.live.api
 
 import com.thk.im.android.core.api.internal.APITokenInterceptor
 import com.thk.im.android.live.LiveApi
-import com.thk.im.android.live.vo.CreateRoomReqVo
-import com.thk.im.android.live.vo.CreateRoomResVo
-import com.thk.im.android.live.vo.DelRoomVo
-import com.thk.im.android.live.vo.JoinRoomReqVo
-import com.thk.im.android.live.vo.JoinRoomResVo
-import com.thk.im.android.live.vo.PlayStreamReqVo
-import com.thk.im.android.live.vo.PlayStreamResVo
-import com.thk.im.android.live.vo.PublishStreamReqVo
-import com.thk.im.android.live.vo.PublishStreamResVo
-import com.thk.im.android.live.vo.RefuseJoinRoomVo
+import com.thk.im.android.live.api.vo.CallRoomMemberReqVo
+import com.thk.im.android.live.api.vo.CreateRoomReqVo
+import com.thk.im.android.live.api.vo.CreateRoomResVo
+import com.thk.im.android.live.api.vo.DelRoomVo
+import com.thk.im.android.live.api.vo.InviteMemberReqVo
+import com.thk.im.android.live.api.vo.JoinRoomReqVo
+import com.thk.im.android.live.api.vo.JoinRoomResVo
+import com.thk.im.android.live.api.vo.PlayStreamReqVo
+import com.thk.im.android.live.api.vo.PlayStreamResVo
+import com.thk.im.android.live.api.vo.PublishStreamReqVo
+import com.thk.im.android.live.api.vo.PublishStreamResVo
+import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
 import io.reactivex.Flowable
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
@@ -20,7 +22,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-class DefaultLiveApi(var token: String, var serverUrl: String) : LiveApi {
+class DefaultLiveApi(private var token: String, private var serverUrl: String) : LiveApi {
 
     private val defaultTimeout: Long = 30
     private val maxIdleConnection = 8
@@ -72,8 +74,16 @@ class DefaultLiveApi(var token: String, var serverUrl: String) : LiveApi {
         return roomApi.createRoom(req)
     }
 
+    override fun callRoomMember(req: CallRoomMemberReqVo): Flowable<Void> {
+        return roomApi.callRoomMember(req)
+    }
+
     override fun joinRoom(req: JoinRoomReqVo): Flowable<JoinRoomResVo> {
         return roomApi.joinRoom(req)
+    }
+
+    override fun inviteMember(req: InviteMemberReqVo): Flowable<Void> {
+        return roomApi.inviteMember(req)
     }
 
     override fun refuseJoinRoom(req: RefuseJoinRoomVo): Flowable<Void> {

@@ -1,18 +1,18 @@
-package com.thk.im.android.live.vo
+package com.thk.im.android.live.api.vo
 
 import com.google.gson.annotations.SerializedName
 import com.thk.im.android.live.ParticipantVo
 
-data class JoinRoomReqVo(
-    @SerializedName("room_id")
-    var roomId: String,
+data class CreateRoomReqVo(
     @SerializedName("u_id")
     val uId: Long,
-    @SerializedName("role")
-    var role: Int
+    @SerializedName("mode")
+    var mode: Int,
+    @SerializedName("members")
+    var members: Set<Long>,
 )
 
-data class JoinRoomResVo(
+data class CreateRoomResVo(
     @SerializedName("id")
     var id: String,
     @SerializedName("owner_id")
@@ -22,7 +22,7 @@ data class JoinRoomResVo(
     @SerializedName("members")
     var members: Set<Long>,
     @SerializedName("participants")
-    var participants: MutableList<ParticipantVo>?,
+    var participantVos: MutableList<ParticipantVo>?,
     @SerializedName("mode")
     var mode: Int,
 )

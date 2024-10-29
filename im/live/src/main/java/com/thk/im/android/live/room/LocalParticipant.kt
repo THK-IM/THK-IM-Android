@@ -9,8 +9,8 @@ import com.thk.im.android.live.DataChannelMsg
 import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.Role
 import com.thk.im.android.live.utils.MediaConstraintsHelper
-import com.thk.im.android.live.vo.PublishStreamReqVo
-import com.thk.im.android.live.vo.PublishStreamResVo
+import com.thk.im.android.live.api.vo.PublishStreamReqVo
+import com.thk.im.android.live.api.vo.PublishStreamResVo
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer

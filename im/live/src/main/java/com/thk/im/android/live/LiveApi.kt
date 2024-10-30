@@ -7,6 +7,7 @@ import com.thk.im.android.live.api.vo.DelRoomVo
 import com.thk.im.android.live.api.vo.InviteMemberReqVo
 import com.thk.im.android.live.api.vo.JoinRoomReqVo
 import com.thk.im.android.live.api.vo.JoinRoomResVo
+import com.thk.im.android.live.api.vo.KickoffMemberReqVo
 import com.thk.im.android.live.api.vo.PlayStreamReqVo
 import com.thk.im.android.live.api.vo.PlayStreamResVo
 import com.thk.im.android.live.api.vo.PublishStreamReqVo
@@ -31,6 +32,8 @@ interface LiveApi {
     fun inviteMember(req: InviteMemberReqVo): Flowable<Void>
 
     fun refuseJoinRoom(req: RefuseJoinRoomVo): Flowable<Void>
+
+    fun kickRoomMember(req: KickoffMemberReqVo): Flowable<Void>
 
     fun delRoom(req: DelRoomVo): Flowable<Void>
 }

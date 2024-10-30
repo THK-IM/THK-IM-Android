@@ -12,4 +12,6 @@ data class CallRoomMemberReqVo(
     val duration: Long,
     @SerializedName("msg")
     val msg: String,
+    @SerializedName("members")
+    var members: Set<Long>,
 )

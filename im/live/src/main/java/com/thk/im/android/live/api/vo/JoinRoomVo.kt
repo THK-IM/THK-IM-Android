@@ -19,8 +19,6 @@ data class JoinRoomResVo(
     var ownerId: Long,
     @SerializedName("create_time")
     var createTime: Long,
-    @SerializedName("members")
-    var members: Set<Long>,
     @SerializedName("participants")
     var participants: MutableList<ParticipantVo>?,
     @SerializedName("mode")

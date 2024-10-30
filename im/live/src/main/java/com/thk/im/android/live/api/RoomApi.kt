@@ -7,6 +7,7 @@ import com.thk.im.android.live.api.vo.DelRoomVo
 import com.thk.im.android.live.api.vo.InviteMemberReqVo
 import com.thk.im.android.live.api.vo.JoinRoomReqVo
 import com.thk.im.android.live.api.vo.JoinRoomResVo
+import com.thk.im.android.live.api.vo.KickoffMemberReqVo
 import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
 import io.reactivex.Flowable
 import retrofit2.http.Body
@@ -38,6 +39,11 @@ interface RoomApi {
     @POST("/room/member/refuse_join")
     fun refuseJoinRoom(
         @Body req: RefuseJoinRoomVo
+    ): Flowable<Void>
+
+    @POST("/room/member/kick")
+    fun kickoffMember(
+        @Body req: KickoffMemberReqVo
     ): Flowable<Void>
 
 

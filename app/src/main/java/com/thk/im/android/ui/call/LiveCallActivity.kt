@@ -68,9 +68,9 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         checkPermission()
     }
 
-    private fun initUserInfo(RTCRoom: RTCRoom) {
-        RTCRoom.members.forEach {
-            if (it != IMLiveManager.shared().selfId) {
+    private fun initUserInfo(rtcRoom: RTCRoom) {
+        rtcRoom.getAllParticipants().forEach {
+            if (it.uId != IMLiveManager.shared().selfId) {
                 val subscriber = object : BaseSubscriber<User>() {
                     override fun onNext(t: User?) {
                         t?.let { user ->
@@ -79,7 +79,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
                     }
 
                 }
-                IMCoreManager.userModule.queryUser(it).compose(RxTransform.flowableToMain())
+                IMCoreManager.userModule.queryUser(it.uId).compose(RxTransform.flowableToMain())
                     .subscribe(subscriber)
                 addDispose(subscriber)
             }

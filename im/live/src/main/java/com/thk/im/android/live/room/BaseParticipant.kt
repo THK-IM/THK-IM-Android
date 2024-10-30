@@ -7,7 +7,6 @@ import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.StringUtils
 import com.thk.im.android.live.DataChannelMsg
 import com.thk.im.android.live.IMLiveManager
-import com.thk.im.android.live.Mode
 import com.thk.im.android.live.NewStreamNotify
 import com.thk.im.android.live.NotifyBean
 import com.thk.im.android.live.NotifyType
@@ -322,8 +321,8 @@ abstract class BaseParticipant(
                 }
                 val room = IMLiveManager.shared().getRoom()
                 room?.let {
-                    val audioEnable = it.mode == Mode.Audio || it.mode == Mode.Video
-                    val videoEnable = it.mode == Mode.Video
+                    val audioEnable = (role == Role.Broadcaster) && room.audioEnable()
+                    val videoEnable = (role == Role.Broadcaster) && room.videoEnable()
                     val remoteParticipant = RemoteParticipant(
                         newStream.uId,
                         newStream.roomId,

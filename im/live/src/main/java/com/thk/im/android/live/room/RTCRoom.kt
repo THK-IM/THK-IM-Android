@@ -10,8 +10,7 @@ import java.nio.ByteBuffer
 class RTCRoom(
     val id: String,
     val uId: Long,
-    val mode: Mode,
-    val members: MutableSet<Long>, // 房间内成员
+    val mode: Int,
     val ownerId: Long,
     val createTime: Long,
     role: Role,
@@ -26,6 +25,13 @@ class RTCRoom(
         initRemoteParticipant(participantVos)
     }
 
+    fun audioEnable(): Boolean {
+        return this.mode >= Mode.Audio.value
+    }
+
+    fun videoEnable(): Boolean {
+        return this.mode == Mode.Video.value || this.mode == Mode.VideoRoom.value
+    }
 
     private fun initLocalParticipant(role: Role) {
         val selfId = IMLiveManager.shared().selfId
@@ -34,8 +40,8 @@ class RTCRoom(
                 selfId,
                 id,
                 role,
-                audioEnable = mode == Mode.Audio || mode == Mode.Video,
-                videoEnable = mode == Mode.Video
+                audioEnable = audioEnable(),
+                videoEnable = videoEnable()
             )
         } else {
             LocalParticipant(
@@ -54,8 +60,8 @@ class RTCRoom(
                     }
                 }
                 if (vo.uId != uId) {
-                    val audioEnable = mode == Mode.Audio || mode == Mode.Video
-                    val videoEnable = mode == Mode.Video
+                    val audioEnable = audioEnable()
+                    val videoEnable = videoEnable()
                     val remoteParticipant =
                         RemoteParticipant(vo.uId, id, role, vo.streamKey, audioEnable, videoEnable)
                     this.remoteParticipants.add(remoteParticipant)

@@ -9,6 +9,7 @@ import com.thk.im.android.live.api.vo.DelRoomVo
 import com.thk.im.android.live.api.vo.InviteMemberReqVo
 import com.thk.im.android.live.api.vo.JoinRoomReqVo
 import com.thk.im.android.live.api.vo.JoinRoomResVo
+import com.thk.im.android.live.api.vo.KickoffMemberReqVo
 import com.thk.im.android.live.api.vo.PlayStreamReqVo
 import com.thk.im.android.live.api.vo.PlayStreamResVo
 import com.thk.im.android.live.api.vo.PublishStreamReqVo
@@ -88,6 +89,10 @@ class DefaultLiveApi(private var token: String, private var serverUrl: String) :
 
     override fun refuseJoinRoom(req: RefuseJoinRoomVo): Flowable<Void> {
         return roomApi.refuseJoinRoom(req)
+    }
+
+    override fun kickRoomMember(req: KickoffMemberReqVo): Flowable<Void> {
+        return roomApi.kickoffMember(req)
     }
 
     override fun delRoom(req: DelRoomVo): Flowable<Void> {

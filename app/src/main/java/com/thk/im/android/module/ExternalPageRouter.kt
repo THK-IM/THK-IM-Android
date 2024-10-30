@@ -46,7 +46,7 @@ class ExternalPageRouter : IMPageRouter {
                     }
                 }
             }
-            IMLiveManager.shared().createRoom(ids, Mode.Video)
+            IMLiveManager.shared().createRoom(Mode.Video)
                 .compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             compositeDisposable.add(subscriber)

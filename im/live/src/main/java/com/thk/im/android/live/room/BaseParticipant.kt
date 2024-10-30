@@ -115,22 +115,20 @@ abstract class BaseParticipant(
     open fun onLocalSdpCreated(sdp: SessionDescription) {
         peerConnection?.setLocalDescription(object : SdpObserver {
             override fun onCreateSuccess(p0: SessionDescription?) {
-                LLog.d("${uId}, setLocalDescription onCreateSuccess")
             }
 
             override fun onSetSuccess() {
-                LLog.d("${uId}, setLocalDescription onSetSuccess")
                 peerConnection?.let {
                     onLocalSdpSetSuccess(it.localDescription)
                 }
             }
 
             override fun onCreateFailure(p0: String?) {
-                LLog.e("${uId}, setLocalDescription onCreateFailure $p0")
+                onError("setLocalDescription", Exception("onCreateFailure: $p0"))
             }
 
             override fun onSetFailure(p0: String?) {
-                LLog.e("${uId}, setLocalDescription onSetFailure $p0")
+                onError("setLocalDescription", Exception("onSetFailure: $p0"))
             }
 
         }, sdp)
@@ -141,22 +139,19 @@ abstract class BaseParticipant(
     }
 
     fun setRemoteSessionDescription(sdp: SessionDescription) {
-        LLog.d("${uId}, setRemoteSessionDescription, ${sdp.description}")
         peerConnection?.setRemoteDescription(object : SdpObserver {
             override fun onCreateSuccess(p0: SessionDescription?) {
-                LLog.d("${uId}, setRemoteDescription onCreateSuccess")
             }
 
             override fun onSetSuccess() {
-                LLog.d("${uId}, setRemoteDescription onSetSuccess")
             }
 
             override fun onCreateFailure(p0: String?) {
-                LLog.e("${uId}, setRemoteDescription onCreateFailure $p0")
+                onError("setRemoteDescription", Exception("onCreateFailure: $p0"))
             }
 
             override fun onSetFailure(p0: String?) {
-                LLog.e("${uId}, setRemoteDescription onSetFailure $p0")
+                onError("setRemoteDescription", Exception("onSetFailure: $p0"))
             }
         }, sdp)
     }
@@ -355,6 +350,14 @@ abstract class BaseParticipant(
         }
     }
 
+    open fun onError(function: String, exception: Exception) {
+        val room = IMLiveManager.shared().getRoom() ?: return
+        if (room.id != this.roomId) {
+            return
+        }
+        room.delegate?.onError(function, exception)
+    }
+
     protected fun addVideoTrack(videoTrack: VideoTrack) {
         LLog.d("$uId, addVideoTrack")
         videoTracks.add(videoTrack)
@@ -362,23 +365,19 @@ abstract class BaseParticipant(
     }
 
     private fun removeVideoTrack(videoTrack: VideoTrack) {
-        LLog.d("$uId, removeVideoTrack")
         videoTracks.remove(videoTrack)
         detach()
     }
 
     protected fun addAudioTrack(audioTrack: AudioTrack) {
-        LLog.d("$uId, addAudioTrack")
         audioTracks.add(audioTrack)
     }
 
     private fun removeAudioTrack(audioTrack: AudioTrack) {
-        LLog.d("$uId, removeAudioTrack")
         audioTracks.remove(audioTrack)
     }
 
     open fun attachViewRender(svr: SurfaceViewRenderer) {
-        LLog.d("$uId, attachViewRender $svr")
         if (this.svr != null) {
             detach()
         }
@@ -387,7 +386,6 @@ abstract class BaseParticipant(
     }
 
     private fun attach() {
-        LLog.d("$uId, attach, ${videoTracks.size}, $svr")
         svr?.let {
             if (videoTracks.size > 0) {
                 it.init(IMLiveManager.shared().getPCFactoryWrapper().eglCtx, null)
@@ -400,15 +398,12 @@ abstract class BaseParticipant(
     }
 
     open fun detachViewRender() {
-        LLog.d("$uId ,detachViewRender")
         detach()
     }
 
     private fun detach() {
-        LLog.d("$uId , detach ${this.svr.toString()}")
         svr?.let {
             it.release()
-            LLog.d("detach svr ${videoTracks.size}")
             for (v in videoTracks) {
                 v.removeSink(it)
             }
@@ -422,7 +417,6 @@ abstract class BaseParticipant(
     }
 
     open fun onDisConnected() {
-        LLog.d("$uId, onDisConnected: ")
         detachViewRender()
         videoTracks.clear()
         audioTracks.clear()

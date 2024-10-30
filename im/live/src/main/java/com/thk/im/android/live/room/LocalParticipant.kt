@@ -19,6 +19,7 @@ import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoSource
+import java.lang.Exception
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
@@ -106,7 +107,7 @@ class LocalParticipant(
             })
             innerDataChannel?.registerObserver(this)
         } else {
-            LLog.e("peerConnection create failed")
+            onError("initPeerConn", Exception("peer connection create failed"))
         }
     }
 
@@ -141,7 +142,6 @@ class LocalParticipant(
                         )
                     )
                     pushStreamKey = t.streamKey
-                    LLog.d("remote sdp: $answer")
                     val remoteSdp = SessionDescription(SessionDescription.Type.ANSWER, answer)
                     setRemoteSessionDescription(remoteSdp)
                 }
@@ -149,7 +149,9 @@ class LocalParticipant(
 
             override fun onError(t: Throwable?) {
                 super.onError(t)
-                LLog.e("remote sdp error: ${t?.message}")
+                t?.let {
+                    this@LocalParticipant.onError("publishStream", Exception(it))
+                }
             }
         }
         IMLiveManager.shared().liveApi.publishStream(reqVo)

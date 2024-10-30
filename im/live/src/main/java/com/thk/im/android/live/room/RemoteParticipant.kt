@@ -10,6 +10,7 @@ import com.thk.im.android.live.api.vo.PlayStreamResVo
 import org.webrtc.MediaStreamTrack
 import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
+import java.lang.Exception
 import java.nio.charset.Charset
 
 class RemoteParticipant(
@@ -39,15 +40,23 @@ class RemoteParticipant(
                 )
             }
         }
+        if (peerConnection == null) {
+            onError("initPeerConn", Exception("create peer connection failed"))
+        }
     }
 
     override fun onLocalSdpSetSuccess(sdp: SessionDescription) {
         super.onLocalSdpSetSuccess(sdp)
         val offer = sdp.description
-        val offerBase64 =
-            String(Base64.encode(offer.toByteArray(Charset.forName("UTF-8")), Base64.DEFAULT))
-        val reqVo =
-            PlayStreamReqVo(roomId, IMLiveManager.shared().selfId, offerBase64, subStreamKey)
+        val offerBase64 = String(
+            Base64.encode(
+                offer.toByteArray(Charset.forName("UTF-8")),
+                Base64.DEFAULT
+            )
+        )
+        val reqVo = PlayStreamReqVo(
+            roomId, IMLiveManager.shared().selfId, offerBase64, subStreamKey
+        )
         val subscriber = object : BaseSubscriber<PlayStreamResVo>() {
             override fun onNext(t: PlayStreamResVo?) {
                 t?.let {
@@ -60,6 +69,13 @@ class RemoteParticipant(
                     streamKey = t.streamKey
                     val remoteSdp = SessionDescription(SessionDescription.Type.ANSWER, answer)
                     setRemoteSessionDescription(remoteSdp)
+                }
+            }
+
+            override fun onError(t: Throwable?) {
+                super.onError(t)
+                t?.let {
+                    this@RemoteParticipant.onError("playStream", Exception(it))
                 }
             }
         }

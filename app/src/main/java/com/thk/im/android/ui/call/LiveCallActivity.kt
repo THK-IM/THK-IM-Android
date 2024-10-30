@@ -37,7 +37,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         val room = IMLiveManager.shared().getRoom() ?: return
-        room.rtcRoomProtocol = this
+        room.delegate = this
         initUserInfo(room)
 
         binding.llRequestCall.initCall(this)

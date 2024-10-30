@@ -16,7 +16,7 @@ class RTCRoom(
     role: Int,
     participantVos: List<ParticipantVo>? // 当前参与人
 ) {
-    var rtcRoomProtocol: RTCRoomProtocol? = null
+    var delegate: RTCRoomProtocol? = null
     private var localParticipant: LocalParticipant? = null
     private var remoteParticipants: MutableList<RemoteParticipant> = ArrayList()
 
@@ -137,7 +137,7 @@ class RTCRoom(
         for (p in remoteParticipants) {
             p.leave()
         }
-        rtcRoomProtocol = null
+        delegate = null
         remoteParticipants.clear()
         localParticipant?.leave()
         localParticipant = null
@@ -178,11 +178,11 @@ class RTCRoom(
     }
 
     private fun notifyJoin(p: BaseParticipant) {
-        rtcRoomProtocol?.onParticipantJoin(p)
+        delegate?.onParticipantJoin(p)
     }
 
     private fun notifyLeave(p: BaseParticipant) {
-        rtcRoomProtocol?.onParticipantLeave(p)
+        delegate?.onParticipantLeave(p)
     }
 
     fun sendMessage(text: String): Boolean {
@@ -214,11 +214,11 @@ class RTCRoom(
     }
 
     fun receivedDcMsg(uId: Long, text: String) {
-        rtcRoomProtocol?.onTextMsgReceived(uId, text)
+        delegate?.onTextMsgReceived(uId, text)
     }
 
     fun receivedDcMsg(bb: ByteBuffer) {
-        rtcRoomProtocol?.onDataMsgReceived(uId, bb)
+        delegate?.onDataMsgReceived(uId, bb)
     }
 
     fun switchCamera() {

@@ -42,9 +42,13 @@ class IMLiveRTCEngine {
         val options = PeerConnectionFactory.Options()
         val encoderFactory = DefaultVideoEncoderFactory(eglBaseContext, true, true)
         val decoderFactory = DefaultVideoDecoderFactory(eglBaseContext)
-        audioDeviceModule = JavaAudioDeviceModule.builder(app).setSamplesReadyCallback {
-
-        }.createAudioDeviceModule()
+        audioDeviceModule = JavaAudioDeviceModule.builder(app)
+            .setPlaybackSamplesReadyCallback {
+                // TODO
+            }
+            .setSamplesReadyCallback {
+                // TODO
+            }.createAudioDeviceModule()
         eglBaseCtx = eglBaseContext
         factory = PeerConnectionFactory.builder().setOptions(options)
             .setVideoEncoderFactory(encoderFactory)

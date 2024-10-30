@@ -9,6 +9,7 @@ import android.os.Build
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
+import org.webrtc.ExternalAudioProcessingFactory
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.audio.JavaAudioDeviceModule
 
@@ -42,6 +43,11 @@ class IMLiveRTCEngine {
         val options = PeerConnectionFactory.Options()
         val encoderFactory = DefaultVideoEncoderFactory(eglBaseContext, true, true)
         val decoderFactory = DefaultVideoDecoderFactory(eglBaseContext)
+        val audioProcessingFactory = ExternalAudioProcessingFactory()
+        audioProcessingFactory.setBypassFlagForRenderPre(true)
+        audioProcessingFactory.setBypassFlagForCapturePost(true)
+        audioProcessingFactory.setCapturePostProcessing(IMLiveAudioCaptureProxy())
+        audioProcessingFactory.setRenderPreProcessing(IMLiveAudioRenderProxy())
         audioDeviceModule = JavaAudioDeviceModule.builder(app)
             .setPlaybackSamplesReadyCallback {
                 // TODO
@@ -53,6 +59,7 @@ class IMLiveRTCEngine {
         factory = PeerConnectionFactory.builder().setOptions(options)
             .setVideoEncoderFactory(encoderFactory)
             .setVideoDecoderFactory(decoderFactory)
+            .setAudioProcessingFactory(audioProcessingFactory)
             .setAudioDeviceModule(audioDeviceModule)
             .createPeerConnectionFactory()
         audioDeviceModule.setSpeakerMute(false)

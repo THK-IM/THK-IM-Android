@@ -242,7 +242,10 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
     override fun onTextMsgReceived(uId: Long, text: String) {
     }
 
-    override fun onDataMsgReceived(uId: Long, data: ByteBuffer) {
+    override fun onDataMsgReceived(data: ByteBuffer) {
+    }
+
+    override fun onConnectStatus(uId: Long, status: Int) {
     }
 
     override fun onParticipantVoice(uId: Long, volume: Double) {

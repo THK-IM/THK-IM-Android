@@ -1,9 +1,12 @@
 package com.thk.im.android.live.room
 
+import com.google.gson.Gson
 import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.Mode
 import com.thk.im.android.live.ParticipantVo
 import com.thk.im.android.live.Role
+import com.thk.im.android.live.VolumeMsg
+import com.thk.im.android.live.VolumeMsgType
 import java.nio.ByteBuffer
 
 class RTCRoom(
@@ -164,16 +167,20 @@ class RTCRoom(
         delegate?.onParticipantLeave(p)
     }
 
-    fun sendMessage(text: String): Boolean {
+    fun sendMessage(type: Int, text: String): Boolean {
         return if (localParticipant != null) {
-            val success = localParticipant!!.sendMessage(text)
+            val success = localParticipant!!.sendMessage(type, text)
             if (success) {
-                receivedDcMsg(uId, text)
+                receivedDcMsg(type, text)
             }
             success
         } else {
             false
         }
+    }
+
+    fun sendMyVolume(volume: Double) {
+        localParticipant?.sendMyVolume(volume)
     }
 
     fun sendBytes(ba: ByteArray): Boolean {
@@ -192,8 +199,12 @@ class RTCRoom(
         }
     }
 
-    fun receivedDcMsg(uId: Long, text: String) {
-        delegate?.onTextMsgReceived(uId, text)
+    fun receivedDcMsg(type: Int, text: String) {
+        if (type == VolumeMsgType) {
+            val volumeMsg = Gson().fromJson(text, VolumeMsg::class.java)
+            delegate?.onParticipantVoice(volumeMsg.uId, volumeMsg.volume)
+        }
+        delegate?.onTextMsgReceived(type, text)
     }
 
     fun receivedDcMsg(bb: ByteBuffer) {

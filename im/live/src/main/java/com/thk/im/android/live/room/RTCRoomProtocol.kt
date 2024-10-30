@@ -17,7 +17,7 @@ interface RTCRoomProtocol {
     /**
      * RTC 文本消息
      */
-    fun onTextMsgReceived(uId: Long, text: String)
+    fun onTextMsgReceived(type: Int, text: String)
 
     /**
      * RTC 数据消息

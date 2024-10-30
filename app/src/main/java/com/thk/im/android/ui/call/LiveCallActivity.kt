@@ -14,6 +14,7 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActvitiyLiveCallBinding
 import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.engine.IMLiveRTCEngine
 import com.thk.im.android.live.room.BaseParticipant
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.room.RTCRoomProtocol
@@ -163,11 +164,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
     }
 
     override fun isSpeakerMuted(): Boolean {
-        return IMLiveManager.shared().isSpeakerMuted()
+        return IMLiveRTCEngine.shared().isSpeakerMuted()
     }
 
     override fun muteSpeaker(mute: Boolean) {
-        IMLiveManager.shared().muteSpeaker(mute)
+        IMLiveRTCEngine.shared().muteSpeaker(mute)
     }
 
     override fun currentLocalCamera(): Int {
@@ -239,7 +240,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         finish()
     }
 
-    override fun onTextMsgReceived(uId: Long, text: String) {
+    override fun onTextMsgReceived(type: Int, text: String) {
     }
 
     override fun onDataMsgReceived(data: ByteBuffer) {

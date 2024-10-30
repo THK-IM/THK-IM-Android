@@ -3,14 +3,15 @@ package com.thk.im.android.live.room
 import android.util.Base64
 import com.google.gson.Gson
 import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.live.DataChannelMsg
 import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.Role
-import com.thk.im.android.live.utils.MediaConstraintsHelper
+import com.thk.im.android.live.VolumeMsg
 import com.thk.im.android.live.api.vo.PublishStreamReqVo
 import com.thk.im.android.live.api.vo.PublishStreamResVo
+import com.thk.im.android.live.engine.IMLiveRTCEngine
+import com.thk.im.android.live.utils.MediaConstraintsHelper
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer
@@ -19,7 +20,6 @@ import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoSource
-import java.lang.Exception
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
@@ -42,15 +42,14 @@ class LocalParticipant(
     override fun initPeerConn() {
         super.initPeerConn()
         if (peerConnection != null) {
-            val pcFactoryWrapper = IMLiveManager.shared().getPCFactoryWrapper()
             if (audioEnable && role == Role.Broadcaster.value) {
-                val audioSource = pcFactoryWrapper.factory.createAudioSource(
+                val audioSource = IMLiveRTCEngine.shared().factory.createAudioSource(
                     MediaConstraintsHelper.build(
                         enable3a = true, enableCpu = true, enableGainControl = true
                     )
                 )
                 // 创建AudioTrack，音频轨
-                val audioTrack = pcFactoryWrapper.factory.createAudioTrack(
+                val audioTrack = IMLiveRTCEngine.shared().factory.createAudioTrack(
                     "audio/$roomId/$uId",
                     audioSource
                 )
@@ -60,6 +59,18 @@ class LocalParticipant(
                 )
 
                 addAudioTrack(audioTrack)
+
+                peerConnection?.senders?.forEach { sender ->
+                    if (sender.track()?.kind() == audioTrack.kind()) {
+                        val parameters = sender.parameters
+                        for (e in parameters.encodings) {
+                            val minBitrate = 8 * 10 * 1024
+                            e.maxBitrateBps = 5 * minBitrate
+                            e.minBitrateBps = minBitrate
+                        }
+                        sender.parameters = parameters
+                    }
+                }
             }
 
             if (videoEnable && role == Role.Broadcaster.value) {
@@ -69,12 +80,12 @@ class LocalParticipant(
                         surfaceTextureHelper =
                             SurfaceTextureHelper.create(
                                 "surface_texture_thread",
-                                pcFactoryWrapper.eglCtx
+                                IMLiveRTCEngine.shared().eglBaseCtx
                             )
                         videoSource =
-                            pcFactoryWrapper.factory.createVideoSource(it.isScreencast)
+                            IMLiveRTCEngine.shared().factory.createVideoSource(it.isScreencast)
                         val videoTrack =
-                            pcFactoryWrapper.factory.createVideoTrack(
+                            IMLiveRTCEngine.shared().factory.createVideoTrack(
                                 "video/$roomId/$uId",
                                 videoSource
                             )
@@ -88,11 +99,11 @@ class LocalParticipant(
                         addVideoTrack(videoTrack)
 
                         peerConnection?.senders?.forEach { sender ->
-                            if (sender.track()?.kind() == "video") {
+                            if (sender.track()?.kind() == videoTrack.kind()) {
                                 val parameters = sender.parameters
                                 for (e in parameters.encodings) {
-                                    val minBitrate = 1024 * 1024
-                                    e.maxBitrateBps = 4 * minBitrate
+                                    val minBitrate = 8 * 50 * 1024
+                                    e.maxBitrateBps = 10 * minBitrate
                                     e.minBitrateBps = minBitrate
                                 }
                                 sender.parameters = parameters
@@ -237,12 +248,17 @@ class LocalParticipant(
         return null
     }
 
+    fun sendMyVolume(volume: Double) {
+        val volumeMsg = VolumeMsg(this.uId, volume)
+        val text = Gson().toJson(volumeMsg)
+        sendMessage(0, text)
+    }
 
-    fun sendMessage(text: String): Boolean {
+    fun sendMessage(type: Int, text: String): Boolean {
         return if (innerDataChannel == null) {
             false
         } else {
-            val msg = DataChannelMsg(uId, text)
+            val msg = DataChannelMsg(type, text)
             val msgStr = Gson().toJson(msg)
             val buffer = DataChannel.Buffer(ByteBuffer.wrap(msgStr.toByteArray()), false)
             innerDataChannel!!.send(buffer)

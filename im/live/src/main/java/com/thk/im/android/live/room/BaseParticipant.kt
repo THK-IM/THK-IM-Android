@@ -10,6 +10,7 @@ import com.thk.im.android.live.NewStreamNotify
 import com.thk.im.android.live.NotifyBean
 import com.thk.im.android.live.NotifyType
 import com.thk.im.android.live.RemoveStreamNotify
+import com.thk.im.android.live.engine.IMLiveRTCEngine
 import com.thk.im.android.live.utils.MediaConstraintsHelper
 import io.reactivex.disposables.CompositeDisposable
 import org.webrtc.AudioTrack
@@ -45,9 +46,8 @@ abstract class BaseParticipant(
         val configuration = PeerConnection.RTCConfiguration(emptyList())
         //必须设置PeerConnection.SdpSemantics.UNIFIED_PLAN
         configuration.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
-        this.peerConnection = IMLiveManager.shared().getPCFactoryWrapper()
-            .factory
-            .createPeerConnection(configuration, this)
+        this.peerConnection =
+            IMLiveRTCEngine.shared().factory.createPeerConnection(configuration, this)
     }
 
     open fun startPeerConnection() {
@@ -329,7 +329,7 @@ abstract class BaseParticipant(
                 val dataChannelMsg = Gson().fromJson(notify.message, DataChannelMsg::class.java)
                 IMLiveManager.shared().getRoom()?.let {
                     handler.post {
-                        it.receivedDcMsg(dataChannelMsg.uId, dataChannelMsg.text)
+                        it.receivedDcMsg(dataChannelMsg.type, dataChannelMsg.text)
                     }
                 }
             }
@@ -382,7 +382,7 @@ abstract class BaseParticipant(
     private fun attach() {
         svr?.let {
             if (videoTracks.size > 0) {
-                it.init(IMLiveManager.shared().getPCFactoryWrapper().eglCtx, null)
+                it.init(IMLiveRTCEngine.shared().eglBaseCtx, null)
                 for (v in videoTracks) {
                     v.addSink(it)
                 }

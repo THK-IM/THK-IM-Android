@@ -51,8 +51,8 @@ data class RemoveStreamNotify(
 )
 
 data class DataChannelMsg(
-    @SerializedName("u_id")
-    var uId: Long,
+    @SerializedName("type")
+    var type: Int,
     @SerializedName("text")
     var text: String,
 )
@@ -66,4 +66,13 @@ data class ParticipantVo(
     var joinTime: Long,
     @SerializedName("stream_key")
     var streamKey: String,
+)
+
+const val VolumeMsgType = 0
+
+data class VolumeMsg(
+    @SerializedName("u_id")
+    var uId: Long,
+    @SerializedName("volume")
+    var volume: Double,
 )

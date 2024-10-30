@@ -49,6 +49,10 @@ class IMLiveRTCEngine {
         audioProcessingFactory.setCapturePostProcessing(IMLiveAudioCaptureProxy())
         audioProcessingFactory.setRenderPreProcessing(IMLiveAudioRenderProxy())
         audioDeviceModule = JavaAudioDeviceModule.builder(app)
+            .setUseHardwareAcousticEchoCanceler(true)
+            .setUseLowLatency(true)
+            .setUseStereoInput(true)
+            .setUseStereoOutput(true)
             .setPlaybackSamplesReadyCallback {
                 // TODO
             }

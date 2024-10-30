@@ -26,7 +26,7 @@ import java.nio.charset.Charset
 class LocalParticipant(
     uId: Long,
     roomId: String,
-    role: Role,
+    role: Int,
     private val audioEnable: Boolean,
     private val videoEnable: Boolean
 ) : BaseParticipant(uId, roomId, role) {
@@ -42,7 +42,7 @@ class LocalParticipant(
         super.initPeerConn()
         if (peerConnection != null) {
             val pcFactoryWrapper = IMLiveManager.shared().getPCFactoryWrapper()
-            if (audioEnable && role == Role.Broadcaster) {
+            if (audioEnable && role == Role.Broadcaster.value) {
                 val audioSource = pcFactoryWrapper.factory.createAudioSource(
                     MediaConstraintsHelper.build(
                         enable3a = true, enableCpu = true, enableGainControl = true
@@ -61,7 +61,7 @@ class LocalParticipant(
                 addAudioTrack(audioTrack)
             }
 
-            if (videoEnable && role == Role.Broadcaster) {
+            if (videoEnable && role == Role.Broadcaster.value) {
                 IMLiveManager.shared().app?.let { app ->
                     videoCapture = createVideoCapture()
                     videoCapture?.let {

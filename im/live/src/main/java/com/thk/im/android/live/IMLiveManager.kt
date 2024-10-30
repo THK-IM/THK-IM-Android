@@ -58,9 +58,9 @@ class IMLiveManager private constructor() {
     }
 
 
-    fun joinRoom(roomId: String, role: Role): Flowable<RTCRoom> {
+    fun joinRoom(roomId: String, role: Int): Flowable<RTCRoom> {
         destroyRoom()
-        return liveApi.joinRoom(JoinRoomReqVo(roomId, this.selfId, role.value)).flatMap {
+        return liveApi.joinRoom(JoinRoomReqVo(roomId, this.selfId, role)).flatMap {
             val participantVos = mutableListOf<ParticipantVo>()
             it.participants?.let { ps ->
                 for (p in ps) {
@@ -86,7 +86,7 @@ class IMLiveManager private constructor() {
                 it.mode,
                 it.ownerId,
                 it.createTime,
-                Role.Broadcaster,
+                Role.Broadcaster.value,
                 it.participantVos
             )
             this@IMLiveManager.rtcRoom = rtcRoom

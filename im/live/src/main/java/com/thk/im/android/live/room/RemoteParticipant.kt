@@ -1,12 +1,12 @@
 package com.thk.im.android.live.room
 
 import android.util.Base64
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.Role
 import com.thk.im.android.live.api.vo.PlayStreamReqVo
 import com.thk.im.android.live.api.vo.PlayStreamResVo
-import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.RxTransform
 import org.webrtc.MediaStreamTrack
 import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
@@ -15,7 +15,7 @@ import java.nio.charset.Charset
 class RemoteParticipant(
     uId: Long,
     roomId: String,
-    role: Role,
+    role: Int,
     private val subStreamKey: String,
     private val audioEnable: Boolean,
     private val videoEnable: Boolean
@@ -26,13 +26,13 @@ class RemoteParticipant(
     override fun initPeerConn() {
         super.initPeerConn()
         peerConnection?.let {
-            if (audioEnable && role == Role.Broadcaster) {
+            if (audioEnable && role == Role.Broadcaster.value) {
                 it.addTransceiver(
                     MediaStreamTrack.MediaType.MEDIA_TYPE_AUDIO,
                     RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.RECV_ONLY)
                 )
             }
-            if (videoEnable && role == Role.Broadcaster) {
+            if (videoEnable && role == Role.Broadcaster.value) {
                 it.addTransceiver(
                     MediaStreamTrack.MediaType.MEDIA_TYPE_VIDEO,
                     RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.RECV_ONLY)

@@ -13,7 +13,7 @@ class RTCRoom(
     val mode: Int,
     val ownerId: Long,
     val createTime: Long,
-    role: Role,
+    role: Int,
     participantVos: List<ParticipantVo>? // 当前参与人
 ) {
     var rtcRoomProtocol: RTCRoomProtocol? = null
@@ -33,9 +33,9 @@ class RTCRoom(
         return this.mode == Mode.Video.value || this.mode == Mode.VideoRoom.value
     }
 
-    private fun initLocalParticipant(role: Role) {
+    private fun initLocalParticipant(role: Int) {
         val selfId = IMLiveManager.shared().selfId
-        localParticipant = if (role == Role.Broadcaster) {
+        localParticipant = if (role == Role.Broadcaster.value) {
             LocalParticipant(
                 selfId,
                 id,
@@ -53,17 +53,18 @@ class RTCRoom(
     private fun initRemoteParticipant(participantVos: List<ParticipantVo>?) {
         participantVos?.let { vos ->
             for (vo in vos) {
-                val role = when (vo.role) {
-                    Role.Broadcaster.value -> Role.Broadcaster
-                    else -> {
-                        Role.Audience
-                    }
-                }
                 if (vo.uId != uId) {
                     val audioEnable = audioEnable()
                     val videoEnable = videoEnable()
                     val remoteParticipant =
-                        RemoteParticipant(vo.uId, id, role, vo.streamKey, audioEnable, videoEnable)
+                        RemoteParticipant(
+                            vo.uId,
+                            id,
+                            vo.role,
+                            vo.streamKey,
+                            audioEnable,
+                            videoEnable
+                        )
                     this.remoteParticipants.add(remoteParticipant)
                 }
             }
@@ -151,7 +152,7 @@ class RTCRoom(
         return array
     }
 
-    fun setRole(role: Role) {
+    fun setRole(role: Int) {
         LLog.v("setRole: $role")
         if (localParticipant != null) {
             val lp = localParticipant!!
@@ -172,7 +173,7 @@ class RTCRoom(
         }
     }
 
-    fun getRole(): Role? {
+    fun getRole(): Int? {
         return this.localParticipant?.role
     }
 

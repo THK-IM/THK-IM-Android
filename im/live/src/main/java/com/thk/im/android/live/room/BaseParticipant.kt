@@ -11,7 +11,6 @@ import com.thk.im.android.live.NewStreamNotify
 import com.thk.im.android.live.NotifyBean
 import com.thk.im.android.live.NotifyType
 import com.thk.im.android.live.RemoveStreamNotify
-import com.thk.im.android.live.Role
 import com.thk.im.android.live.utils.MediaConstraintsHelper
 import io.reactivex.disposables.CompositeDisposable
 import org.webrtc.AudioTrack
@@ -30,7 +29,7 @@ import java.nio.charset.Charset
 abstract class BaseParticipant(
     val uId: Long,
     val roomId: String,
-    val role: Role,
+    val role: Int,
 ) : PeerConnection.Observer, DataChannel.Observer {
 
     private var dataChannelMap: HashMap<String, DataChannel> = HashMap()
@@ -313,23 +312,15 @@ abstract class BaseParticipant(
         when (notify.type) {
             NotifyType.NewStream.value -> {
                 val newStream = Gson().fromJson(notify.message, NewStreamNotify::class.java)
-                val role = when (newStream.role) {
-                    Role.Broadcaster.value -> Role.Broadcaster
-                    else -> {
-                        Role.Audience
-                    }
-                }
                 val room = IMLiveManager.shared().getRoom()
                 room?.let {
-                    val audioEnable = (role == Role.Broadcaster) && room.audioEnable()
-                    val videoEnable = (role == Role.Broadcaster) && room.videoEnable()
                     val remoteParticipant = RemoteParticipant(
                         newStream.uId,
                         newStream.roomId,
-                        role,
+                        newStream.role,
                         newStream.streamKey,
-                        audioEnable,
-                        videoEnable
+                        room.audioEnable(),
+                        room.videoEnable()
                     )
                     IMLiveManager.shared().getRoom()?.let {
                         handler.post {

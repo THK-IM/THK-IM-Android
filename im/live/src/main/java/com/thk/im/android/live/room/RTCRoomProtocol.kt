@@ -22,12 +22,17 @@ interface RTCRoomProtocol {
     /**
      * RTC 数据消息
      */
-    fun onDataMsgReceived(uId: Long, data: ByteBuffer)
+    fun onDataMsgReceived(data: ByteBuffer)
 
     /**
      * RTC 语音音量
      */
     fun onParticipantVoice(uId: Long, volume: Double)
+
+    /**
+     * RTC 连接状态
+     */
+    fun onConnectStatus(uId: Long, status: Int)
 
 
     /**

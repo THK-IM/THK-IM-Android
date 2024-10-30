@@ -1,6 +1,5 @@
 package com.thk.im.android.live.room
 
-import com.thk.im.android.core.base.LLog
 import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.Mode
 import com.thk.im.android.live.ParticipantVo
@@ -37,11 +36,7 @@ class RTCRoom(
         val selfId = IMLiveManager.shared().selfId
         localParticipant = if (role == Role.Broadcaster.value) {
             LocalParticipant(
-                selfId,
-                id,
-                role,
-                audioEnable = audioEnable(),
-                videoEnable = videoEnable()
+                selfId, id, role, audioEnable(), videoEnable()
             )
         } else {
             LocalParticipant(
@@ -54,17 +49,9 @@ class RTCRoom(
         participantVos?.let { vos ->
             for (vo in vos) {
                 if (vo.uId != uId) {
-                    val audioEnable = audioEnable()
-                    val videoEnable = videoEnable()
-                    val remoteParticipant =
-                        RemoteParticipant(
-                            vo.uId,
-                            id,
-                            vo.role,
-                            vo.streamKey,
-                            audioEnable,
-                            videoEnable
-                        )
+                    val remoteParticipant = RemoteParticipant(
+                        vo.uId, id, vo.role, vo.streamKey, audioEnable(), videoEnable()
+                    )
                     this.remoteParticipants.add(remoteParticipant)
                 }
             }
@@ -72,7 +59,6 @@ class RTCRoom(
     }
 
     fun participantJoin(p: BaseParticipant) {
-        LLog.d("participantJoin ${p.uId}")
         if (p is RemoteParticipant) {
             if (!remoteParticipants.contains(p)) {
                 remoteParticipants.add(p)
@@ -133,7 +119,6 @@ class RTCRoom(
     }
 
     fun destroy() {
-        LLog.d("room destroy")
         for (p in remoteParticipants) {
             p.leave()
         }
@@ -152,17 +137,11 @@ class RTCRoom(
         return array
     }
 
-    fun setRole(role: Int) {
-        LLog.v("setRole: $role")
-        if (localParticipant != null) {
-            val lp = localParticipant!!
-            if (lp.role != role) {
-                lp.onDisConnected()
-                lp.leave()
-                initLocalParticipant(role)
-                localParticipant?.let {
-                    participantJoin(it)
-                }
+    fun updateMyRole(role: Int) {
+        localParticipant?.let {
+            if (it.role != role) {
+                it.leave()
+                it.onDisConnected()
             } else {
                 return
             }
@@ -173,7 +152,7 @@ class RTCRoom(
         }
     }
 
-    fun getRole(): Int? {
+    fun getMyRole(): Int? {
         return this.localParticipant?.role
     }
 
@@ -218,7 +197,11 @@ class RTCRoom(
     }
 
     fun receivedDcMsg(bb: ByteBuffer) {
-        delegate?.onDataMsgReceived(uId, bb)
+        delegate?.onDataMsgReceived(bb)
+    }
+
+    fun onConnectStatusChange(uId: Long, status: Int) {
+        delegate?.onConnectStatus(uId, status)
     }
 
     fun switchCamera() {

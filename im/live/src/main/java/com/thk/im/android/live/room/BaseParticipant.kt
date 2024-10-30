@@ -4,7 +4,6 @@ import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
 import com.thk.im.android.core.base.LLog
-import com.thk.im.android.core.base.utils.StringUtils
 import com.thk.im.android.live.DataChannelMsg
 import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.NewStreamNotify
@@ -183,29 +182,21 @@ abstract class BaseParticipant(
 
     override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {
         super.onConnectionChange(newState)
-        LLog.d("${uId}, onConnectionChange ${newState.toString()}")
         peerConnection?.connectionState()?.let {
-            when (it) {
-                PeerConnection.PeerConnectionState.CONNECTING, PeerConnection.PeerConnectionState.NEW -> {
-                    // 连接中
-                }
-
-                PeerConnection.PeerConnectionState.CONNECTED -> {
-                    // 已经连接
-                }
-
-                else -> {
-                    // 断开连接
-                    onDisConnected()
-                }
+            if (it == PeerConnection.PeerConnectionState.CLOSED ||
+                it == PeerConnection.PeerConnectionState.DISCONNECTED ||
+                it == PeerConnection.PeerConnectionState.FAILED
+            ) {
+                // 断开连接
+                onDisConnected()
             }
+            onConnectStatusChange(it.ordinal)
         }
     }
 
     override fun onAddStream(p0: MediaStream?) {
         LLog.d("${uId}, onAddStream")
         p0?.let {
-            LLog.d("${uId}, onAddStream, ${it.audioTracks.size}, ${it.videoTracks.size}")
             handler.post {
                 if (this is RemoteParticipant) {
                     if (it.videoTracks != null) {
@@ -226,7 +217,6 @@ abstract class BaseParticipant(
     override fun onRemoveStream(p0: MediaStream?) {
         LLog.d("${uId}, onRemoveStream")
         p0?.let {
-            LLog.d("${uId}, onRemoveStream, ${it.audioTracks.size}, ${it.videoTracks.size}")
             if (this is RemoteParticipant) {
                 if (it.videoTracks != null) {
                     handler.post {
@@ -279,14 +269,12 @@ abstract class BaseParticipant(
         p0?.let {
             if (it.binary) {
                 it.data?.let { data ->
-                    LLog.d("onMessage: " + StringUtils.byteArray2HexString(data.array()))
-                    this.onNewBufferMessage(it.data)
+                    this.onNewBufferMessage(data)
                 }
             } else {
                 it.data?.let { data ->
                     val charset = Charset.forName("utf-8")
                     val message = charset.decode(data).toString()
-                    LLog.d("onMessage: $message")
                     this.onNewMessage(message)
                 }
             }
@@ -294,15 +282,14 @@ abstract class BaseParticipant(
     }
 
     open fun onNewBufferMessage(bb: ByteBuffer) {
-        IMLiveManager.shared().getRoom()?.let {
+        IMLiveManager.shared().getRoom()?.let { room ->
             handler.post {
-                it.receivedDcMsg(bb)
+                room.receivedDcMsg(bb)
             }
         }
     }
 
     open fun onNewMessage(message: String) {
-        LLog.d("$uId, onNewMessage: $message")
         val notify = Gson().fromJson(message, NotifyBean::class.java)
         when (notify.type) {
             NotifyType.NewStream.value -> {
@@ -323,7 +310,6 @@ abstract class BaseParticipant(
                         }
                     }
                 }
-
             }
 
             NotifyType.RemoveStream.value -> {
@@ -348,6 +334,14 @@ abstract class BaseParticipant(
                 }
             }
         }
+    }
+
+    open fun onConnectStatusChange(status: Int) {
+        val room = IMLiveManager.shared().getRoom() ?: return
+        if (room.id != this.roomId) {
+            return
+        }
+        room.onConnectStatusChange(uId, status)
     }
 
     open fun onError(function: String, exception: Exception) {

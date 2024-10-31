@@ -8,6 +8,16 @@ data class CreateRoomReqVo(
     val uId: Long,
     @SerializedName("mode")
     var mode: Int,
+    @SerializedName("video_max_bitrate")
+    val videoMaxBitrate: Int,
+    @SerializedName("audio_max_bitrate")
+    val audioMaxBitrate: Int,
+    @SerializedName("video_width")
+    val videoWidth: Int,
+    @SerializedName("video_height")
+    val videoHeight: Int,
+    @SerializedName("video_fps")
+    val videoFps: Int
 )
 
 data class CreateRoomResVo(
@@ -21,4 +31,6 @@ data class CreateRoomResVo(
     var participantVos: MutableList<ParticipantVo>?,
     @SerializedName("mode")
     var mode: Int,
+    @SerializedName("media_prams")
+    val mediaPrams: MediaPrams,
 )

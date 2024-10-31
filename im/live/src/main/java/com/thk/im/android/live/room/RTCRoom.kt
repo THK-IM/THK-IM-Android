@@ -7,6 +7,7 @@ import com.thk.im.android.live.ParticipantVo
 import com.thk.im.android.live.Role
 import com.thk.im.android.live.VolumeMsg
 import com.thk.im.android.live.VolumeMsgType
+import com.thk.im.android.live.api.vo.MediaPrams
 import java.nio.ByteBuffer
 
 class RTCRoom(
@@ -15,6 +16,7 @@ class RTCRoom(
     val mode: Int,
     val ownerId: Long,
     val createTime: Long,
+    val mediaPrams: MediaPrams,
     role: Int,
     participantVos: List<ParticipantVo>? // 当前参与人
 ) {
@@ -39,11 +41,11 @@ class RTCRoom(
         val selfId = IMLiveManager.shared().selfId
         localParticipant = if (role == Role.Broadcaster.value) {
             LocalParticipant(
-                selfId, id, role, audioEnable(), videoEnable()
+                selfId, id, role, mediaPrams, audioEnable(), videoEnable()
             )
         } else {
             LocalParticipant(
-                selfId, id, role, audioEnable = false, videoEnable = false
+                selfId, id, role, mediaPrams, audioEnable = false, videoEnable = false
             )
         }
     }

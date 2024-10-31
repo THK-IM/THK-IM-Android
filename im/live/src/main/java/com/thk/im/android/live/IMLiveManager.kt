@@ -8,13 +8,13 @@ import com.thk.im.android.live.api.vo.CreateRoomReqVo
 import com.thk.im.android.live.api.vo.DelRoomVo
 import com.thk.im.android.live.api.vo.InviteMemberReqVo
 import com.thk.im.android.live.api.vo.JoinRoomReqVo
+import com.thk.im.android.live.api.vo.MediaPrams
 import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.signal.LiveSignal
 import com.thk.im.android.live.signal.LiveSignalProtocol
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
-import org.webrtc.PeerConnectionFactory
 
 
 class IMLiveManager private constructor() {
@@ -55,22 +55,35 @@ class IMLiveManager private constructor() {
                 }
             }
             val rtcRoom = RTCRoom(
-                roomId, selfId, it.mode, it.ownerId, it.createTime, role, participantVos
+                roomId,
+                selfId,
+                it.mode,
+                it.ownerId,
+                it.createTime,
+                it.mediaPrams,
+                role,
+                participantVos
             )
             this@IMLiveManager.rtcRoom = rtcRoom
             Flowable.just(rtcRoom)
         }
     }
 
-    fun createRoom(mode: Mode): Flowable<RTCRoom> {
+    fun createRoom(mode: Mode, mediaPrams: MediaPrams): Flowable<RTCRoom> {
         destroyRoom()
-        return liveApi.createRoom(CreateRoomReqVo(this.selfId, mode.value)).flatMap {
+        val req = CreateRoomReqVo(
+            selfId, mode.value,
+            mediaPrams.videoMaxBitrate, mediaPrams.audioMaxBitrate,
+            mediaPrams.videoWidth, mediaPrams.videoHeight, mediaPrams.videoFps,
+        )
+        return liveApi.createRoom(req).flatMap {
             val rtcRoom = RTCRoom(
                 it.id,
                 selfId,
                 it.mode,
                 it.ownerId,
                 it.createTime,
+                it.mediaPrams,
                 Role.Broadcaster.value,
                 it.participantVos
             )

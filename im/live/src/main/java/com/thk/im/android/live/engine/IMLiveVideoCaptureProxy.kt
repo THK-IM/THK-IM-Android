@@ -5,7 +5,9 @@ import org.webrtc.VideoProcessor
 import org.webrtc.VideoSink
 
 class IMLiveVideoCaptureProxy : VideoProcessor {
+
     private var videoSink: VideoSink? = null
+
     override fun onCapturerStarted(p0: Boolean) {
     }
 

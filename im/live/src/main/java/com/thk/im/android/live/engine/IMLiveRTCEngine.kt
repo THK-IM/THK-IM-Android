@@ -12,7 +12,9 @@ import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
 import org.webrtc.ExternalAudioProcessingFactory
+import org.webrtc.ExternalAudioProcessingFactory.AudioProcessing
 import org.webrtc.PeerConnectionFactory
+import org.webrtc.VideoProcessor
 import org.webrtc.audio.JavaAudioDeviceModule
 
 
@@ -34,6 +36,10 @@ class IMLiveRTCEngine {
     lateinit var eglBaseCtx: EglBase.Context
     private lateinit var audioDeviceModule: JavaAudioDeviceModule
     private lateinit var app: Application
+    private var videoProcessor: VideoProcessor? = IMLiveVideoCaptureProxy()
+    private var audioCaptureProxy: AudioProcessing = IMLiveAudioCaptureProxy()
+    private var audioRenderProxy: AudioProcessing = IMLiveAudioRenderProxy()
+    private val audioProcessingFactory = ExternalAudioProcessingFactory()
 
     fun init(app: Application) {
         this.app = app
@@ -45,18 +51,17 @@ class IMLiveRTCEngine {
         val options = PeerConnectionFactory.Options()
         val encoderFactory = DefaultVideoEncoderFactory(eglBaseContext, true, true)
         val decoderFactory = DefaultVideoDecoderFactory(eglBaseContext)
-        val audioProcessingFactory = ExternalAudioProcessingFactory()
         audioProcessingFactory.setBypassFlagForRenderPre(true)
         audioProcessingFactory.setBypassFlagForCapturePost(true)
-        audioProcessingFactory.setCapturePostProcessing(IMLiveAudioCaptureProxy())
-        audioProcessingFactory.setRenderPreProcessing(IMLiveAudioRenderProxy())
+        audioProcessingFactory.setCapturePostProcessing(audioCaptureProxy)
+        audioProcessingFactory.setRenderPreProcessing(audioRenderProxy)
         audioDeviceModule = JavaAudioDeviceModule.builder(app)
             .setUseHardwareAcousticEchoCanceler(true)
             .setUseLowLatency(true)
             .setUseStereoInput(true)
             .setUseStereoOutput(true)
             .setSamplesReadyCallback {
-                onSamplesReady(it)
+                onAudioCapture(it)
             }.createAudioDeviceModule()
         eglBaseCtx = eglBaseContext
         factory = PeerConnectionFactory.builder().setOptions(options)
@@ -124,7 +129,29 @@ class IMLiveRTCEngine {
         }
     }
 
-    private fun onSamplesReady(samples: JavaAudioDeviceModule.AudioSamples) {
+    fun videoCaptureProxy(): VideoProcessor? {
+        return videoProcessor
+    }
+
+    fun clearVideoProxy() {
+        videoProcessor?.setSink(null)
+    }
+
+    fun updateVideoProxy(proxy: VideoProcessor?) {
+        videoProcessor = proxy
+    }
+
+    fun updateAudioCaptureDelegate(delegate: AudioProcessing) {
+        this.audioCaptureProxy = delegate
+        this.audioProcessingFactory.setCapturePostProcessing(delegate)
+    }
+
+    fun updateAudioRenderDelegate(delegate: AudioProcessing) {
+        this.audioRenderProxy = delegate
+        this.audioProcessingFactory.setRenderPreProcessing(delegate)
+    }
+
+    private fun onAudioCapture(samples: JavaAudioDeviceModule.AudioSamples) {
         val room = IMLiveManager.shared().getRoom() ?: return
         val db = AudioUtils.calculateDecibel(samples.data)
         room.sendMyVolume(db)

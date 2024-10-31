@@ -12,7 +12,6 @@ import com.thk.im.android.live.api.vo.MediaPrams
 import com.thk.im.android.live.api.vo.PublishStreamReqVo
 import com.thk.im.android.live.api.vo.PublishStreamResVo
 import com.thk.im.android.live.engine.IMLiveRTCEngine
-import com.thk.im.android.live.engine.IMLiveVideoCaptureProxy
 import com.thk.im.android.live.utils.MediaConstraintsHelper
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
@@ -85,8 +84,10 @@ class LocalParticipant(
                             )
                         videoSource =
                             IMLiveRTCEngine.shared().factory.createVideoSource(it.isScreencast)
-                        val videoProcessor = IMLiveVideoCaptureProxy()
-                        videoSource?.setVideoProcessor(videoProcessor)
+                        val videoProcessor = IMLiveRTCEngine.shared().videoCaptureProxy()
+                        videoProcessor?.let { processor ->
+                            videoSource?.setVideoProcessor(processor)
+                        }
                         val videoTrack =
                             IMLiveRTCEngine.shared().factory.createVideoTrack(
                                 "video/$roomId/$uId",
@@ -238,6 +239,7 @@ class LocalParticipant(
             it.dispose()
         }
         innerDataChannel = null
+        IMLiveRTCEngine.shared().clearVideoProxy()
         videoSource?.dispose()
         videoCapture?.dispose()
         surfaceTextureHelper?.dispose()

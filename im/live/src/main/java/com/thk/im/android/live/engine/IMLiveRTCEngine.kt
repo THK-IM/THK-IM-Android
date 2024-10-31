@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
+import com.thk.im.android.core.base.utils.AudioUtils
+import com.thk.im.android.live.IMLiveManager
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
@@ -53,11 +55,8 @@ class IMLiveRTCEngine {
             .setUseLowLatency(true)
             .setUseStereoInput(true)
             .setUseStereoOutput(true)
-            .setPlaybackSamplesReadyCallback {
-                // TODO
-            }
             .setSamplesReadyCallback {
-                // TODO
+                onSamplesReady(it)
             }.createAudioDeviceModule()
         eglBaseCtx = eglBaseContext
         factory = PeerConnectionFactory.builder().setOptions(options)
@@ -123,5 +122,11 @@ class IMLiveRTCEngine {
         } else {
             emptyArray()
         }
+    }
+
+    private fun onSamplesReady(samples: JavaAudioDeviceModule.AudioSamples) {
+        val room = IMLiveManager.shared().getRoom() ?: return
+        val db = AudioUtils.calculateDecibel(samples.data)
+        room.sendMyVolume(db)
     }
 }

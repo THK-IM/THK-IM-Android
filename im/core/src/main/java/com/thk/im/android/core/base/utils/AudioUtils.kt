@@ -1,6 +1,5 @@
-package com.thk.im.android.media.audio
+package com.thk.im.android.core.base.utils
 
-import com.thk.im.android.core.base.LLog
 import kotlin.math.abs
 import kotlin.math.log10
 
@@ -30,7 +29,6 @@ object AudioUtils {
 
 
     fun calculateDecibel(byteArray: ByteArray): Double {
-        LLog.v("calculateDecibel ${byteArray.size}")
         return calculateRMS(byteArray)
     }
 

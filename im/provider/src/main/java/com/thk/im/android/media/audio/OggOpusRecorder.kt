@@ -9,6 +9,7 @@ import android.media.MediaRecorder
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.ActivityCompat
+import com.thk.im.android.core.base.utils.AudioUtils
 import com.thk.im.android.ui.protocol.AudioCallback
 import com.thk.im.android.ui.protocol.AudioStatus
 import top.oply.opuslib.OpusTool

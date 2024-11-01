@@ -107,6 +107,7 @@ object OggOpusPlayer {
                     if (ret == 0) {
                         playing = false
                         onStop(AudioStatus.Exited)
+                        return@run
                     } else {
                         playing = true
                     }

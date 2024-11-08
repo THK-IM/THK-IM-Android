@@ -28,6 +28,7 @@ import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.utils.AppUtils
+import com.thk.im.android.core.base.utils.UIUtils
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.preview.databinding.ActivityMediaPreviewBinding
@@ -261,14 +262,14 @@ class IMMediaPreviewActivity : AppCompatActivity() {
     }
 
     private fun translatePreview(transitionX: Float, transitionY: Float) {
-        val alpha =
-            1 - abs(transitionY) / AppUtils.instance().screenHeight
+        val alpha = 1 - abs(transitionY) / AppUtils.instance().screenHeight
+        val color = UIUtils.setAlphaComponent(Color.BLACK, alpha)
         val scale = maxOf(minOf(1f, alpha), 0.7f)
         binding.vpMediaPreview.translationX = transitionX / binding.clContent.scaleX
-        binding.vpMediaPreview.translationY = transitionY / binding.clContent.scaleX
+        binding.vpMediaPreview.translationY = transitionY / binding.clContent.scaleY
         binding.vpMediaPreview.scaleX = scale
         binding.vpMediaPreview.scaleY = scale
-        binding.clContent.background.alpha = (alpha * 255).toInt()
+        binding.clContent.setBackgroundColor(color)
         val recyclerView = binding.vpMediaPreview.getChildAt(0) as RecyclerView
         adapter.hideChildren(binding.vpMediaPreview.currentItem, recyclerView)
     }
@@ -280,11 +281,11 @@ class IMMediaPreviewActivity : AppCompatActivity() {
         binding.vpMediaPreview.translationY = 0f
         binding.vpMediaPreview.scaleX = 1f
         binding.vpMediaPreview.scaleY = 1f
-        binding.clContent.background.alpha = 255
+        binding.clContent.setBackgroundColor(Color.BLACK)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        if (binding.clContent.background.alpha != 255) {
+        if (binding.vpMediaPreview.scaleX != 1f) {
             intercept(ev)
             return true
         }
@@ -376,8 +377,10 @@ class IMMediaPreviewActivity : AppCompatActivity() {
             )
             scaleAnimation.interpolator = LinearInterpolator()
 
+            val alpha = 1 - abs(binding.vpMediaPreview.translationY) / AppUtils.instance().screenHeight
+            val color = UIUtils.setAlphaComponent(Color.BLACK, alpha)
             val colorAnim = ObjectAnimator.ofInt(
-                binding.clContent, "backgroundColor", Color.BLACK, Color.TRANSPARENT
+                binding.clContent, "backgroundColor", color, Color.TRANSPARENT
             )
             colorAnim.setEvaluator(ArgbEvaluator())
             colorAnim.duration = animationDuration

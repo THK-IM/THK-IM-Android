@@ -43,7 +43,7 @@ import kotlin.math.abs
 
 class IMMediaPreviewActivity : AppCompatActivity() {
 
-    val videoPlayer by lazy {
+    private val videoPlayer by lazy {
         THKVideoPlayerView(this)
     }
 
@@ -55,7 +55,7 @@ class IMMediaPreviewActivity : AppCompatActivity() {
     private var defaultId = 0L
     private var dragStartX = 0
     private var dragStartY = 0
-    private val animationDuration = 300L
+    private val animationDuration = 150L
     private val currentPreviewView: View?
         get() {
             val recyclerView = binding.vpMediaPreview.getChildAt(0) as RecyclerView

@@ -10,8 +10,6 @@ import com.thk.im.android.live.api.vo.PlayStreamResVo
 import org.webrtc.MediaStreamTrack
 import org.webrtc.RtpTransceiver
 import org.webrtc.SessionDescription
-import java.lang.Exception
-import java.nio.charset.Charset
 
 class RemoteParticipant(
     uId: Long,
@@ -50,7 +48,7 @@ class RemoteParticipant(
         val offer = sdp.description
         val offerBase64 = String(
             Base64.encode(
-                offer.toByteArray(Charset.forName("UTF-8")),
+                offer.toByteArray(Charsets.UTF_8),
                 Base64.DEFAULT
             )
         )
@@ -62,7 +60,7 @@ class RemoteParticipant(
                 t?.let {
                     val answer = String(
                         Base64.decode(
-                            it.answerSdp.toByteArray(Charset.forName("UTF-8")),
+                            it.answerSdp.toByteArray(Charsets.UTF_8),
                             Base64.DEFAULT
                         )
                     )

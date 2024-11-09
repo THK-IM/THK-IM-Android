@@ -10,6 +10,7 @@ import com.thk.im.android.live.api.vo.InviteMemberReqVo
 import com.thk.im.android.live.api.vo.JoinRoomReqVo
 import com.thk.im.android.live.api.vo.MediaPrams
 import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
+import com.thk.im.android.live.engine.IMLiveRTCEngine
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.signal.LiveSignal
 import com.thk.im.android.live.signal.LiveSignalProtocol
@@ -40,6 +41,7 @@ class IMLiveManager private constructor() {
 
     fun init(app: Application) {
         this.app = app
+        IMLiveRTCEngine.shared().init(app)
     }
 
 

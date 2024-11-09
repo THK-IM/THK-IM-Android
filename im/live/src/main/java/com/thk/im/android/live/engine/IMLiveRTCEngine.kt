@@ -39,10 +39,14 @@ class IMLiveRTCEngine {
     private var videoProcessor: VideoProcessor? = IMLiveVideoCaptureProxy()
     private var audioCaptureProxy: AudioProcessing = IMLiveAudioCaptureProxy()
     private var audioRenderProxy: AudioProcessing = IMLiveAudioRenderProxy()
-    private val audioProcessingFactory = ExternalAudioProcessingFactory()
+    private lateinit var audioProcessingFactory: ExternalAudioProcessingFactory
 
     fun init(app: Application) {
         this.app = app
+        initEngine()
+    }
+
+    private fun initEngine() {
         PeerConnectionFactory.initialize(
             PeerConnectionFactory.InitializationOptions.builder(app).createInitializationOptions()
         )
@@ -51,6 +55,7 @@ class IMLiveRTCEngine {
         val options = PeerConnectionFactory.Options()
         val encoderFactory = DefaultVideoEncoderFactory(eglBaseContext, true, true)
         val decoderFactory = DefaultVideoDecoderFactory(eglBaseContext)
+        audioProcessingFactory = ExternalAudioProcessingFactory()
         audioProcessingFactory.setBypassFlagForRenderPre(true)
         audioProcessingFactory.setBypassFlagForCapturePost(true)
         audioProcessingFactory.setCapturePostProcessing(audioCaptureProxy)

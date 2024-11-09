@@ -21,7 +21,7 @@ object AudioUtils {
             totalAmplitude += abs(sample)
         }
         val averageAmplitude = totalAmplitude / floatData.size
-        if (averageAmplitude < 0) {
+        if (averageAmplitude <= 0) {
             return 0.0
         }
         return 20 * log10(averageAmplitude)

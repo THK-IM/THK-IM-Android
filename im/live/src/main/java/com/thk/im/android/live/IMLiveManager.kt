@@ -21,14 +21,14 @@ import io.reactivex.disposables.CompositeDisposable
 class IMLiveManager private constructor() {
 
     companion object {
-        private var innerManager: IMLiveManager? = null
+        private var shareManager: IMLiveManager? = null
 
         @Synchronized
         fun shared(): IMLiveManager {
-            if (innerManager == null) {
-                innerManager = IMLiveManager()
+            if (shareManager == null) {
+                shareManager = IMLiveManager()
             }
-            return innerManager as IMLiveManager
+            return shareManager as IMLiveManager
         }
     }
 

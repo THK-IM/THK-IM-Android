@@ -5,13 +5,12 @@ import android.os.Looper
 import com.google.gson.Gson
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.live.DataChannelMsg
-import com.thk.im.android.live.LiveManager
 import com.thk.im.android.live.NewStreamNotify
 import com.thk.im.android.live.NotifyBean
 import com.thk.im.android.live.NotifyType
 import com.thk.im.android.live.RemoveStreamNotify
-import com.thk.im.android.live.engine.LiveRTCEngine
 import com.thk.im.android.live.engine.LiveMediaConstraints
+import com.thk.im.android.live.engine.LiveRTCEngine
 import io.reactivex.disposables.CompositeDisposable
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
@@ -281,7 +280,7 @@ abstract class BaseParticipant(
     }
 
     open fun onNewBufferMessage(bb: ByteBuffer) {
-        LiveManager.shared().getRoom()?.let { room ->
+        RTCRoomManager.shared().currentRoom()?.let { room ->
             handler.post {
                 room.receivedDcMsg(bb)
             }
@@ -293,20 +292,17 @@ abstract class BaseParticipant(
         when (notify.type) {
             NotifyType.NewStream.value -> {
                 val newStream = Gson().fromJson(notify.message, NewStreamNotify::class.java)
-                val room = LiveManager.shared().getRoom()
-                room?.let {
+                RTCRoomManager.shared().currentRoom()?.let {
                     val remoteParticipant = RemoteParticipant(
                         newStream.uId,
                         newStream.roomId,
                         newStream.role,
                         newStream.streamKey,
-                        room.audioEnable(),
-                        room.videoEnable()
+                        it.audioEnable(),
+                        it.videoEnable()
                     )
-                    LiveManager.shared().getRoom()?.let {
-                        handler.post {
-                            it.participantJoin(remoteParticipant)
-                        }
+                    handler.post {
+                        it.participantJoin(remoteParticipant)
                     }
                 }
             }
@@ -314,7 +310,7 @@ abstract class BaseParticipant(
             NotifyType.RemoveStream.value -> {
                 val removeStreamNotify =
                     Gson().fromJson(notify.message, RemoveStreamNotify::class.java)
-                LiveManager.shared().getRoom()?.let {
+                RTCRoomManager.shared().currentRoom()?.let {
                     handler.post {
                         it.participantLeave(
                             removeStreamNotify.roomId,
@@ -326,7 +322,7 @@ abstract class BaseParticipant(
 
             NotifyType.DataChannelMsg.value -> {
                 val dataChannelMsg = Gson().fromJson(notify.message, DataChannelMsg::class.java)
-                LiveManager.shared().getRoom()?.let {
+                RTCRoomManager.shared().currentRoom()?.let {
                     handler.post {
                         it.receivedDcMsg(dataChannelMsg.type, dataChannelMsg.text)
                     }
@@ -336,7 +332,7 @@ abstract class BaseParticipant(
     }
 
     open fun onConnectStatusChange(status: Int) {
-        val room = LiveManager.shared().getRoom() ?: return
+        val room = RTCRoomManager.shared().currentRoom() ?: return
         if (room.id != this.roomId) {
             return
         }
@@ -344,7 +340,7 @@ abstract class BaseParticipant(
     }
 
     open fun onError(function: String, exception: Exception) {
-        val room = LiveManager.shared().getRoom() ?: return
+        val room = RTCRoomManager.shared().currentRoom() ?: return
         if (room.id != this.roomId) {
             return
         }
@@ -418,7 +414,7 @@ abstract class BaseParticipant(
             v.dispose()
         }
         dataChannelMap.clear()
-        LiveManager.shared().getRoom()?.onParticipantLeave(this)
+        RTCRoomManager.shared().currentRoom()?.onParticipantLeave(this)
         handler.removeCallbacksAndMessages(null)
         compositeDisposable.clear()
     }

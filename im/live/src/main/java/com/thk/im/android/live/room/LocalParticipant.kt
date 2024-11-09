@@ -172,7 +172,7 @@ class LocalParticipant(
                 }
             }
         }
-        LiveManager.shared().liveApi.publishStream(reqVo)
+        RTCRoomManager.shared().liveApi.publishStream(reqVo)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         compositeDisposable.add(subscriber)

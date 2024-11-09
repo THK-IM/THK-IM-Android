@@ -239,19 +239,19 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         finish()
     }
 
-    override fun onRemoteAcceptedCalling(roomId: String, uId: Long) {
+    override fun onRemoteAcceptedCallingBySignal(roomId: String, uId: Long) {
     }
 
-    override fun onRemoteRejectedCalling(roomId: String, uId: Long, msg: String) {
+    override fun onRemoteRejectedCallingBySignal(roomId: String, uId: Long, msg: String) {
     }
 
-    override fun onRemoteHangupCalling(roomId: String, uId: Long, msg: String) {
+    override fun onRemoteHangupCallingBySignal(roomId: String, uId: Long, msg: String) {
     }
 
-    override fun onMemberKickedOff(roomId: String, uIds: Set<Long>) {
+    override fun onMemberKickedOffBySignal(roomId: String, uIds: Set<Long>) {
     }
 
-    override fun onCallEnded(roomId: String) {
+    override fun onCallEndedBySignal(roomId: String) {
     }
 
     override fun onParticipantJoin(p: BaseParticipant) {

@@ -38,26 +38,26 @@ interface LiveCallProtocol {
     /**
      * 对方接听
      */
-    fun onRemoteAcceptedCalling(roomId: String, uId: Long)
+    fun onRemoteAcceptedCallingBySignal(roomId: String, uId: Long)
 
     /**
      * 对方拒绝接听
      */
-    fun onRemoteRejectedCalling(roomId: String, uId: Long, msg: String)
+    fun onRemoteRejectedCallingBySignal(roomId: String, uId: Long, msg: String)
 
     /**
      * 对方挂断电话
      */
-    fun onRemoteHangupCalling(roomId: String, uId: Long, msg: String)
+    fun onRemoteHangupCallingBySignal(roomId: String, uId: Long, msg: String)
 
     /**
      * 被踢下
      */
-    fun onMemberKickedOff(roomId: String, uIds: Set<Long>)
+    fun onMemberKickedOffBySignal(roomId: String, uIds: Set<Long>)
 
     /**
      * 房间通话结束
      */
-    fun onCallEnded(roomId: String)
+    fun onCallEndedBySignal(roomId: String)
 
 }

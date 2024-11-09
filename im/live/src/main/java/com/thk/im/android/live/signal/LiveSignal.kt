@@ -9,7 +9,7 @@ enum class LiveSignalType(val value: Int) {
     BeingRequested(1),
 
     // 取消请求通话
-    CancelRequested(2),
+    CancelRequesting(2),
 
     // 拒绝请求通话
     RejectRequest(3),
@@ -45,7 +45,7 @@ data class BeingRequestedSignal(
     var timeoutTime: Long,
 )
 
-data class CancelRequestedSignal(
+data class CancelRequestingSignal(
     @SerializedName("room_id")
     var roomId: String,
     @SerializedName("msg")
@@ -126,9 +126,9 @@ data class LiveSignal(
         return null
     }
 
-    fun cancelRequestedSignal(): CancelRequestedSignal? {
-        if (this.type == LiveSignalType.CancelRequested.value) {
-            return Gson().fromJson(body, CancelRequestedSignal::class.java)
+    fun cancelRequestedSignal(): CancelRequestingSignal? {
+        if (this.type == LiveSignalType.CancelRequesting.value) {
+            return Gson().fromJson(body, CancelRequestingSignal::class.java)
         }
         return null
     }

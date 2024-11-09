@@ -1,6 +1,7 @@
 package com.thk.im.android.live.api
 
 import com.thk.im.android.live.api.vo.CallRoomMemberReqVo
+import com.thk.im.android.live.api.vo.CancelCallRoomMemberReqVo
 import com.thk.im.android.live.api.vo.CreateRoomReqVo
 import com.thk.im.android.live.api.vo.CreateRoomResVo
 import com.thk.im.android.live.api.vo.DelRoomVo
@@ -24,6 +25,11 @@ interface RoomApi {
     @POST("/room/call")
     fun callRoomMember(
         @Body req: CallRoomMemberReqVo
+    ): Flowable<Void>
+
+    @POST("/room/cancel_call")
+    fun cancelCallRoomMember(
+        @Body req: CancelCallRoomMemberReqVo
     ): Flowable<Void>
 
     @POST("/room/member/join")

@@ -3,6 +3,7 @@ package com.thk.im.android.live.api
 import com.thk.im.android.core.api.internal.APITokenInterceptor
 import com.thk.im.android.live.LiveApi
 import com.thk.im.android.live.api.vo.CallRoomMemberReqVo
+import com.thk.im.android.live.api.vo.CancelCallRoomMemberReqVo
 import com.thk.im.android.live.api.vo.CreateRoomReqVo
 import com.thk.im.android.live.api.vo.CreateRoomResVo
 import com.thk.im.android.live.api.vo.DelRoomVo
@@ -77,6 +78,10 @@ class DefaultLiveApi(private var token: String, private var serverUrl: String) :
 
     override fun callRoomMember(req: CallRoomMemberReqVo): Flowable<Void> {
         return roomApi.callRoomMember(req)
+    }
+
+    override fun cancelCallRoomMember(req: CancelCallRoomMemberReqVo): Flowable<Void> {
+        return roomApi.cancelCallRoomMember(req)
     }
 
     override fun joinRoom(req: JoinRoomReqVo): Flowable<JoinRoomResVo> {

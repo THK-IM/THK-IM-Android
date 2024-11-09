@@ -1,6 +1,7 @@
 package com.thk.im.android.live
 
 import com.thk.im.android.live.api.vo.CallRoomMemberReqVo
+import com.thk.im.android.live.api.vo.CancelCallRoomMemberReqVo
 import com.thk.im.android.live.api.vo.CreateRoomReqVo
 import com.thk.im.android.live.api.vo.CreateRoomResVo
 import com.thk.im.android.live.api.vo.DelRoomVo
@@ -14,6 +15,7 @@ import com.thk.im.android.live.api.vo.PublishStreamReqVo
 import com.thk.im.android.live.api.vo.PublishStreamResVo
 import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
 import io.reactivex.Flowable
+import retrofit2.http.Body
 
 interface LiveApi {
 
@@ -26,6 +28,8 @@ interface LiveApi {
     fun createRoom(req: CreateRoomReqVo): Flowable<CreateRoomResVo>
 
     fun callRoomMember(req: CallRoomMemberReqVo): Flowable<Void>
+
+    fun cancelCallRoomMember( req: CancelCallRoomMemberReqVo): Flowable<Void>
 
     fun joinRoom(req: JoinRoomReqVo): Flowable<JoinRoomResVo>
 

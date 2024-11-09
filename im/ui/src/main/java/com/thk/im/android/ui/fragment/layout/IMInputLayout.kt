@@ -88,10 +88,8 @@ class IMInputLayout : ConstraintLayout {
             sendInputContent()
         }
 
-        IMUIManager.uiResourceProvider?.tintColor()?.let {
-            binding.tvSendMsg.setShape(it, floatArrayOf(15f, 15f, 15f, 15f), false)
-        }
-
+        val sendBgColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#2610F5")
+        binding.tvSendMsg.setShape(sendBgColor, floatArrayOf(15f, 15f, 15f, 15f), false)
 
         val tintColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#999999")
         binding.vReplyLine.setShape(

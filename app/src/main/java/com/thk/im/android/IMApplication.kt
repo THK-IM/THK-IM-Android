@@ -19,6 +19,7 @@ import com.thk.im.android.module.CipherCrypto
 import com.thk.im.android.module.ExternalPageRouter
 import com.thk.im.android.module.IMContactModule
 import com.thk.im.android.module.IMCustomModule
+import com.thk.im.android.module.IMDemoUIProvider
 import com.thk.im.android.module.IMGroupModule
 import com.thk.im.android.module.IMUserModule
 import com.thk.im.android.ui.manager.IMUIManager
@@ -61,6 +62,7 @@ class IMApplication : Application() {
         IMCoreManager.customModule = IMCustomModule(this)
         IMUIManager.init(this)
         IMUIManager.pageRouter = ExternalPageRouter()
+        IMUIManager.uiResourceProvider = IMDemoUIProvider(this)
         IMLiveManager.shared().init(this)
     }
 

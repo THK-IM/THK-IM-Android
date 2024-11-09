@@ -116,7 +116,7 @@ class IMLiveManager private constructor() {
         disposes.add(subscriber)
     }
 
-    fun leaveRoom() {
+    fun destroyRoom() {
         val room = rtcRoom ?: return
         if (room.ownerId == selfId) {
             val subscriber = object : BaseSubscriber<Void>() {
@@ -127,14 +127,14 @@ class IMLiveManager private constructor() {
                 .subscribe(subscriber)
             disposes.add(subscriber)
         }
-        destroyRoom()
+        leaveRoom()
     }
 
     fun getRoom(): RTCRoom? {
         return rtcRoom
     }
 
-    fun destroyRoom() {
+    fun leaveRoom() {
         rtcRoom?.destroy()
         rtcRoom = null
         disposes.clear()

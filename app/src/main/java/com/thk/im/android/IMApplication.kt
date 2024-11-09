@@ -12,8 +12,7 @@ import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule
-import com.thk.im.android.live.IMLiveManager
-import com.thk.im.android.live.api.DefaultLiveApi
+import com.thk.im.android.live.LiveManager
 import com.thk.im.android.media.Provider
 import com.thk.im.android.module.CipherCrypto
 import com.thk.im.android.module.ExternalPageRouter
@@ -63,7 +62,7 @@ class IMApplication : Application() {
         IMUIManager.init(this)
         IMUIManager.pageRouter = ExternalPageRouter()
         IMUIManager.uiResourceProvider = IMDemoUIProvider(this)
-        IMLiveManager.shared().init(this)
+        LiveManager.shared().init(this)
     }
 
     fun initIMUser(token: String, uId: Long): Flowable<Boolean> {
@@ -82,8 +81,8 @@ class IMApplication : Application() {
             IMCoreManager.imApi = imApi
             IMCoreManager.initUser(uId)
 
-            IMLiveManager.shared().liveApi = DefaultLiveApi(token, Host.RtcApi)
-            IMLiveManager.shared().selfId = uId
+            LiveManager.shared().initUser(uId, token, Host.RtcApi)
+
             it.onNext(true)
             it.onComplete()
         }, BackpressureStrategy.LATEST)

@@ -3,7 +3,7 @@ package com.thk.im.android.live.engine
 import org.webrtc.ExternalAudioProcessingFactory.AudioProcessing
 import java.nio.ByteBuffer
 
-open class IMLiveAudioRenderProxy: AudioProcessing {
+open class LiveAudioCaptureProxy: AudioProcessing {
     override fun initialize(p0: Int, p1: Int) {
     }
 

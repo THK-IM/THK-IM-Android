@@ -13,8 +13,8 @@ import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActvitiyLiveCallBinding
-import com.thk.im.android.live.IMLiveManager
-import com.thk.im.android.live.engine.IMLiveRTCEngine
+import com.thk.im.android.live.LiveManager
+import com.thk.im.android.live.engine.LiveRTCEngine
 import com.thk.im.android.live.room.BaseParticipant
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.room.RTCRoomProtocol
@@ -37,7 +37,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         binding = ActvitiyLiveCallBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        val room = IMLiveManager.shared().getRoom() ?: return
+        val room = LiveManager.shared().getRoom() ?: return
         room.delegate = this
         initUserInfo(room)
 
@@ -71,7 +71,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
 
     private fun initUserInfo(rtcRoom: RTCRoom) {
         rtcRoom.getAllParticipants().forEach {
-            if (it.uId != IMLiveManager.shared().selfId) {
+            if (it.uId != LiveManager.shared().selfId) {
                 val subscriber = object : BaseSubscriber<User>() {
                     override fun onNext(t: User?) {
                         t?.let { user ->
@@ -101,7 +101,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
     }
 
     private fun initRoom() {
-        val room = IMLiveManager.shared().getRoom()
+        val room = LiveManager.shared().getRoom()
         room?.let {
             var remoteParticipantCnt = 0
             it.getAllParticipants().forEach { p ->
@@ -113,7 +113,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
             if (remoteParticipantCnt > 0) {
                 showCallingView()
             } else {
-                if (it.ownerId == IMLiveManager.shared().selfId) {
+                if (it.ownerId == LiveManager.shared().selfId) {
                     showRequestCallView()
                 } else {
                     showBeCallingView()
@@ -149,8 +149,8 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         } else {
             binding.participantLocal.setParticipant(p)
             binding.participantLocal.setFullscreenMode(true)
-            val room = IMLiveManager.shared().getRoom() ?: return
-            if (room.ownerId == IMLiveManager.shared().selfId) {
+            val room = LiveManager.shared().getRoom() ?: return
+            if (room.ownerId == LiveManager.shared().selfId) {
                 binding.participantLocal.startPeerConnection()
             }
         }
@@ -160,15 +160,15 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         super.onDestroy()
         binding.participantLocal.destroy()
         binding.participantRemote.destroy()
-        IMLiveManager.shared().getRoom()?.destroy()
+        LiveManager.shared().getRoom()?.destroy()
     }
 
     override fun isSpeakerMuted(): Boolean {
-        return IMLiveRTCEngine.shared().isSpeakerMuted()
+        return LiveRTCEngine.shared().isSpeakerMuted()
     }
 
     override fun muteSpeaker(mute: Boolean) {
-        IMLiveRTCEngine.shared().muteSpeaker(mute)
+        LiveRTCEngine.shared().muteSpeaker(mute)
     }
 
     override fun currentLocalCamera(): Int {
@@ -213,7 +213,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
 
 
     override fun accept() {
-        val room = IMLiveManager.shared().getRoom()
+        val room = LiveManager.shared().getRoom()
         room?.let {
             showCallingView()
             binding.participantLocal.startPeerConnection()
@@ -226,7 +226,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
     }
 
     override fun hangup() {
-        IMLiveManager.shared().leaveRoom()
+        LiveManager.shared().leaveRoom()
         finish()
     }
 
@@ -236,7 +236,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
     }
 
     override fun onParticipantLeave(p: BaseParticipant) {
-        IMLiveManager.shared().leaveRoom()
+        LiveManager.shared().leaveRoom()
         finish()
     }
 

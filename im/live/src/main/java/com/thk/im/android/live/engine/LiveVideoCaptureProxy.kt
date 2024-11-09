@@ -4,7 +4,7 @@ import org.webrtc.VideoFrame
 import org.webrtc.VideoProcessor
 import org.webrtc.VideoSink
 
-class IMLiveVideoCaptureProxy : VideoProcessor {
+class LiveVideoCaptureProxy : VideoProcessor {
 
     private var videoSink: VideoSink? = null
 

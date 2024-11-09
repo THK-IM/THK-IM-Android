@@ -5,13 +5,13 @@ import android.os.Looper
 import com.google.gson.Gson
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.live.DataChannelMsg
-import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.LiveManager
 import com.thk.im.android.live.NewStreamNotify
 import com.thk.im.android.live.NotifyBean
 import com.thk.im.android.live.NotifyType
 import com.thk.im.android.live.RemoveStreamNotify
-import com.thk.im.android.live.engine.IMLiveRTCEngine
-import com.thk.im.android.live.engine.MediaConstraintsHelper
+import com.thk.im.android.live.engine.LiveRTCEngine
+import com.thk.im.android.live.engine.LiveMediaConstraints
 import io.reactivex.disposables.CompositeDisposable
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
@@ -47,7 +47,7 @@ abstract class BaseParticipant(
         //必须设置PeerConnection.SdpSemantics.UNIFIED_PLAN
         configuration.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
         this.peerConnection =
-            IMLiveRTCEngine.shared().factory.createPeerConnection(configuration, this)
+            LiveRTCEngine.shared().factory.createPeerConnection(configuration, this)
     }
 
     open fun startPeerConnection() {
@@ -73,7 +73,7 @@ abstract class BaseParticipant(
                 LLog.e("${uId}, createOffer onSetFailure $p0")
             }
 
-        }, MediaConstraintsHelper.offerOrAnswerConstraint(this is RemoteParticipant))
+        }, LiveMediaConstraints.offerOrAnswerConstraint(this is RemoteParticipant))
     }
 
     fun setAudioMuted(muted: Boolean) {
@@ -281,7 +281,7 @@ abstract class BaseParticipant(
     }
 
     open fun onNewBufferMessage(bb: ByteBuffer) {
-        IMLiveManager.shared().getRoom()?.let { room ->
+        LiveManager.shared().getRoom()?.let { room ->
             handler.post {
                 room.receivedDcMsg(bb)
             }
@@ -293,7 +293,7 @@ abstract class BaseParticipant(
         when (notify.type) {
             NotifyType.NewStream.value -> {
                 val newStream = Gson().fromJson(notify.message, NewStreamNotify::class.java)
-                val room = IMLiveManager.shared().getRoom()
+                val room = LiveManager.shared().getRoom()
                 room?.let {
                     val remoteParticipant = RemoteParticipant(
                         newStream.uId,
@@ -303,7 +303,7 @@ abstract class BaseParticipant(
                         room.audioEnable(),
                         room.videoEnable()
                     )
-                    IMLiveManager.shared().getRoom()?.let {
+                    LiveManager.shared().getRoom()?.let {
                         handler.post {
                             it.participantJoin(remoteParticipant)
                         }
@@ -314,7 +314,7 @@ abstract class BaseParticipant(
             NotifyType.RemoveStream.value -> {
                 val removeStreamNotify =
                     Gson().fromJson(notify.message, RemoveStreamNotify::class.java)
-                IMLiveManager.shared().getRoom()?.let {
+                LiveManager.shared().getRoom()?.let {
                     handler.post {
                         it.participantLeave(
                             removeStreamNotify.roomId,
@@ -326,7 +326,7 @@ abstract class BaseParticipant(
 
             NotifyType.DataChannelMsg.value -> {
                 val dataChannelMsg = Gson().fromJson(notify.message, DataChannelMsg::class.java)
-                IMLiveManager.shared().getRoom()?.let {
+                LiveManager.shared().getRoom()?.let {
                     handler.post {
                         it.receivedDcMsg(dataChannelMsg.type, dataChannelMsg.text)
                     }
@@ -336,7 +336,7 @@ abstract class BaseParticipant(
     }
 
     open fun onConnectStatusChange(status: Int) {
-        val room = IMLiveManager.shared().getRoom() ?: return
+        val room = LiveManager.shared().getRoom() ?: return
         if (room.id != this.roomId) {
             return
         }
@@ -344,7 +344,7 @@ abstract class BaseParticipant(
     }
 
     open fun onError(function: String, exception: Exception) {
-        val room = IMLiveManager.shared().getRoom() ?: return
+        val room = LiveManager.shared().getRoom() ?: return
         if (room.id != this.roomId) {
             return
         }
@@ -381,7 +381,7 @@ abstract class BaseParticipant(
     private fun attach() {
         svr?.let {
             if (videoTracks.size > 0) {
-                it.init(IMLiveRTCEngine.shared().eglBaseCtx, null)
+                it.init(LiveRTCEngine.shared().eglBaseCtx, null)
                 for (v in videoTracks) {
                     v.addSink(it)
                 }
@@ -418,7 +418,7 @@ abstract class BaseParticipant(
             v.dispose()
         }
         dataChannelMap.clear()
-        IMLiveManager.shared().getRoom()?.onParticipantLeave(this)
+        LiveManager.shared().getRoom()?.onParticipantLeave(this)
         handler.removeCallbacksAndMessages(null)
         compositeDisposable.clear()
     }

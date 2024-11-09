@@ -2,7 +2,7 @@ package com.thk.im.android.live.engine
 
 import org.webrtc.MediaConstraints
 
-object MediaConstraintsHelper {
+object LiveMediaConstraints {
 
     fun build(
         enable3a: Boolean,

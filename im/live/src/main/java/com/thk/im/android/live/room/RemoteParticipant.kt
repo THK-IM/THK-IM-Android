@@ -3,7 +3,7 @@ package com.thk.im.android.live.room
 import android.util.Base64
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
-import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.LiveManager
 import com.thk.im.android.live.Role
 import com.thk.im.android.live.api.vo.PlayStreamReqVo
 import com.thk.im.android.live.api.vo.PlayStreamResVo
@@ -53,7 +53,7 @@ class RemoteParticipant(
             )
         )
         val reqVo = PlayStreamReqVo(
-            roomId, IMLiveManager.shared().selfId, offerBase64, subStreamKey
+            roomId, LiveManager.shared().selfId, offerBase64, subStreamKey
         )
         val subscriber = object : BaseSubscriber<PlayStreamResVo>() {
             override fun onNext(t: PlayStreamResVo?) {
@@ -77,7 +77,7 @@ class RemoteParticipant(
                 }
             }
         }
-        IMLiveManager.shared().liveApi
+        LiveManager.shared().liveApi
             .playStream(reqVo)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)

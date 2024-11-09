@@ -7,7 +7,7 @@ import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
 import com.thk.im.android.core.base.utils.AudioUtils
-import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.LiveManager
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
@@ -18,17 +18,17 @@ import org.webrtc.VideoProcessor
 import org.webrtc.audio.JavaAudioDeviceModule
 
 
-class IMLiveRTCEngine {
+class LiveRTCEngine {
 
     companion object {
-        private var innerEngine: IMLiveRTCEngine? = null
+        private var innerEngine: LiveRTCEngine? = null
 
         @Synchronized
-        fun shared(): IMLiveRTCEngine {
+        fun shared(): LiveRTCEngine {
             if (innerEngine == null) {
-                innerEngine = IMLiveRTCEngine()
+                innerEngine = LiveRTCEngine()
             }
-            return innerEngine as IMLiveRTCEngine
+            return innerEngine as LiveRTCEngine
         }
     }
 
@@ -36,9 +36,9 @@ class IMLiveRTCEngine {
     lateinit var eglBaseCtx: EglBase.Context
     private lateinit var audioDeviceModule: JavaAudioDeviceModule
     private lateinit var app: Application
-    private var videoProcessor: VideoProcessor? = IMLiveVideoCaptureProxy()
-    private var audioCaptureProxy: AudioProcessing = IMLiveAudioCaptureProxy()
-    private var audioRenderProxy: AudioProcessing = IMLiveAudioRenderProxy()
+    private var videoProcessor: VideoProcessor? = LiveVideoCaptureProxy()
+    private var audioCaptureProxy: AudioProcessing = LiveAudioCaptureProxy()
+    private var audioRenderProxy: AudioProcessing = LiveAudioRenderProxy()
     private lateinit var audioProcessingFactory: ExternalAudioProcessingFactory
 
     fun init(app: Application) {
@@ -157,7 +157,7 @@ class IMLiveRTCEngine {
     }
 
     private fun onAudioCapture(samples: JavaAudioDeviceModule.AudioSamples) {
-        val room = IMLiveManager.shared().getRoom() ?: return
+        val room = LiveManager.shared().getRoom() ?: return
         val db = AudioUtils.calculateDecibel(samples.data)
         room.sendMyVolume(db)
     }

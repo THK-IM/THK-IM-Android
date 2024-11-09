@@ -5,14 +5,14 @@ import com.google.gson.Gson
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.live.DataChannelMsg
-import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.LiveManager
 import com.thk.im.android.live.Role
 import com.thk.im.android.live.VolumeMsg
 import com.thk.im.android.live.api.vo.MediaParams
 import com.thk.im.android.live.api.vo.PublishStreamReqVo
 import com.thk.im.android.live.api.vo.PublishStreamResVo
-import com.thk.im.android.live.engine.IMLiveRTCEngine
-import com.thk.im.android.live.engine.MediaConstraintsHelper
+import com.thk.im.android.live.engine.LiveRTCEngine
+import com.thk.im.android.live.engine.LiveMediaConstraints
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer
@@ -44,13 +44,13 @@ class LocalParticipant(
         super.initPeerConn()
         if (peerConnection != null) {
             if (audioEnable && role == Role.Broadcaster.value) {
-                val audioSource = IMLiveRTCEngine.shared().factory.createAudioSource(
-                    MediaConstraintsHelper.build(
+                val audioSource = LiveRTCEngine.shared().factory.createAudioSource(
+                    LiveMediaConstraints.build(
                         enable3a = true, enableCpu = true, enableGainControl = true
                     )
                 )
                 // 创建AudioTrack，音频轨
-                val audioTrack = IMLiveRTCEngine.shared().factory.createAudioTrack(
+                val audioTrack = LiveRTCEngine.shared().factory.createAudioTrack(
                     "audio/$roomId/$uId",
                     audioSource
                 )
@@ -74,22 +74,22 @@ class LocalParticipant(
             }
 
             if (videoEnable && role == Role.Broadcaster.value) {
-                IMLiveManager.shared().app?.let { app ->
+                LiveManager.shared().app?.let { app ->
                     videoCapture = createVideoCapture()
                     videoCapture?.let {
                         surfaceTextureHelper =
                             SurfaceTextureHelper.create(
                                 "surface_texture_thread",
-                                IMLiveRTCEngine.shared().eglBaseCtx
+                                LiveRTCEngine.shared().eglBaseCtx
                             )
                         videoSource =
-                            IMLiveRTCEngine.shared().factory.createVideoSource(it.isScreencast)
-                        val videoProcessor = IMLiveRTCEngine.shared().videoCaptureProxy()
+                            LiveRTCEngine.shared().factory.createVideoSource(it.isScreencast)
+                        val videoProcessor = LiveRTCEngine.shared().videoCaptureProxy()
                         videoProcessor?.let { processor ->
                             videoSource?.setVideoProcessor(processor)
                         }
                         val videoTrack =
-                            IMLiveRTCEngine.shared().factory.createVideoTrack(
+                            LiveRTCEngine.shared().factory.createVideoTrack(
                                 "video/$roomId/$uId",
                                 videoSource
                             )
@@ -134,8 +134,8 @@ class LocalParticipant(
             return 0
         }
         val enumerator =
-            if (Camera2Enumerator.isSupported(IMLiveManager.shared().app)) Camera2Enumerator(
-                IMLiveManager.shared().app
+            if (Camera2Enumerator.isSupported(LiveManager.shared().app)) Camera2Enumerator(
+                LiveManager.shared().app
             ) else Camera1Enumerator()
         return if (enumerator.isFrontFacing(cameraName!!)) {
             2
@@ -172,14 +172,14 @@ class LocalParticipant(
                 }
             }
         }
-        IMLiveManager.shared().liveApi.publishStream(reqVo)
+        LiveManager.shared().liveApi.publishStream(reqVo)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         compositeDisposable.add(subscriber)
     }
 
     private fun createVideoCapture(): CameraVideoCapturer? {
-        val context = IMLiveManager.shared().app ?: return null
+        val context = LiveManager.shared().app ?: return null
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         cameraName = getBackCameraName()
@@ -190,7 +190,7 @@ class LocalParticipant(
     }
 
     private fun getFrontCameraName(): String? {
-        val context = IMLiveManager.shared().app ?: return null
+        val context = LiveManager.shared().app ?: return null
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         val deviceNames = enumerator.deviceNames
@@ -205,7 +205,7 @@ class LocalParticipant(
     }
 
     private fun getBackCameraName(): String? {
-        val context = IMLiveManager.shared().app ?: return null
+        val context = LiveManager.shared().app ?: return null
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         val deviceNames = enumerator.deviceNames
@@ -221,7 +221,7 @@ class LocalParticipant(
 
     fun switchCamera() {
         if (cameraName == null) return
-        val context = IMLiveManager.shared().app ?: return
+        val context = LiveManager.shared().app ?: return
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         cameraName = if (enumerator.isFrontFacing(cameraName)) {
@@ -239,7 +239,7 @@ class LocalParticipant(
             it.dispose()
         }
         innerDataChannel = null
-        IMLiveRTCEngine.shared().clearVideoProxy()
+        LiveRTCEngine.shared().clearVideoProxy()
         videoSource?.dispose()
         videoCapture?.dispose()
         surfaceTextureHelper?.dispose()

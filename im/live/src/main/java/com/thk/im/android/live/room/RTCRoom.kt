@@ -1,7 +1,6 @@
 package com.thk.im.android.live.room
 
 import com.google.gson.Gson
-import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.Mode
 import com.thk.im.android.live.ParticipantVo
 import com.thk.im.android.live.Role
@@ -12,12 +11,11 @@ import java.nio.ByteBuffer
 
 class RTCRoom(
     val id: String,
-    val uId: Long,
     val mode: Int,
     val ownerId: Long,
     val createTime: Long,
+    private val role: Int,
     private val mediaParams: MediaParams,
-    role: Int,
     participantVos: List<ParticipantVo>? // 当前参与人
 ) {
     var delegate: RTCRoomProtocol? = null
@@ -38,7 +36,7 @@ class RTCRoom(
     }
 
     private fun initLocalParticipant(role: Int) {
-        val selfId = IMLiveManager.shared().selfId
+        val selfId = RTCRoomManager.shared().myUId
         localParticipant = if (role == Role.Broadcaster.value) {
             LocalParticipant(
                 selfId, id, role, mediaParams, audioEnable(), videoEnable()
@@ -53,7 +51,7 @@ class RTCRoom(
     private fun initRemoteParticipant(participantVos: List<ParticipantVo>?) {
         participantVos?.let { vos ->
             for (vo in vos) {
-                if (vo.uId != uId) {
+                if (vo.uId != RTCRoomManager.shared().myUId) {
                     val remoteParticipant = RemoteParticipant(
                         vo.uId, id, vo.role, vo.streamKey, audioEnable(), videoEnable()
                     )

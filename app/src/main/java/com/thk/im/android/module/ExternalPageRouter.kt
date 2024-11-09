@@ -9,7 +9,7 @@ import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
-import com.thk.im.android.live.IMLiveManager
+import com.thk.im.android.live.LiveManager
 import com.thk.im.android.live.Mode
 import com.thk.im.android.live.api.vo.MediaParams
 import com.thk.im.android.live.room.RTCRoom
@@ -39,7 +39,7 @@ class ExternalPageRouter : IMPageRouter {
 
     override fun openLiveCall(ctx: Context, session: Session) {
         if (session.type == SessionType.Single.value) {
-            val ids = mutableSetOf(session.entityId, IMLiveManager.shared().selfId)
+            val ids = mutableSetOf(session.entityId, LiveManager.shared().selfId)
             val subscriber = object : BaseSubscriber<RTCRoom>() {
                 override fun onNext(t: RTCRoom?) {
                     t?.let {
@@ -54,7 +54,7 @@ class ExternalPageRouter : IMPageRouter {
                 960,
                 20,
             )
-            IMLiveManager.shared().createRoom(Mode.Video, params)
+            LiveManager.shared().createRoom(Mode.Video, params)
                 .compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             compositeDisposable.add(subscriber)

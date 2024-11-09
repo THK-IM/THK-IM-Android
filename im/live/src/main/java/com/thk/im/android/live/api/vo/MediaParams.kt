@@ -2,7 +2,7 @@ package com.thk.im.android.live.api.vo
 
 import com.google.gson.annotations.SerializedName
 
-data class MediaPrams(
+data class MediaParams(
     @SerializedName("video_max_bitrate")
     val videoMaxBitrate: Int,
     @SerializedName("audio_max_bitrate")

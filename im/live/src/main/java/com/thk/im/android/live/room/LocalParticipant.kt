@@ -8,7 +8,7 @@ import com.thk.im.android.live.DataChannelMsg
 import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.Role
 import com.thk.im.android.live.VolumeMsg
-import com.thk.im.android.live.api.vo.MediaPrams
+import com.thk.im.android.live.api.vo.MediaParams
 import com.thk.im.android.live.api.vo.PublishStreamReqVo
 import com.thk.im.android.live.api.vo.PublishStreamResVo
 import com.thk.im.android.live.engine.IMLiveRTCEngine
@@ -28,7 +28,7 @@ class LocalParticipant(
     uId: Long,
     roomId: String,
     role: Int,
-    private val mediaPrams: MediaPrams,
+    private val mediaParams: MediaParams,
     private val audioEnable: Boolean,
     private val videoEnable: Boolean
 ) : BaseParticipant(uId, roomId, role) {
@@ -65,7 +65,7 @@ class LocalParticipant(
                     if (sender.track()?.kind() == audioTrack.kind()) {
                         val parameters = sender.parameters
                         for (e in parameters.encodings) {
-                            e.maxBitrateBps = mediaPrams.audioMaxBitrate
+                            e.maxBitrateBps = mediaParams.audioMaxBitrate
                             e.minBitrateBps = 10 * 8 * 1024
                         }
                         sender.parameters = parameters
@@ -100,9 +100,9 @@ class LocalParticipant(
                         it.initialize(surfaceTextureHelper, app, videoSource!!.capturerObserver)
 
                         it.startCapture(
-                            mediaPrams.videoWidth,
-                            mediaPrams.videoHeight,
-                            mediaPrams.videoFps
+                            mediaParams.videoWidth,
+                            mediaParams.videoHeight,
+                            mediaParams.videoFps
                         )
                         addVideoTrack(videoTrack)
 
@@ -110,7 +110,7 @@ class LocalParticipant(
                             if (sender.track()?.kind() == videoTrack.kind()) {
                                 val parameters = sender.parameters
                                 for (e in parameters.encodings) {
-                                    e.maxBitrateBps = mediaPrams.videoMaxBitrate
+                                    e.maxBitrateBps = mediaParams.videoMaxBitrate
                                     e.minBitrateBps = 10 * 8 * 1024
                                 }
                                 sender.parameters = parameters

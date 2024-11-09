@@ -11,7 +11,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.live.IMLiveManager
 import com.thk.im.android.live.Mode
-import com.thk.im.android.live.api.vo.MediaPrams
+import com.thk.im.android.live.api.vo.MediaParams
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.ui.call.LiveCallActivity
 import com.thk.im.android.ui.chat.MessageActivity
@@ -47,7 +47,7 @@ class ExternalPageRouter : IMPageRouter {
                     }
                 }
             }
-            val params = MediaPrams(
+            val params = MediaParams(
                 512 * 8 * 1024,
                 48 * 8 * 1024,
                 540,

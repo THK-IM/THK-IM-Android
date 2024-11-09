@@ -24,5 +24,5 @@ data class JoinRoomResVo(
     @SerializedName("mode")
     var mode: Int,
     @SerializedName("media_prams")
-    val mediaPrams: MediaPrams,
+    val mediaParams: MediaParams,
 )

@@ -8,7 +8,7 @@ import com.thk.im.android.live.api.vo.CreateRoomReqVo
 import com.thk.im.android.live.api.vo.DelRoomVo
 import com.thk.im.android.live.api.vo.InviteMemberReqVo
 import com.thk.im.android.live.api.vo.JoinRoomReqVo
-import com.thk.im.android.live.api.vo.MediaPrams
+import com.thk.im.android.live.api.vo.MediaParams
 import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
 import com.thk.im.android.live.engine.IMLiveRTCEngine
 import com.thk.im.android.live.room.RTCRoom
@@ -62,7 +62,7 @@ class IMLiveManager private constructor() {
                 it.mode,
                 it.ownerId,
                 it.createTime,
-                it.mediaPrams,
+                it.mediaParams,
                 role,
                 participantVos
             )
@@ -71,12 +71,12 @@ class IMLiveManager private constructor() {
         }
     }
 
-    fun createRoom(mode: Mode, mediaPrams: MediaPrams): Flowable<RTCRoom> {
+    fun createRoom(mode: Mode, mediaParams: MediaParams): Flowable<RTCRoom> {
         destroyRoom()
         val req = CreateRoomReqVo(
             selfId, mode.value,
-            mediaPrams.videoMaxBitrate, mediaPrams.audioMaxBitrate,
-            mediaPrams.videoWidth, mediaPrams.videoHeight, mediaPrams.videoFps,
+            mediaParams.videoMaxBitrate, mediaParams.audioMaxBitrate,
+            mediaParams.videoWidth, mediaParams.videoHeight, mediaParams.videoFps,
         )
         return liveApi.createRoom(req).flatMap {
             val rtcRoom = RTCRoom(
@@ -85,7 +85,7 @@ class IMLiveManager private constructor() {
                 it.mode,
                 it.ownerId,
                 it.createTime,
-                it.mediaPrams,
+                it.mediaParams,
                 Role.Broadcaster.value,
                 it.participantVos
             )

@@ -8,7 +8,7 @@ enum class LiveSignalType(val value: Int) {
     // 正在被请求通话
     BeingRequested(1),
 
-    // 取消被请求通话
+    // 取消请求通话
     CancelRequested(2),
 
     // 拒绝请求通话
@@ -25,6 +25,7 @@ enum class LiveSignalType(val value: Int) {
 
     // 踢出成员
     KickMember(7),
+
 }
 
 data class BeingRequestedSignal(

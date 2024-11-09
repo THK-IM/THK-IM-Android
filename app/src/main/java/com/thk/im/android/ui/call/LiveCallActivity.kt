@@ -12,34 +12,71 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActvitiyLiveCallBinding
-import com.thk.im.android.live.engine.LiveRTCEngine
+import com.thk.im.android.live.CallType
+import com.thk.im.android.live.Mode
 import com.thk.im.android.live.room.BaseParticipant
 import com.thk.im.android.live.room.RTCRoom
+import com.thk.im.android.live.room.RTCRoomCallBack
 import com.thk.im.android.live.room.RTCRoomManager
-import com.thk.im.android.live.room.RTCRoomProtocol
 import com.thk.im.android.live.room.RemoteParticipant
 import com.thk.im.android.ui.base.BaseActivity
 import java.nio.ByteBuffer
 
-class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
+class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
 
     companion object {
-        fun startCallActivity(ctx: Context) {
+
+        fun startCallActivity(
+            ctx: Context,
+            roomId: String,
+            callType: CallType,
+            members: Array<Long>
+        ) {
             val intent = Intent(ctx, LiveCallActivity::class.java)
+            intent.putExtra("callType", callType.value)
+            intent.putExtra("roomId", roomId)
+            intent.putExtra("members", members)
             ctx.startActivity(intent)
         }
     }
 
     private lateinit var binding: ActvitiyLiveCallBinding
+    private lateinit var room: RTCRoom
+
+    private fun callType(): Int {
+        return intent.getIntExtra("callType", 1)
+    }
+
+    private fun roomId(): String {
+        return intent.getStringExtra("roomId") ?: ""
+    }
+
+    private fun members(): Array<Long> {
+        return intent.getLongArrayExtra("members")?.toTypedArray() ?: emptyArray()
+    }
+
+    private fun rtcRoom(): RTCRoom? {
+        return RTCRoomManager.shared().getRoomById(roomId())
+    }
+
+    private lateinit var rtcRoom: RTCRoom
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActvitiyLiveCallBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
+        val room = RTCRoomManager.shared().getRoomById(roomId())
+        if (room == null) {
+            finish()
+            return
+        }
+        rtcRoom = room
         setContentView(binding.root)
-        val room = RTCRoomManager.shared().currentRoom() ?: return
-        room.delegate = this
-        initUserInfo(room)
+        initView()
+        initUserInfo()
+        checkPermission()
+    }
 
+    private fun initView() {
         binding.llRequestCall.initCall(this)
         binding.llCalling.initCall(this)
         binding.llBeCalling.initCall(this)
@@ -63,10 +100,9 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
                 binding.participantRemote.setFullscreenMode(true)
             }
         }
-        checkPermission()
     }
 
-    private fun initUserInfo(rtcRoom: RTCRoom) {
+    private fun initUserInfo() {
         rtcRoom.getAllParticipants().forEach {
             if (it.uId != RTCRoomManager.shared().myUId) {
                 val subscriber = object : BaseSubscriber<User>() {
@@ -88,7 +124,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         XXPermissions.with(this).permission(Permission.CAMERA, Permission.RECORD_AUDIO)
             .request(object : OnPermissionCallback {
                 override fun onGranted(permissions: MutableList<String>, allGranted: Boolean) {
-                    initRoom()
+                    initRoomUI()
                 }
 
                 override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
@@ -97,24 +133,21 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
             })
     }
 
-    private fun initRoom() {
-        val room = RTCRoomManager.shared().currentRoom()
-        room?.let {
-            var remoteParticipantCnt = 0
-            it.getAllParticipants().forEach { p ->
-                initParticipant(p)
-                if (p is RemoteParticipant) {
-                    remoteParticipantCnt++
-                }
+    private fun initRoomUI() {
+        var remoteParticipantCnt = 0
+        rtcRoom.getAllParticipants().forEach { p ->
+            initParticipant(p)
+            if (p is RemoteParticipant) {
+                remoteParticipantCnt++
             }
-            if (remoteParticipantCnt > 0) {
-                showCallingView()
+        }
+        if (remoteParticipantCnt > 0) {
+            showCallingView()
+        } else {
+            if (callType() == CallType.RequestCalling.value) {
+                showRequestCallView()
             } else {
-                if (it.ownerId == RTCRoomManager.shared().myUId) {
-                    showRequestCallView()
-                } else {
-                    showBeCallingView()
-                }
+                showBeCallingView()
             }
         }
     }
@@ -146,8 +179,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         } else {
             binding.participantLocal.setParticipant(p)
             binding.participantLocal.setFullscreenMode(true)
-            val room = RTCRoomManager.shared().currentRoom() ?: return
-            if (room.ownerId == RTCRoomManager.shared().myUId) {
+            if (rtcRoom.ownerId == RTCRoomManager.shared().myUId) {
                 binding.participantLocal.startPeerConnection()
             }
         }
@@ -157,88 +189,38 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         super.onDestroy()
         binding.participantLocal.destroy()
         binding.participantRemote.destroy()
-        RTCRoomManager.shared().destroyRoom()
+        rtcRoom.destroy()
     }
 
-    override fun isSpeakerMuted(): Boolean {
-        return LiveRTCEngine.shared().isSpeakerMuted()
+    override fun room(): RTCRoom {
+        return room
     }
 
-    override fun muteSpeaker(mute: Boolean) {
-        LiveRTCEngine.shared().muteSpeaker(mute)
-    }
+    override fun requestCalling(mode: Mode, members: Set<Long>) {
 
-    override fun currentLocalCamera(): Int {
-        return binding.participantLocal.currentCamera()
-    }
-
-    override fun switchLocalCamera() {
-        binding.participantLocal.switchCamera()
-    }
-
-    override fun muteLocalVideo(mute: Boolean) {
-        binding.participantLocal.muteVideo(mute)
-    }
-
-    override fun isLocalVideoMuted(): Boolean {
-        return binding.participantLocal.isVideoMuted()
-    }
-
-    override fun muteLocalAudio(mute: Boolean) {
-        binding.participantLocal.muteAudio(mute)
-    }
-
-    override fun isLocalAudioMuted(): Boolean {
-        return binding.participantLocal.isAudioMuted()
-    }
-
-    override fun muteRemoteAudio(uId: Long, mute: Boolean) {
-        binding.participantRemote.muteAudio(mute)
-    }
-
-    override fun isRemoteAudioMuted(uId: Long): Boolean {
-        return binding.participantRemote.isAudioMuted()
-    }
-
-    override fun muteRemoteVideo(uId: Long, mute: Boolean) {
-        binding.participantRemote.muteVideo(mute)
-    }
-
-    override fun isRemoteVideoMuted(uId: Long): Boolean {
-        return binding.participantRemote.isVideoMuted()
     }
 
     override fun cancelCalling() {
-        val room = RTCRoomManager.shared().currentRoom()
-        room?.let {
-            RTCRoomManager.shared().leaveRoom()
-        }
         finish()
     }
 
     override fun acceptCalling() {
-        val room = RTCRoomManager.shared().currentRoom()
-        room?.let {
-            showCallingView()
-            binding.participantLocal.startPeerConnection()
-            it.getAllParticipants().forEach { p ->
-                if (p is RemoteParticipant) {
-                    initParticipant(p)
-                }
+        showCallingView()
+        binding.participantLocal.startPeerConnection()
+        room.getAllParticipants().forEach { p ->
+            if (p is RemoteParticipant) {
+                initParticipant(p)
             }
         }
     }
 
     override fun rejectCalling() {
-        val room = RTCRoomManager.shared().currentRoom()
-        room?.let {
-            RTCRoomManager.shared().refuseToJoinRoom(it.id, "")
-        }
+        RTCRoomManager.shared().refuseToJoinRoom(room.id, "")
         finish()
     }
 
     override fun hangupCalling() {
-        RTCRoomManager.shared().leaveRoom()
+
         finish()
     }
 
@@ -248,8 +230,6 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
     }
 
     override fun onParticipantLeave(p: BaseParticipant) {
-        RTCRoomManager.shared().leaveRoom()
-        finish()
     }
 
     override fun onTextMsgReceived(type: Int, text: String) {

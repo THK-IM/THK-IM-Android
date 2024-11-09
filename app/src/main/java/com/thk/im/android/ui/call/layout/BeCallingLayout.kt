@@ -33,15 +33,14 @@ class BeCallingLayout : ConstraintLayout {
             liveCallProtocol.acceptCalling()
         }
 
-
-        binding.ivOpenCloseCamera.isSelected = liveCallProtocol.isLocalVideoMuted()
+        binding.ivOpenCloseCamera.isSelected = liveCallProtocol.room().isLocalVideoMuted()
         binding.ivOpenCloseCamera.setOnClickListener {
-            liveCallProtocol.muteLocalVideo(!binding.ivOpenCloseCamera.isSelected)
-            binding.ivOpenCloseCamera.isSelected = liveCallProtocol.isLocalVideoMuted()
+            liveCallProtocol.room().muteLocalVideo(!binding.ivOpenCloseCamera.isSelected)
+            binding.ivOpenCloseCamera.isSelected = liveCallProtocol.room().isLocalVideoMuted()
         }
 
         binding.ivSwitchCamera.setOnClickListener {
-            liveCallProtocol.switchLocalCamera()
+            liveCallProtocol.room().switchLocalCamera()
         }
     }
 }

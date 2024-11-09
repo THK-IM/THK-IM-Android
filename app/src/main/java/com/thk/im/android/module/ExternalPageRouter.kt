@@ -10,7 +10,7 @@ import com.thk.im.android.core.db.entity.Group
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
-import com.thk.im.android.live.LiveManager
+import com.thk.im.android.live.CallType
 import com.thk.im.android.live.Mode
 import com.thk.im.android.live.api.vo.MediaParams
 import com.thk.im.android.live.room.RTCRoom
@@ -41,12 +41,11 @@ class ExternalPageRouter : IMPageRouter {
 
     override fun openLiveCall(ctx: Context, session: Session) {
         if (session.type == SessionType.Single.value) {
-            val ids = mutableSetOf(session.entityId, IMCoreManager.uId)
+            val ids = arrayOf(IMCoreManager.uId, session.entityId)
             val subscriber = object : BaseSubscriber<RTCRoom>() {
-                override fun onNext(t: RTCRoom?) {
-                    t?.let {
-                        LiveCallActivity.startCallActivity(ctx)
-                    }
+                override fun onNext(t: RTCRoom) {
+                    RTCRoomManager.shared().addRoom(t)
+                    LiveCallActivity.startCallActivity(ctx, t.id, CallType.RequestCalling, ids)
                 }
             }
             val params = MediaParams(

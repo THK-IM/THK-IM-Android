@@ -2,7 +2,7 @@ package com.thk.im.android.live.room
 
 import java.nio.ByteBuffer
 
-interface RTCRoomProtocol {
+interface RTCRoomCallBack {
 
     /**
      * RTC 用户加入

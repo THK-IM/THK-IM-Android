@@ -280,7 +280,7 @@ abstract class BaseParticipant(
     }
 
     open fun onNewBufferMessage(bb: ByteBuffer) {
-        RTCRoomManager.shared().currentRoom()?.let { room ->
+        RTCRoomManager.shared().getRoomById(roomId)?.let { room ->
             handler.post {
                 room.receivedDcMsg(bb)
             }
@@ -292,7 +292,7 @@ abstract class BaseParticipant(
         when (notify.type) {
             NotifyType.NewStream.value -> {
                 val newStream = Gson().fromJson(notify.message, NewStreamNotify::class.java)
-                RTCRoomManager.shared().currentRoom()?.let {
+                RTCRoomManager.shared().getRoomById(roomId)?.let {
                     val remoteParticipant = RemoteParticipant(
                         newStream.uId,
                         newStream.roomId,
@@ -310,7 +310,7 @@ abstract class BaseParticipant(
             NotifyType.RemoveStream.value -> {
                 val removeStreamNotify =
                     Gson().fromJson(notify.message, RemoveStreamNotify::class.java)
-                RTCRoomManager.shared().currentRoom()?.let {
+                RTCRoomManager.shared().getRoomById(roomId)?.let {
                     handler.post {
                         it.participantLeave(
                             removeStreamNotify.roomId,
@@ -322,7 +322,7 @@ abstract class BaseParticipant(
 
             NotifyType.DataChannelMsg.value -> {
                 val dataChannelMsg = Gson().fromJson(notify.message, DataChannelMsg::class.java)
-                RTCRoomManager.shared().currentRoom()?.let {
+                RTCRoomManager.shared().getRoomById(roomId)?.let {
                     handler.post {
                         it.receivedDcMsg(dataChannelMsg.type, dataChannelMsg.text)
                     }
@@ -332,7 +332,7 @@ abstract class BaseParticipant(
     }
 
     open fun onConnectStatusChange(status: Int) {
-        val room = RTCRoomManager.shared().currentRoom() ?: return
+        val room = RTCRoomManager.shared().getRoomById(roomId) ?: return
         if (room.id != this.roomId) {
             return
         }
@@ -340,11 +340,11 @@ abstract class BaseParticipant(
     }
 
     open fun onError(function: String, exception: Exception) {
-        val room = RTCRoomManager.shared().currentRoom() ?: return
+        val room = RTCRoomManager.shared().getRoomById(roomId) ?: return
         if (room.id != this.roomId) {
             return
         }
-        room.delegate?.onError(function, exception)
+        room.callback?.onError(function, exception)
     }
 
     protected fun addVideoTrack(videoTrack: VideoTrack) {
@@ -414,7 +414,7 @@ abstract class BaseParticipant(
             v.dispose()
         }
         dataChannelMap.clear()
-        RTCRoomManager.shared().currentRoom()?.onParticipantLeave(this)
+        RTCRoomManager.shared().getRoomById(roomId)?.onParticipantLeave(this)
         handler.removeCallbacksAndMessages(null)
         compositeDisposable.clear()
     }

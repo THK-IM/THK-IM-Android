@@ -7,6 +7,7 @@ import com.thk.im.android.live.Role
 import com.thk.im.android.live.VolumeMsg
 import com.thk.im.android.live.VolumeMsgType
 import com.thk.im.android.live.api.vo.MediaParams
+import com.thk.im.android.live.engine.LiveRTCEngine
 import java.nio.ByteBuffer
 
 class RTCRoom(
@@ -18,9 +19,9 @@ class RTCRoom(
     private val mediaParams: MediaParams,
     participantVos: List<ParticipantVo>? // 当前参与人
 ) {
-    var delegate: RTCRoomProtocol? = null
+    var callback: RTCRoomCallBack? = null
     private var localParticipant: LocalParticipant? = null
-    private var remoteParticipants: MutableList<RemoteParticipant> = ArrayList()
+    private var remoteParticipants = mutableListOf<RemoteParticipant>()
 
     init {
         initLocalParticipant(role)
@@ -121,16 +122,6 @@ class RTCRoom(
         notifyLeave(p)
     }
 
-    fun destroy() {
-        for (p in remoteParticipants) {
-            p.leave()
-        }
-        delegate = null
-        remoteParticipants.clear()
-        localParticipant?.leave()
-        localParticipant = null
-    }
-
     fun getAllParticipants(): List<BaseParticipant> {
         val array = mutableListOf<BaseParticipant>()
         localParticipant?.let {
@@ -160,11 +151,11 @@ class RTCRoom(
     }
 
     private fun notifyJoin(p: BaseParticipant) {
-        delegate?.onParticipantJoin(p)
+        callback?.onParticipantJoin(p)
     }
 
     private fun notifyLeave(p: BaseParticipant) {
-        delegate?.onParticipantLeave(p)
+        callback?.onParticipantLeave(p)
     }
 
     fun sendMessage(type: Int, text: String): Boolean {
@@ -202,21 +193,151 @@ class RTCRoom(
     fun receivedDcMsg(type: Int, text: String) {
         if (type == VolumeMsgType) {
             val volumeMsg = Gson().fromJson(text, VolumeMsg::class.java)
-            delegate?.onParticipantVoice(volumeMsg.uId, volumeMsg.volume)
+            callback?.onParticipantVoice(volumeMsg.uId, volumeMsg.volume)
         }
-        delegate?.onTextMsgReceived(type, text)
+        callback?.onTextMsgReceived(type, text)
     }
 
     fun receivedDcMsg(bb: ByteBuffer) {
-        delegate?.onDataMsgReceived(bb)
+        callback?.onDataMsgReceived(bb)
     }
 
     fun onConnectStatusChange(uId: Long, status: Int) {
-        delegate?.onConnectStatus(uId, status)
+        callback?.onConnectStatus(uId, status)
     }
 
-    fun switchCamera() {
+    /**
+     * 扬声器是否打开
+     */
+    fun isSpeakerMuted(): Boolean {
+        return LiveRTCEngine.shared().isSpeakerMuted()
+    }
+
+    /**
+     * 打开/关闭扬声器
+     */
+    fun muteSpeaker(mute: Boolean) {
+        LiveRTCEngine.shared().muteSpeaker(mute)
+    }
+
+    /**
+     * 获取本地摄像头: 0 未知, 1 后置, 2 前置
+     */
+    fun currentLocalCamera(): Int {
+        return localParticipant?.currentCamera() ?: 0
+    }
+
+    /**
+     * 切换本地摄像头
+     */
+    fun switchLocalCamera() {
         localParticipant?.switchCamera()
+    }
+
+    /**
+     * 打开本地视频
+     */
+    fun muteLocalVideo(mute: Boolean) {
+        localParticipant?.setVideoMuted(mute)
+    }
+
+    /**
+     * 本地视频是否打开
+     */
+    fun isLocalVideoMuted(): Boolean {
+        return localParticipant?.getVideoMuted() ?: false
+    }
+
+    /**
+     * 打开/关闭本地音频
+     */
+    fun muteLocalAudio(mute: Boolean) {
+        localParticipant?.setAudioMuted(mute)
+    }
+
+    /**
+     * 本地音频是否关闭
+     */
+    fun isLocalAudioMuted(): Boolean {
+        return localParticipant?.getAudioMuted() ?: false
+    }
+
+    /**
+     * 打开/关闭远端音频
+     */
+    fun muteRemoteAudio(uId: Long, mute: Boolean) {
+        for (p in remoteParticipants) {
+            if (p.uId == uId) {
+                p.setAudioMuted(mute)
+            }
+        }
+    }
+
+    /**
+     * 打开/关闭远端音频
+     */
+    fun muteAllRemoteAudio(mute: Boolean) {
+        for (p in remoteParticipants) {
+            p.setAudioMuted(mute)
+        }
+    }
+
+    /**
+     * 远端音频是否关闭
+     */
+    fun isRemoteAudioMuted(uId: Long): Boolean {
+        for (p in remoteParticipants) {
+            if (p.uId == uId) {
+                return p.getAudioMuted()
+            }
+        }
+        return true
+    }
+
+    /**
+     * 打开/关闭远端视频
+     */
+    fun muteRemoteVideo(uId: Long, mute: Boolean) {
+        for (p in remoteParticipants) {
+            if (p.uId == uId) {
+                p.setAudioMuted(mute)
+            }
+        }
+    }
+
+    /**
+     * 打开/关闭远端音频
+     */
+    fun muteAllRemoteVideo(mute: Boolean) {
+        for (p in remoteParticipants) {
+            p.setVideoMuted(mute)
+        }
+    }
+
+    /**
+     * 远端视频是否关闭
+     */
+    fun isRemoteVideoMuted(uId: Long): Boolean {
+        for (p in remoteParticipants) {
+            if (p.uId == uId) {
+                return p.getVideoMuted()
+            }
+        }
+        return true
+    }
+
+    /**
+     * 销毁房间
+     */
+    fun destroy() {
+        for (p in remoteParticipants) {
+            p.leave()
+        }
+        callback = null
+        remoteParticipants.clear()
+        localParticipant?.leave()
+        localParticipant = null
+        RTCRoomManager.shared().leaveRoom(id, true)
     }
 
 }

@@ -1,11 +1,19 @@
 package com.thk.im.android.live
 
+import android.os.Parcelable
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 
 enum class Role(val value: Int) {
     Audience(1), // 观众
     Broadcaster(2), // 主播
+}
+
+enum class CallType(val value: Int) {
+    RequestCalling(1), // 请求通话
+    BeCalling(2), // 被请求通话
 }
 
 enum class Mode(val value: Int) {
@@ -57,6 +65,8 @@ data class DataChannelMsg(
     var text: String,
 )
 
+@Keep
+@Parcelize
 data class ParticipantVo(
     @SerializedName("u_id")
     var uId: Long,
@@ -66,7 +76,9 @@ data class ParticipantVo(
     var joinTime: Long,
     @SerializedName("stream_key")
     var streamKey: String,
-)
+) : Parcelable {
+
+}
 
 const val VolumeMsgType = 0
 

@@ -7,7 +7,6 @@ import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
 import com.thk.im.android.core.base.utils.AudioUtils
-import com.thk.im.android.live.LiveManager
 import com.thk.im.android.live.room.RTCRoomManager
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
@@ -158,8 +157,9 @@ class LiveRTCEngine {
     }
 
     private fun onAudioCapture(samples: JavaAudioDeviceModule.AudioSamples) {
-        val room = RTCRoomManager.shared().currentRoom() ?: return
         val db = AudioUtils.calculateDecibel(samples.data)
-        room.sendMyVolume(db)
+        RTCRoomManager.shared().allRooms().forEach {
+            it.sendMyVolume(db)
+        }
     }
 }

@@ -5,7 +5,7 @@ import com.thk.im.android.live.LiveApi
 import com.thk.im.android.live.api.vo.CallRoomMemberReqVo
 import com.thk.im.android.live.api.vo.CancelCallRoomMemberReqVo
 import com.thk.im.android.live.api.vo.CreateRoomReqVo
-import com.thk.im.android.live.api.vo.CreateRoomResVo
+import com.thk.im.android.live.api.vo.RoomResVo
 import com.thk.im.android.live.api.vo.DelRoomVo
 import com.thk.im.android.live.api.vo.InviteMemberReqVo
 import com.thk.im.android.live.api.vo.JoinRoomReqVo
@@ -72,8 +72,12 @@ class DefaultLiveApi(private var token: String, private var serverUrl: String) :
         return rtcApi.requestPlay(req)
     }
 
-    override fun createRoom(req: CreateRoomReqVo): Flowable<CreateRoomResVo> {
+    override fun createRoom(req: CreateRoomReqVo): Flowable<RoomResVo> {
         return roomApi.createRoom(req)
+    }
+
+    override fun queryRoom(id: String): Flowable<RoomResVo> {
+        return roomApi.queryRoom(id)
     }
 
     override fun callRoomMember(req: CallRoomMemberReqVo): Flowable<Void> {

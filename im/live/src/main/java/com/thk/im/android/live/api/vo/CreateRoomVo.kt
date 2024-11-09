@@ -1,7 +1,10 @@
 package com.thk.im.android.live.api.vo
 
+import android.os.Parcelable
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import com.thk.im.android.live.ParticipantVo
+import kotlinx.parcelize.Parcelize
 
 data class CreateRoomReqVo(
     @SerializedName("u_id")
@@ -20,7 +23,9 @@ data class CreateRoomReqVo(
     val videoFps: Int
 )
 
-data class CreateRoomResVo(
+@Keep
+@Parcelize
+data class RoomResVo(
     @SerializedName("id")
     var id: String,
     @SerializedName("owner_id")
@@ -33,4 +38,4 @@ data class CreateRoomResVo(
     var mode: Int,
     @SerializedName("media_params")
     val mediaParams: MediaParams,
-)
+) : Parcelable

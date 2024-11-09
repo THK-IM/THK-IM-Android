@@ -3,7 +3,7 @@ package com.thk.im.android.live.api
 import com.thk.im.android.live.api.vo.CallRoomMemberReqVo
 import com.thk.im.android.live.api.vo.CancelCallRoomMemberReqVo
 import com.thk.im.android.live.api.vo.CreateRoomReqVo
-import com.thk.im.android.live.api.vo.CreateRoomResVo
+import com.thk.im.android.live.api.vo.RoomResVo
 import com.thk.im.android.live.api.vo.DelRoomVo
 import com.thk.im.android.live.api.vo.InviteMemberReqVo
 import com.thk.im.android.live.api.vo.JoinRoomReqVo
@@ -12,15 +12,22 @@ import com.thk.im.android.live.api.vo.KickoffMemberReqVo
 import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
 import io.reactivex.Flowable
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface RoomApi {
 
     @POST("/room")
     fun createRoom(
         @Body req: CreateRoomReqVo
-    ): Flowable<CreateRoomResVo>
+    ): Flowable<RoomResVo>
+
+    @GET("/room/{id}")
+    fun queryRoom(
+        @Path("id") id: String
+    ):Flowable<RoomResVo>
 
     @POST("/room/call")
     fun callRoomMember(

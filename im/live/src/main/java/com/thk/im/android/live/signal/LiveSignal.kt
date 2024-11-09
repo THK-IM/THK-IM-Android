@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 
 enum class LiveSignalType(val value: Int) {
     // 正在被请求通话
-    BeingRequested(1),
+    BeingRequesting(1),
 
     // 取消请求通话
     CancelRequesting(2),
@@ -28,7 +28,7 @@ enum class LiveSignalType(val value: Int) {
 
 }
 
-data class BeingRequestedSignal(
+data class BeingRequestingSignal(
     @SerializedName("room_id")
     var roomId: String,
     @SerializedName("members")
@@ -119,9 +119,9 @@ data class LiveSignal(
     @SerializedName("body")
     var body: String,
 ) {
-    fun beingRequestedSignal(): BeingRequestedSignal? {
-        if (this.type == LiveSignalType.BeingRequested.value) {
-            return Gson().fromJson(body, BeingRequestedSignal::class.java)
+    fun beingRequestingSignal(): BeingRequestingSignal? {
+        if (this.type == LiveSignalType.BeingRequesting.value) {
+            return Gson().fromJson(body, BeingRequestingSignal::class.java)
         }
         return null
     }

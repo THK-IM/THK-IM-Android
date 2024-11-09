@@ -55,7 +55,7 @@ class IMMediaPreviewActivity : AppCompatActivity() {
     private var defaultId = 0L
     private var dragStartX = 0
     private var dragStartY = 0
-    private val animationDuration = 150L
+    private val animationDuration = 250L
     private val currentPreviewView: View?
         get() {
             val recyclerView = binding.vpMediaPreview.getChildAt(0) as RecyclerView

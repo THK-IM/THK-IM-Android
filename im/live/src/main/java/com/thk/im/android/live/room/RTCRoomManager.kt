@@ -12,6 +12,7 @@ import com.thk.im.android.live.api.vo.CreateRoomReqVo
 import com.thk.im.android.live.api.vo.DelRoomVo
 import com.thk.im.android.live.api.vo.InviteMemberReqVo
 import com.thk.im.android.live.api.vo.JoinRoomReqVo
+import com.thk.im.android.live.api.vo.KickoffMemberReqVo
 import com.thk.im.android.live.api.vo.MediaParams
 import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
 import io.reactivex.Flowable
@@ -69,6 +70,19 @@ class RTCRoomManager private constructor() {
     }
 
     /**
+     * 查询房间
+     */
+    fun queryRoom(id: String): Flowable<RTCRoom> {
+        return liveApi.queryRoom(id).flatMap {
+            val rtcRoom = RTCRoom(
+                it.id, it.mode, it.ownerId, it.createTime, Role.Broadcaster.value,
+                it.mediaParams, it.participantVos
+            )
+            Flowable.just(rtcRoom)
+        }
+    }
+
+    /**
      * 加入房间
      */
     fun joinRoom(roomId: String, role: Int): Flowable<RTCRoom> {
@@ -92,51 +106,34 @@ class RTCRoomManager private constructor() {
     /**
      * 向房间成员发送呼叫
      */
-    fun callRoomMember(
+    fun callRoomMembers(
         id: String,
         msg: String,
         duration: Long,
         members: Set<Long>
-    ) {
-        val subscriber = object : BaseSubscriber<Void>() {
-            override fun onNext(t: Void?) {
-            }
-        }
+    ): Flowable<Void> {
         val req = CallRoomMemberReqVo(id, myUId, duration, msg, members)
-        liveApi.callRoomMember(req).compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
-        disposes.add(subscriber)
+        return liveApi.callRoomMember(req)
     }
 
     /**
      * 取消向房间成员发送呼叫
      */
-    fun cancelCallRoomMember(
+    fun cancelCallRoomMembers(
         id: String,
         msg: String,
         members: Set<Long>
-    ) {
-        val subscriber = object : BaseSubscriber<Void>() {
-            override fun onNext(t: Void?) {
-            }
-        }
+    ): Flowable<Void> {
         val req = CancelCallRoomMemberReqVo(id, myUId, msg, members)
-        liveApi.cancelCallRoomMember(req).compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
-        disposes.add(subscriber)
+        return liveApi.cancelCallRoomMember(req)
     }
 
     /**
      * 拒绝加入房间(拒绝电话)
      */
-    fun refuseToJoinRoom(id: String, msg: String) {
-        val subscriber = object : BaseSubscriber<Void>() {
-            override fun onNext(t: Void?) {
-            }
-        }
+    fun refuseToJoinRoom(id: String, msg: String): Flowable<Void> {
         val req = RefuseJoinRoomVo(id, myUId, msg)
-        liveApi.refuseJoinRoom(req).compose(RxTransform.flowableToMain()).subscribe(subscriber)
-        disposes.add(subscriber)
+        return liveApi.refuseJoinRoom(req)
     }
 
     /**
@@ -147,14 +144,21 @@ class RTCRoomManager private constructor() {
         uIds: Set<Long>,
         msg: String,
         duration: Long
-    ) {
-        val subscriber = object : BaseSubscriber<Void>() {
-            override fun onNext(t: Void?) {
-            }
-        }
+    ): Flowable<Void> {
         val req = InviteMemberReqVo(id, myUId, uIds, duration, msg)
-        liveApi.inviteMember(req).compose(RxTransform.flowableToMain()).subscribe(subscriber)
-        disposes.add(subscriber)
+        return liveApi.inviteMember(req)
+    }
+
+    /**
+     * 踢出成员
+     */
+    fun kickoffMembers(
+        id: String,
+        uIds: Set<Long>,
+        msg: String
+    ): Flowable<Void> {
+        val req = KickoffMemberReqVo(id, myUId, msg, uIds)
+        return liveApi.kickRoomMember(req)
     }
 
     /**
@@ -162,6 +166,9 @@ class RTCRoomManager private constructor() {
      */
     fun leaveRoom(id: String, delRoom: Boolean) {
         val room = getRoomById(id) ?: return
+        rtcRooms.removeAll {
+            it.id == id
+        }
         if (room.ownerId == myUId && delRoom) {
             val subscriber = object : BaseSubscriber<Void>() {
                 override fun onNext(t: Void?) {
@@ -171,9 +178,6 @@ class RTCRoomManager private constructor() {
             liveApi.delRoom(DelRoomVo(id, myUId)).compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             disposes.add(subscriber)
-        }
-        rtcRooms.removeAll {
-            it.id == id
         }
     }
 

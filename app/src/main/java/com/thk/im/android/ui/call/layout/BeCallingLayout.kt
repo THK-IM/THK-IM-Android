@@ -26,11 +26,11 @@ class BeCallingLayout : ConstraintLayout {
     fun initCall(protocol: LiveCallProtocol) {
         liveCallProtocol = protocol
         binding.ivHangup.setOnClickListener {
-            liveCallProtocol.hangup()
+            liveCallProtocol.rejectCalling()
         }
 
         binding.ivAccept.setOnClickListener {
-            liveCallProtocol.accept()
+            liveCallProtocol.acceptCalling()
         }
 
 

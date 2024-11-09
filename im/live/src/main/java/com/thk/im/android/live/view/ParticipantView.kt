@@ -58,8 +58,16 @@ class ParticipantView : ConstraintLayout {
         parent.addView(surfaceView)
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (!fullScreen && event != null) {
+    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+        val interceptor = touchEvent(ev)
+        if (interceptor) {
+            return true
+        }
+        return super.onInterceptTouchEvent(ev)
+    }
+
+    private fun touchEvent(event: MotionEvent): Boolean {
+        if (!fullScreen) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     lastPositionX = event.x
@@ -89,12 +97,11 @@ class ParticipantView : ConstraintLayout {
                         }
                     }
                 }
-
                 MotionEvent.ACTION_CANCEL -> {}
             }
             return true
         }
-        return super.onTouchEvent(event)
+        return false
     }
 
     fun setDefaultScale(scaleX: Float, scaleY: Float) {

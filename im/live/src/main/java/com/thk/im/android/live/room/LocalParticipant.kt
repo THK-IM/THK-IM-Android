@@ -11,8 +11,8 @@ import com.thk.im.android.live.VolumeMsg
 import com.thk.im.android.live.api.vo.MediaParams
 import com.thk.im.android.live.api.vo.PublishStreamReqVo
 import com.thk.im.android.live.api.vo.PublishStreamResVo
-import com.thk.im.android.live.engine.LiveRTCEngine
 import com.thk.im.android.live.engine.LiveMediaConstraints
+import com.thk.im.android.live.engine.LiveRTCEngine
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer
@@ -22,7 +22,6 @@ import org.webrtc.SessionDescription
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoSource
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 
 class LocalParticipant(
     uId: Long,
@@ -148,14 +147,14 @@ class LocalParticipant(
         super.onLocalSdpSetSuccess(sdp)
         val offer = sdp.description
         val offerBase64 =
-            String(Base64.encode(offer.toByteArray(Charset.forName("UTF-8")), Base64.DEFAULT))
+            String(Base64.encode(offer.toByteArray(Charsets.UTF_8), Base64.DEFAULT))
         val reqVo = PublishStreamReqVo(roomId, uId, offerBase64)
         val subscriber = object : BaseSubscriber<PublishStreamResVo>() {
             override fun onNext(t: PublishStreamResVo?) {
                 t?.let {
                     val answer = String(
                         Base64.decode(
-                            it.answerSdp.toByteArray(Charset.forName("UTF-8")),
+                            it.answerSdp.toByteArray(Charsets.UTF_8),
                             Base64.DEFAULT
                         )
                     )
@@ -276,20 +275,12 @@ class LocalParticipant(
     }
 
     fun sendBytes(ba: ByteArray): Boolean {
-        return if (innerDataChannel == null) {
-            false
-        } else {
-            val buffer = DataChannel.Buffer(ByteBuffer.wrap(ba), true)
-            innerDataChannel!!.send(buffer)
-        }
+        val buffer = DataChannel.Buffer(ByteBuffer.wrap(ba), true)
+        return innerDataChannel?.send(buffer) ?: false
     }
 
     fun sendByteBuffer(bb: ByteBuffer): Boolean {
-        return if (innerDataChannel == null) {
-            false
-        } else {
-            val buffer = DataChannel.Buffer(bb, true)
-            innerDataChannel!!.send(buffer)
-        }
+        val buffer = DataChannel.Buffer(bb, true)
+        return innerDataChannel?.send(buffer) ?: false
     }
 }

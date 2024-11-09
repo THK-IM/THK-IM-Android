@@ -27,7 +27,7 @@ class CallingLayout : ConstraintLayout {
     fun initCall(protocol: LiveCallProtocol) {
         liveCallProtocol = protocol
         binding.ivHangup.setOnClickListener {
-            liveCallProtocol.hangup()
+            liveCallProtocol.hangupCalling()
         }
 
         binding.ivAudioMute.isSelected = liveCallProtocol.isLocalAudioMuted()

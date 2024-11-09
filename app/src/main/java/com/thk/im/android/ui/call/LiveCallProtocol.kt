@@ -23,10 +23,13 @@ interface LiveCallProtocol {
     fun switchLocalCamera()
 
     /**
-     * 打开本地摄像头
+     * 打开本地视频
      */
     fun muteLocalVideo(mute: Boolean)
 
+    /**
+     * 本地视频是否打开
+     */
     fun isLocalVideoMuted(): Boolean
 
     /**
@@ -60,12 +63,22 @@ interface LiveCallProtocol {
     fun isRemoteVideoMuted(uId: Long): Boolean
 
     /**
-     * 接听
+     * 取消calling
      */
-    fun accept()
+    fun cancelCalling()
 
     /**
-     * 挂断
+     * 接听
      */
-    fun hangup()
+    fun acceptCalling()
+
+    /**
+     * 拒绝接听
+     */
+    fun rejectCalling()
+
+    /**
+     * 挂断电话
+     */
+    fun hangupCalling()
 }

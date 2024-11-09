@@ -9,7 +9,6 @@ import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActvitiyLiveCallBinding
@@ -56,7 +55,6 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         }
 
         binding.participantRemote.setOnClickListener {
-            LLog.d("onClick: participantRemote")
             if (!binding.participantRemote.isFullScreen()) {
                 binding.participantLocal.bringToFront()
                 binding.llCallingInfo.bringToFront()
@@ -65,7 +63,6 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
                 binding.participantRemote.setFullscreenMode(true)
             }
         }
-
         checkPermission()
     }
 
@@ -211,8 +208,15 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         return binding.participantRemote.isVideoMuted()
     }
 
+    override fun cancelCalling() {
+        val room = RTCRoomManager.shared().currentRoom()
+        room?.let {
+            RTCRoomManager.shared().leaveRoom()
+        }
+        finish()
+    }
 
-    override fun accept() {
+    override fun acceptCalling() {
         val room = RTCRoomManager.shared().currentRoom()
         room?.let {
             showCallingView()
@@ -225,7 +229,15 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         }
     }
 
-    override fun hangup() {
+    override fun rejectCalling() {
+        val room = RTCRoomManager.shared().currentRoom()
+        room?.let {
+            RTCRoomManager.shared().refuseToJoinRoom(it.id, "")
+        }
+        finish()
+    }
+
+    override fun hangupCalling() {
         RTCRoomManager.shared().leaveRoom()
         finish()
     }

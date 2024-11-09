@@ -39,4 +39,5 @@ interface RTCRoomProtocol {
      *  RTC error
      */
     fun onError(function: String, ex: Exception)
+
 }

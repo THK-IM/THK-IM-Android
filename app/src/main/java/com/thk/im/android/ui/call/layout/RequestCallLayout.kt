@@ -26,7 +26,7 @@ class RequestCallLayout : ConstraintLayout {
     fun initCall(protocol: LiveCallProtocol) {
         this.liveCallProtocol = protocol
         binding.ivHangup.setOnClickListener {
-            liveCallProtocol.hangup()
+            liveCallProtocol.cancelCalling()
         }
 
         binding.ivOpenCloseCamera.isSelected = liveCallProtocol.isLocalVideoMuted()

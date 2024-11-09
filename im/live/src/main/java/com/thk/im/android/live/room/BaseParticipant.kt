@@ -45,8 +45,8 @@ abstract class BaseParticipant(
         val configuration = PeerConnection.RTCConfiguration(emptyList())
         //必须设置PeerConnection.SdpSemantics.UNIFIED_PLAN
         configuration.sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
-        this.peerConnection =
-            LiveRTCEngine.shared().factory.createPeerConnection(configuration, this)
+        this.peerConnection = LiveRTCEngine.shared()
+            .factory.createPeerConnection(configuration, this)
     }
 
     open fun startPeerConnection() {

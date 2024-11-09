@@ -12,7 +12,7 @@ import com.thk.im.android.live.api.vo.MediaParams
 import com.thk.im.android.live.api.vo.PublishStreamReqVo
 import com.thk.im.android.live.api.vo.PublishStreamResVo
 import com.thk.im.android.live.engine.IMLiveRTCEngine
-import com.thk.im.android.live.utils.MediaConstraintsHelper
+import com.thk.im.android.live.engine.MediaConstraintsHelper
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer

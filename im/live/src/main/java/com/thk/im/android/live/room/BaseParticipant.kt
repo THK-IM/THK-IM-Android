@@ -11,7 +11,7 @@ import com.thk.im.android.live.NotifyBean
 import com.thk.im.android.live.NotifyType
 import com.thk.im.android.live.RemoveStreamNotify
 import com.thk.im.android.live.engine.IMLiveRTCEngine
-import com.thk.im.android.live.utils.MediaConstraintsHelper
+import com.thk.im.android.live.engine.MediaConstraintsHelper
 import io.reactivex.disposables.CompositeDisposable
 import org.webrtc.AudioTrack
 import org.webrtc.DataChannel
@@ -101,7 +101,6 @@ abstract class BaseParticipant(
     fun getVideoMuted(): Boolean {
         return videoMuted
     }
-
 
     fun setVolume(volume: Double) {
         audioTracks.let {

@@ -197,11 +197,19 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     override fun requestCalling(mode: Mode, members: Set<Long>) {
-
+        // TODO
     }
 
     override fun cancelCalling() {
-        finish()
+        val subscriber = object : BaseSubscriber<Void>() {
+            override fun onNext(t: Void?) {
+                finish()
+            }
+        }
+        RTCRoomManager.shared().cancelCallRoomMembers(room.id, "", members().toSet())
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        addDispose(subscriber)
     }
 
     override fun acceptCalling() {
@@ -215,12 +223,19 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     override fun rejectCalling() {
+        val subscriber = object : BaseSubscriber<Void>() {
+            override fun onNext(t: Void?) {
+                finish()
+            }
+        }
         RTCRoomManager.shared().refuseToJoinRoom(room.id, "")
-        finish()
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        addDispose(subscriber)
     }
 
     override fun hangupCalling() {
-
+        rtcRoom.destroy()
         finish()
     }
 

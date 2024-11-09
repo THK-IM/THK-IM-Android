@@ -234,7 +234,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomProtocol, LiveCallProtocol {
         showCallingView()
         initParticipant(p)
     }
-t
+
     override fun onParticipantLeave(p: BaseParticipant) {
         RTCRoomManager.shared().leaveRoom()
         finish()

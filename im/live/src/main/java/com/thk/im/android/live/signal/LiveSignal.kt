@@ -119,51 +119,13 @@ data class LiveSignal(
     @SerializedName("body")
     var body: String,
 ) {
-    fun beingRequestingSignal(): BeingRequestingSignal? {
-        if (this.type == LiveSignalType.BeingRequesting.value) {
-            return Gson().fromJson(body, BeingRequestingSignal::class.java)
-        }
-        return null
-    }
-
-    fun cancelRequestedSignal(): CancelRequestingSignal? {
-        if (this.type == LiveSignalType.CancelRequesting.value) {
-            return Gson().fromJson(body, CancelRequestingSignal::class.java)
-        }
-        return null
-    }
-
-    fun rejectRequestSignal(): RejectRequestSignal? {
-        if (this.type == LiveSignalType.RejectRequest.value) {
-            return Gson().fromJson(body, RejectRequestSignal::class.java)
-        }
-        return null
-    }
-
-    fun acceptRequestSignal(): AcceptRequestSignal? {
-        if (this.type == LiveSignalType.AcceptRequest.value) {
-            return Gson().fromJson(body, AcceptRequestSignal::class.java)
-        }
-        return null
-    }
-
-    fun hangupSignal(): HangupSignal? {
-        if (this.type == LiveSignalType.Hangup.value) {
-            return Gson().fromJson(body, HangupSignal::class.java)
-        }
-        return null
-    }
-
-    fun endCallSignal(): EndCallSignal? {
-        if (this.type == LiveSignalType.EndCall.value) {
-            return Gson().fromJson(body, EndCallSignal::class.java)
-        }
-        return null
-    }
-
-    fun kickMemberSignal(): KickMemberSignal? {
-        if (this.type == LiveSignalType.KickMember.value) {
-            return Gson().fromJson(body, KickMemberSignal::class.java)
+    fun <T> signalForType(type: Int, clazz: Class<T>): T? {
+        if (this.type == type) {
+            return try {
+                Gson().fromJson(body, clazz)
+            } catch (e: Exception) {
+                null
+            }
         }
         return null
     }

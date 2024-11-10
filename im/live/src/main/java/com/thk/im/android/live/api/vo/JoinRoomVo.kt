@@ -23,6 +23,6 @@ data class JoinRoomResVo(
     var participants: MutableList<ParticipantVo>?,
     @SerializedName("mode")
     var mode: Int,
-    @SerializedName("media_prams")
+    @SerializedName("media_params")
     val mediaParams: MediaParams,
 )

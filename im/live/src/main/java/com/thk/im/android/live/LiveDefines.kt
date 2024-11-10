@@ -15,11 +15,6 @@ interface LiveRequestProcessor {
      */
     fun onBeingRequested(signal: BeingRequestedSignal)
 
-    /**
-     * 收到取消呼叫请求
-     */
-    fun onCancelBeingRequested(signal: CancelBeingRequestedSignal)
-
 }
 
 enum class LiveSignalType(val value: Int) {

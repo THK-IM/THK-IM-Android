@@ -42,8 +42,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     private lateinit var binding: ActvitiyLiveCallBinding
-    private lateinit var room: RTCRoom
-    private var requestCalling = false
+    private lateinit var rtcRoom: RTCRoom
 
     private fun callType(): Int {
         return intent.getIntExtra("callType", 1)
@@ -71,9 +70,16 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         val rejectMembers = rejectMembers()
         val needCallMembers = mutableSetOf<Long>()
         for (m in members) {
-            if (!acceptMembers.contains(m) && !rejectMembers.contains(m)) {
-                needCallMembers.add(m)
+            if (acceptMembers.contains(m)) {
+                continue
             }
+            if (rejectMembers.contains(m)) {
+                continue
+            }
+            if (m == RTCRoomManager.shared().myUId) {
+                continue
+            }
+            needCallMembers.add(m)
         }
         return needCallMembers
     }
@@ -81,8 +87,6 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     private fun rtcRoom(): RTCRoom? {
         return RTCRoomManager.shared().getRoomById(roomId())
     }
-
-    private lateinit var rtcRoom: RTCRoom
 
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActvitiyLiveCallBinding.inflate(layoutInflater)
@@ -102,7 +106,6 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     private fun initView() {
         binding.llRequestCall.initCall(this)
         binding.llCalling.initCall(this)
-        binding.llBeCalling.initCall(this)
 
         binding.participantLocal.setOnClickListener {
             if (!binding.participantLocal.isFullScreen()) {
@@ -171,6 +174,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     private fun initRoomUI() {
+        if (callType() == CallType.RequestCalling.value) {
+            showRequestCallView()
+        } else {
+            showCallingView()
+        }
         var remoteParticipantCnt = 0
         rtcRoom.getAllParticipants().forEach { p ->
             initParticipant(p)
@@ -178,33 +186,16 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 remoteParticipantCnt++
             }
         }
-        if (remoteParticipantCnt > 0) {
-            showCallingView()
-        } else {
-            if (callType() == CallType.RequestCalling.value) {
-                showRequestCallView()
-            } else {
-                showBeCallingView()
-            }
-        }
-    }
-
-    private fun showBeCallingView() {
-        binding.llRequestCall.visibility = View.GONE
-        binding.llCalling.visibility = View.GONE
-        binding.llBeCalling.visibility = View.VISIBLE
     }
 
     private fun showRequestCallView() {
         binding.llRequestCall.visibility = View.VISIBLE
         binding.llCalling.visibility = View.GONE
-        binding.llBeCalling.visibility = View.GONE
     }
 
     private fun showCallingView() {
         binding.llRequestCall.visibility = View.GONE
         binding.llCalling.visibility = View.VISIBLE
-        binding.llBeCalling.visibility = View.GONE
         startRequestCalling()
     }
 
@@ -231,7 +222,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     override fun room(): RTCRoom {
-        return room
+        return rtcRoom
     }
 
     override fun startRequestCalling() {
@@ -257,29 +248,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 finish()
             }
         }
-        RTCRoomManager.shared().cancelCallRoomMembers(room.id, "", members().toSet())
-            .compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
-        addDispose(subscriber)
-    }
-
-    override fun acceptCalling() {
-        showCallingView()
-        binding.participantLocal.startPeerConnection()
-        room.getAllParticipants().forEach { p ->
-            if (p is RemoteParticipant) {
-                initParticipant(p)
-            }
-        }
-    }
-
-    override fun rejectCalling() {
-        val subscriber = object : BaseSubscriber<Void>() {
-            override fun onNext(t: Void?) {
-                finish()
-            }
-        }
-        RTCRoomManager.shared().refuseToJoinRoom(room.id, "")
+        RTCRoomManager.shared().cancelCallRoomMembers(rtcRoom.id, "", members().toSet())
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         addDispose(subscriber)

@@ -1,6 +1,5 @@
 package com.thk.im.android.ui.call
 
-import com.thk.im.android.live.Mode
 import com.thk.im.android.live.room.RTCRoom
 
 interface LiveCallProtocol {
@@ -19,16 +18,6 @@ interface LiveCallProtocol {
      * 取消calling
      */
     fun cancelRequestCalling()
-
-    /**
-     * 接听
-     */
-    fun acceptCalling()
-
-    /**
-     * 拒绝接听
-     */
-    fun rejectCalling()
 
     /**
      * 挂断电话

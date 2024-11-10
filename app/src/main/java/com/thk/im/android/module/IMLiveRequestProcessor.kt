@@ -11,7 +11,6 @@ import com.thk.im.android.ui.component.BeRequestedCallPopup
 
 class IMLiveRequestProcessor(private val app: Application) : LiveRequestProcessor {
 
-    private val popupMap = hashMapOf<String, BeRequestedCallPopup>()
     private val processedRoomIds = mutableSetOf<String>()
 
     override fun onBeingRequested(signal: BeingRequestedSignal) {
@@ -21,26 +20,15 @@ class IMLiveRequestProcessor(private val app: Application) : LiveRequestProcesso
                 return
             }
             processedRoomIds.add(signal.roomId)
-            if (popupMap[signal.roomId] == null) {
-                val beRequestedPopup = BeRequestedCallPopup(currentActivity)
-                beRequestedPopup.signal = signal
-                XPopup.Builder(currentActivity).isDestroyOnDismiss(true)
-                    .popupAnimation(PopupAnimation.TranslateFromTop)
-                    .asCustom(beRequestedPopup)
-                    .show()
-                popupMap[signal.roomId] = beRequestedPopup
-            }
+            val beRequestedPopup = BeRequestedCallPopup(currentActivity)
+            beRequestedPopup.signal = signal
+            XPopup.Builder(currentActivity).isDestroyOnDismiss(true)
+                .popupAnimation(PopupAnimation.TranslateFromTop)
+                .asCustom(beRequestedPopup)
+                .show()
         } else {
             // 应用切入后台
         }
     }
 
-    override fun onCancelBeingRequested(signal: CancelBeingRequestedSignal) {
-        popupMap[signal.roomId]?.let {
-            it.post {
-                it.dismiss()
-            }
-        }
-        popupMap.remove(signal.roomId)
-    }
 }

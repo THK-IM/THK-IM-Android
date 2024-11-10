@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.module.internal.DefaultCustomModule
 import com.thk.im.android.live.LiveManager
-import com.thk.im.android.live.signal.LiveSignal
+import com.thk.im.android.live.LiveSignal
 import io.reactivex.disposables.CompositeDisposable
 
 

@@ -22,7 +22,7 @@ class LiveManager private constructor() {
     }
 
     var app: Application? = null
-    var liveCallingProtocol: LiveCallingProtocol? = null
+    var liveRequestProcessor: LiveRequestProcessor? = null
 
     fun init(app: Application) {
         this.app = app
@@ -42,7 +42,7 @@ class LiveManager private constructor() {
                     LiveSignalType.BeingRequested.value,
                     BeingRequestedSignal::class.java
                 )?.let {
-                    liveCallingProtocol?.onBeingRequested(it)
+                    liveRequestProcessor?.onBeingRequested(it)
                 }
             }
 
@@ -51,7 +51,7 @@ class LiveManager private constructor() {
                     LiveSignalType.CancelBeingRequested.value,
                     CancelBeingRequestedSignal::class.java
                 )?.let {
-                    liveCallingProtocol?.onCancelBeingRequested(it)
+                    liveRequestProcessor?.onCancelBeingRequested(it)
                 }
             }
 

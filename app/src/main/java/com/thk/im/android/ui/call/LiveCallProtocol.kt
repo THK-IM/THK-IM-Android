@@ -13,12 +13,12 @@ interface LiveCallProtocol {
     /**
      * 发起通话
      */
-    fun requestCalling(mode: Mode, members: Set<Long>)
+    fun startRequestCalling()
 
     /**
      * 取消calling
      */
-    fun cancelCalling()
+    fun cancelRequestCalling()
 
     /**
      * 接听

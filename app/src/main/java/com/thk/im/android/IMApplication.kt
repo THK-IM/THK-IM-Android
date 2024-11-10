@@ -14,12 +14,13 @@ import com.thk.im.android.core.fileloader.internal.DefaultFileLoadModule
 import com.thk.im.android.core.signal.inernal.DefaultSignalModule
 import com.thk.im.android.live.LiveManager
 import com.thk.im.android.media.Provider
-import com.thk.im.android.module.CipherCrypto
-import com.thk.im.android.module.ExternalPageRouter
+import com.thk.im.android.module.IMCipherCrypto
 import com.thk.im.android.module.IMContactModule
 import com.thk.im.android.module.IMCustomModule
 import com.thk.im.android.module.IMDemoUIProvider
+import com.thk.im.android.module.IMExternalPageRouter
 import com.thk.im.android.module.IMGroupModule
+import com.thk.im.android.module.IMLiveRequestProcessor
 import com.thk.im.android.module.IMUserModule
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.preview.Previewer
@@ -54,15 +55,16 @@ class IMApplication : Application() {
     private fun initIMConfig() {
         val debug = true
         IMCoreManager.init(this, debug)
-        IMCoreManager.crypto = CipherCrypto("1234123412341234", "0000000000000000")
+        IMCoreManager.crypto = IMCipherCrypto("1234123412341234", "0000000000000000")
         IMCoreManager.userModule = IMUserModule()
         IMCoreManager.contactModule = IMContactModule()
         IMCoreManager.groupModule = IMGroupModule()
         IMCoreManager.customModule = IMCustomModule(this)
         IMUIManager.init(this)
-        IMUIManager.pageRouter = ExternalPageRouter()
+        IMUIManager.pageRouter = IMExternalPageRouter()
         IMUIManager.uiResourceProvider = IMDemoUIProvider(this)
         LiveManager.shared().init(this)
+        LiveManager.shared().liveRequestProcessor = IMLiveRequestProcessor(this)
     }
 
     fun initIMUser(token: String, uId: Long): Flowable<Boolean> {
@@ -98,17 +100,17 @@ class IMApplication : Application() {
                 currentActivity = activity
             }
 
-            override fun onActivityPaused(activity: Activity) {}
+            override fun onActivityPaused(activity: Activity) {
+                if (currentActivity == activity) {
+                    currentActivity = null
+                }
+            }
 
             override fun onActivityStopped(activity: Activity) {}
 
             override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
-            override fun onActivityDestroyed(activity: Activity) {
-                if (currentActivity == activity) {
-                    currentActivity = null
-                }
-            }
+            override fun onActivityDestroyed(activity: Activity) {}
 
         })
     }

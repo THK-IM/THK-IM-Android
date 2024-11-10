@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 
 val liveSignalEvent = "LiveSignalEvent"
 
-interface LiveCallingProtocol {
+interface LiveRequestProcessor {
 
     /**
      * 收到被呼叫请求

@@ -21,7 +21,7 @@ import com.thk.im.android.ui.contact.ContactUserActivity
 import com.thk.im.android.ui.protocol.IMPageRouter
 import io.reactivex.disposables.CompositeDisposable
 
-class ExternalPageRouter : IMPageRouter {
+class IMExternalPageRouter : IMPageRouter {
 
     private val compositeDisposable = CompositeDisposable()
 

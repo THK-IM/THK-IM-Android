@@ -3,7 +3,7 @@ package com.thk.im.android.module
 import com.thk.im.android.core.Crypto
 import com.thk.im.android.core.base.AES
 
-class CipherCrypto(private val key: String, private val iv: String) : Crypto {
+class IMCipherCrypto(private val key: String, private val iv: String) : Crypto {
 
     private val aes = AES(key, iv)
 

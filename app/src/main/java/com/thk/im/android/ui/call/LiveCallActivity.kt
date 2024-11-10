@@ -13,14 +13,15 @@ import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.databinding.ActvitiyLiveCallBinding
 import com.thk.im.android.live.CallType
-import com.thk.im.android.live.Mode
 import com.thk.im.android.live.room.BaseParticipant
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.room.RTCRoomCallBack
 import com.thk.im.android.live.room.RTCRoomManager
 import com.thk.im.android.live.room.RemoteParticipant
 import com.thk.im.android.ui.base.BaseActivity
+import io.reactivex.Flowable
 import java.nio.ByteBuffer
+import java.util.concurrent.TimeUnit
 
 class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
 
@@ -42,6 +43,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
 
     private lateinit var binding: ActvitiyLiveCallBinding
     private lateinit var room: RTCRoom
+    private var requestCalling = false
 
     private fun callType(): Int {
         return intent.getIntExtra("callType", 1)
@@ -55,6 +57,27 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         return intent.getLongArrayExtra("members")?.toTypedArray() ?: emptyArray()
     }
 
+    private fun acceptMembers(): Array<Long> {
+        return intent.getLongArrayExtra("accept_members")?.toTypedArray() ?: emptyArray()
+    }
+
+    private fun rejectMembers(): Array<Long> {
+        return intent.getLongArrayExtra("reject_members")?.toTypedArray() ?: emptyArray()
+    }
+
+    private fun needCallMembers(): Set<Long> {
+        val members = members()
+        val acceptMembers = acceptMembers()
+        val rejectMembers = rejectMembers()
+        val needCallMembers = mutableSetOf<Long>()
+        for (m in members) {
+            if (!acceptMembers.contains(m) && !rejectMembers.contains(m)) {
+                needCallMembers.add(m)
+            }
+        }
+        return needCallMembers
+    }
+
     private fun rtcRoom(): RTCRoom? {
         return RTCRoomManager.shared().getRoomById(roomId())
     }
@@ -64,7 +87,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActvitiyLiveCallBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
-        val room = RTCRoomManager.shared().getRoomById(roomId())
+        val room = rtcRoom()
         if (room == null) {
             finish()
             return
@@ -100,6 +123,20 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 binding.participantRemote.setFullscreenMode(true)
             }
         }
+
+        val subscriber = object : BaseSubscriber<Long>() {
+            override fun onNext(t: Long) {
+                timerTick(t)
+            }
+        }
+        Flowable.interval(0, 3, TimeUnit.SECONDS).take(Long.MAX_VALUE)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        addDispose(subscriber)
+    }
+
+    private fun timerTick(t: Long) {
+
     }
 
     private fun initUserInfo() {
@@ -168,6 +205,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         binding.llRequestCall.visibility = View.GONE
         binding.llCalling.visibility = View.VISIBLE
         binding.llBeCalling.visibility = View.GONE
+        startRequestCalling()
     }
 
     private fun initParticipant(p: BaseParticipant) {
@@ -196,11 +234,24 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         return room
     }
 
-    override fun requestCalling(mode: Mode, members: Set<Long>) {
-        // TODO
+    override fun startRequestCalling() {
+        val needCallMembers = needCallMembers()
+        if (needCallMembers.isNotEmpty()) {
+            val subscriber = object : BaseSubscriber<Void>() {
+                override fun onNext(t: Void?) {
+                }
+            }
+            RTCRoomManager.shared().callRoomMembers(
+                roomId(), "ssss", 3, needCallMembers
+            ).subscribe(subscriber)
+            addDispose(subscriber)
+            binding.llCalling.postDelayed({
+                startRequestCalling()
+            }, 3000)
+        }
     }
 
-    override fun cancelCalling() {
+    override fun cancelRequestCalling() {
         val subscriber = object : BaseSubscriber<Void>() {
             override fun onNext(t: Void?) {
                 finish()

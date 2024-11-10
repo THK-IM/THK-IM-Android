@@ -13,21 +13,21 @@ interface LiveCallingProtocol {
     /**
      * 收到被呼叫请求
      */
-    fun onBeCalling(signal: BeingRequestingSignal)
+    fun onBeingRequested(signal: BeingRequestedSignal)
 
     /**
      * 收到取消呼叫请求
      */
-    fun onCancelBeCalling(signal: CancelRequestingSignal)
+    fun onCancelBeingRequested(signal: CancelBeingRequestedSignal)
 
 }
 
 enum class LiveSignalType(val value: Int) {
     // 正在被请求通话
-    BeingRequesting(1),
+    BeingRequested(1),
 
     // 取消请求通话
-    CancelRequesting(2),
+    CancelBeingRequested(2),
 
     // 拒绝请求通话
     RejectRequest(3),
@@ -46,7 +46,7 @@ enum class LiveSignalType(val value: Int) {
 
 }
 
-data class BeingRequestingSignal(
+data class BeingRequestedSignal(
     @SerializedName("room_id")
     var roomId: String,
     @SerializedName("members")
@@ -63,7 +63,7 @@ data class BeingRequestingSignal(
     var timeoutTime: Long,
 )
 
-data class CancelRequestingSignal(
+data class CancelBeingRequestedSignal(
     @SerializedName("room_id")
     var roomId: String,
     @SerializedName("msg")

@@ -37,21 +37,21 @@ class LiveManager private constructor() {
 
     fun onLiveSignalReceived(signal: LiveSignal) {
         when (signal.type) {
-            LiveSignalType.BeingRequesting.value -> {
+            LiveSignalType.BeingRequested.value -> {
                 signal.signalForType(
-                    LiveSignalType.BeingRequesting.value,
-                    BeingRequestingSignal::class.java
+                    LiveSignalType.BeingRequested.value,
+                    BeingRequestedSignal::class.java
                 )?.let {
-                    liveCallingProtocol?.onBeCalling(it)
+                    liveCallingProtocol?.onBeingRequested(it)
                 }
             }
 
-            LiveSignalType.CancelRequesting.value -> {
+            LiveSignalType.CancelBeingRequested.value -> {
                 signal.signalForType(
-                    LiveSignalType.CancelRequesting.value,
-                    CancelRequestingSignal::class.java
+                    LiveSignalType.CancelBeingRequested.value,
+                    CancelBeingRequestedSignal::class.java
                 )?.let {
-                    liveCallingProtocol?.onCancelBeCalling(it)
+                    liveCallingProtocol?.onCancelBeingRequested(it)
                 }
             }
 

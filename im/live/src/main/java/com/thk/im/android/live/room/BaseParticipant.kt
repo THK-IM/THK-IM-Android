@@ -52,7 +52,7 @@ abstract class BaseParticipant(
     open fun startPeerConnection() {
         peerConnection?.createOffer(object : SdpObserver {
             override fun onCreateSuccess(p0: SessionDescription?) {
-                LLog.d("${uId}, createOffer onCreateSuccess")
+                LLog.d("RTCRoom", "${this.javaClass} $uId  createOffer onCreateSuccess")
                 p0?.let {
                     if (it.type == SessionDescription.Type.OFFER) {
                         onLocalSdpCreated(it)
@@ -61,15 +61,15 @@ abstract class BaseParticipant(
             }
 
             override fun onSetSuccess() {
-                LLog.d("${uId}, createOffer onSetSuccess")
+                LLog.d("RTCRoom", "${this.javaClass} $uId createOffer onSetSuccess")
             }
 
             override fun onCreateFailure(p0: String?) {
-                LLog.e("${uId}, createOffer onCreateFailure $p0")
+                LLog.d("RTCRoom", "${this.javaClass} $uId  createOffer onCreateFailure $p0")
             }
 
             override fun onSetFailure(p0: String?) {
-                LLog.e("${uId}, createOffer onSetFailure $p0")
+                LLog.d("RTCRoom", "${this.javaClass} $uId  createOffer onSetFailure $p0")
             }
 
         }, LiveMediaConstraints.offerOrAnswerConstraint(this is RemoteParticipant))
@@ -144,10 +144,12 @@ abstract class BaseParticipant(
             }
 
             override fun onCreateFailure(p0: String?) {
+                LLog.d("RTCRoom", "${this.javaClass} $uId onCreateFailure $p0")
                 onError("setRemoteDescription", Exception("onCreateFailure: $p0"))
             }
 
             override fun onSetFailure(p0: String?) {
+                LLog.d("RTCRoom", "${this.javaClass} $uId onSetFailure $p0")
                 onError("setRemoteDescription", Exception("onSetFailure: $p0"))
             }
         }, sdp)
@@ -155,31 +157,32 @@ abstract class BaseParticipant(
 
 
     override fun onSignalingChange(p0: PeerConnection.SignalingState?) {
-        LLog.d("${uId}, onSignalingChange $p0")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onSignalingChange $p0")
     }
 
     override fun onIceConnectionChange(p0: PeerConnection.IceConnectionState?) {
-        LLog.d("${uId}, onIceConnectionChange $p0")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onIceConnectionChange $p0")
     }
 
     override fun onIceConnectionReceivingChange(p0: Boolean) {
-        LLog.d("${uId}, onIceConnectionReceivingChange $p0")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onIceConnectionReceivingChange $p0")
     }
 
     override fun onIceGatheringChange(p0: PeerConnection.IceGatheringState?) {
-        LLog.d("${uId}, onIceGatheringChange $p0")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onIceGatheringChange $p0")
     }
 
     override fun onIceCandidate(p0: IceCandidate?) {
-        LLog.d("${uId}, onIceCandidate $p0")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onIceCandidate $p0")
     }
 
     override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {
-        LLog.d("${uId}, onIceCandidatesRemoved $p0")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onIceCandidatesRemoved $p0")
     }
 
     override fun onConnectionChange(newState: PeerConnection.PeerConnectionState?) {
         super.onConnectionChange(newState)
+        LLog.d("RTCRoom", "${this.javaClass} $uId onConnectionChange")
         peerConnection?.connectionState()?.let {
             if (it == PeerConnection.PeerConnectionState.CLOSED ||
                 it == PeerConnection.PeerConnectionState.DISCONNECTED ||
@@ -193,7 +196,7 @@ abstract class BaseParticipant(
     }
 
     override fun onAddStream(p0: MediaStream?) {
-        LLog.d("${uId}, onAddStream")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onAddStream")
         p0?.let {
             handler.post {
                 if (this is RemoteParticipant) {
@@ -213,7 +216,7 @@ abstract class BaseParticipant(
     }
 
     override fun onRemoveStream(p0: MediaStream?) {
-        LLog.d("${uId}, onRemoveStream")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onRemoveStream")
         p0?.let {
             if (this is RemoteParticipant) {
                 if (it.videoTracks != null) {
@@ -232,7 +235,7 @@ abstract class BaseParticipant(
     }
 
     override fun onDataChannel(p0: DataChannel?) {
-        LLog.d("${uId}, onDataChannel")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onDataChannel")
         p0?.let {
             it.registerObserver(this)
             it.label()?.let { label ->
@@ -242,28 +245,31 @@ abstract class BaseParticipant(
     }
 
     override fun onRenegotiationNeeded() {
-        LLog.d("${uId}, onRenegotiationNeeded")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onRenegotiationNeeded")
     }
 
     override fun onAddTrack(p0: RtpReceiver?, p1: Array<out MediaStream>?) {
         super.onAddTrack(p0, p1)
-        LLog.d("${uId}, onAddTrack")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onAddTrack")
     }
 
     override fun onRemoveTrack(receiver: RtpReceiver?) {
         super.onRemoveTrack(receiver)
-        LLog.d("${uId}, onRemoveTrack")
+        LLog.d("RTCRoom", "${this.javaClass} $uId onRemoveTrack")
     }
 
     override fun onBufferedAmountChange(p0: Long) {
-        LLog.d("onBufferedAmountChange, p0: $p0")
     }
 
     override fun onStateChange() {
-        LLog.d("onStateChange, connect status: ${peerConnection?.connectionState()}")
+        LLog.d(
+            "RTCRoom",
+            "${this.javaClass} $uId onStateChange, connect status: ${peerConnection?.connectionState()}"
+        )
     }
 
     override fun onMessage(p0: DataChannel.Buffer?) {
+        LLog.d("RTCRoom", "${this.javaClass} $uId, onMessage")
         p0?.let {
             if (it.binary) {
                 it.data?.let { data ->
@@ -280,6 +286,7 @@ abstract class BaseParticipant(
     }
 
     open fun onNewBufferMessage(bb: ByteBuffer) {
+        LLog.d("RTCRoom", "${this.javaClass} $uId, onNewBufferMessage")
         RTCRoomManager.shared().getRoomById(roomId)?.let { room ->
             handler.post {
                 room.receivedDcMsg(bb)
@@ -288,6 +295,7 @@ abstract class BaseParticipant(
     }
 
     open fun onNewMessage(message: String) {
+        LLog.d("RTCRoom", "${this.javaClass} $uId, onNewMessage")
         val notify = Gson().fromJson(message, NotifyBean::class.java)
         when (notify.type) {
             NotifyType.NewStream.value -> {
@@ -332,6 +340,7 @@ abstract class BaseParticipant(
     }
 
     open fun onConnectStatusChange(status: Int) {
+        LLog.d("RTCRoom", "${this.javaClass} $uId, onConnectStatusChange")
         val room = RTCRoomManager.shared().getRoomById(roomId) ?: return
         if (room.id != this.roomId) {
             return
@@ -340,6 +349,7 @@ abstract class BaseParticipant(
     }
 
     open fun onError(function: String, exception: Exception) {
+        LLog.d("RTCRoom", "${this.javaClass} $uId, onError ${exception.message}")
         val room = RTCRoomManager.shared().getRoomById(roomId) ?: return
         if (room.id != this.roomId) {
             return
@@ -348,12 +358,13 @@ abstract class BaseParticipant(
     }
 
     protected fun addVideoTrack(videoTrack: VideoTrack) {
-        LLog.d("$uId, addVideoTrack")
+        LLog.d("RTCRoom", "${this.javaClass} $uId, addVideoTrack")
         videoTracks.add(videoTrack)
         attach()
     }
 
     private fun removeVideoTrack(videoTrack: VideoTrack) {
+        LLog.d("RTCRoom", "${this.javaClass} $uId, addVideoTrack")
         videoTracks.remove(videoTrack)
         detach()
     }

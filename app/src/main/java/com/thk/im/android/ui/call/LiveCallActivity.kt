@@ -91,13 +91,13 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActvitiyLiveCallBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
+        setContentView(binding.root)
         val room = rtcRoom()
         if (room == null) {
             finish()
             return
         }
         rtcRoom = room
-        setContentView(binding.root)
         initView()
         initUserInfo()
         checkPermission()
@@ -208,9 +208,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         } else {
             binding.participantLocal.setParticipant(p)
             binding.participantLocal.setFullscreenMode(true)
-            if (rtcRoom.ownerId == RTCRoomManager.shared().myUId) {
-                binding.participantLocal.startPeerConnection()
-            }
+            binding.participantLocal.startPeerConnection()
         }
     }
 

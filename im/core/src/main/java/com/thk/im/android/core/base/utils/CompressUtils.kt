@@ -170,6 +170,35 @@ object CompressUtils {
         stream.close()
     }
 
+    @Throws(Exception::class)
+    fun compressSync(source: Bitmap, size: Int): Bitmap {
+        val length = source.byteCount
+        if (length <= size) {
+            return source
+        }
+        val rate = sqrt((length / size).toDouble()).toInt() * 2
+        var sample = 2
+        while (sample < rate) {
+            sample *= 2
+        }
+        val stream = ByteArrayOutputStream()
+
+        val width: Int = source.width
+        val height: Int = source.height
+        val scale = sqrt(sample.toDouble()).toFloat()
+        val m = Matrix()
+        m.setScale(1 / scale, 1 / scale)
+        val bitmap = Bitmap.createBitmap(
+            source, 0, 0, width, height, m, true
+        )
+        bitmap.compress(
+            if (bitmap.hasAlpha()) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG,
+            if (bitmap.hasAlpha()) 100 else 60,
+            stream
+        )
+        return bitmap
+    }
+
 
     /**
      * 获取bitmap的长宽

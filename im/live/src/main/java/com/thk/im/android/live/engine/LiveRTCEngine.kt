@@ -53,7 +53,7 @@ class LiveRTCEngine {
         val eglBase = EglBase.create()
         val eglBaseContext = eglBase.eglBaseContext
         val options = PeerConnectionFactory.Options()
-        val encoderFactory = DefaultVideoEncoderFactory(eglBaseContext, false, false)
+        val encoderFactory = DefaultVideoEncoderFactory(eglBaseContext, true, true)
         val decoderFactory = DefaultVideoDecoderFactory(eglBaseContext)
         audioProcessingFactory = ExternalAudioProcessingFactory()
         audioProcessingFactory.setBypassFlagForRenderPre(true)

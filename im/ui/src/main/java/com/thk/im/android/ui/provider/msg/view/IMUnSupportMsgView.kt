@@ -36,7 +36,6 @@ class IMUnSupportMsgView : LinearLayout, IMsgBodyView {
     }
 
     override fun setMessage(
-        positionType: Int,
         message: Message,
         session: Session?,
         delegate: IMMsgVHOperator?,

@@ -345,43 +345,9 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     private fun renderReplyMsg() {
         if (message.rMsgId != null && message.referMsg != null) {
             msgReplyContentView.visibility = View.VISIBLE
-            val userInfo =
-                msgVHOperator?.msgSender()?.syncGetSessionMemberInfo(message.referMsg!!.fUid)
-            userInfo?.let { info ->
-                val user = info.first
-                info.second?.noteName?.let { noteName ->
-                    if (noteName.isNotEmpty()) {
-                        user.nickname = noteName
-                    }
-                }
-                info.second?.noteAvatar?.let { noteAvatar ->
-                    if (noteAvatar.isNotEmpty()) {
-                        user.avatar = noteAvatar
-                    }
-                }
-                message.referMsg?.let {
-                    msgReplyContentView.setMessage(
-                        getPositionType(), user, it, session, msgVHOperator
-                    )
-                }
-                return
-            }
-
-            val subscriber = object : BaseSubscriber<User>() {
-                override fun onNext(t: User?) {
-                    t?.let { user ->
-                        message.referMsg?.let {
-                            msgReplyContentView.setMessage(
-                                getPositionType(), user, it, session, msgVHOperator
-                            )
-                        }
-                    }
-                }
-            }
-            IMCoreManager.userModule.queryUser(message.referMsg!!.fUid)
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            disposable.add(subscriber)
+            msgReplyContentView.setMessage(
+                getPositionType(), message.referMsg!!, session, msgVHOperator
+            )
         } else {
             msgReplyContentView.visibility = View.GONE
         }

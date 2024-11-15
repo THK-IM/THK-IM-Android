@@ -8,7 +8,6 @@ import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 interface IMsgBodyView {
 
     fun setMessage(
-        positionType: Int,
         message: Message,
         session: Session?,
         delegate: IMMsgVHOperator?,

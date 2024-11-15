@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.db.entity.Message
+import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
@@ -98,6 +99,15 @@ abstract class IMBaseMessageIVProvider {
                     ?: R.layout.itemview_msg_mid_container
             }
         }
+    }
+
+    open fun onMsgClick(
+        context: Context,
+        msg: Message,
+        session: Session?,
+        originView: View
+    ): Boolean {
+        return false
     }
 
 

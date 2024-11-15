@@ -87,3 +87,8 @@ interface Crypto {
     fun encrypt(text: String): String?
     fun decrypt(cipherText: String): String?
 }
+
+data class IMCache(
+    val time: Long,
+    val data: Any,
+)

@@ -140,6 +140,7 @@ class IMMessageAdapter(
             if (pos >= 0 && pos < messageList.size) {
                 messageList[pos] = message
                 notifyItemChanged(pos)
+                referMessageUpdate(message)
                 return pos
             } else {
                 val position = findInsertPosition(message)
@@ -169,6 +170,7 @@ class IMMessageAdapter(
                 messageList[pos] = message
                 notifyItemChanged(pos)
             }
+            referMessageUpdate(message)
         }
     }
 
@@ -223,6 +225,15 @@ class IMMessageAdapter(
     fun batchDelete(deleteMessages: List<Message>) {
         deleteMessages.forEach {
             delete(it)
+        }
+    }
+
+    private fun referMessageUpdate(message: Message) {
+        for ((index, m) in messageList.withIndex()) {
+            if (m.rMsgId == message.id) {
+                messageList[index].referMsg = message
+                notifyItemChanged(index)
+            }
         }
     }
 

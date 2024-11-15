@@ -395,12 +395,14 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         super.onViewDetached()
         disposable.clear()
         msgBodyView().onViewDetached()
+        msgReplyContentView.onViewDetached()
     }
 
     override fun onViewRecycled() {
         super.onViewRecycled()
-        msgVHOperator = null
+        msgReplyContentView.onViewRecycled()
         msgBodyView().onViewDestroyed()
+        msgVHOperator = null
     }
 
     open fun displayAvatar(imageView: ImageView, url: String) {

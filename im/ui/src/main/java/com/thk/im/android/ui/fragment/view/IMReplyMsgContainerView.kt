@@ -15,9 +15,10 @@ import com.thk.im.android.ui.databinding.ViewReplyMsgContainerBinding
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
-class IMReplyMsgContainerView : LinearLayout {
+open class IMReplyMsgContainerView : LinearLayout {
 
     private val binding: ViewReplyMsgContainerBinding
+    private var replyBodyView: IMsgBodyView? = null
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -47,5 +48,14 @@ class IMReplyMsgContainerView : LinearLayout {
         val view = IMUIManager.getMsgIVProviderByMsgType(message.type).replyMsgView(context)
         binding.flReplyContent.addView(view.contentView())
         view.setMessage(positionType, message, session, delegate, true)
+        replyBodyView = view
+    }
+
+    open fun onViewDetached() {
+        replyBodyView?.onViewDetached()
+    }
+
+    open fun onViewRecycled() {
+        replyBodyView?.onViewDestroyed()
     }
 }

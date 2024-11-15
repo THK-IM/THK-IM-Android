@@ -176,7 +176,7 @@ object CompressUtils {
         if (length <= size) {
             return source
         }
-        val rate = sqrt((length / size).toDouble()).toInt() * 2
+        val rate = sqrt((length / size).toDouble()).toInt()
         var sample = 2
         while (sample < rate) {
             sample *= 2
@@ -185,7 +185,7 @@ object CompressUtils {
 
         val width: Int = source.width
         val height: Int = source.height
-        val scale = sqrt(sample.toDouble()).toFloat()
+        val scale = sample.toFloat()
         val m = Matrix()
         m.setScale(1 / scale, 1 / scale)
         val bitmap = Bitmap.createBitmap(

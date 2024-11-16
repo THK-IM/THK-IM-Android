@@ -90,6 +90,12 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
     }
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {
+        val interceptor = IMUIManager.getMsgIVProviderByMsgType(msg.type).onMsgClick(
+            this, msg, null, originView
+        )
+        if (interceptor) {
+            return
+        }
         if (msg.type == MsgType.Image.value || msg.type == MsgType.Video.value) {
             val messages = binding.rcvMessage.getMessages()
             val mediaMessages = ArrayList<Message>()

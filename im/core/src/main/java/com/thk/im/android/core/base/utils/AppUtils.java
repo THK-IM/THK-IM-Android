@@ -60,6 +60,21 @@ public class AppUtils {
     }
 
     /**
+     * 获取版本号名称
+     */
+    public String getAppName() {
+        String appName = "";
+        try {
+            int appNameRes = mApp.getPackageManager().
+                    getPackageInfo(mApp.getPackageName(), PackageManager.GET_CONFIGURATIONS).applicationInfo.labelRes;
+            appName = mApp.getResources().getString(appNameRes);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return appName;
+    }
+
+    /**
      * 获取当前本地apk的版本
      */
     public int getVersionCode() {

@@ -6,6 +6,9 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.core.view.children
+import com.thk.im.android.core.IMCoreManager
+import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
@@ -14,10 +17,13 @@ import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewReplyMsgContainerBinding
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
+import io.reactivex.disposables.CompositeDisposable
 
-class IMReplyMsgContainerView : LinearLayout {
+open class IMReplyMsgContainerView : LinearLayout {
 
     private val binding: ViewReplyMsgContainerBinding
+    private var replyBodyView: IMsgBodyView? = null
+    private val disposables = CompositeDisposable()
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -34,18 +40,45 @@ class IMReplyMsgContainerView : LinearLayout {
     }
 
     fun setMessage(
-        positionType: Int,
-        user: User,
+        pos: Int,
         message: Message,
         session: Session,
         delegate: IMMsgVHOperator?
     ) {
-        binding.tvReplyMsgUserNick.text = user.nickname
         binding.flReplyContent.children.forEach {
             binding.flReplyContent.removeView(it)
         }
         val view = IMUIManager.getMsgIVProviderByMsgType(message.type).replyMsgView(context)
         binding.flReplyContent.addView(view.contentView())
-        view.setMessage(positionType, message, session, delegate, true)
+        view.setMessage(pos, message, session, delegate, true)
+        replyBodyView = view
+
+        val userInfo =
+            delegate?.msgSender()?.syncGetSessionMemberInfo(message.referMsg!!.fUid)
+        userInfo?.let { info ->
+            val nickname = IMUIManager.nicknameForSessionMember(info.first, info.second)
+            binding.tvReplyMsgUserNick.text = nickname
+            return
+        }
+
+        val subscriber = object : BaseSubscriber<User>() {
+            override fun onNext(t: User?) {
+                t?.let { user ->
+                    binding.tvReplyMsgUserNick.text = user.nickname
+                }
+            }
+        }
+        IMCoreManager.userModule.queryUser(message.referMsg!!.fUid)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposables.add(subscriber)
+    }
+
+    open fun onViewDetached() {
+        replyBodyView?.onViewDetached()
+    }
+
+    open fun onViewRecycled() {
+        replyBodyView?.onViewDestroyed()
     }
 }

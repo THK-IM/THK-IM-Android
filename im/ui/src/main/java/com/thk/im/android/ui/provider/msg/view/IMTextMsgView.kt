@@ -42,7 +42,6 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
     }
 
     override fun setMessage(
-        positionType: Int,
         message: Message,
         session: Session?,
         delegate: IMMsgVHOperator?,
@@ -54,7 +53,7 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
             binding.tvMsgContent.textSize = 12.0f
             binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
         } else {
-            if (positionType == IMMsgPosType.Mid.value) {
+            if (message.fUid == 0L) {
                 binding.tvMsgContent.textSize = 12.0f
                 binding.tvMsgContent.setTextColor(Color.parseColor("#FFFFFF"))
             } else {

@@ -47,6 +47,8 @@ object IMCoreManager {
     val severTime: Long
         get() = commonModule.getSeverTime()
 
+    val cacheMap = hashMapOf<String, IMCache>()
+
     var crypto: Crypto? = null
 
     fun init(app: Application, debug: Boolean = true) {
@@ -107,6 +109,22 @@ object IMCoreManager {
             }
         })
         signalModule.connect()
+    }
+
+    // 默认10分钟过期
+    fun setCache(key: String, data: Any, expired: Long = 10 * 3600 * 1000) {
+        cacheMap[key] = IMCache(severTime + expired, data)
+    }
+
+    inline fun <reified T : Any> getCache(key: String): T? {
+        val cache = cacheMap[key] ?: return null
+        if (cache.time > severTime) {
+            val data = cache.data as? T
+            return data
+        } else {
+            cacheMap.remove(key)
+            return null
+        }
     }
 
     fun shutdown() {

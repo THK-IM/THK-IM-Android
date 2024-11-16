@@ -79,11 +79,10 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         this.session = session
         this.msgVHOperator = msgVHOperator
         onViewDetached()
-        attachLayout()
-        renderMsgStatus()
-        updateSelectMode()
-        renderReplyMsg()
-        fetchUserInfo()
+        setupSelectMode()
+        setupEvent()
+        renderMsgView()
+        renderUser()
     }
 
     override fun onViewAttached() {
@@ -91,58 +90,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         onMessageShow()
     }
 
-    private fun attachLayout() {
-        // 内容视图layout
-        if (hasBubble()) {
-            when (getPositionType()) {
-                IMMsgPosType.Left.value -> {
-                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
-                    if (bubble != null) {
-                        msgContentView.background = bubble
-                    } else {
-                        msgContentView.setShape(
-                            Color.parseColor("#ffdddddd"),
-                            floatArrayOf(0f, 10f, 0f, 10f),
-                            false
-                        )
-                    }
-                }
-
-                IMMsgPosType.Right.value -> {
-                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
-                    if (bubble != null) {
-                        msgContentView.background = bubble
-                    } else {
-                        msgContentView.setShape(
-                            Color.parseColor("#d1e3fe"),
-                            floatArrayOf(10f, 0f, 10f, 0f),
-                            false
-                        )
-                    }
-                }
-
-                else -> {
-                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
-                    if (bubble != null) {
-                        msgContentView.background = bubble
-                    } else {
-                        msgContentView.setShape(
-                            Color.parseColor("#20000000"),
-                            floatArrayOf(10f, 10f, 10f, 10f),
-                            false
-                        )
-                    }
-                }
-            }
-        }
-
-        msgBodyContentView.children.forEach {
-            if (it is IMsgBodyView) {
-                msgBodyContentView.removeView(it)
-            }
-        }
-        msgBodyContentView.addView(msgBodyView().contentView())
-
+    private fun setupEvent() {
         ivAvatarView?.setOnClickListener {
             msgVHOperator?.onMsgSenderClick(message, pos, it)
         }
@@ -224,7 +172,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
             .or(MsgOperateStatus.ServerRead.value)
     }
 
-    open fun fetchUserInfo() {
+    open fun renderUser() {
         tvNicknameView?.let {
             if (session.type != SessionType.Single.value) {
                 it.visibility = View.VISIBLE
@@ -248,6 +196,59 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
                 .subscribe(subscriber)
             disposable.add(subscriber)
         }
+    }
+
+    open fun renderMsgView() {
+        if (hasBubble()) {
+            when (getPositionType()) {
+                IMMsgPosType.Left.value -> {
+                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
+                    if (bubble != null) {
+                        msgContentView.background = bubble
+                    } else {
+                        msgContentView.setShape(
+                            Color.parseColor("#ffdddddd"),
+                            floatArrayOf(0f, 10f, 0f, 10f),
+                            false
+                        )
+                    }
+                }
+
+                IMMsgPosType.Right.value -> {
+                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
+                    if (bubble != null) {
+                        msgContentView.background = bubble
+                    } else {
+                        msgContentView.setShape(
+                            Color.parseColor("#d1e3fe"),
+                            floatArrayOf(10f, 0f, 10f, 0f),
+                            false
+                        )
+                    }
+                }
+
+                else -> {
+                    val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
+                    if (bubble != null) {
+                        msgContentView.background = bubble
+                    } else {
+                        msgContentView.setShape(
+                            Color.parseColor("#20000000"),
+                            floatArrayOf(10f, 10f, 10f, 10f),
+                            false
+                        )
+                    }
+                }
+            }
+        }
+        msgBodyContentView.children.forEach {
+            if (it is IMsgBodyView) {
+                msgBodyContentView.removeView(it)
+            }
+        }
+        msgBodyContentView.addView(msgBodyView().contentView())
+        renderReplyMsg()
+        renderMsgStatus()
     }
 
     open fun renderUserInfo(user: User, sessionMember: SessionMember?) {
@@ -345,43 +346,9 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     private fun renderReplyMsg() {
         if (message.rMsgId != null && message.referMsg != null) {
             msgReplyContentView.visibility = View.VISIBLE
-            val userInfo =
-                msgVHOperator?.msgSender()?.syncGetSessionMemberInfo(message.referMsg!!.fUid)
-            userInfo?.let { info ->
-                val user = info.first
-                info.second?.noteName?.let { noteName ->
-                    if (noteName.isNotEmpty()) {
-                        user.nickname = noteName
-                    }
-                }
-                info.second?.noteAvatar?.let { noteAvatar ->
-                    if (noteAvatar.isNotEmpty()) {
-                        user.avatar = noteAvatar
-                    }
-                }
-                message.referMsg?.let {
-                    msgReplyContentView.setMessage(
-                        getPositionType(), user, it, session, msgVHOperator
-                    )
-                }
-                return
-            }
-
-            val subscriber = object : BaseSubscriber<User>() {
-                override fun onNext(t: User?) {
-                    t?.let { user ->
-                        message.referMsg?.let {
-                            msgReplyContentView.setMessage(
-                                getPositionType(), user, it, session, msgVHOperator
-                            )
-                        }
-                    }
-                }
-            }
-            IMCoreManager.userModule.queryUser(message.referMsg!!.fUid)
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            disposable.add(subscriber)
+            msgReplyContentView.setMessage(
+                getPositionType(), message.referMsg!!, session, msgVHOperator
+            )
         } else {
             msgReplyContentView.visibility = View.GONE
         }
@@ -395,12 +362,14 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         super.onViewDetached()
         disposable.clear()
         msgBodyView().onViewDetached()
+        msgReplyContentView.onViewDetached()
     }
 
     override fun onViewRecycled() {
         super.onViewRecycled()
-        msgVHOperator = null
+        msgReplyContentView.onViewRecycled()
         msgBodyView().onViewDestroyed()
+        msgVHOperator = null
     }
 
     open fun displayAvatar(imageView: ImageView, url: String) {
@@ -408,7 +377,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     }
 
 
-    fun updateSelectMode() {
+    private fun setupSelectMode() {
         msgVHOperator?.let {
             if (it.isSelectMode()) {
                 if (canSelect()) {

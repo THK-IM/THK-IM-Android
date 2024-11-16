@@ -50,7 +50,7 @@ open class IMReplyMsgContainerView : LinearLayout {
         }
         val view = IMUIManager.getMsgIVProviderByMsgType(message.type).replyMsgView(context)
         binding.flReplyContent.addView(view.contentView())
-        view.setMessage(pos, message, session, delegate, true)
+        view.setMessage(message, session, delegate, true)
         replyBodyView = view
 
         val userInfo =

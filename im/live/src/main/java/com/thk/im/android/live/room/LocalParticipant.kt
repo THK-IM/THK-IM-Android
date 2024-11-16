@@ -101,7 +101,7 @@ class LocalParticipant(
                         it.startCapture(
                             mediaParams.videoWidth,
                             mediaParams.videoHeight,
-                            mediaParams.videoFps
+                            mediaParams.videoFps / 2
                         )
                         addVideoTrack(videoTrack)
 

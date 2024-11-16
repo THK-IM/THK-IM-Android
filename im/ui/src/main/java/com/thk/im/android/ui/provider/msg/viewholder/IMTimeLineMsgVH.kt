@@ -31,6 +31,6 @@ class IMTimeLineMsgVH(
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-        view.setMessage(getPositionType(), message, session, msgVHOperator)
+        view.setMessage(message, session, msgVHOperator)
     }
 }

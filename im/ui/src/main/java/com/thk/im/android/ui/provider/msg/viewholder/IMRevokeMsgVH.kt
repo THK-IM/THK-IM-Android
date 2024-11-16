@@ -25,7 +25,7 @@ class IMRevokeMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         msgVHOperator: IMMsgVHOperator
     ) {
         super.onViewBind(position, messages, session, msgVHOperator)
-        view.setMessage(getPositionType(), message, session, msgVHOperator)
+        view.setMessage(message, session, msgVHOperator)
     }
 
 }

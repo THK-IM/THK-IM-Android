@@ -13,6 +13,7 @@ import com.thk.im.android.live.api.vo.DelRoomVo
 import com.thk.im.android.live.api.vo.InviteMemberReqVo
 import com.thk.im.android.live.api.vo.JoinRoomReqVo
 import com.thk.im.android.live.api.vo.KickoffMemberReqVo
+import com.thk.im.android.live.api.vo.LeaveRoomReqVo
 import com.thk.im.android.live.api.vo.MediaParams
 import com.thk.im.android.live.api.vo.RefuseJoinRoomVo
 import io.reactivex.Flowable
@@ -169,13 +170,18 @@ class RTCRoomManager private constructor() {
         rtcRooms.removeAll {
             it.id == id
         }
-        if (room.ownerId == myUId && delRoom) {
-            val subscriber = object : BaseSubscriber<Void>() {
-                override fun onNext(t: Void?) {
+        room.destroy()
+        val subscriber = object : BaseSubscriber<Void>() {
+            override fun onNext(t: Void?) {
 
-                }
             }
+        }
+        if (room.ownerId == myUId && delRoom) {
             liveApi.delRoom(DelRoomVo(id, myUId)).compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            disposes.add(subscriber)
+        } else {
+            liveApi.leaveRoom(LeaveRoomReqVo(id, myUId, "")).compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             disposes.add(subscriber)
         }

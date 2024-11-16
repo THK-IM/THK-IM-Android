@@ -1,4 +1,4 @@
-package com.thk.im.android.ui.component
+package com.thk.im.android.ui.call.popup
 
 import android.content.Context
 import android.graphics.Color
@@ -8,6 +8,7 @@ import androidx.emoji2.widget.EmojiTextView
 import androidx.lifecycle.Observer
 import com.lxj.xpopup.core.PositionPopupView
 import com.thk.im.android.R
+import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
@@ -25,7 +26,7 @@ import com.thk.im.android.live.room.RTCRoomManager
 import com.thk.im.android.ui.call.LiveCallActivity
 import io.reactivex.disposables.CompositeDisposable
 
-class BeRequestedCallPopup(context: Context) : PositionPopupView(context) {
+class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
 
     lateinit var signal: BeingRequestedSignal
     private lateinit var rootView: LinearLayout
@@ -34,6 +35,14 @@ class BeRequestedCallPopup(context: Context) : PositionPopupView(context) {
     private lateinit var rejectView: EmojiTextView
     private val disposable = CompositeDisposable()
     private val observer = Observer<LiveSignal> { s ->
+        s.signalForType(
+            LiveSignalType.BeingRequested.value,
+            BeingRequestedSignal::class.java
+        )?.let {
+            if (it.roomId == signal.roomId) {
+                beCalling(it)
+            }
+        }
         s.signalForType(
             LiveSignalType.CancelBeingRequested.value,
             CancelBeingRequestedSignal::class.java
@@ -74,11 +83,11 @@ class BeRequestedCallPopup(context: Context) : PositionPopupView(context) {
         acceptView.setOnClickListener {
             val subscriber = object : BaseSubscriber<RTCRoom>() {
                 override fun onNext(t: RTCRoom) {
-                    dismiss()
                     RTCRoomManager.shared().addRoom(t)
                     LiveCallActivity.startCallActivity(
                         context, t.id, CallType.BeCalling, signal.members.toTypedArray()
                     )
+                    dismiss()
                 }
             }
             RTCRoomManager.shared().joinRoom(signal.roomId, Role.Broadcaster.value)
@@ -101,6 +110,23 @@ class BeRequestedCallPopup(context: Context) : PositionPopupView(context) {
                 .compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             disposable.add(subscriber)
+        }
+
+        notifyCalling()
+    }
+
+    private fun beCalling(signal: BeingRequestedSignal) {
+        this.signal = signal
+    }
+
+    private fun notifyCalling() {
+        if (signal.createTime + signal.timeoutTime > IMCoreManager.severTime) {
+            AppUtils.instance().notifyNewMessage()
+            rootView.postDelayed({
+                notifyCalling()
+            }, 1000)
+        } else {
+            dismiss()
         }
     }
 

@@ -7,7 +7,7 @@ import com.thk.im.android.IMApplication
 import com.thk.im.android.live.BeingRequestedSignal
 import com.thk.im.android.live.CancelBeingRequestedSignal
 import com.thk.im.android.live.LiveRequestProcessor
-import com.thk.im.android.ui.component.BeRequestedCallPopup
+import com.thk.im.android.ui.call.popup.BeRequestedCallingPopup
 
 class IMLiveRequestProcessor(private val app: Application) : LiveRequestProcessor {
 
@@ -20,7 +20,7 @@ class IMLiveRequestProcessor(private val app: Application) : LiveRequestProcesso
                 return
             }
             processedRoomIds.add(signal.roomId)
-            val beRequestedPopup = BeRequestedCallPopup(currentActivity)
+            val beRequestedPopup = BeRequestedCallingPopup(currentActivity)
             beRequestedPopup.signal = signal
             XPopup.Builder(currentActivity).isDestroyOnDismiss(true)
                 .popupAnimation(PopupAnimation.TranslateFromTop)
@@ -29,6 +29,9 @@ class IMLiveRequestProcessor(private val app: Application) : LiveRequestProcesso
         } else {
             // 应用切入后台
         }
+    }
+
+    override fun onCancelBeingRequested(signal: CancelBeingRequestedSignal) {
     }
 
 }

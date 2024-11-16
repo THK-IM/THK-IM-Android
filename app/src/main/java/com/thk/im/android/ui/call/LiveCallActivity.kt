@@ -212,13 +212,6 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        binding.participantLocal.destroy()
-        binding.participantRemote.destroy()
-        rtcRoom.destroy()
-    }
-
     override fun room(): RTCRoom {
         return rtcRoom
     }
@@ -253,7 +246,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     override fun hangupCalling() {
-        rtcRoom.destroy()
+        RTCRoomManager.shared().leaveRoom(roomId(), true)
         finish()
     }
 

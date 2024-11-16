@@ -46,10 +46,19 @@ class LiveManager private constructor() {
                 }
             }
 
+            LiveSignalType.CancelBeingRequested.value -> {
+                signal.signalForType(
+                    LiveSignalType.CancelBeingRequested.value,
+                    CancelBeingRequestedSignal::class.java
+                )?.let {
+                    liveRequestProcessor?.onCancelBeingRequested(it)
+                }
+            }
+
             else -> {
-                XEventBus.post(liveSignalEvent, signal)
             }
         }
+        XEventBus.post(liveSignalEvent, signal)
     }
 
 }

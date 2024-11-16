@@ -337,7 +337,6 @@ class RTCRoom(
         remoteParticipants.clear()
         localParticipant?.leave()
         localParticipant = null
-        RTCRoomManager.shared().leaveRoom(id, true)
     }
 
 }

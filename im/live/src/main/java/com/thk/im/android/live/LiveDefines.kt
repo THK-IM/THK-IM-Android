@@ -80,8 +80,8 @@ data class RejectRequestSignal(
     var roomId: String,
     @SerializedName("msg")
     var msg: String,
-    @SerializedName("create_time")
-    var createTime: Long,
+    @SerializedName("u_id")
+    var uId: Long,
     @SerializedName("reject_time")
     var rejectTime: Long,
 )
@@ -91,8 +91,8 @@ data class AcceptRequestSignal(
     var roomId: String,
     @SerializedName("msg")
     var msg: String,
-    @SerializedName("create_time")
-    var createTime: Long,
+    @SerializedName("u_id")
+    var uId: Long,
     @SerializedName("accept_time")
     var acceptTime: Long,
 )
@@ -102,8 +102,8 @@ data class HangupSignal(
     var roomId: String,
     @SerializedName("msg")
     var msg: String,
-    @SerializedName("create_time")
-    var createTime: Long,
+    @SerializedName("u_id")
+    var uId: Long,
     @SerializedName("hangup_time")
     var hangupTime: Long,
 )

@@ -42,7 +42,7 @@ interface LiveCallProtocol {
     /**
      * 被踢下
      */
-    fun onMemberKickedOffBySignal(roomId: String, uIds: Set<Long>)
+    fun onMemberKickedOffBySignal(roomId: String, uIds: Set<Long>, msg: String)
 
     /**
      * 房间通话结束

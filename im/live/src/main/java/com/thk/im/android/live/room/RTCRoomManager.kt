@@ -1,7 +1,5 @@
 package com.thk.im.android.live.room
 
-import com.thk.im.android.core.base.BaseSubscriber
-import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.live.LiveApi
 import com.thk.im.android.live.Mode
 import com.thk.im.android.live.ParticipantVo
@@ -165,25 +163,21 @@ class RTCRoomManager private constructor() {
     /**
      * 离开房间, 如果是房主，在删除房间
      */
-    fun leaveRoom(id: String, delRoom: Boolean) {
-        val room = getRoomById(id) ?: return
+    fun leaveRoom(id: String, delRoom: Boolean): Flowable<Void> {
+        return if (getRoomById(id)?.ownerId == myUId && delRoom) {
+            liveApi.delRoom(DelRoomVo(id, myUId))
+        } else {
+            liveApi.leaveRoom(LeaveRoomReqVo(id, myUId, ""))
+        }
+    }
+
+    /**
+     * 销毁本地房间
+     */
+    fun destroyLocalRoom(id: String) {
+        getRoomById(id)?.destroy()
         rtcRooms.removeAll {
             it.id == id
-        }
-        room.destroy()
-        val subscriber = object : BaseSubscriber<Void>() {
-            override fun onNext(t: Void?) {
-
-            }
-        }
-        if (room.ownerId == myUId && delRoom) {
-            liveApi.delRoom(DelRoomVo(id, myUId)).compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            disposes.add(subscriber)
-        } else {
-            liveApi.leaveRoom(LeaveRoomReqVo(id, myUId, "")).compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            disposes.add(subscriber)
         }
     }
 

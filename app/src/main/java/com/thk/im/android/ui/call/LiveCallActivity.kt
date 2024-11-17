@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Observer
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
@@ -11,17 +12,24 @@ import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
+import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.databinding.ActvitiyLiveCallBinding
+import com.thk.im.android.live.AcceptRequestSignal
 import com.thk.im.android.live.CallType
+import com.thk.im.android.live.EndCallSignal
+import com.thk.im.android.live.HangupSignal
+import com.thk.im.android.live.KickMemberSignal
+import com.thk.im.android.live.LiveSignal
+import com.thk.im.android.live.LiveSignalType
+import com.thk.im.android.live.RejectRequestSignal
+import com.thk.im.android.live.liveSignalEvent
 import com.thk.im.android.live.room.BaseParticipant
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.room.RTCRoomCallBack
 import com.thk.im.android.live.room.RTCRoomManager
 import com.thk.im.android.live.room.RemoteParticipant
 import com.thk.im.android.ui.base.BaseActivity
-import io.reactivex.Flowable
 import java.nio.ByteBuffer
-import java.util.concurrent.TimeUnit
 
 class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
 
@@ -84,15 +92,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         return needCallMembers
     }
 
-    private fun rtcRoom(): RTCRoom? {
-        return RTCRoomManager.shared().getRoomById(roomId())
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActvitiyLiveCallBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        val room = rtcRoom()
+        val room = RTCRoomManager.shared().getRoomById(roomId())
         if (room == null) {
             finish()
             return
@@ -101,6 +105,42 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         initView()
         initUserInfo()
         checkPermission()
+        XEventBus.observe(this, liveSignalEvent, Observer<LiveSignal> { signal ->
+            signal.signalForType(
+                LiveSignalType.AcceptRequest.value,
+                AcceptRequestSignal::class.java
+            )?.let {
+                onRemoteAcceptedCallingBySignal(it.roomId, it.uId)
+            }
+
+            signal.signalForType(
+                LiveSignalType.RejectRequest.value,
+                RejectRequestSignal::class.java
+            )?.let {
+                onRemoteRejectedCallingBySignal(it.roomId, it.uId, it.msg)
+            }
+
+            signal.signalForType(
+                LiveSignalType.Hangup.value,
+                HangupSignal::class.java
+            )?.let {
+                onRemoteHangupCallingBySignal(it.roomId, it.uId, it.msg)
+            }
+
+            signal.signalForType(
+                LiveSignalType.KickMember.value,
+                KickMemberSignal::class.java
+            )?.let {
+                onMemberKickedOffBySignal(it.roomId, it.kickIds, it.msg)
+            }
+
+            signal.signalForType(
+                LiveSignalType.EndCall.value,
+                EndCallSignal::class.java
+            )?.let {
+                onCallEndedBySignal(it.roomId)
+            }
+        })
     }
 
     private fun initView() {
@@ -127,19 +167,15 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
             }
         }
 
-        val subscriber = object : BaseSubscriber<Long>() {
-            override fun onNext(t: Long) {
-                timerTick(t)
-            }
-        }
-        Flowable.interval(0, 3, TimeUnit.SECONDS).take(Long.MAX_VALUE)
-            .compose(RxTransform.flowableToMain())
-            .subscribe(subscriber)
-        addDispose(subscriber)
-    }
-
-    private fun timerTick(t: Long) {
-
+//        val subscriber = object : BaseSubscriber<Long>() {
+//            override fun onNext(t: Long) {
+//                timerTick(t)
+//            }
+//        }
+//        Flowable.interval(0, 3, TimeUnit.SECONDS).take(Long.MAX_VALUE)
+//            .compose(RxTransform.flowableToMain())
+//            .subscribe(subscriber)
+//        addDispose(subscriber)
     }
 
     private fun initUserInfo() {
@@ -179,24 +215,17 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         } else {
             showCallingView()
         }
-        var remoteParticipantCnt = 0
-        rtcRoom.getAllParticipants().forEach { p ->
-            initParticipant(p)
-            if (p is RemoteParticipant) {
-                remoteParticipantCnt++
-            }
-        }
     }
 
     private fun showRequestCallView() {
         binding.llRequestCall.visibility = View.VISIBLE
         binding.llCalling.visibility = View.GONE
+        startRequestCalling()
     }
 
     private fun showCallingView() {
         binding.llRequestCall.visibility = View.GONE
         binding.llCalling.visibility = View.VISIBLE
-        startRequestCalling()
     }
 
     private fun initParticipant(p: BaseParticipant) {
@@ -210,6 +239,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
             binding.participantLocal.setFullscreenMode(true)
             binding.participantLocal.startPeerConnection()
         }
+    }
+
+    override fun finish() {
+        super.finish()
+        RTCRoomManager.shared().destroyLocalRoom(roomId())
     }
 
     override fun room(): RTCRoom {
@@ -239,30 +273,59 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 finish()
             }
         }
-        RTCRoomManager.shared().cancelCallRoomMembers(rtcRoom.id, "", members().toSet())
+        RTCRoomManager.shared().cancelCallRoomMembers(rtcRoom.id, "", needCallMembers().toSet())
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         addDispose(subscriber)
     }
 
     override fun hangupCalling() {
+        val subscriber = object : BaseSubscriber<Void>() {
+            override fun onNext(t: Void?) {
+                finish()
+            }
+        }
         RTCRoomManager.shared().leaveRoom(roomId(), true)
-        finish()
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        addDispose(subscriber)
     }
 
     override fun onRemoteAcceptedCallingBySignal(roomId: String, uId: Long) {
+        if (roomId == roomId()) {
+            var members = acceptMembers()
+            members = members.plus(uId)
+            intent.putExtra("accept_members", members)
+        }
     }
 
     override fun onRemoteRejectedCallingBySignal(roomId: String, uId: Long, msg: String) {
+        if (roomId == roomId()) {
+            var members = rejectMembers()
+            members = members.plus(uId)
+            intent.putExtra("reject_members", members)
+        }
     }
 
     override fun onRemoteHangupCallingBySignal(roomId: String, uId: Long, msg: String) {
+        if (roomId == roomId()) {
+            val subscriber = object : BaseSubscriber<Void>() {
+                override fun onNext(t: Void?) {
+                    finish()
+                }
+            }
+            RTCRoomManager.shared().leaveRoom(roomId, true)
+                .compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
+            addDispose(subscriber)
+        }
     }
 
-    override fun onMemberKickedOffBySignal(roomId: String, uIds: Set<Long>) {
+    override fun onMemberKickedOffBySignal(roomId: String, uIds: Set<Long>, msg: String) {
     }
 
     override fun onCallEndedBySignal(roomId: String) {
+        finish()
     }
 
     override fun onParticipantJoin(p: BaseParticipant) {

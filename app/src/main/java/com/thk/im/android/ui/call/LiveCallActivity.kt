@@ -22,8 +22,6 @@ import com.thk.im.android.live.KickMemberSignal
 import com.thk.im.android.live.LiveSignal
 import com.thk.im.android.live.LiveSignalType
 import com.thk.im.android.live.RejectRequestSignal
-import com.thk.im.android.live.callTimeoutSecond
-import com.thk.im.android.live.liveSignalEvent
 import com.thk.im.android.live.room.BaseParticipant
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.room.RTCRoomCallBack
@@ -105,7 +103,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         initView()
         initUserInfo()
         checkPermission()
-        XEventBus.observe(this, liveSignalEvent, Observer<LiveSignal> { signal ->
+        XEventBus.observe(this, LiveSignal.EVENT, Observer<LiveSignal> { signal ->
             signal.signalForType(
                 LiveSignalType.AcceptRequest.value,
                 AcceptRequestSignal::class.java
@@ -252,11 +250,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 }
             }
             RTCRoomManager.shared().callRoomMembers(
-                roomId(), "", callTimeoutSecond.toLong(), needCallMembers
+                roomId(), "", LiveSignal.TIMEOUT_SECOND.toLong(), needCallMembers
             ).compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             addDispose(subscriber)
-            binding.llCalling.postDelayed(callAction, (callTimeoutSecond + 2) * 1000L)
+            binding.llCalling.postDelayed(callAction, (LiveSignal.TIMEOUT_SECOND + 2) * 1000L)
         }
     }
 

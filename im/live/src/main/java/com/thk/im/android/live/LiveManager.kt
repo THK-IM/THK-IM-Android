@@ -58,7 +58,7 @@ class LiveManager private constructor() {
             else -> {
             }
         }
-        XEventBus.post(liveSignalEvent, signal)
+        XEventBus.post(LiveSignal.EVENT, signal)
     }
 
 }

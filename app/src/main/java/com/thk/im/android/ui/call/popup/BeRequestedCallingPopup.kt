@@ -22,7 +22,6 @@ import com.thk.im.android.live.LiveSignal
 import com.thk.im.android.live.LiveSignalType
 import com.thk.im.android.live.Role
 import com.thk.im.android.live.RoomMode
-import com.thk.im.android.live.liveSignalEvent
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.room.RTCRoomManager
 import com.thk.im.android.ui.call.LiveCallActivity
@@ -59,7 +58,7 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
     override fun onCreate() {
         super.onCreate()
         binding = PopupBeRequestingBinding.bind(popupImplView)
-        XEventBus.observe(liveSignalEvent, observer)
+        XEventBus.observe(LiveSignal.EVENT, observer)
         binding.lyContainer.setShape(
             Color.parseColor("#A0000000"), floatArrayOf(12f, 12f, 12f, 12f), false
         )
@@ -144,7 +143,7 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
 
     override fun onDestroy() {
         super.onDestroy()
-        XEventBus.unObserve(liveSignalEvent, observer)
+        XEventBus.unObserve(LiveSignal.EVENT, observer)
         disposable.clear()
     }
 

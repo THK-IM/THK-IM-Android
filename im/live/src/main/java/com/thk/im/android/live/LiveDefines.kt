@@ -6,9 +6,6 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
-const val liveSignalEvent = "LiveSignalEvent"
-const val callTimeoutSecond = 3
-
 interface LiveRequestProcessor {
 
     /**
@@ -139,6 +136,11 @@ data class LiveSignal(
     @SerializedName("body")
     var body: String,
 ) {
+    companion object {
+        const val EVENT = "LiveSignalEvent"
+        const val TIMEOUT_SECOND = 3
+    }
+
     fun <T> signalForType(type: Int, clazz: Class<T>): T? {
         if (this.type == type) {
             return try {

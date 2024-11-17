@@ -250,11 +250,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 }
             }
             RTCRoomManager.shared().callRoomMembers(
-                roomId(), "", LiveSignal.TIMEOUT_SECOND.toLong(), needCallMembers
+                roomId(), "", LiveSignal.TIMEOUT_SECOND.toLong() + 2, needCallMembers
             ).compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             addDispose(subscriber)
-            binding.llCalling.postDelayed(callAction, (LiveSignal.TIMEOUT_SECOND + 2) * 1000L)
+            binding.llCalling.postDelayed(callAction, (LiveSignal.TIMEOUT_SECOND) * 1000L)
         }
     }
 

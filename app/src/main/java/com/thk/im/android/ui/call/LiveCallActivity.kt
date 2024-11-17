@@ -208,6 +208,10 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         } else {
             showCallingView()
         }
+
+        rtcRoom.getAllParticipants().forEach { p ->
+            initParticipant(p)
+        }
     }
 
     private fun showRequestCallView() {

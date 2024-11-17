@@ -78,11 +78,11 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
         binding.ivAccept.setOnClickListener {
             val subscriber = object : BaseSubscriber<RTCRoom>() {
                 override fun onNext(t: RTCRoom) {
+                    dismiss()
                     RTCRoomManager.shared().addRoom(t)
                     LiveCallActivity.startCallActivity(
                         context, t.id, CallType.BeCalling, signal.members.toLongArray()
                     )
-                    dismiss()
                 }
             }
             RTCRoomManager.shared().joinRoom(signal.roomId, Role.Broadcaster.value)

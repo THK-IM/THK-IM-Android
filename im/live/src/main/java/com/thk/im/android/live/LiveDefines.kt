@@ -232,3 +232,18 @@ data class VolumeMsg(
     @SerializedName("volume")
     var volume: Double,
 )
+
+data class IMCallMsg(
+    @SerializedName("room_id")
+    var roomId: String,
+    @SerializedName("room_owner_id")
+    val roomOwnerId: String,
+    @SerializedName("room_mode")
+    var roomMode: Int,
+    @SerializedName("create_time")
+    var createTime: Long,
+    @SerializedName("accepted")
+    var accepted: Int, // 是否接听 0未接听 1被挂断 2取消 3已接通
+    @SerializedName("duration")
+    var duration: Long, // 通话时长
+)

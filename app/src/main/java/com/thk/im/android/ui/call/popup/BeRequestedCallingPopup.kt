@@ -32,6 +32,11 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
     lateinit var signal: BeingRequestedSignal
     private lateinit var binding: PopupBeRequestingBinding
     private val disposable = CompositeDisposable()
+
+    private val callAction = Runnable {
+        notifyCalling()
+    }
+
     private val observer = Observer<LiveSignal> { s ->
         s.signalForType(
             LiveSignalType.BeingRequested.value,
@@ -133,12 +138,15 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
     private fun notifyCalling() {
         if (signal.timeoutTime > IMCoreManager.severTime) {
             AppUtils.instance().notifyNewMessage()
-            rootView.postDelayed({
-                notifyCalling()
-            }, 1500)
+            binding.root.postDelayed(callAction, 1500)
         } else {
             dismiss()
         }
+    }
+
+    override fun dismiss() {
+        super.dismiss()
+        binding.root.removeCallbacks(callAction)
     }
 
     override fun onDestroy() {

@@ -1,9 +1,9 @@
 package com.thk.im.android.live.room
 
 import com.google.gson.Gson
-import com.thk.im.android.live.RoomMode
 import com.thk.im.android.live.ParticipantVo
 import com.thk.im.android.live.Role
+import com.thk.im.android.live.RoomMode
 import com.thk.im.android.live.VolumeMsg
 import com.thk.im.android.live.VolumeMsgType
 import com.thk.im.android.live.api.vo.MediaParams
@@ -129,6 +129,14 @@ class RTCRoom(
         }
         array.addAll(remoteParticipants)
         return array
+    }
+
+    fun remoteParticipants(): List<RemoteParticipant> {
+        return remoteParticipants
+    }
+
+    fun localParticipant(): LocalParticipant? {
+        return localParticipant
     }
 
     fun updateMyRole(role: Int) {

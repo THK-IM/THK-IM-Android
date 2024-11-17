@@ -61,16 +61,20 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         return intent.getStringExtra("roomId") ?: ""
     }
 
-    private fun members(): Array<Long> {
-        return intent.getLongArrayExtra("members")?.toTypedArray() ?: emptyArray()
+    private fun members(): MutableSet<Long> {
+        return intent.getLongArrayExtra("members")?.toMutableSet() ?: mutableSetOf()
     }
 
-    private fun acceptMembers(): Array<Long> {
-        return intent.getLongArrayExtra("accept_members")?.toTypedArray() ?: emptyArray()
+    private fun acceptMembers(): MutableSet<Long> {
+        return intent.getLongArrayExtra("accept_members")?.toMutableSet() ?: mutableSetOf()
     }
 
-    private fun rejectMembers(): Array<Long> {
-        return intent.getLongArrayExtra("reject_members")?.toTypedArray() ?: emptyArray()
+    private fun rejectMembers(): MutableSet<Long> {
+        return intent.getLongArrayExtra("reject_members")?.toMutableSet() ?: mutableSetOf()
+    }
+
+    private fun hangupMembers(): MutableSet<Long> {
+        return intent.getLongArrayExtra("hangup_members")?.toMutableSet() ?: mutableSetOf()
     }
 
     private fun needCallMembers(): Set<Long> {
@@ -250,7 +254,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 }
             }
             RTCRoomManager.shared().callRoomMembers(
-                roomId(), "", LiveSignal.TIMEOUT_SECOND.toLong(), needCallMembers
+                roomId(), "", (2 + LiveSignal.TIMEOUT_SECOND).toLong(), needCallMembers
             ).compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             addDispose(subscriber)
@@ -292,17 +296,28 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
 
     override fun onRemoteAcceptedCallingBySignal(roomId: String, uId: Long) {
         if (roomId == roomId()) {
-            var members = acceptMembers()
-            members = members.plus(uId)
-            intent.putExtra("accept_members", members.toLongArray())
+            val acceptMembers = acceptMembers()
+            acceptMembers.add(uId)
+            intent.putExtra("accept_members", acceptMembers.toLongArray())
+
+            val rejectMembers = rejectMembers()
+            rejectMembers.remove(uId)
+            intent.putExtra("reject_members", rejectMembers.toLongArray())
+
+            showCallingView()
         }
     }
 
     override fun onRemoteRejectedCallingBySignal(roomId: String, uId: Long, msg: String) {
         if (roomId == roomId()) {
-            var members = rejectMembers()
-            members = members.plus(uId)
-            intent.putExtra("reject_members", members.toLongArray())
+            val acceptMembers = acceptMembers()
+            acceptMembers.remove(uId)
+            intent.putExtra("accept_members", acceptMembers.toLongArray())
+
+            val rejectMembers = rejectMembers()
+            rejectMembers.add(uId)
+            intent.putExtra("reject_members", rejectMembers.toLongArray())
+
             if (needCallMembers().isEmpty() && acceptMembers().isEmpty()) {
                 finish()
             }
@@ -311,19 +326,10 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
 
     override fun onRemoteHangupCallingBySignal(roomId: String, uId: Long, msg: String) {
         if (roomId == roomId()) {
-            val subscriber = object : BaseSubscriber<Void>() {
-                override fun onNext(t: Void?) {
-                }
-
-                override fun onComplete() {
-                    super.onComplete()
-                    finish()
-                }
-            }
-            RTCRoomManager.shared().leaveRoom(roomId, true)
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            addDispose(subscriber)
+            val hangupMembers = hangupMembers()
+            hangupMembers.add(uId)
+            intent.putExtra("hangup_members", hangupMembers.toLongArray())
+            finish()
         }
     }
 
@@ -336,10 +342,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
 
     override fun onParticipantJoin(p: BaseParticipant) {
         initParticipant(p)
+        showCallingView()
     }
 
     override fun onParticipantLeave(p: BaseParticipant) {
-        finish()
+//        finish()
     }
 
     override fun onTextMsgReceived(type: Int, text: String) {

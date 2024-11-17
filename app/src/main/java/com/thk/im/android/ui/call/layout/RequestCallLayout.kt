@@ -29,14 +29,15 @@ class RequestCallLayout : ConstraintLayout {
             liveCallProtocol.cancelRequestCalling()
         }
 
-        binding.ivOpenCloseCamera.isSelected = liveCallProtocol.room().isLocalVideoMuted()
+        binding.ivOpenCloseCamera.isSelected = liveCallProtocol.room()?.isLocalVideoMuted() ?: true
         binding.ivOpenCloseCamera.setOnClickListener {
-            liveCallProtocol.room().muteLocalVideo(!binding.ivOpenCloseCamera.isSelected)
-            binding.ivOpenCloseCamera.isSelected = liveCallProtocol.room().isLocalVideoMuted()
+            liveCallProtocol.room()?.muteLocalVideo(!binding.ivOpenCloseCamera.isSelected)
+            binding.ivOpenCloseCamera.isSelected =
+                liveCallProtocol.room()?.isLocalVideoMuted() ?: true
         }
 
         binding.ivSwitchCamera.setOnClickListener {
-            liveCallProtocol.room().switchLocalCamera()
+            liveCallProtocol.room()?.switchLocalCamera()
         }
     }
 }

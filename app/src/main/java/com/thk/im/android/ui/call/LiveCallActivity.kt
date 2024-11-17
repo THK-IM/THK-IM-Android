@@ -50,7 +50,6 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     private lateinit var binding: ActvitiyLiveCallBinding
-    private lateinit var rtcRoom: RTCRoom
     private val callAction = Runnable {
         startRequestCalling()
     }
@@ -99,12 +98,9 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         binding = ActvitiyLiveCallBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        val room = RTCRoomManager.shared().getRoomById(roomId())
-        if (room == null) {
-            finish()
-            return
+        RTCRoomManager.shared().getRoomById(roomId())?.let {
+            it.callback = this
         }
-        rtcRoom = room
         initView()
         initUserInfo()
         checkPermission()
@@ -172,7 +168,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     private fun initUserInfo() {
-        rtcRoom.getAllParticipants().forEach {
+        RTCRoomManager.shared().getRoomById(roomId())?.getAllParticipants()?.forEach {
             if (it.uId != RTCRoomManager.shared().myUId) {
                 val subscriber = object : BaseSubscriber<User>() {
                     override fun onNext(t: User?) {
@@ -208,8 +204,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         } else {
             showCallingView()
         }
-
-        rtcRoom.getAllParticipants().forEach { p ->
+        RTCRoomManager.shared().getRoomById(roomId())?.getAllParticipants()?.forEach { p ->
             initParticipant(p)
         }
     }
@@ -244,8 +239,8 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         RTCRoomManager.shared().destroyLocalRoom(roomId())
     }
 
-    override fun room(): RTCRoom {
-        return rtcRoom
+    override fun room(): RTCRoom? {
+        return RTCRoomManager.shared().getRoomById(roomId())
     }
 
     override fun startRequestCalling() {
@@ -274,7 +269,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 finish()
             }
         }
-        RTCRoomManager.shared().cancelCallRoomMembers(rtcRoom.id, "", needCallMembers().toSet())
+        RTCRoomManager.shared().cancelCallRoomMembers(roomId(), "", needCallMembers().toSet())
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         addDispose(subscriber)
@@ -300,7 +295,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         if (roomId == roomId()) {
             var members = acceptMembers()
             members = members.plus(uId)
-            intent.putExtra("accept_members", members)
+            intent.putExtra("accept_members", members.toLongArray())
         }
     }
 
@@ -308,7 +303,10 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         if (roomId == roomId()) {
             var members = rejectMembers()
             members = members.plus(uId)
-            intent.putExtra("reject_members", members)
+            intent.putExtra("reject_members", members.toLongArray())
+            if (needCallMembers().isEmpty() && acceptMembers().isEmpty()) {
+                finish()
+            }
         }
     }
 
@@ -338,11 +336,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     override fun onParticipantJoin(p: BaseParticipant) {
-        showCallingView()
         initParticipant(p)
     }
 
     override fun onParticipantLeave(p: BaseParticipant) {
+        finish()
     }
 
     override fun onTextMsgReceived(type: Int, text: String) {

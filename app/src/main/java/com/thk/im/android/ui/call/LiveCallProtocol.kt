@@ -7,7 +7,7 @@ interface LiveCallProtocol {
     /**
      * 当前房间
      */
-    fun room(): RTCRoom
+    fun room(): RTCRoom?
 
     /**
      * 发起通话

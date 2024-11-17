@@ -30,26 +30,27 @@ class CallingLayout : ConstraintLayout {
             liveCallProtocol.hangupCalling()
         }
 
-        binding.ivAudioMute.isSelected = protocol.room().isLocalAudioMuted()
+        binding.ivAudioMute.isSelected = protocol.room()?.isLocalAudioMuted() ?: true
         binding.ivAudioMute.setOnClickListener {
-            liveCallProtocol.room().muteLocalAudio(!binding.ivAudioMute.isSelected)
-            binding.ivAudioMute.isSelected = liveCallProtocol.room().isLocalAudioMuted()
+            liveCallProtocol.room()?.muteLocalAudio(!binding.ivAudioMute.isSelected)
+            binding.ivAudioMute.isSelected = liveCallProtocol.room()?.isLocalAudioMuted() ?: true
         }
 
-        binding.ivSwitchSpeaker.isSelected = liveCallProtocol.room().isSpeakerMuted()
+        binding.ivSwitchSpeaker.isSelected = liveCallProtocol.room()?.isSpeakerMuted() ?: true
         binding.ivSwitchSpeaker.setOnClickListener {
-            liveCallProtocol.room().muteSpeaker(!binding.ivSwitchSpeaker.isSelected)
-            binding.ivSwitchSpeaker.isSelected = liveCallProtocol.room().isSpeakerMuted()
+            liveCallProtocol.room()?.muteSpeaker(!binding.ivSwitchSpeaker.isSelected)
+            binding.ivSwitchSpeaker.isSelected = liveCallProtocol.room()?.isSpeakerMuted() ?: true
         }
 
-        binding.ivOpenCloseCamera.isSelected = liveCallProtocol.room().isLocalVideoMuted()
+        binding.ivOpenCloseCamera.isSelected = liveCallProtocol.room()?.isLocalVideoMuted() ?: true
         binding.ivOpenCloseCamera.setOnClickListener {
-            liveCallProtocol.room().muteLocalVideo(!binding.ivOpenCloseCamera.isSelected)
-            binding.ivOpenCloseCamera.isSelected = liveCallProtocol.room().isLocalVideoMuted()
+            liveCallProtocol.room()?.muteLocalVideo(!binding.ivOpenCloseCamera.isSelected)
+            binding.ivOpenCloseCamera.isSelected =
+                liveCallProtocol.room()?.isLocalVideoMuted() ?: true
         }
 
         binding.ivSwitchCamera.setOnClickListener {
-            liveCallProtocol.room().switchLocalCamera()
+            liveCallProtocol.room()?.switchLocalCamera()
         }
     }
 }

@@ -22,6 +22,7 @@ import com.thk.im.android.live.KickMemberSignal
 import com.thk.im.android.live.LiveSignal
 import com.thk.im.android.live.LiveSignalType
 import com.thk.im.android.live.RejectRequestSignal
+import com.thk.im.android.live.callTimeoutSecond
 import com.thk.im.android.live.liveSignalEvent
 import com.thk.im.android.live.room.BaseParticipant
 import com.thk.im.android.live.room.RTCRoom
@@ -251,11 +252,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 }
             }
             RTCRoomManager.shared().callRoomMembers(
-                roomId(), "", 3, needCallMembers
+                roomId(), "", callTimeoutSecond.toLong(), needCallMembers
             ).compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             addDispose(subscriber)
-            binding.llCalling.postDelayed(callAction, 3000)
+            binding.llCalling.postDelayed(callAction, (callTimeoutSecond + 2) * 1000L)
         }
     }
 

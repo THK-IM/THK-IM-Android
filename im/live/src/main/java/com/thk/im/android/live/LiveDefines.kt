@@ -6,7 +6,8 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
-val liveSignalEvent = "LiveSignalEvent"
+const val liveSignalEvent = "LiveSignalEvent"
+const val callTimeoutSecond = 3
 
 interface LiveRequestProcessor {
 

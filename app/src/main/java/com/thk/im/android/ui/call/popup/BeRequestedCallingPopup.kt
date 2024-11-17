@@ -132,7 +132,7 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
     }
 
     private fun notifyCalling() {
-        if (signal.createTime + signal.timeoutTime > IMCoreManager.severTime) {
+        if (signal.timeoutTime > IMCoreManager.severTime) {
             AppUtils.instance().notifyNewMessage()
             rootView.postDelayed({
                 notifyCalling()

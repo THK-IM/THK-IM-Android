@@ -1,7 +1,7 @@
 package com.thk.im.android.live.room
 
 import com.thk.im.android.live.LiveApi
-import com.thk.im.android.live.Mode
+import com.thk.im.android.live.RoomMode
 import com.thk.im.android.live.ParticipantVo
 import com.thk.im.android.live.Role
 import com.thk.im.android.live.api.vo.CallRoomMemberReqVo
@@ -53,7 +53,7 @@ class RTCRoomManager private constructor() {
     /**
      * 创建房间
      */
-    fun createRoom(mode: Mode, mediaParams: MediaParams): Flowable<RTCRoom> {
+    fun createRoom(mode: RoomMode, mediaParams: MediaParams): Flowable<RTCRoom> {
         val req = CreateRoomReqVo(
             myUId, mode.value,
             mediaParams.videoMaxBitrate, mediaParams.audioMaxBitrate,

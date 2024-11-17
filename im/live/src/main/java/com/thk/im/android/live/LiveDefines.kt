@@ -160,7 +160,7 @@ enum class CallType(val value: Int) {
     BeCalling(2), // 被请求通话
 }
 
-enum class Mode(val value: Int) {
+enum class RoomMode(val value: Int) {
     Chat(1), // 文字直播间
     Audio(2), // 语音电话
     Video(3), // 视频电话

@@ -2,24 +2,26 @@ package com.thk.im.android.ui.call.popup
 
 import android.content.Context
 import android.graphics.Color
-import android.text.TextUtils
-import android.widget.LinearLayout
-import androidx.emoji2.widget.EmojiTextView
 import androidx.lifecycle.Observer
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.lxj.xpopup.core.PositionPopupView
 import com.thk.im.android.R
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.base.utils.AppUtils
+import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.event.XEventBus
+import com.thk.im.android.databinding.PopupBeRequestingBinding
 import com.thk.im.android.live.BeingRequestedSignal
 import com.thk.im.android.live.CallType
 import com.thk.im.android.live.CancelBeingRequestedSignal
 import com.thk.im.android.live.LiveSignal
 import com.thk.im.android.live.LiveSignalType
 import com.thk.im.android.live.Role
+import com.thk.im.android.live.RoomMode
 import com.thk.im.android.live.liveSignalEvent
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.room.RTCRoomManager
@@ -29,10 +31,7 @@ import io.reactivex.disposables.CompositeDisposable
 class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
 
     lateinit var signal: BeingRequestedSignal
-    private lateinit var rootView: LinearLayout
-    private lateinit var msgView: EmojiTextView
-    private lateinit var acceptView: EmojiTextView
-    private lateinit var rejectView: EmojiTextView
+    private lateinit var binding: PopupBeRequestingBinding
     private val disposable = CompositeDisposable()
     private val observer = Observer<LiveSignal> { s ->
         s.signalForType(
@@ -59,33 +58,29 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
 
     override fun onCreate() {
         super.onCreate()
+        binding = PopupBeRequestingBinding.bind(popupImplView)
         XEventBus.observe(liveSignalEvent, observer)
-        rootView = findViewById(R.id.ly_root)
-        msgView = findViewById(R.id.tv_msg)
-        acceptView = findViewById(R.id.tv_accept)
-        rejectView = findViewById(R.id.tv_reject)
-        rootView.setShape(
-            Color.parseColor("#FFFFFF"), floatArrayOf(12f, 12f, 12f, 12f), false
+        binding.lyContainer.setShape(
+            Color.parseColor("#A0000000"), floatArrayOf(12f, 12f, 12f, 12f), false
         )
-        if (TextUtils.isEmpty(signal.msg)) {
-            msgView.text = "xx邀请你进行电话"
-        } else {
-            msgView.text = signal.msg
+
+        val shapeMode = ShapeAppearanceModel.builder()
+            .setAllCornerSizes(AppUtils.dp2px(10f).toFloat())
+            .build()
+        binding.ivAvatar.shapeAppearanceModel = shapeMode
+
+        if (signal.mode == RoomMode.Video.value) {
+            binding.tvMsg.text = "邀请你视频通话"
+        } else if (signal.mode == RoomMode.Audio.value) {
+            binding.tvMsg.text = "邀请你语音通话"
         }
-        acceptView.setShape(
-            Color.parseColor("#DDDDDD"), floatArrayOf(12f, 12f, 12f, 12f), false
-        )
 
-        rejectView.setShape(
-            Color.parseColor("#DDDDDD"), floatArrayOf(12f, 12f, 12f, 12f), false
-        )
-
-        acceptView.setOnClickListener {
+        binding.ivAccept.setOnClickListener {
             val subscriber = object : BaseSubscriber<RTCRoom>() {
                 override fun onNext(t: RTCRoom) {
                     RTCRoomManager.shared().addRoom(t)
                     LiveCallActivity.startCallActivity(
-                        context, t.id, CallType.BeCalling, signal.members.toTypedArray()
+                        context, t.id, CallType.BeCalling, signal.members.toLongArray()
                     )
                     dismiss()
                 }
@@ -96,7 +91,7 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
             disposable.add(subscriber)
         }
 
-        rejectView.setOnClickListener {
+        binding.ivReject.setOnClickListener {
             val subscriber = object : BaseSubscriber<Void>() {
                 override fun onNext(t: Void?) {
                 }
@@ -111,8 +106,25 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
                 .subscribe(subscriber)
             disposable.add(subscriber)
         }
-
         notifyCalling()
+        requestUser(signal.requestId)
+    }
+
+    private fun requestUser(id: Long) {
+        val subscriber = object : BaseSubscriber<User>() {
+            override fun onNext(t: User) {
+                updateUser(t)
+            }
+        }
+        IMCoreManager.userModule.queryUser(id)
+            .compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        disposable.add(subscriber)
+    }
+
+    private fun updateUser(u: User) {
+        IMImageLoader.displayImageUrl(binding.ivAvatar, u.avatar ?: "")
+        binding.tvNickname.text = u.nickname
     }
 
     private fun beCalling(signal: BeingRequestedSignal) {
@@ -124,7 +136,7 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
             AppUtils.instance().notifyNewMessage()
             rootView.postDelayed({
                 notifyCalling()
-            }, 1000)
+            }, 1500)
         } else {
             dismiss()
         }

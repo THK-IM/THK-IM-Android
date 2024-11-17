@@ -39,7 +39,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
             ctx: Context,
             roomId: String,
             callType: CallType,
-            members: Array<Long>
+            members: LongArray
         ) {
             val intent = Intent(ctx, LiveCallActivity::class.java)
             intent.putExtra("callType", callType.value)
@@ -51,6 +51,9 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
 
     private lateinit var binding: ActvitiyLiveCallBinding
     private lateinit var rtcRoom: RTCRoom
+    private val callAction = Runnable {
+        startRequestCalling()
+    }
 
     private fun callType(): Int {
         return intent.getIntExtra("callType", 1)
@@ -166,16 +169,6 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 binding.participantRemote.setFullscreenMode(true)
             }
         }
-
-//        val subscriber = object : BaseSubscriber<Long>() {
-//            override fun onNext(t: Long) {
-//                timerTick(t)
-//            }
-//        }
-//        Flowable.interval(0, 3, TimeUnit.SECONDS).take(Long.MAX_VALUE)
-//            .compose(RxTransform.flowableToMain())
-//            .subscribe(subscriber)
-//        addDispose(subscriber)
     }
 
     private fun initUserInfo() {
@@ -243,6 +236,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
 
     override fun finish() {
         super.finish()
+        binding.llCalling.removeCallbacks(callAction)
         RTCRoomManager.shared().destroyLocalRoom(roomId())
     }
 
@@ -258,18 +252,21 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
                 }
             }
             RTCRoomManager.shared().callRoomMembers(
-                roomId(), "ssss", 3, needCallMembers
-            ).subscribe(subscriber)
+                roomId(), "", 3, needCallMembers
+            ).compose(RxTransform.flowableToMain())
+                .subscribe(subscriber)
             addDispose(subscriber)
-            binding.llCalling.postDelayed({
-                startRequestCalling()
-            }, 3000)
+            binding.llCalling.postDelayed(callAction, 3000)
         }
     }
 
     override fun cancelRequestCalling() {
         val subscriber = object : BaseSubscriber<Void>() {
             override fun onNext(t: Void?) {
+            }
+
+            override fun onComplete() {
+                super.onComplete()
                 finish()
             }
         }
@@ -282,6 +279,10 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     override fun hangupCalling() {
         val subscriber = object : BaseSubscriber<Void>() {
             override fun onNext(t: Void?) {
+            }
+
+            override fun onComplete() {
+                super.onComplete()
                 finish()
             }
         }
@@ -311,6 +312,10 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         if (roomId == roomId()) {
             val subscriber = object : BaseSubscriber<Void>() {
                 override fun onNext(t: Void?) {
+                }
+
+                override fun onComplete() {
+                    super.onComplete()
                     finish()
                 }
             }

@@ -1,7 +1,7 @@
 package com.thk.im.android.live.room
 
 import com.google.gson.Gson
-import com.thk.im.android.live.Mode
+import com.thk.im.android.live.RoomMode
 import com.thk.im.android.live.ParticipantVo
 import com.thk.im.android.live.Role
 import com.thk.im.android.live.VolumeMsg
@@ -29,11 +29,11 @@ class RTCRoom(
     }
 
     fun audioEnable(): Boolean {
-        return this.mode >= Mode.Audio.value
+        return this.mode >= RoomMode.Audio.value
     }
 
     fun videoEnable(): Boolean {
-        return this.mode == Mode.Video.value || this.mode == Mode.VideoRoom.value
+        return this.mode == RoomMode.Video.value || this.mode == RoomMode.VideoRoom.value
     }
 
     private fun initLocalParticipant(role: Int) {

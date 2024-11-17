@@ -23,6 +23,7 @@ class IMLiveRequestProcessor(private val app: Application) : LiveRequestProcesso
             val beRequestedPopup = BeRequestedCallingPopup(currentActivity)
             beRequestedPopup.signal = signal
             XPopup.Builder(currentActivity).isDestroyOnDismiss(true)
+                .dismissOnTouchOutside(false)
                 .popupAnimation(PopupAnimation.TranslateFromTop)
                 .asCustom(beRequestedPopup)
                 .show()

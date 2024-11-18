@@ -49,7 +49,7 @@ class IMExternalPageRouter : IMPageRouter {
                 }
             }
             val params = MediaParams(
-                512 * 8 * 1024,
+                2048 * 8 * 1024,
                 48 * 8 * 1024,
                 540,
                 960,

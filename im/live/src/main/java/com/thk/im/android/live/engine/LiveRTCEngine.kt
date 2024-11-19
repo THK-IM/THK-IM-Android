@@ -19,6 +19,7 @@ import org.webrtc.Logging
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.VideoProcessor
 import org.webrtc.audio.JavaAudioDeviceModule
+import java.nio.ByteBuffer
 
 
 class LiveRTCEngine {
@@ -52,7 +53,6 @@ class LiveRTCEngine {
     private fun initEngine() {
         val logger = Loggable { p0, p1, p2 ->
             LLog.d("LiveRTCEngine", "$p0, $p1, $p2")
-
         }
         PeerConnectionFactory.initialize(
             PeerConnectionFactory.InitializationOptions.builder(app)
@@ -65,8 +65,8 @@ class LiveRTCEngine {
         val encoderFactory = DefaultVideoEncoderFactory(eglBaseContext, true, true)
         val decoderFactory = DefaultVideoDecoderFactory(eglBaseContext)
         audioProcessingFactory = ExternalAudioProcessingFactory()
-        audioProcessingFactory.setBypassFlagForRenderPre(true)
-        audioProcessingFactory.setBypassFlagForCapturePost(true)
+        audioProcessingFactory.setBypassFlagForRenderPre(false)
+        audioProcessingFactory.setBypassFlagForCapturePost(false)
         audioProcessingFactory.setCapturePostProcessing(audioCaptureProxy)
         audioProcessingFactory.setRenderPreProcessing(audioRenderProxy)
         audioDeviceModule = JavaAudioDeviceModule.builder(app)
@@ -75,7 +75,6 @@ class LiveRTCEngine {
             .setUseStereoInput(true)
             .setUseStereoOutput(true)
             .setSamplesReadyCallback {
-                onAudioCapture(it)
             }.createAudioDeviceModule()
         eglBaseCtx = eglBaseContext
         factory = PeerConnectionFactory.builder().setOptions(options)
@@ -165,8 +164,11 @@ class LiveRTCEngine {
         this.audioProcessingFactory.setRenderPreProcessing(delegate)
     }
 
-    private fun onAudioCapture(samples: JavaAudioDeviceModule.AudioSamples) {
-        val db = AudioUtils.calculateDecibel(samples.data)
+    fun captureOriginAudio(buffer: ByteBuffer, length: Int) {
+        val ba = ByteArray(length)
+        buffer.get(ba)
+        val db = AudioUtils.calculateDecibel(ba)
+        LLog.d("LiveRTCEngine", "captureOriginAudio $db")
         RTCRoomManager.shared().allRooms().forEach {
             it.sendMyVolume(db)
         }

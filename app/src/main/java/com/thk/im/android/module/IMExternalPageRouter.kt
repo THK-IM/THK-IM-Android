@@ -48,7 +48,7 @@ class IMExternalPageRouter : IMPageRouter {
                     LiveCallActivity.startCallActivity(ctx, t.id, CallType.RequestCalling, ids)
                 }
             }
-            RTCRoomManager.shared().createRoom(RoomMode.Video, Media.R169_H1080.value)
+            RTCRoomManager.shared().createRoom(RoomMode.Video, Media.R169_H540.value)
                 .compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             compositeDisposable.add(subscriber)

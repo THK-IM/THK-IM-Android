@@ -179,7 +179,7 @@ class RTCRoom(
     }
 
     fun sendMyVolume(volume: Double) {
-//        localParticipant?.sendMyVolume(volume)
+        localParticipant?.sendMyVolume(volume)
     }
 
     fun sendBytes(ba: ByteArray): Boolean {

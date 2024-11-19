@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.AudioUtils
 import com.thk.im.android.live.room.RTCRoomManager
 import org.webrtc.DefaultVideoDecoderFactory
@@ -13,6 +14,8 @@ import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
 import org.webrtc.ExternalAudioProcessingFactory
 import org.webrtc.ExternalAudioProcessingFactory.AudioProcessing
+import org.webrtc.Loggable
+import org.webrtc.Logging
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.VideoProcessor
 import org.webrtc.audio.JavaAudioDeviceModule
@@ -47,8 +50,14 @@ class LiveRTCEngine {
     }
 
     private fun initEngine() {
+        val logger = Loggable { p0, p1, p2 ->
+            LLog.d("LiveRTCEngine", "$p0, $p1, $p2")
+
+        }
         PeerConnectionFactory.initialize(
-            PeerConnectionFactory.InitializationOptions.builder(app).createInitializationOptions()
+            PeerConnectionFactory.InitializationOptions.builder(app)
+                .setInjectableLogger(logger, Logging.Severity.LS_INFO)
+                .createInitializationOptions()
         )
         val eglBase = EglBase.create()
         val eglBaseContext = eglBase.eglBaseContext

@@ -65,7 +65,6 @@ class LocalParticipant(
                         val parameters = sender.parameters
                         for (e in parameters.encodings) {
                             e.maxBitrateBps = mediaParams.audioMaxBitrate
-                            e.minBitrateBps = 10 * 8 * 1024
                         }
                         sender.parameters = parameters
                     }
@@ -101,7 +100,7 @@ class LocalParticipant(
                         it.startCapture(
                             mediaParams.videoWidth,
                             mediaParams.videoHeight,
-                            mediaParams.videoFps / 2
+                            mediaParams.videoFps
                         )
                         addVideoTrack(videoTrack)
 
@@ -110,7 +109,6 @@ class LocalParticipant(
                                 val parameters = sender.parameters
                                 for (e in parameters.encodings) {
                                     e.maxBitrateBps = mediaParams.videoMaxBitrate
-                                    e.minBitrateBps = 10 * 8 * 1024
                                 }
                                 sender.parameters = parameters
                             }

@@ -12,7 +12,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.live.CallType
 import com.thk.im.android.live.RoomMode
-import com.thk.im.android.live.api.vo.MediaParams
+import com.thk.im.android.live.api.vo.Media
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.room.RTCRoomManager
 import com.thk.im.android.ui.call.LiveCallActivity
@@ -48,14 +48,7 @@ class IMExternalPageRouter : IMPageRouter {
                     LiveCallActivity.startCallActivity(ctx, t.id, CallType.RequestCalling, ids)
                 }
             }
-            val params = MediaParams(
-                2048 * 8 * 1024,
-                48 * 8 * 1024,
-                540,
-                960,
-                20,
-            )
-            RTCRoomManager.shared().createRoom(RoomMode.Video, params)
+            RTCRoomManager.shared().createRoom(RoomMode.Video, Media.R169_H1080.value)
                 .compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             compositeDisposable.add(subscriber)

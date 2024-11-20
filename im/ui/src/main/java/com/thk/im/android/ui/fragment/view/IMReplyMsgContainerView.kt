@@ -54,7 +54,7 @@ open class IMReplyMsgContainerView : LinearLayout {
         replyBodyView = view
 
         val userInfo =
-            delegate?.msgSender()?.syncGetSessionMemberInfo(message.referMsg!!.fUid)
+            delegate?.msgSender()?.syncGetSessionMemberInfo(message.fUid)
         userInfo?.let { info ->
             val nickname = IMUIManager.nicknameForSessionMember(info.first, info.second)
             binding.tvReplyMsgUserNick.text = nickname
@@ -68,7 +68,7 @@ open class IMReplyMsgContainerView : LinearLayout {
                 }
             }
         }
-        IMCoreManager.userModule.queryUser(message.referMsg!!.fUid)
+        IMCoreManager.userModule.queryUser(message.fUid)
             .compose(RxTransform.flowableToMain())
             .subscribe(subscriber)
         disposables.add(subscriber)

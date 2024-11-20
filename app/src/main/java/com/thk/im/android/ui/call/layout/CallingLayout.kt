@@ -30,23 +30,24 @@ class CallingLayout : ConstraintLayout {
             liveCallProtocol.hangupCalling()
         }
 
-        binding.ivAudioMute.isSelected = protocol.room()?.isLocalAudioMuted() ?: true
+        binding.ivAudioMute.isSelected = protocol.room()?.isMicrophoneMuted() ?: true
         binding.ivAudioMute.setOnClickListener {
-            liveCallProtocol.room()?.muteLocalAudio(!binding.ivAudioMute.isSelected)
-            binding.ivAudioMute.isSelected = liveCallProtocol.room()?.isLocalAudioMuted() ?: true
+            liveCallProtocol.room()?.muteMicrophone(!binding.ivAudioMute.isSelected)
+            binding.ivAudioMute.isSelected = liveCallProtocol.room()?.isMicrophoneMuted() ?: true
         }
 
-        binding.ivSwitchSpeaker.isSelected = liveCallProtocol.room()?.isSpeakerMuted() ?: true
+        binding.ivSwitchSpeaker.isSelected = liveCallProtocol.room()?.isSpeakerOn() ?: true
         binding.ivSwitchSpeaker.setOnClickListener {
-            liveCallProtocol.room()?.muteSpeaker(!binding.ivSwitchSpeaker.isSelected)
-            binding.ivSwitchSpeaker.isSelected = liveCallProtocol.room()?.isSpeakerMuted() ?: true
+            liveCallProtocol.room()?.setSpeakerOn(!binding.ivSwitchSpeaker.isSelected)
+            binding.ivSwitchSpeaker.isSelected = liveCallProtocol.room()?.isSpeakerOn() ?: true
         }
 
-        binding.ivOpenCloseCamera.isSelected = liveCallProtocol.room()?.isLocalVideoMuted() ?: true
+        binding.ivOpenCloseCamera.isSelected =
+            liveCallProtocol.room()?.isLocalVideoStreamMuted() ?: true
         binding.ivOpenCloseCamera.setOnClickListener {
-            liveCallProtocol.room()?.muteLocalVideo(!binding.ivOpenCloseCamera.isSelected)
+            liveCallProtocol.room()?.muteLocalVideoStream(!binding.ivOpenCloseCamera.isSelected)
             binding.ivOpenCloseCamera.isSelected =
-                liveCallProtocol.room()?.isLocalVideoMuted() ?: true
+                liveCallProtocol.room()?.isLocalVideoStreamMuted() ?: true
         }
 
         binding.ivSwitchCamera.setOnClickListener {

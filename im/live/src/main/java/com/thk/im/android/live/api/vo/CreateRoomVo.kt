@@ -11,16 +11,8 @@ data class CreateRoomReqVo(
     val uId: Long,
     @SerializedName("mode")
     var mode: Int,
-    @SerializedName("video_max_bitrate")
-    val videoMaxBitrate: Int,
-    @SerializedName("audio_max_bitrate")
-    val audioMaxBitrate: Int,
-    @SerializedName("video_width")
-    val videoWidth: Int,
-    @SerializedName("video_height")
-    val videoHeight: Int,
-    @SerializedName("video_fps")
-    val videoFps: Int
+    @SerializedName("media_params")
+    var mediaParams: MediaParams
 )
 
 @Keep

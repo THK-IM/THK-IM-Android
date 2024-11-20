@@ -65,7 +65,6 @@ class LocalParticipant(
                         val parameters = sender.parameters
                         for (e in parameters.encodings) {
                             e.maxBitrateBps = mediaParams.audioMaxBitrate
-                            e.minBitrateBps = 10 * 8 * 1024
                         }
                         sender.parameters = parameters
                     }
@@ -101,7 +100,7 @@ class LocalParticipant(
                         it.startCapture(
                             mediaParams.videoWidth,
                             mediaParams.videoHeight,
-                            mediaParams.videoFps / 2
+                            mediaParams.videoFps
                         )
                         addVideoTrack(videoTrack)
 
@@ -110,7 +109,6 @@ class LocalParticipant(
                                 val parameters = sender.parameters
                                 for (e in parameters.encodings) {
                                     e.maxBitrateBps = mediaParams.videoMaxBitrate
-                                    e.minBitrateBps = 10 * 8 * 1024
                                 }
                                 sender.parameters = parameters
                             }
@@ -181,7 +179,7 @@ class LocalParticipant(
         val context = LiveManager.shared().app ?: return null
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
-        cameraName = getBackCameraName()
+        cameraName = getFrontCameraName()
         if (cameraName != null) {
             return enumerator.createCapturer(cameraName!!, null)
         }
@@ -255,12 +253,13 @@ class LocalParticipant(
         return null
     }
 
-    fun sendMyVolume(volume: Double) {
+    fun sendMyVolume(volume: Double): Boolean {
         if (role == Role.Broadcaster.value) {
             val volumeMsg = VolumeMsg(this.uId, volume)
             val text = Gson().toJson(volumeMsg)
-            sendMessage(0, text)
+            return sendMessage(0, text)
         }
+        return false
     }
 
     fun sendMessage(type: Int, text: String): Boolean {

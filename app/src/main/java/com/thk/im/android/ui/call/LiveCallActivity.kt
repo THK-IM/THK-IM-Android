@@ -10,6 +10,7 @@ import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.event.XEventBus
@@ -359,6 +360,10 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     override fun onParticipantVoice(uId: Long, volume: Double) {
+        LLog.d(
+            "RTCRoomCallBack",
+            "uid: $uId, isMyself: ${uId == RTCRoomManager.shared().myUId} volume: $volume"
+        )
     }
 
     override fun onError(function: String, ex: Exception) {

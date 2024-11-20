@@ -19,6 +19,7 @@ import org.webrtc.Logging
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.VideoProcessor
 import org.webrtc.audio.JavaAudioDeviceModule
+import java.nio.ByteBuffer
 
 
 class LiveRTCEngine {
@@ -43,6 +44,8 @@ class LiveRTCEngine {
     private var audioCaptureProxy: AudioProcessing = LiveAudioCaptureProxy()
     private var audioRenderProxy: AudioProcessing = LiveAudioRenderProxy()
     private lateinit var audioProcessingFactory: ExternalAudioProcessingFactory
+    private var speakerMuted = false
+    private var microphoneMuted = false
 
     fun init(app: Application) {
         this.app = app
@@ -52,7 +55,6 @@ class LiveRTCEngine {
     private fun initEngine() {
         val logger = Loggable { p0, p1, p2 ->
             LLog.d("LiveRTCEngine", "$p0, $p1, $p2")
-
         }
         PeerConnectionFactory.initialize(
             PeerConnectionFactory.InitializationOptions.builder(app)
@@ -65,8 +67,8 @@ class LiveRTCEngine {
         val encoderFactory = DefaultVideoEncoderFactory(eglBaseContext, true, true)
         val decoderFactory = DefaultVideoDecoderFactory(eglBaseContext)
         audioProcessingFactory = ExternalAudioProcessingFactory()
-        audioProcessingFactory.setBypassFlagForRenderPre(true)
-        audioProcessingFactory.setBypassFlagForCapturePost(true)
+        audioProcessingFactory.setBypassFlagForRenderPre(false)
+        audioProcessingFactory.setBypassFlagForCapturePost(false)
         audioProcessingFactory.setCapturePostProcessing(audioCaptureProxy)
         audioProcessingFactory.setRenderPreProcessing(audioRenderProxy)
         audioDeviceModule = JavaAudioDeviceModule.builder(app)
@@ -75,7 +77,6 @@ class LiveRTCEngine {
             .setUseStereoInput(true)
             .setUseStereoOutput(true)
             .setSamplesReadyCallback {
-                onAudioCapture(it)
             }.createAudioDeviceModule()
         eglBaseCtx = eglBaseContext
         factory = PeerConnectionFactory.builder().setOptions(options)
@@ -84,46 +85,84 @@ class LiveRTCEngine {
             .setAudioProcessingFactory(audioProcessingFactory)
             .setAudioDeviceModule(audioDeviceModule)
             .createPeerConnectionFactory()
-        audioDeviceModule.setSpeakerMute(false)
-        audioDeviceModule.setMicrophoneMute(false)
+        audioDeviceModule.setSpeakerMute(speakerMuted)
+        audioDeviceModule.setMicrophoneMute(microphoneMuted)
     }
 
-
-    fun isSpeakerMuted(): Boolean {
+    /**
+     * 扬声器外放是否打开
+     */
+    fun isSpeakerOn(): Boolean {
         val audioManager = app.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        return !audioManager.isSpeakerphoneOn
+        return audioManager.isSpeakerphoneOn
     }
 
-    fun muteSpeaker(mute: Boolean) {
+    /**
+     * 打开扬声器外放
+     */
+    fun setSpeakerOn(on: Boolean) {
         // 设置扬声器播放
         val audioManager = app.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
             app.packageManager.hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT)
         ) {
-            if (!mute) {
+            if (on) {
                 val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
                 for (device in devices) {
                     if (device.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
-                        audioManager.setCommunicationDevice(device)
+                        val res = audioManager.setCommunicationDevice(device)
+                        LLog.d("LiveRTCEngine", "setSpeakerOn $res")
                     }
                 }
             } else {
-                audioManager.clearCommunicationDevice()
+                val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+                for (device in devices) {
+                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
+                        val res = audioManager.setCommunicationDevice(device)
+                        LLog.d("LiveRTCEngine", "setSpeakerOn $res")
+                    }
+                }
             }
         } else {
-            audioManager.isSpeakerphoneOn = !mute
+            audioManager.isSpeakerphoneOn = on
+            audioManager.mode = AudioManager.MODE_NORMAL
         }
-        audioManager.mode = AudioManager.MODE_NORMAL
     }
 
-    fun setMicrophoneMute(mute: Boolean) {
-        audioDeviceModule.setMicrophoneMute(mute)
+    /**
+     * rtc音频外放是否禁止
+     */
+    fun isSpeakerMuted(): Boolean {
+        return speakerMuted
     }
 
-    fun setSpeakerMute(mute: Boolean) {
+    /**
+     * 禁止/打开rtc音频外放
+     */
+    fun muteSpeaker(mute: Boolean) {
+        speakerMuted = mute
         audioDeviceModule.setSpeakerMute(mute)
     }
 
+    /**
+     * rtc音频输入是否禁止
+     */
+    fun isMicrophoneMuted(): Boolean {
+        return microphoneMuted
+    }
+
+    /**
+     * 禁止/打开rtc音频输入
+     */
+    fun setMicrophoneMuted(mute: Boolean) {
+        microphoneMuted = mute
+        audioDeviceModule.setMicrophoneMute(mute)
+    }
+
+
+    /**
+     * 设置音频录入设备
+     */
     fun setPreferredInputDevice(preferredInputDevice: AudioDeviceInfo) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             audioDeviceModule.setPreferredInputDevice(preferredInputDevice)
@@ -165,10 +204,15 @@ class LiveRTCEngine {
         this.audioProcessingFactory.setRenderPreProcessing(delegate)
     }
 
-    private fun onAudioCapture(samples: JavaAudioDeviceModule.AudioSamples) {
-        val db = AudioUtils.calculateDecibel(samples.data)
-        RTCRoomManager.shared().allRooms().forEach {
-            it.sendMyVolume(db)
+    fun captureOriginAudio(buffer: ByteBuffer, length: Int) {
+        val ba = ByteArray(length)
+        buffer.get(ba)
+        val db = AudioUtils.calculateDecibel(ba)
+        LLog.d("LiveRTCEngine", "captureOriginAudio $db")
+        if (db > 0) {
+            RTCRoomManager.shared().allRooms().forEach {
+                it.sendMyVolume(db)
+            }
         }
     }
 }

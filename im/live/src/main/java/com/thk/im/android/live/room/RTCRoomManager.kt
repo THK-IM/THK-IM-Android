@@ -56,8 +56,7 @@ class RTCRoomManager private constructor() {
     fun createRoom(mode: RoomMode, mediaParams: MediaParams): Flowable<RTCRoom> {
         val req = CreateRoomReqVo(
             myUId, mode.value,
-            mediaParams.videoMaxBitrate, mediaParams.audioMaxBitrate,
-            mediaParams.videoWidth, mediaParams.videoHeight, mediaParams.videoFps,
+            mediaParams
         )
         return liveApi.createRoom(req).flatMap {
             val rtcRoom = RTCRoom(

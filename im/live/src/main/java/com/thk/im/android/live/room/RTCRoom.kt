@@ -178,8 +178,12 @@ class RTCRoom(
         }
     }
 
-    fun sendMyVolume(volume: Double) {
-//        localParticipant?.sendMyVolume(volume)
+    fun sendMyVolume(volume: Double): Boolean {
+        val success = localParticipant?.sendMyVolume(volume) ?: false
+        if (success) {
+            callback?.onParticipantVoice(RTCRoomManager.shared().myUId, volume)
+        }
+        return success
     }
 
     fun sendBytes(ba: ByteArray): Boolean {
@@ -215,14 +219,43 @@ class RTCRoom(
     }
 
     /**
-     * 扬声器是否打开
+     * 扬声器外放是否打开
+     */
+    fun isSpeakerOn(): Boolean {
+        return LiveRTCEngine.shared().isSpeakerOn()
+    }
+
+    /**
+     * 打开扬声器外放
+     */
+    fun setSpeakerOn(on: Boolean) {
+        return LiveRTCEngine.shared().setSpeakerOn(on)
+    }
+
+
+    /**
+     * rtc音频输入是否禁止
+     */
+    fun isMicrophoneMuted(): Boolean {
+        return LiveRTCEngine.shared().isMicrophoneMuted()
+    }
+
+    /**
+     * 打开/关闭rtc音频输入
+     */
+    fun muteMicrophone(mute: Boolean) {
+        LiveRTCEngine.shared().setMicrophoneMuted(mute)
+    }
+
+    /**
+     * rtc音频外放是否禁止
      */
     fun isSpeakerMuted(): Boolean {
         return LiveRTCEngine.shared().isSpeakerMuted()
     }
 
     /**
-     * 打开/关闭扬声器
+     * 打开/关闭rtc音频外放
      */
     fun muteSpeaker(mute: Boolean) {
         LiveRTCEngine.shared().muteSpeaker(mute)
@@ -243,37 +276,37 @@ class RTCRoom(
     }
 
     /**
-     * 打开本地视频
+     * 打开本地视频流
      */
-    fun muteLocalVideo(mute: Boolean) {
+    fun muteLocalVideoStream(mute: Boolean) {
         localParticipant?.setVideoMuted(mute)
     }
 
     /**
      * 本地视频是否打开
      */
-    fun isLocalVideoMuted(): Boolean {
+    fun isLocalVideoStreamMuted(): Boolean {
         return localParticipant?.getVideoMuted() ?: false
     }
 
     /**
      * 打开/关闭本地音频
      */
-    fun muteLocalAudio(mute: Boolean) {
+    fun muteLocalAudioStream(mute: Boolean) {
         localParticipant?.setAudioMuted(mute)
     }
 
     /**
      * 本地音频是否关闭
      */
-    fun isLocalAudioMuted(): Boolean {
+    fun isLocalAudioStreamMuted(): Boolean {
         return localParticipant?.getAudioMuted() ?: false
     }
 
     /**
      * 打开/关闭远端音频
      */
-    fun muteRemoteAudio(uId: Long, mute: Boolean) {
+    fun muteRemoteAudioStream(uId: Long, mute: Boolean) {
         for (p in remoteParticipants) {
             if (p.uId == uId) {
                 p.setAudioMuted(mute)
@@ -284,7 +317,7 @@ class RTCRoom(
     /**
      * 打开/关闭远端音频
      */
-    fun muteAllRemoteAudio(mute: Boolean) {
+    fun muteAllRemoteAudioStream(mute: Boolean) {
         for (p in remoteParticipants) {
             p.setAudioMuted(mute)
         }
@@ -293,7 +326,7 @@ class RTCRoom(
     /**
      * 远端音频是否关闭
      */
-    fun isRemoteAudioMuted(uId: Long): Boolean {
+    fun isRemoteAudioStreamMuted(uId: Long): Boolean {
         for (p in remoteParticipants) {
             if (p.uId == uId) {
                 return p.getAudioMuted()
@@ -305,7 +338,7 @@ class RTCRoom(
     /**
      * 打开/关闭远端视频
      */
-    fun muteRemoteVideo(uId: Long, mute: Boolean) {
+    fun muteRemoteVideoStream(uId: Long, mute: Boolean) {
         for (p in remoteParticipants) {
             if (p.uId == uId) {
                 p.setAudioMuted(mute)
@@ -316,7 +349,7 @@ class RTCRoom(
     /**
      * 打开/关闭远端音频
      */
-    fun muteAllRemoteVideo(mute: Boolean) {
+    fun muteAllRemoteVideoStream(mute: Boolean) {
         for (p in remoteParticipants) {
             p.setVideoMuted(mute)
         }
@@ -325,7 +358,7 @@ class RTCRoom(
     /**
      * 远端视频是否关闭
      */
-    fun isRemoteVideoMuted(uId: Long): Boolean {
+    fun isRemoteVideoStreamMuted(uId: Long): Boolean {
         for (p in remoteParticipants) {
             if (p.uId == uId) {
                 return p.getVideoMuted()

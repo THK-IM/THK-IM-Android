@@ -72,49 +72,35 @@ class LocalParticipant(
             }
 
             if (videoEnable && role == Role.Broadcaster.value) {
-                LiveManager.shared().app?.let { app ->
-                    videoCapture = createVideoCapture()
-                    videoCapture?.let {
-                        surfaceTextureHelper =
-                            SurfaceTextureHelper.create(
-                                "surface_texture_thread",
-                                LiveRTCEngine.shared().eglBaseCtx
-                            )
-                        videoSource =
-                            LiveRTCEngine.shared().factory.createVideoSource(it.isScreencast)
-                        val videoProcessor = LiveRTCEngine.shared().videoCaptureProxy()
-                        videoProcessor?.let { processor ->
-                            videoSource?.setVideoProcessor(processor)
+                surfaceTextureHelper =
+                    SurfaceTextureHelper.create(
+                        "surface_texture_thread",
+                        LiveRTCEngine.shared().eglBaseCtx
+                    )
+                videoSource = LiveRTCEngine.shared().factory.createVideoSource(false)
+                val videoProcessor = LiveRTCEngine.shared().videoCaptureProxy()
+                videoProcessor?.let { processor ->
+                    videoSource?.setVideoProcessor(processor)
+                }
+                val videoTrack = LiveRTCEngine.shared().factory.createVideoTrack(
+                    "video/$roomId/$uId",
+                    videoSource
+                )
+                peerConnection?.addTransceiver(
+                    videoTrack,
+                    RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY)
+                )
+                addVideoTrack(videoTrack)
+                peerConnection?.senders?.forEach { sender ->
+                    if (sender.track()?.kind() == videoTrack.kind()) {
+                        val parameters = sender.parameters
+                        for (e in parameters.encodings) {
+                            e.maxBitrateBps = mediaParams.videoMaxBitrate
                         }
-                        val videoTrack =
-                            LiveRTCEngine.shared().factory.createVideoTrack(
-                                "video/$roomId/$uId",
-                                videoSource
-                            )
-                        peerConnection?.addTransceiver(
-                            videoTrack,
-                            RtpTransceiver.RtpTransceiverInit(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY)
-                        )
-                        it.initialize(surfaceTextureHelper, app, videoSource!!.capturerObserver)
-
-                        it.startCapture(
-                            mediaParams.videoWidth,
-                            mediaParams.videoHeight,
-                            mediaParams.videoFps
-                        )
-                        addVideoTrack(videoTrack)
-
-                        peerConnection?.senders?.forEach { sender ->
-                            if (sender.track()?.kind() == videoTrack.kind()) {
-                                val parameters = sender.parameters
-                                for (e in parameters.encodings) {
-                                    e.maxBitrateBps = mediaParams.videoMaxBitrate
-                                }
-                                sender.parameters = parameters
-                            }
-                        }
+                        sender.parameters = parameters
                     }
                 }
+                startCaptureVideo()
             }
             innerDataChannel = peerConnection!!.createDataChannel("", DataChannel.Init().apply {
                 ordered = true
@@ -175,15 +161,23 @@ class LocalParticipant(
         compositeDisposable.add(subscriber)
     }
 
-    private fun createVideoCapture(): CameraVideoCapturer? {
-        val context = LiveManager.shared().app ?: return null
-        val enumerator =
-            if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
+    private fun startCaptureVideo() {
+        val app = LiveManager.shared().app ?: return
         cameraName = getFrontCameraName()
-        if (cameraName != null) {
-            return enumerator.createCapturer(cameraName!!, null)
+        if (cameraName == null) {
+            cameraName = getBackCameraName()
         }
-        return null
+        if (cameraName == null) return
+
+        val enumerator =
+            if (Camera2Enumerator.isSupported(app)) Camera2Enumerator(app) else Camera1Enumerator()
+        this.videoCapture = enumerator.createCapturer(cameraName, null)
+        this.videoCapture?.initialize(surfaceTextureHelper, app, videoSource!!.capturerObserver)
+        this.videoCapture?.startCapture(
+            mediaParams.videoWidth,
+            mediaParams.videoHeight,
+            mediaParams.videoFps
+        )
     }
 
     private fun getFrontCameraName(): String? {
@@ -216,9 +210,15 @@ class LocalParticipant(
         return cameraName
     }
 
-    fun switchCamera() {
-        if (cameraName == null) return
-        val context = LiveManager.shared().app ?: return
+    fun switchCamera(): Boolean {
+        val context = LiveManager.shared().app ?: return false
+        if (cameraName == null) {
+            cameraName = getFrontCameraName()
+        }
+        if (cameraName == null) {
+            cameraName = getBackCameraName()
+        }
+        if (cameraName == null) return false
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
         cameraName = if (enumerator.isFrontFacing(cameraName)) {
@@ -226,7 +226,9 @@ class LocalParticipant(
         } else {
             getFrontCameraName()
         }
+        if (cameraName == null) return false
         videoCapture?.switchCamera(null, cameraName)
+        return true
     }
 
     override fun onDisConnected() {

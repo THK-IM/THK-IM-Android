@@ -163,21 +163,21 @@ class LocalParticipant(
 
     private fun startCaptureVideo() {
         val app = LiveManager.shared().app ?: return
-        cameraName = getFrontCameraName()
-        if (cameraName == null) {
-            cameraName = getBackCameraName()
+        var name = getFrontCameraName()
+        if (name == null) {
+            name = getBackCameraName()
         }
-        if (cameraName == null) return
-
+        if (name == null) return
         val enumerator =
             if (Camera2Enumerator.isSupported(app)) Camera2Enumerator(app) else Camera1Enumerator()
-        this.videoCapture = enumerator.createCapturer(cameraName, null)
+        this.videoCapture = enumerator.createCapturer(name, null)
         this.videoCapture?.initialize(surfaceTextureHelper, app, videoSource!!.capturerObserver)
         this.videoCapture?.startCapture(
             mediaParams.videoWidth,
             mediaParams.videoHeight,
             mediaParams.videoFps
         )
+        cameraName = name
     }
 
     private fun getFrontCameraName(): String? {
@@ -212,22 +212,24 @@ class LocalParticipant(
 
     fun switchCamera(): Boolean {
         val context = LiveManager.shared().app ?: return false
-        if (cameraName == null) {
-            cameraName = getFrontCameraName()
-        }
-        if (cameraName == null) {
-            cameraName = getBackCameraName()
-        }
-        if (cameraName == null) return false
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
-        cameraName = if (enumerator.isFrontFacing(cameraName)) {
-            getBackCameraName()
+        var name = getFrontCameraName()
+        if (cameraName == null) {
+            if (name == null) {
+                name = getBackCameraName()
+            }
         } else {
-            getFrontCameraName()
+            name = if (enumerator.isFrontFacing(cameraName)) {
+                getBackCameraName()
+            } else {
+                getFrontCameraName()
+            }
         }
-        if (cameraName == null) return false
-        videoCapture?.switchCamera(null, cameraName)
+
+        if (name == null) return false
+        videoCapture?.switchCamera(null, name)
+        cameraName = name
         return true
     }
 

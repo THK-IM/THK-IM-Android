@@ -179,7 +179,7 @@ class LocalParticipant(
         val context = LiveManager.shared().app ?: return null
         val enumerator =
             if (Camera2Enumerator.isSupported(context)) Camera2Enumerator(context) else Camera1Enumerator()
-        cameraName = getBackCameraName()
+        cameraName = getFrontCameraName()
         if (cameraName != null) {
             return enumerator.createCapturer(cameraName!!, null)
         }

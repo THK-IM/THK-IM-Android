@@ -360,7 +360,10 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     override fun onParticipantVoice(uId: Long, volume: Double) {
-        LLog.d("RTCRoomCallBack", "uid: $uId, volume: $volume")
+        LLog.d(
+            "RTCRoomCallBack",
+            "uid: $uId, isMyself: ${uId == RTCRoomManager.shared().myUId} volume: $volume"
+        )
     }
 
     override fun onError(function: String, ex: Exception) {

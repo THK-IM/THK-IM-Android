@@ -209,8 +209,10 @@ class LiveRTCEngine {
         buffer.get(ba)
         val db = AudioUtils.calculateDecibel(ba)
         LLog.d("LiveRTCEngine", "captureOriginAudio $db")
-        RTCRoomManager.shared().allRooms().forEach {
-            it.sendMyVolume(db)
+        if (db > 0) {
+            RTCRoomManager.shared().allRooms().forEach {
+                it.sendMyVolume(db)
+            }
         }
     }
 }

@@ -21,10 +21,7 @@ open class LiveAudioRenderProxy : AudioProcessing {
         val current = System.currentTimeMillis()
         if (current - lastCal > 500) {
             LLog.d("LiveAudioProxy", "Render process $p0, $p1")
-            p2?.let {
-                LiveRTCEngine.shared().captureOriginAudio(it, p1)
-                lastCal = current
-            }
+            lastCal = current
         }
     }
 }

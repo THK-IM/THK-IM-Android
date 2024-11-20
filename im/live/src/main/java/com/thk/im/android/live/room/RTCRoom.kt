@@ -178,8 +178,12 @@ class RTCRoom(
         }
     }
 
-    fun sendMyVolume(volume: Double) {
-        localParticipant?.sendMyVolume(volume)
+    fun sendMyVolume(volume: Double): Boolean {
+        val success = localParticipant?.sendMyVolume(volume) ?: false
+        if (success) {
+            callback?.onParticipantVoice(RTCRoomManager.shared().myUId, volume)
+        }
+        return success
     }
 
     fun sendBytes(ba: ByteArray): Boolean {

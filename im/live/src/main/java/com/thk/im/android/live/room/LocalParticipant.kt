@@ -253,12 +253,13 @@ class LocalParticipant(
         return null
     }
 
-    fun sendMyVolume(volume: Double) {
+    fun sendMyVolume(volume: Double): Boolean {
         if (role == Role.Broadcaster.value) {
             val volumeMsg = VolumeMsg(this.uId, volume)
             val text = Gson().toJson(volumeMsg)
-            sendMessage(0, text)
+            return sendMessage(0, text)
         }
+        return false
     }
 
     fun sendMessage(type: Int, text: String): Boolean {

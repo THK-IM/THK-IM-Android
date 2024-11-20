@@ -23,9 +23,9 @@ open class LiveAudioCaptureProxy : AudioProcessing {
         val current = System.currentTimeMillis()
         if (current - lastCal > 500) {
             p2?.let {
-                LLog.d("LiveAudioProxy", "process $p0, $p1 ${it.limit()}")
+                LLog.d("LiveAudioProxy", "process $p0, $p1 ")
                 val buffer = BufferUtils.cloneByteBuffer(it)
-                LiveRTCEngine.shared().captureOriginAudio(buffer, p1 * p0)
+                LiveRTCEngine.shared().captureOriginAudio(buffer, p1)
                 lastCal = current
             }
         }

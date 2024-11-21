@@ -22,6 +22,8 @@ import com.thk.im.android.module.IMExternalPageRouter
 import com.thk.im.android.module.IMGroupModule
 import com.thk.im.android.module.IMLiveRequestProcessor
 import com.thk.im.android.module.IMUserModule
+import com.thk.im.android.module.msg.call.IMCallMsgProcessor
+import com.thk.im.android.module.msg.call.IMCallMsgProvider
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.preview.Previewer
 import io.reactivex.BackpressureStrategy
@@ -60,7 +62,9 @@ class IMApplication : Application() {
         IMCoreManager.contactModule = IMContactModule()
         IMCoreManager.groupModule = IMGroupModule()
         IMCoreManager.customModule = IMCustomModule(this)
+        IMCoreManager.messageModule.registerMsgProcessor(IMCallMsgProcessor())
         IMUIManager.init(this)
+        IMUIManager.registerMsgIVProvider(IMCallMsgProvider())
         IMUIManager.pageRouter = IMExternalPageRouter()
         IMUIManager.uiResourceProvider = IMDemoUIProvider(this)
         LiveManager.shared().init(this)

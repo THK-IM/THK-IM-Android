@@ -85,7 +85,7 @@ class BeRequestedCallingPopup(context: Context) : PositionPopupView(context) {
                     dismiss()
                     RTCRoomManager.shared().addRoom(t)
                     LiveCallActivity.startCallActivity(
-                        context, t.id, CallType.BeCalling, signal.members.toLongArray()
+                        context, null, t.id, CallType.BeCalling, signal.members.toLongArray()
                     )
                 }
             }

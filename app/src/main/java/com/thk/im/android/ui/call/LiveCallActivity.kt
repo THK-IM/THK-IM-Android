@@ -5,9 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
+import com.google.gson.Gson
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
+import com.thk.im.android.constant.DemoMsgType
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
@@ -28,6 +30,7 @@ import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.room.RTCRoomCallBack
 import com.thk.im.android.live.room.RTCRoomManager
 import com.thk.im.android.live.room.RemoteParticipant
+import com.thk.im.android.module.msg.call.IMCallMsg
 import com.thk.im.android.ui.base.BaseActivity
 import java.nio.ByteBuffer
 
@@ -37,18 +40,21 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
 
         fun startCallActivity(
             ctx: Context,
+            sessionId: Long?,
             roomId: String,
             callType: CallType,
             members: LongArray
         ) {
             val intent = Intent(ctx, LiveCallActivity::class.java)
             intent.putExtra("callType", callType.value)
+            intent.putExtra("sessionId", sessionId)
             intent.putExtra("roomId", roomId)
             intent.putExtra("members", members)
             ctx.startActivity(intent)
         }
     }
 
+    private var callMsg: IMCallMsg? = null
     private lateinit var binding: ActvitiyLiveCallBinding
     private val callAction = Runnable {
         startRequestCalling()
@@ -104,6 +110,9 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         setContentView(binding.root)
         RTCRoomManager.shared().getRoomById(roomId())?.let {
             it.callback = this
+            if (it.ownerId == IMCoreManager.uId) {
+                callMsg = IMCallMsg(it.id, it.ownerId, it.mode, it.createTime, 0, 0, 0)
+            }
         }
         initView()
         initUserInfo()
@@ -240,7 +249,21 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     override fun finish() {
         super.finish()
         binding.llCalling.removeCallbacks(callAction)
+        callMsg?.let {
+            if (it.accepted == 2) {
+                it.duration = IMCoreManager.severTime - it.acceptTime
+            }
+            sendCallMsgToUId(it)
+            callMsg = null
+        }
         RTCRoomManager.shared().destroyLocalRoom(roomId())
+    }
+
+    private fun sendCallMsgToUId(callMsg: IMCallMsg) {
+        val sessionId = intent.getLongExtra("sessionId", 0)
+        if (sessionId == 0L) return
+        val msg = Gson().toJson(callMsg)
+        IMCoreManager.messageModule.sendMessage(sessionId, DemoMsgType.Call.value, msg, null)
     }
 
     override fun room(): RTCRoom? {
@@ -306,6 +329,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
             intent.putExtra("reject_members", rejectMembers.toLongArray())
 
             showCallingView()
+
+            callMsg?.let {
+                it.accepted = 2
+                it.acceptTime = IMCoreManager.severTime
+            }
         }
     }
 
@@ -318,7 +346,10 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
             val rejectMembers = rejectMembers()
             rejectMembers.add(uId)
             intent.putExtra("reject_members", rejectMembers.toLongArray())
-
+            callMsg?.let {
+                it.accepted = 1
+                it.acceptTime = IMCoreManager.severTime
+            }
             if (needCallMembers().isEmpty() && acceptMembers().isEmpty()) {
                 finish()
             }

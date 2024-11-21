@@ -45,7 +45,13 @@ class IMExternalPageRouter : IMPageRouter {
             val subscriber = object : BaseSubscriber<RTCRoom>() {
                 override fun onNext(t: RTCRoom) {
                     RTCRoomManager.shared().addRoom(t)
-                    LiveCallActivity.startCallActivity(ctx, t.id, CallType.RequestCalling, ids)
+                    LiveCallActivity.startCallActivity(
+                        ctx,
+                        session.id,
+                        t.id,
+                        CallType.RequestCalling,
+                        ids
+                    )
                 }
             }
             RTCRoomManager.shared().createRoom(RoomMode.Video, Media.R169_H180.value)

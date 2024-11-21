@@ -11,12 +11,6 @@ object LiveMediaConstraints {
     ): MediaConstraints {
         val constraints = MediaConstraints()
         val enable3aStr = if (enable3a) "true" else "false"
-        constraints.mandatory.add(
-            MediaConstraints.KeyValuePair(
-                "googDAEchoCancellation",
-                enable3aStr
-            )
-        )
         //回声消除
         constraints.mandatory.add(
             MediaConstraints.KeyValuePair(

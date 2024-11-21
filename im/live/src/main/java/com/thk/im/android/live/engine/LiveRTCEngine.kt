@@ -7,6 +7,8 @@ import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.MediaRecorder
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.AudioUtils
 import com.thk.im.android.live.room.RTCRoomManager
@@ -20,7 +22,6 @@ import org.webrtc.Logging
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.VideoProcessor
 import org.webrtc.audio.JavaAudioDeviceModule
-import java.nio.ByteBuffer
 
 
 class LiveRTCEngine {
@@ -47,6 +48,9 @@ class LiveRTCEngine {
     private lateinit var audioProcessingFactory: ExternalAudioProcessingFactory
     private var speakerMuted = false
     private var microphoneMuted = false
+
+    private var lastCaptureTime: Long = 0
+    private val handler = Handler(Looper.getMainLooper())
 
     fun init(app: Application) {
         this.app = app
@@ -79,6 +83,13 @@ class LiveRTCEngine {
             .setUseLowLatency(false)
             .setUseStereoInput(true)
             .setUseStereoOutput(true)
+            .setSamplesReadyCallback {
+                val current = System.currentTimeMillis()
+                if (current - lastCaptureTime > 500) {
+                    captureOriginAudio(it.data)
+                    lastCaptureTime = current
+                }
+            }
             .createAudioDeviceModule()
         eglBaseCtx = eglBaseContext
         factory = PeerConnectionFactory.builder().setOptions(options)
@@ -208,13 +219,16 @@ class LiveRTCEngine {
     }
 
     fun captureOriginAudio(ba: ByteArray) {
-        val db = AudioUtils.calculateDecibel(ba)
-        LLog.d("LiveRTCEngine", "captureOriginAudio $db")
-        if (db > 0) {
-            RTCRoomManager.shared().allRooms().forEach {
-                it.sendMyVolume(db)
+        handler.post {
+            val db = AudioUtils.calculateDecibel(ba)
+            LLog.d("LiveRTCEngine", "captureOriginAudio $db")
+            if (db > 0) {
+                RTCRoomManager.shared().allRooms().forEach {
+                    it.sendMyVolume(db)
+                }
             }
         }
+
     }
 
 }

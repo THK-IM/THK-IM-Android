@@ -1,16 +1,12 @@
 package com.thk.im.android.live.engine
 
-import android.os.Handler
-import android.os.Looper
 import com.thk.im.android.core.base.LLog
 import org.webrtc.ExternalAudioProcessingFactory.AudioProcessing
 import java.nio.ByteBuffer
-import kotlin.math.min
 
 open class LiveAudioCaptureProxy : AudioProcessing {
 
     private var lastCal: Long = 0
-    private val handler = Handler(Looper.getMainLooper())
 
     // int sampleRateHz, int numChannels
     override fun initialize(p0: Int, p1: Int) {
@@ -24,14 +20,12 @@ open class LiveAudioCaptureProxy : AudioProcessing {
     // int numBands, int numFrames, ByteBuffer buffer
     override fun process(p0: Int, p1: Int, p2: ByteBuffer) {
         val current = System.currentTimeMillis()
-        if (current - lastCal > 500) {
-            val length = min(p1, 256)
-            val data = ByteArray(length)
-            p2.get(data, 0, length)
-            handler.post {
-                LiveRTCEngine.shared().captureOriginAudio(data)
-            }
-            lastCal = current
-        }
+//        if (current - lastCal > 500) {
+//            val length = min(p1, 256)
+//            val data = ByteArray(length)
+//            p2.get(data, 0, length)
+//            LiveRTCEngine.shared().captureOriginAudio(data)
+//            lastCal = current
+//        }
     }
 }

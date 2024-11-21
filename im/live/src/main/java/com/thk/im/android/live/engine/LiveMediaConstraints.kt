@@ -11,19 +11,32 @@ object LiveMediaConstraints {
     ): MediaConstraints {
         val constraints = MediaConstraints()
         val enable3aStr = if (enable3a) "true" else "false"
+        constraints.mandatory.add(
+            MediaConstraints.KeyValuePair(
+                "googDAEchoCancellation",
+                enable3aStr
+            )
+        )
         //回声消除
         constraints.mandatory.add(
             MediaConstraints.KeyValuePair(
-                "googEchoCancellation",
+                "googEchoCancellation2",
                 enable3aStr
             )
         )
         //高音过滤
         constraints.mandatory.add(MediaConstraints.KeyValuePair("googHighpassFilter", enable3aStr))
+        constraints.mandatory.add(MediaConstraints.KeyValuePair("googAudioMirroring", enable3aStr))
         //噪音处理
         constraints.mandatory.add(
             MediaConstraints.KeyValuePair(
-                "googNoiseSuppression",
+                "googTypingNoiseDetection",
+                enable3aStr
+            )
+        )
+        constraints.mandatory.add(
+            MediaConstraints.KeyValuePair(
+                "googNoiseSuppression2",
                 enable3aStr
             )
         )
@@ -41,7 +54,7 @@ object LiveMediaConstraints {
         //自动增益
         constraints.mandatory.add(
             MediaConstraints.KeyValuePair(
-                "googAutoGainControl",
+                "googAutoGainControl2",
                 enableGainControlStr
             )
         )

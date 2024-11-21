@@ -45,7 +45,7 @@ class LocalParticipant(
             if (audioEnable && role == Role.Broadcaster.value) {
                 val audioSource = LiveRTCEngine.shared().factory.createAudioSource(
                     LiveMediaConstraints.build(
-                        enable3a = false, enableCpu = false, enableGainControl = false
+                        enable3a = true, enableCpu = true, enableGainControl = true
                     )
                 )
                 // 创建AudioTrack，音频轨

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
+import android.media.MediaRecorder
 import android.os.Build
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.AudioUtils
@@ -73,6 +74,8 @@ class LiveRTCEngine {
         audioProcessingFactory.setRenderPreProcessing(audioRenderProxy)
         audioDeviceModule = JavaAudioDeviceModule.builder(app)
             .setUseHardwareAcousticEchoCanceler(true)
+            .setUseHardwareNoiseSuppressor(true)
+            .setAudioSource(MediaRecorder.AudioSource.CAMCORDER)
             .setUseLowLatency(true)
             .setUseStereoInput(true)
             .setUseStereoOutput(true)
@@ -87,6 +90,7 @@ class LiveRTCEngine {
             .createPeerConnectionFactory()
         audioDeviceModule.setSpeakerMute(speakerMuted)
         audioDeviceModule.setMicrophoneMute(microphoneMuted)
+
     }
 
     /**

@@ -30,10 +30,10 @@ class CallingLayout : ConstraintLayout {
             liveCallProtocol.hangupCalling()
         }
 
-        binding.ivAudioMute.isSelected = protocol.room()?.isMicrophoneMuted() ?: true
+        binding.ivAudioMute.isSelected = protocol.room()?.isMicrophoneMuted()?.not() ?: true
         binding.ivAudioMute.setOnClickListener {
-            liveCallProtocol.room()?.muteMicrophone(!binding.ivAudioMute.isSelected)
-            binding.ivAudioMute.isSelected = liveCallProtocol.room()?.isMicrophoneMuted() ?: true
+            liveCallProtocol.room()?.muteMicrophone(binding.ivAudioMute.isSelected)
+            binding.ivAudioMute.isSelected = liveCallProtocol.room()?.isMicrophoneMuted()?.not() ?: true
         }
 
         binding.ivSwitchSpeaker.isSelected = liveCallProtocol.room()?.isSpeakerOn() ?: true
@@ -43,11 +43,11 @@ class CallingLayout : ConstraintLayout {
         }
 
         binding.ivOpenCloseCamera.isSelected =
-            liveCallProtocol.room()?.isLocalVideoStreamMuted() ?: true
+            (liveCallProtocol.room()?.isLocalVideoStreamMuted()?.not()) ?: true
         binding.ivOpenCloseCamera.setOnClickListener {
-            liveCallProtocol.room()?.muteLocalVideoStream(!binding.ivOpenCloseCamera.isSelected)
+            liveCallProtocol.room()?.muteLocalVideoStream(binding.ivOpenCloseCamera.isSelected)
             binding.ivOpenCloseCamera.isSelected =
-                liveCallProtocol.room()?.isLocalVideoStreamMuted() ?: true
+                liveCallProtocol.room()?.isLocalVideoStreamMuted()?.not() ?: true
         }
 
         binding.ivSwitchCamera.setOnClickListener {

@@ -22,12 +22,12 @@ open class LiveAudioCaptureProxy : AudioProcessing {
     override fun process(p0: Int, p1: Int, p2: ByteBuffer?) {
         val current = System.currentTimeMillis()
         if (current - lastCal > 500) {
-            p2?.let {
-                LLog.d("LiveAudioProxy", "process $p0, $p1 ")
-                val buffer = BufferUtils.cloneByteBuffer(it)
-                LiveRTCEngine.shared().captureOriginAudio(buffer, p1)
-                lastCal = current
-            }
+//            p2?.let {
+//                LLog.d("LiveAudioProxy", "process $p0, $p1 ")
+//                val buffer = BufferUtils.cloneByteBuffer(it)
+//                LiveRTCEngine.shared().captureOriginAudio(buffer, p1)
+//                lastCal = current
+//            }
         }
     }
 }

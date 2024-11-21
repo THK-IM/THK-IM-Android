@@ -76,11 +76,10 @@ class LiveRTCEngine {
             .setUseHardwareAcousticEchoCanceler(true)
             .setUseHardwareNoiseSuppressor(true)
             .setAudioSource(MediaRecorder.AudioSource.CAMCORDER)
-            .setUseLowLatency(true)
+            .setUseLowLatency(false)
             .setUseStereoInput(true)
             .setUseStereoOutput(true)
-            .setSamplesReadyCallback {
-            }.createAudioDeviceModule()
+            .createAudioDeviceModule()
         eglBaseCtx = eglBaseContext
         factory = PeerConnectionFactory.builder().setOptions(options)
             .setVideoEncoderFactory(encoderFactory)
@@ -208,9 +207,7 @@ class LiveRTCEngine {
         this.audioProcessingFactory.setRenderPreProcessing(delegate)
     }
 
-    fun captureOriginAudio(buffer: ByteBuffer, length: Int) {
-        val ba = ByteArray(length)
-        buffer.get(ba)
+    fun captureOriginAudio(ba: ByteArray) {
         val db = AudioUtils.calculateDecibel(ba)
         LLog.d("LiveRTCEngine", "captureOriginAudio $db")
         if (db > 0) {
@@ -219,4 +216,5 @@ class LiveRTCEngine {
             }
         }
     }
+
 }

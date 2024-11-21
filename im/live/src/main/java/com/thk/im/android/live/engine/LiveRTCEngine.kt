@@ -3,6 +3,7 @@ package com.thk.im.android.live.engine
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.MediaRecorder
@@ -76,11 +77,16 @@ class LiveRTCEngine {
         audioProcessingFactory.setBypassFlagForCapturePost(false)
         audioProcessingFactory.setCapturePostProcessing(audioCaptureProxy)
         audioProcessingFactory.setRenderPreProcessing(audioRenderProxy)
+        val audioAttributes = AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+            .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+            .build()
         audioDeviceModule = JavaAudioDeviceModule.builder(app)
             .setUseHardwareAcousticEchoCanceler(true)
             .setUseHardwareNoiseSuppressor(true)
-            .setAudioSource(MediaRecorder.AudioSource.CAMCORDER)
-            .setUseLowLatency(false)
+            .setAudioAttributes(audioAttributes)
+            .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
+            .setUseLowLatency(true)
             .setUseStereoInput(true)
             .setUseStereoOutput(true)
             .setSamplesReadyCallback {
@@ -131,7 +137,7 @@ class LiveRTCEngine {
             } else {
                 val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
                 for (device in devices) {
-                    if (device.type == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
+                    if (device.type != AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
                         val res = audioManager.setCommunicationDevice(device)
                         LLog.d("LiveRTCEngine", "setSpeakerOn $res")
                     }

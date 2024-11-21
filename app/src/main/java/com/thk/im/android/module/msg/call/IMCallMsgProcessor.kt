@@ -8,11 +8,11 @@ import com.thk.im.android.live.RoomMode
 
 class IMCallMsgProcessor : IMBaseMsgProcessor() {
     override fun msgDesc(msg: Message): String {
-        val callMsg = Gson().fromJson(msg.content, IMCallMsg::class.java) ?: return ""
+        val callMsg = Gson().fromJson(msg.content, IMCallMsg::class.java) ?: return "[语音通话]"
         return if (callMsg.roomMode == RoomMode.Audio.value) {
-            "语音通话"
+            "[语音通话]"
         } else {
-            "视频通话"
+            "[视频通话]"
         }
     }
 

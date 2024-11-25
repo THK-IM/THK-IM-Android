@@ -55,6 +55,8 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         if (this.position == IMMsgPosType.Reply) {
             binding.tvMsgContent.setPadding(0, 0, 0, 0)
             binding.tvMsgContent.textSize = 12.0f
+            binding.tvMsgContent.maxLines = 3
+            binding.tvMsgContent.ellipsize = android.text.TextUtils.TruncateAt.END
             binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
         } else {
             if (message.fUid == 0L) {

@@ -76,15 +76,15 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_unread_count"
             android:layout_width="wrap_content"
+            android:minWidth="16dp"
             android:layout_height="16dp"
+            android:gravity="center"
             android:layout_marginTop="-6dp"
             android:layout_marginRight="-6dp"
             android:background="@drawable/bg_tv_unread_count"
-            android:paddingTop="2dp"
             android:textAlignment="center"
             android:textColor="#ffffff"
-            android:textSize="8sp"
-            android:visibility="gone"
+            android:textSize="11sp"
             app:layout_constraintRight_toRightOf="@id/avatar_container"
             app:layout_constraintTop_toTopOf="@id/avatar_container" />
 

@@ -13,6 +13,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.databinding.ViewMsgCallBinding
 import com.thk.im.android.live.RoomMode
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMCallMsgView : LinearLayout, IMsgBodyView {
@@ -33,11 +34,13 @@ class IMCallMsgView : LinearLayout, IMsgBodyView {
         binding = ViewMsgCallBinding.bind(view)
     }
 
+    override fun setPosition(position: IMMsgPosType) {
+    }
+
     override fun setMessage(
         message: Message,
         session: Session?,
-        delegate: IMMsgVHOperator?,
-        isReply: Boolean
+        delegate: IMMsgVHOperator?
     ) {
         val callMsg = Gson().fromJson(message.content, IMCallMsg::class.java)
         if (callMsg.roomMode == RoomMode.Audio.value) {

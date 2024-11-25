@@ -9,7 +9,9 @@ import kotlinx.parcelize.Parcelize
 enum class IMMsgPosType(val value: Int) {
     Mid(0),
     Left(1),
-    Right(2)
+    Right(2),
+    Reply(3),
+    Session(4)
 }
 
 @Keep

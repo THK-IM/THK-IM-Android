@@ -12,6 +12,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgRecordBinding
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMRecordMsgBody
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
@@ -37,17 +38,21 @@ class IMRecordMsgView : LinearLayout, IMsgBodyView {
         return this
     }
 
+    private var position = IMMsgPosType.Left
+    override fun setPosition(position: IMMsgPosType) {
+        this.position = position
+    }
+
     override fun setMessage(
         message: Message,
         session: Session?,
-        delegate: IMMsgVHOperator?,
-        isReply: Boolean
+        delegate: IMMsgVHOperator?
     ) {
         val recordBody = Gson().fromJson(message.content, IMRecordMsgBody::class.java)
         binding.tvRecordTitle.text = recordBody.title
         binding.tvRecordContent.text = recordBody.content
 
-        if (isReply) {
+        if (this.position == IMMsgPosType.Reply) {
             binding.tvRecordTitle.textSize = 12.0f
             binding.tvRecordTitle.setTextColor(Color.parseColor("#ff999999"))
             binding.tvRecordContent.textSize = 12.0f

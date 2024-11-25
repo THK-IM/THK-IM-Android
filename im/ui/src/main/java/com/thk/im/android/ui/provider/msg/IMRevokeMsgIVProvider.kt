@@ -9,8 +9,8 @@ import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
 import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
+import com.thk.im.android.ui.provider.msg.view.IMRecordMsgView
 import com.thk.im.android.ui.provider.msg.view.IMRevokeMsgView
-import com.thk.im.android.ui.provider.msg.viewholder.IMRevokeMsgVH
 
 open class IMRevokeMsgIVProvider : IMBaseMessageIVProvider() {
 
@@ -31,15 +31,10 @@ open class IMRevokeMsgIVProvider : IMBaseMessageIVProvider() {
         return 3 * messageType() + IMMsgPosType.Mid.value
     }
 
-    override fun replyMsgView(context: Context): IMsgBodyView {
-        return IMRevokeMsgView(context)
+    override fun msgBodyView(context: Context, position: IMMsgPosType): IMsgBodyView {
+        val v = IMRevokeMsgView(context)
+        v.setPosition(position)
+        return v
     }
 
-    override fun createViewHolder(
-        lifecycleOwner: LifecycleOwner,
-        itemView: View,
-        viewType: Int
-    ): IMBaseMsgVH {
-        return IMRevokeMsgVH(lifecycleOwner, itemView, viewType)
-    }
 }

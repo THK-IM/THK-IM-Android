@@ -455,8 +455,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
     }
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {
-        LLog.v("previewMessage ${msg.type} $position, $msg")
-        val interceptor = IMUIManager.getMsgIVProviderByMsgType(msg.type).onMsgClick(
+        val interceptor = IMUIManager.getMsgIVProviderByMsgType(msg.type).onMsgBodyClick(
             requireContext(), msg, session, originView
         )
         if (!interceptor) {

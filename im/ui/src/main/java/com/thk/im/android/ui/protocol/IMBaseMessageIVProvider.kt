@@ -30,17 +30,13 @@ abstract class IMBaseMessageIVProvider {
         return false
     }
 
-    open fun getSelfId(): Long {
-        return IMCoreManager.uId
-    }
-
     /**
      * 视图类型,一种消息类型可注册多种视图类型
      * ex: 文本消息类型(1),系统发的文本视图类型(3),他人发的文本视图类型(4),自己发的图片视图类型(5)
      * ex: 图片消息类型(2),系统发的图片视图类型(6),他人发的图片视图类型(7),自己发的图片视图类型(8)
      */
     open fun viewType(entity: Message): Int {
-        val selfId = getSelfId()
+        val selfId = IMCoreManager.uId
         return when (entity.fUid) {
             0L -> {
                 3 * messageType() + IMMsgPosType.Mid.value     // 中间显示 （一般为后台系统发送, 如 某某加入/退出了群聊）
@@ -59,7 +55,7 @@ abstract class IMBaseMessageIVProvider {
     /**
      * 返回消息视图实例
      */
-    fun viewHolder(
+    open fun viewHolder(
         lifecycleOwner: LifecycleOwner,
         viewType: Int,
         parent: ViewGroup
@@ -69,17 +65,13 @@ abstract class IMBaseMessageIVProvider {
         return createViewHolder(lifecycleOwner, itemView, viewType)
     }
 
-    open fun replyMsgView(context: Context): IMsgBodyView {
-        val view = IMTextMsgView(context)
-        return view
-    }
-
-    abstract fun createViewHolder(
+    open fun createViewHolder(
         lifecycleOwner: LifecycleOwner,
         itemView: View,
         viewType: Int
-    ): IMBaseMsgVH
-
+    ): IMBaseMsgVH {
+        return IMBaseMsgVH(lifecycleOwner, itemView, viewType)
+    }
 
     open fun getDefaultRes(viewType: Int): Int {
         val msgType = messageType()
@@ -101,7 +93,13 @@ abstract class IMBaseMessageIVProvider {
         }
     }
 
-    open fun onMsgClick(
+   open fun msgBodyView(context: Context, position: IMMsgPosType): IMsgBodyView {
+        val view = IMTextMsgView(context)
+        view.setPosition(position)
+        return view
+    }
+
+    open fun onMsgBodyClick(
         context: Context,
         msg: Message,
         session: Session?,

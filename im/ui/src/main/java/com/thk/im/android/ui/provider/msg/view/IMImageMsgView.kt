@@ -18,6 +18,7 @@ import com.thk.im.android.ui.databinding.ViewMsgImageBinding
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.manager.IMImageMsgBody
 import com.thk.im.android.ui.manager.IMImageMsgData
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMImageMsgView : LinearLayout, IMsgBodyView {
@@ -42,11 +43,15 @@ class IMImageMsgView : LinearLayout, IMsgBodyView {
         return this
     }
 
+    private var position = IMMsgPosType.Left
+    override fun setPosition(position: IMMsgPosType) {
+        this.position = position
+    }
+
     override fun setMessage(
         message: Message,
         session: Session?,
-        delegate: IMMsgVHOperator?,
-        isReply: Boolean
+        delegate: IMMsgVHOperator?
     ) {
         var imagePath = ""
         var width = 0
@@ -79,7 +84,7 @@ class IMImageMsgView : LinearLayout, IMsgBodyView {
         }
 
         if (width != 0 && height != 0) {
-            setLayoutParams(width, height, isReply)
+            setLayoutParams(width, height, this.position == IMMsgPosType.Reply)
         }
         if (imagePath != "") {
             renderImage(imagePath)

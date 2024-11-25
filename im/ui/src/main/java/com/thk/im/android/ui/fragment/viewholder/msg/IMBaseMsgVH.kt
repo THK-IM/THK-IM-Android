@@ -35,7 +35,7 @@ import io.reactivex.disposables.CompositeDisposable
 import java.lang.Integer.max
 
 
-abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val viewType: Int) :
+open class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val viewType: Int) :
     IMBaseVH(liftOwner, itemView) {
 
     open lateinit var message: Message
@@ -53,7 +53,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     private val selectView: ImageView = itemView.findViewById(R.id.iv_msg_select)
     private val msgContentView: LinearLayout = itemView.findViewById(R.id.msg_content)
     private val msgBodyContentView: LinearLayout = itemView.findViewById(R.id.msg_body_content)
-    protected val msgReplyContentView: IMReplyMsgContainerView =
+    private val msgReplyContentView: IMReplyMsgContainerView =
         itemView.findViewById(R.id.msg_reply_content)
 
     init {
@@ -63,7 +63,11 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     }
 
 
-    abstract fun msgBodyView(): IMsgBodyView
+    open fun msgBodyView(): IMsgBodyView {
+        val messageType = viewType / 3
+        return IMUIManager.getMsgIVProviderByMsgType(messageType)
+            .msgBodyView(itemView.context, getPositionType())
+    }
 
     /**
      * ViewHolder 绑定数据触发设置界面ui
@@ -201,7 +205,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     open fun renderMsgView() {
         if (hasBubble()) {
             when (getPositionType()) {
-                IMMsgPosType.Left.value -> {
+                IMMsgPosType.Left -> {
                     val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
                     if (bubble != null) {
                         msgContentView.background = bubble
@@ -214,7 +218,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
                     }
                 }
 
-                IMMsgPosType.Right.value -> {
+                IMMsgPosType.Right -> {
                     val bubble = IMUIManager.uiResourceProvider?.msgBubble(message, session)
                     if (bubble != null) {
                         msgContentView.background = bubble
@@ -246,7 +250,10 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
                 msgBodyContentView.removeView(it)
             }
         }
-        msgBodyContentView.addView(msgBodyView().contentView())
+        val bodyView = msgBodyView()
+        bodyView.setPosition(getPositionType())
+        bodyView.setMessage(message, session, msgVHOperator)
+        msgBodyContentView.addView(bodyView.contentView())
         renderReplyMsg()
         renderMsgStatus()
     }
@@ -347,7 +354,7 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         if (message.rMsgId != null && message.referMsg != null) {
             msgReplyContentView.visibility = View.VISIBLE
             msgReplyContentView.setMessage(
-                getPositionType(), message.referMsg!!, session, msgVHOperator
+                message.referMsg!!, session, msgVHOperator
             )
         } else {
             msgReplyContentView.visibility = View.GONE
@@ -361,14 +368,22 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
     override fun onViewDetached() {
         super.onViewDetached()
         disposable.clear()
-        msgBodyView().onViewDetached()
+        msgBodyContentView.children.forEach {
+            if (it is IMsgBodyView) {
+                it.onViewDetached()
+            }
+        }
         msgReplyContentView.onViewDetached()
     }
 
     override fun onViewRecycled() {
         super.onViewRecycled()
         msgReplyContentView.onViewRecycled()
-        msgBodyView().onViewDestroyed()
+        msgBodyContentView.children.forEach {
+            if (it is IMsgBodyView) {
+                it.onViewDestroyed()
+            }
+        }
         msgVHOperator = null
     }
 
@@ -394,8 +409,15 @@ abstract class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val v
         }
     }
 
-    protected fun getPositionType(): Int {
-        return viewType % 3
+    private fun getPositionType(): IMMsgPosType {
+        val positionType = viewType % 3
+        var type = IMMsgPosType.Left
+        if (positionType == 0) {
+            type = IMMsgPosType.Mid
+        } else if (positionType == 2) {
+            type = IMMsgPosType.Right
+        }
+        return type
     }
 
     fun highlightFlashing(times: Int) {

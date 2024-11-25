@@ -14,6 +14,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgRevokeBinding
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMRevokeMsgData
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
@@ -42,13 +43,17 @@ class IMRevokeMsgView : LinearLayout, IMsgBodyView {
         return this
     }
 
+    private var position = IMMsgPosType.Left
+    override fun setPosition(position: IMMsgPosType) {
+        this.position = position
+    }
+
     override fun setMessage(
         message: Message,
         session: Session?,
-        delegate: IMMsgVHOperator?,
-        isReply: Boolean
+        delegate: IMMsgVHOperator?
     ) {
-        if (isReply) {
+        if (this.position == IMMsgPosType.Reply) {
             binding.tvReedit.textSize = 12.0f
             binding.tvReedit.setTextColor(Color.parseColor("#ff999999"))
             binding.tvWhoRevoke.textSize = 12.0f

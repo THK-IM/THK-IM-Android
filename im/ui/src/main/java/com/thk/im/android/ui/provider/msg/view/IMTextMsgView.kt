@@ -41,14 +41,18 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         binding = ViewMsgTextBinding.bind(view)
     }
 
+    private var position = IMMsgPosType.Left
+    override fun setPosition(position: IMMsgPosType) {
+        this.position = position
+    }
+
     override fun setMessage(
         message: Message,
         session: Session?,
-        delegate: IMMsgVHOperator?,
-        isReply: Boolean
+        delegate: IMMsgVHOperator?
     ) {
         this.delegate = WeakReference(delegate)
-        if (isReply) {
+        if (this.position == IMMsgPosType.Reply) {
             binding.tvMsgContent.setPadding(0, 0, 0, 0)
             binding.tvMsgContent.textSize = 12.0f
             binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))

@@ -15,6 +15,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewReplyMsgContainerBinding
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import io.reactivex.disposables.CompositeDisposable
@@ -40,7 +41,6 @@ open class IMReplyMsgContainerView : LinearLayout {
     }
 
     fun setMessage(
-        pos: Int,
         message: Message,
         session: Session,
         delegate: IMMsgVHOperator?
@@ -48,9 +48,9 @@ open class IMReplyMsgContainerView : LinearLayout {
         binding.flReplyContent.children.forEach {
             binding.flReplyContent.removeView(it)
         }
-        val view = IMUIManager.getMsgIVProviderByMsgType(message.type).replyMsgView(context)
+        val view = IMUIManager.getMsgIVProviderByMsgType(message.type).msgBodyView(context, IMMsgPosType.Reply)
         binding.flReplyContent.addView(view.contentView())
-        view.setMessage(message, session, delegate, true)
+        view.setMessage(message, session, delegate)
         replyBodyView = view
 
         val userInfo =

@@ -76,12 +76,12 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_unread_count"
             android:layout_width="wrap_content"
-            android:minWidth="16dp"
             android:layout_height="16dp"
-            android:gravity="center"
             android:layout_marginTop="-6dp"
             android:layout_marginRight="-6dp"
             android:background="@drawable/bg_tv_unread_count"
+            android:gravity="center"
+            android:minWidth="16dp"
             android:textAlignment="center"
             android:textColor="#ffffff"
             android:textSize="11sp"
@@ -119,20 +119,64 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
 
-        <androidx.emoji2.widget.EmojiTextView
-            android:id="@+id/tv_last_message"
+        <RelativeLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginRight="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="#999999"
-            android:textSize="12sp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="@+id/tv_nickname"
             app:layout_constraintRight_toRightOf="@id/iv_session_status"
-            app:layout_constraintTop_toBottomOf="@+id/tv_nickname" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_nickname">
 
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_send_status"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="2dp"
+                android:visibility="gone" />
+
+            <androidx.emoji2.widget.EmojiTextView
+                android:id="@+id/tv_at_info"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="2dp"
+                android:layout_toEndOf="@id/iv_send_status"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:text="@string/someone_at_me"
+                android:textColor="#FF0000"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <androidx.emoji2.widget.EmojiTextView
+                android:id="@+id/tv_sender_name"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/tv_at_info"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:text="@string/someone_at_me"
+                android:textColor="#999999"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <androidx.emoji2.widget.EmojiTextView
+                android:id="@+id/tv_last_message"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/tv_sender_name"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textColor="#999999"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

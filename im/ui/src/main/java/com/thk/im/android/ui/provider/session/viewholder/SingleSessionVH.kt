@@ -11,6 +11,7 @@ import com.thk.im.android.core.base.IMImageLoader
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.base.utils.DateUtils
 import com.thk.im.android.core.base.utils.StringUtils
+import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
@@ -25,28 +26,12 @@ class SingleSessionVH(
 ) : IMBaseSessionVH(
     lifecycleOwner, LayoutInflater.from(parent.context).inflate(resId, parent, false)
 ) {
-    private val disposable = CompositeDisposable()
 
-    override fun onViewBind(session: Session, sessionVHOperator: IMSessionVHOperator) {
-        super.onViewBind(session, sessionVHOperator)
-        showUserInfo(session)
+    override fun renderSenderName(message: Message) {
+        
     }
 
-    override fun updateSession(session: Session) {
-        super.updateSession(session)
-    }
-
-    override fun onViewDetached() {
-        disposable.clear()
-    }
-
-    override fun onLifeOwnerResume() {
-    }
-
-    override fun onLifeOwnerPause() {
-    }
-
-    private fun showUserInfo(session: Session) {
+    override fun renderSessionEntityInfo() {
         val subscriber = object : BaseSubscriber<User>() {
             override fun onNext(t: User) {
                 nickView.text = t.nickname

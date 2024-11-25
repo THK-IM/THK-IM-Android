@@ -54,7 +54,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
     }
 
     open fun processRevokeMsg(msg: Message) {
-        val sender = getSenderName(msg)
+        val sender = getUserSessionName(msg.sid, msg.fUid)
         val data = IMRevokeMsgData(sender)
         var existed = false
         if (msg.rMsgId != null) {
@@ -81,11 +81,11 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
         }
     }
 
-    override fun getSenderName(msg: Message): String {
-        return if (msg.fUid == IMCoreManager.uId) {
+    override fun getUserSessionName(sessionId: Long, uId: Long): String {
+        return if (uId == IMCoreManager.uId) {
             IMCoreManager.app.getString(R.string.yourself)
         } else {
-            super.getSenderName(msg) ?: "xxx"
+            super.getUserSessionName(sessionId, uId) ?: "xxx"
         }
     }
 

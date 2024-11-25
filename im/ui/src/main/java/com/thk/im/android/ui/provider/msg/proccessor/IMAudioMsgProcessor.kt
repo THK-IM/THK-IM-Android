@@ -29,10 +29,6 @@ open class IMAudioMsgProcessor : IMBaseMsgProcessor() {
         return MsgType.Audio.value
     }
 
-    override fun atMeDesc(msg: Message): String {
-        return IMCoreManager.app.getString(R.string.someone_at_me)
-    }
-
     override fun msgDesc(msg: Message): String {
         return IMCoreManager.app.getString(R.string.im_audio_msg)
     }

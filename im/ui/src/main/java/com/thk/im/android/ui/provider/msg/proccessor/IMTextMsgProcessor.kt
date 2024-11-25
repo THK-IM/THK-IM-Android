@@ -16,10 +16,6 @@ open class IMTextMsgProcessor : IMBaseMsgProcessor() {
         return MsgType.Text.value
     }
 
-    override fun atMeDesc(msg: Message): String {
-        return IMCoreManager.app.getString(R.string.someone_at_me)
-    }
-
     override fun msgDesc(msg: Message): String {
         if (msg.content != null) {
             var body = msg.content

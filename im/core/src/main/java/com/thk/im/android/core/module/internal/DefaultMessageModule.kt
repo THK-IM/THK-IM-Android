@@ -559,27 +559,7 @@ open class DefaultMessageModule : MessageModule {
                 if (forceNotify || t.mTime <= msg.mTime || t.unReadCount != unReadCount
                     || TextUtils.isEmpty(t.lastMsg)
                 ) {
-                    val processor = getMsgProcessor(msg.type)
-                    var statusText = ""
-                    if (msg.sendStatus == MsgSendStatus.Sending.value ||
-                        msg.sendStatus == MsgSendStatus.Init.value ||
-                        msg.sendStatus == MsgSendStatus.Uploading.value
-                    ) {
-                        statusText = "➡️"
-                    } else if (msg.sendStatus == MsgSendStatus.SendFailed.value) {
-                        statusText = "❗"
-                    }
-                    var sender: String? = null
-                    if (t.type != SessionType.Single.value) {
-                        if (msg.fUid > 0) {
-                            sender = processor.getSenderName(msg)
-                        }
-                    }
-                    var senderText = ""
-                    if (sender != null) {
-                        senderText = "${sender}:"
-                    }
-                    t.lastMsg = "$statusText$senderText${processor.sessionDesc(msg)}"
+                    t.lastMsg = Gson().toJson(msg)
                     if (t.mTime < msg.cTime) {
                         t.mTime = msg.cTime
                     }
@@ -591,11 +571,6 @@ open class DefaultMessageModule : MessageModule {
                         (msg.oprStatus.and(MsgOperateStatus.ServerRead.value) == 0) &&
                         !getMsgProcessor(msg.type).needReprocess(msg)
                     ) {
-                        LLog.d("processSessionByMessage", "notifyNewMessage")
-                        val sessionLog = Gson().toJson(t)
-                        val messageLog = Gson().toJson(msg)
-                        LLog.d("processSessionByMessage", "session: $sessionLog")
-                        LLog.d("processSessionByMessage", "message: $messageLog")
                         notifyNewMessage(t, msg)
                     }
                 }

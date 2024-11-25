@@ -16,5 +16,7 @@ interface IMSessionMemberDao {
 
     fun findSessionMember(sessionId: Long, userId: Long): SessionMember?
 
+    fun findSessionMembers(sessionId: Long, userIds: Set<Long>): List<SessionMember>
+
     fun findSessionMemberCount(sessionId: Long): Int
 }

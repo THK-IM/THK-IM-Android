@@ -52,17 +52,19 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         delegate: IMMsgVHOperator?
     ) {
         this.delegate = WeakReference(delegate)
-        if (this.position == IMMsgPosType.Reply) {
-            binding.tvMsgContent.setPadding(0, 0, 0, 0)
-            binding.tvMsgContent.textSize = 12.0f
-            binding.tvMsgContent.maxLines = 3
-            binding.tvMsgContent.ellipsize = android.text.TextUtils.TruncateAt.END
-            binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
-        } else {
-            if (message.fUid == 0L) {
+        when (this.position) {
+            IMMsgPosType.Reply -> {
+                binding.tvMsgContent.setPadding(0, 0, 0, 0)
+                binding.tvMsgContent.textSize = 12.0f
+                binding.tvMsgContent.maxLines = 3
+                binding.tvMsgContent.ellipsize = android.text.TextUtils.TruncateAt.END
+                binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
+            }
+            IMMsgPosType.Mid -> {
                 binding.tvMsgContent.textSize = 12.0f
                 binding.tvMsgContent.setTextColor(Color.parseColor("#FFFFFF"))
-            } else {
+            }
+            else -> {
                 binding.tvMsgContent.textSize = 16.0f
                 binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
             }
@@ -75,6 +77,11 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         render(content, updated)
     }
 
+
+    override fun contentView(): ViewGroup {
+        return this
+    }
+
     private fun replaceIdToNickname(content: String, atUIds: Set<Long>): String {
         return AtStringUtils.replaceAtUIdsToNickname(content, atUIds) { id ->
             val sender = delegate?.get()?.msgSender() ?: return@replaceAtUIdsToNickname "$id"
@@ -84,10 +91,6 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
                 info.second
             )
         }
-    }
-
-    override fun contentView(): ViewGroup {
-        return this
     }
 
     private fun render(content: String, updated: Boolean) {

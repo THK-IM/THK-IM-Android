@@ -29,16 +29,11 @@ class SingleSessionVH(
 
     override fun onViewBind(session: Session, sessionVHOperator: IMSessionVHOperator) {
         super.onViewBind(session, sessionVHOperator)
-        lastMsgView.text = session.lastMsg
-        lastTimeView.text =
-            DateUtils.timeToMsgTime(session.mTime, IMCoreManager.severTime)
-        if (session.unReadCount == 0) {
-            unReadCountView.visibility = View.GONE
-        } else {
-            unReadCountView.visibility = View.VISIBLE
-            unReadCountView.text = StringUtils.getMessageCount(session.unReadCount)
-        }
         showUserInfo(session)
+    }
+
+    override fun updateSession(session: Session) {
+        super.updateSession(session)
     }
 
     override fun onViewDetached() {

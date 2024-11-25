@@ -9,6 +9,8 @@ import androidx.emoji2.widget.EmojiTextView
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.SessionStatus
+import com.thk.im.android.core.base.utils.DateUtils
+import com.thk.im.android.core.base.utils.StringUtils
 import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.viewholder.IMBaseVH
@@ -43,13 +45,25 @@ abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
 
     open fun updateSession(session: Session) {
         this.session = session
+
+        lastMsgView.text = session.lastMsg
+        lastTimeView.text =
+            DateUtils.timeToMsgTime(session.mTime, IMCoreManager.severTime)
         if (session.status.and(SessionStatus.Silence.value) > 0) {
             statusView.visibility = View.VISIBLE
+            unReadCountView.visibility = View.GONE
             muteView.text = itemView.context.getString(R.string.cancel_silence)
         } else {
             statusView.visibility = View.GONE
+            if (session.unReadCount == 0) {
+                unReadCountView.visibility = View.GONE
+            } else {
+                unReadCountView.visibility = View.VISIBLE
+                unReadCountView.text = StringUtils.getMessageCount(session.unReadCount)
+            }
             muteView.text = itemView.context.getString(R.string.silence)
         }
+
         if (session.topTimestamp > 0) {
             topView.text = itemView.context.getString(R.string.cancel_top)
         } else {

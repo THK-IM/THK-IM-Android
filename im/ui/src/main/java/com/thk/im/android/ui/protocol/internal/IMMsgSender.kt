@@ -118,6 +118,9 @@ interface IMMsgSender {
     /// 同步获取用户信息
     fun syncGetSessionMemberInfo(userId: Long): Pair<User, SessionMember?>?
 
+    /// 同步获取用户id
+    fun syncGetSessionMemberUserIdByNickname(nick: String): Long?
+
     /// 设置用户信息
     fun saveSessionMemberInfo(info: Pair<User, SessionMember?>)
 

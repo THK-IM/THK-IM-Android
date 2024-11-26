@@ -331,7 +331,8 @@ class IMInputLayout : ConstraintLayout {
                         return@replaceAtNickNamesToUIds k.toLongOrNull() ?: 0L
                     }
                 }
-                return@replaceAtNickNamesToUIds 0L
+                val id = msgSender?.syncGetSessionMemberUserIdByNickname(nickname.trim())
+                return@replaceAtNickNamesToUIds id ?: 0L
             }
             if (reeditMsg != null) {
                 val msg = IMReeditMsgData(reeditMsg!!.sid, reeditMsg!!.msgId, text)

@@ -857,6 +857,16 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         return memberMap[userId]
     }
 
+
+    override fun syncGetSessionMemberUserIdByNickname(nick: String): Long? {
+        for ((k, v) in this.memberMap) {
+            if (v.second?.noteName == nick || v.first.nickname == nick) {
+                return k
+            }
+        }
+        return null
+    }
+
     override fun saveSessionMemberInfo(info: Pair<User, SessionMember?>) {
         memberMap[info.first.id] = info
     }

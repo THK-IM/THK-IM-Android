@@ -16,6 +16,7 @@ import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.RxTransform
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.core.db.entity.Session
+import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.fragment.adapter.IMMessageAdapter
 import com.thk.im.android.ui.manager.IMUIManager
@@ -346,23 +347,25 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         }
         val fromUId = message.fUid
         if (fromUId > 0 && fromUId != IMCoreManager.uId) {
-            val subscriber = object : BaseSubscriber<User>() {
-                override fun onNext(t: User?) {
-                    t?.let {
-                        msgSender?.addAtUser(it, null)
+            msgSender?.let {
+                val subscriber = object : BaseSubscriber<Pair<User, SessionMember?>>() {
+                    override fun onNext(t: Pair<User, SessionMember?>?) {
+                        t?.let { p ->
+                            msgSender?.addAtUser(p.first, p.second)
+                        }
                     }
-                }
 
-                override fun onComplete() {
-                    super.onComplete()
-                    disposables.remove(this)
-                }
+                    override fun onComplete() {
+                        super.onComplete()
+                        disposables.remove(this)
+                    }
 
+                }
+                it.asyncGetSessionMemberInfo(fromUId)
+                    .compose(RxTransform.flowableToMain())
+                    .subscribe(subscriber)
+                disposables.add(subscriber)
             }
-            IMCoreManager.userModule.queryUser(fromUId)
-                .compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            disposables.add(subscriber)
         }
     }
 

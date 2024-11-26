@@ -327,9 +327,8 @@ class IMInputLayout : ConstraintLayout {
             val text = it.toString()
             val (_, atUIds) = AtStringUtils.replaceAtNickNamesToUIds(text) { nickname ->
                 for ((k, v) in atMap) {
-                    if (v == nickname) {
-                        return@replaceAtNickNamesToUIds k.toLongOrNull()
-                            ?: return@replaceAtNickNamesToUIds 0L
+                    if (v.trim() == nickname) {
+                        return@replaceAtNickNamesToUIds k.toLongOrNull() ?: 0L
                     }
                 }
                 return@replaceAtNickNamesToUIds 0L

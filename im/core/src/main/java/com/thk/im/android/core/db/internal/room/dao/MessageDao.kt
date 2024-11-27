@@ -129,6 +129,9 @@ internal interface MessageDao {
         oprStatus: Int = MsgOperateStatus.ClientRead.value
     ): List<Message>
 
+    @Query("select * from message where type >= 0 and opr_status & :oprStatus = 0 order by c_time asc ")
+    fun findAllUnreadMessages(oprStatus: Int = MsgOperateStatus.ClientRead.value): List<Message>
+
     @Query("select * from message where type = :msgType order by c_time desc limit :offset, :count ")
     fun findLatestMessagesByType(msgType: Int, offset: Int, count: Int): List<Message>
 

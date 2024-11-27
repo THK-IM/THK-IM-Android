@@ -291,7 +291,7 @@ abstract class IMBaseMsgProcessor {
             }
             XEventBus.post(IMEvent.MsgNew.value, msg)
         }
-        if (notify && notifySession) {
+        if (notifySession) {
             IMCoreManager.messageModule.processSessionByMessage(msg)
         }
     }

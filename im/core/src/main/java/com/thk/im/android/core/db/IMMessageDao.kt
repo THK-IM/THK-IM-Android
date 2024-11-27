@@ -98,6 +98,11 @@ interface IMMessageDao {
      */
     fun findSessionAtMeUnreadMessages(sessionId: Long): List<Message>
 
+    /**
+     * 查询所谓未读消息
+     */
+    fun findAllUnreadMessages(): List<Message>
+
     fun findLatestMessagesByType(msgType: Int, offset: Int, count: Int): List<Message>
 
     fun search(sid: Long, type: Int, keyword: String, count: Int, offset: Int): List<Message>

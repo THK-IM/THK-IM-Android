@@ -150,7 +150,7 @@ abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
             }
         }
         // @人视图
-        if (session.unReadCount > 0 && message.isAtMe() && message.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) {
+        if (message.isAtMe() && message.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0) {
             tvAInfoView.visibility = View.VISIBLE
         } else {
             tvAInfoView.visibility = View.GONE

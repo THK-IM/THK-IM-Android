@@ -8,6 +8,7 @@ import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.SessionStatus
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.api.vo.MessageVo
@@ -809,8 +810,16 @@ open class DefaultMessageModule : MessageModule {
     override fun setAllMessageRead(): Flowable<Void> {
         return Flowable.create({
             try {
-                IMCoreManager.getImDataBase().messageDao().updateAllMsgRead()
-                IMCoreManager.getImDataBase().sessionDao().updateAllMsgRead()
+                val unReadMessages = IMCoreManager.db.messageDao().findAllUnreadMessages()
+                for (m in unReadMessages) {
+                    if (m.fUid != IMCoreManager.uId && m.msgId > 0) {
+                        IMCoreManager.messageModule
+                            .sendMessage(
+                                m.sid, MsgType.Read.value,
+                                null, null, null, m.msgId
+                            )
+                    }
+                }
             } catch (e: Exception) {
                 it.onError(e)
             }

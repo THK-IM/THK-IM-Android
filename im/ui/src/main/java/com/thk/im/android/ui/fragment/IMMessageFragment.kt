@@ -804,6 +804,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
     override fun onSessionMemberAt(user: User, sessionMember: SessionMember?) {
         binding.llInputLayout.addAtSessionMember(user, sessionMember)
+        binding.llInputLayout.openKeyboard()
     }
 
     override fun openAtPopupView() {

@@ -147,6 +147,10 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         return atMeMessages
     }
 
+    override fun findAllUnreadMessages(): List<Message> {
+        return roomDatabase.messageDao().findAllUnreadMessages()
+    }
+
     override fun findLatestMessagesByType(msgType: Int, offset: Int, count: Int): List<Message> {
         return roomDatabase.messageDao().findLatestMessagesByType(msgType, offset, count)
     }

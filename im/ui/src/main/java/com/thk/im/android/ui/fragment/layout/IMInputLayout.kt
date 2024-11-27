@@ -413,8 +413,8 @@ class IMInputLayout : ConstraintLayout {
                     } else {
                         binding.etMessage.text.delete(index - 1, index)
                     }
-                } else {
-                    binding.etMessage.text.delete(index - 1, index)
+                } else if (index == 1){
+                    binding.etMessage.text.delete(0, index)
                 }
             }
         }

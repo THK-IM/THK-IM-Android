@@ -120,11 +120,10 @@ internal interface MessageDao {
     fun findLastMessageBySessionId(sid: Long): Message?
 
     /**
-     * 查询session中At我的未读消息
+     * 查询session中的未读消息
      */
-
     @Query("select * from message where session_id = :sid and type >= 0 and opr_status & :oprStatus = 0 order by c_time asc ")
-    fun findSessionAtMeUnreadMessages(
+    fun findAllUnreadMessagesBySessionId(
         sid: Long,
         oprStatus: Int = MsgOperateStatus.ClientRead.value
     ): List<Message>

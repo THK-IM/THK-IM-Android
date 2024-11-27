@@ -1,6 +1,5 @@
 package com.thk.im.android.core.glide
 
-import android.util.Log
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import okio.Buffer
@@ -41,10 +40,6 @@ class ProgressResponseBody(private val url: String, private val responseBody: Re
                 if (this.progress != progress) {
                     this.progress = progress
                     val listener = GuildProgressInterceptor.LISTENER_MAP[url]?.get()
-                    Log.v(
-                        "LoadProgress",
-                        "${url} ${totalBytesRead} ${fullLength} ${progress} ${listener == null}"
-                    )
                     listener?.onLoadProgress(url, progress == 100, progress)
                 }
             }

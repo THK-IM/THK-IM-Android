@@ -188,18 +188,20 @@ abstract class IMBaseSessionVH(liftOwner: LifecycleOwner, itemView: View) :
     }
 
     open fun renderSenderName(message: Message) {
-        val subscriber = object : BaseSubscriber<String>() {
-            override fun onNext(t: String) {
-                tvSenderNameView.visibility = View.VISIBLE
-                tvSenderNameView.text = t + ": "
+        if (message.fUid > 0) {
+            val subscriber = object : BaseSubscriber<String>() {
+                override fun onNext(t: String) {
+                    tvSenderNameView.visibility = View.VISIBLE
+                    tvSenderNameView.text = t + ": "
+                }
             }
+            Flowable.just(message).flatMap { msg ->
+                val name = IMCoreManager.messageModule.getMsgProcessor(msg.type)
+                    .getUserSessionName(msg.sid, msg.fUid)
+                return@flatMap Flowable.just(name)
+            }.compose(RxTransform.flowableToMain()).subscribe(subscriber)
+            disposable.add(subscriber)
         }
-        Flowable.just(message).flatMap { msg ->
-            val name = IMCoreManager.messageModule.getMsgProcessor(msg.type)
-                .getUserSessionName(msg.sid, msg.fUid)
-            return@flatMap Flowable.just(name)
-        }.compose(RxTransform.flowableToMain()).subscribe(subscriber)
-        disposable.add(subscriber)
     }
 
     open fun renderMessage(text: String?) {

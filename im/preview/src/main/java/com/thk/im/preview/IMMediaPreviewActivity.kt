@@ -188,37 +188,33 @@ class IMMediaPreviewActivity : AppCompatActivity() {
 
     private fun initEventBus() {
         XEventBus.observe(this, IMEvent.MsgUpdate.value, Observer<Message> {
-            it?.let {
-                if (it.type == MsgType.Image.value) {
-                    for (i in 0 until adapter.messages.size) {
-                        if (adapter.messages[i].id == it.id) {
-                            val recyclerView = binding.vpMediaPreview.getChildAt(0) as? RecyclerView
-                            val itemVH = recyclerView?.findViewHolderForLayoutPosition(i)
-                            if (itemVH == null) {
-                                val adapter =
-                                    binding.vpMediaPreview.adapter as MessagePreviewAdapter
-                                adapter.updateMessage(it, i)
-                            }
-                            break
+            if (it.type == MsgType.Image.value) {
+                for (i in 0 until adapter.messages.size) {
+                    if (adapter.messages[i].id == it.id) {
+                        val recyclerView = binding.vpMediaPreview.getChildAt(0) as? RecyclerView
+                        val itemVH = recyclerView?.findViewHolderForLayoutPosition(i)
+                        if (itemVH == null) {
+                            val adapter =
+                                binding.vpMediaPreview.adapter as MessagePreviewAdapter
+                            adapter.updateMessage(it, i)
                         }
+                        break
                     }
                 }
             }
         })
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
-            it?.let {
-                if (it.type == MsgType.Image.value) {
-                    for (i in 0 until adapter.messages.size) {
-                        if (adapter.messages[i].id == it.id) {
-                            val recyclerView = binding.vpMediaPreview.getChildAt(0) as? RecyclerView
-                            val itemVH = recyclerView?.findViewHolderForLayoutPosition(i)
-                            if (itemVH == null) {
-                                val adapter =
-                                    binding.vpMediaPreview.adapter as MessagePreviewAdapter
-                                adapter.updateMessage(it, i)
-                            }
-                            break
+            if (it.type == MsgType.Image.value) {
+                for (i in 0 until adapter.messages.size) {
+                    if (adapter.messages[i].id == it.id) {
+                        val recyclerView = binding.vpMediaPreview.getChildAt(0) as? RecyclerView
+                        val itemVH = recyclerView?.findViewHolderForLayoutPosition(i)
+                        if (itemVH == null) {
+                            val adapter =
+                                binding.vpMediaPreview.adapter as MessagePreviewAdapter
+                            adapter.updateMessage(it, i)
                         }
+                        break
                     }
                 }
             }
@@ -377,7 +373,8 @@ class IMMediaPreviewActivity : AppCompatActivity() {
             )
             scaleAnimation.interpolator = LinearInterpolator()
 
-            val alpha = 1 - abs(binding.vpMediaPreview.translationY) / AppUtils.instance().screenHeight
+            val alpha =
+                1 - abs(binding.vpMediaPreview.translationY) / AppUtils.instance().screenHeight
             val color = UIUtils.setAlphaComponent(Color.BLACK, alpha)
             val colorAnim = ObjectAnimator.ofInt(
                 binding.clContent, "backgroundColor", color, Color.TRANSPARENT

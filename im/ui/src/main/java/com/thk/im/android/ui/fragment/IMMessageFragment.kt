@@ -27,6 +27,7 @@ import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.SessionType
+import com.thk.im.android.core.SignalStatus
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
@@ -246,7 +247,8 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                 binding.rcvMessage.loadMessages()
             }
         }
-        IMCoreManager.messageModule.querySessionMembers(session!!.id, true)
+        val online = IMCoreManager.signalModule.signalStatus == SignalStatus.Connected
+        IMCoreManager.messageModule.querySessionMembers(session!!.id, online)
             .flatMap { members ->
                 val uIds = mutableSetOf<Long>()
                 for (m in members) {

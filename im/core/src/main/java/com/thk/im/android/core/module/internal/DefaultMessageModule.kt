@@ -659,6 +659,7 @@ open class DefaultMessageModule : MessageModule {
     }
 
     private fun queryLastSessionMember(sessionId: Long, count: Int): Flowable<List<SessionMember>> {
+        val requestTime = IMCoreManager.severTime
         return Flowable.just(sessionId).flatMap {
             val mTime = IMCoreManager.db.sessionDao().findMemberSyncTimeById(sessionId)
             return@flatMap Flowable.just(mTime)
@@ -666,7 +667,7 @@ open class DefaultMessageModule : MessageModule {
             return@flatMap IMCoreManager.imApi.queryLatestSessionMembers(sessionId, it, null, count)
         }.flatMap {
             IMCoreManager.db.sessionMemberDao().insertOrReplace(it)
-            IMCoreManager.db.sessionDao().updateMemberSyncTime(sessionId, IMCoreManager.severTime)
+            IMCoreManager.db.sessionDao().updateMemberSyncTime(sessionId, requestTime)
             if (it.size >= count) {
                 return@flatMap queryLastSessionMember(sessionId, count)
             } else {

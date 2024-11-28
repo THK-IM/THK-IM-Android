@@ -52,6 +52,7 @@ open class DefaultMessageModule : MessageModule {
     private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 Ios:1 Android:2
     private val needAckMap = HashMap<Long, MutableSet<Long>>()
     private val ackMessagePublishSubject = PublishSubject.create<Int>()
+    private val sessionMemberQueryTimeMap = mutableMapOf<Long, Long>()
 
     init {
         initAckMessagePublishSubject()
@@ -626,40 +627,31 @@ open class DefaultMessageModule : MessageModule {
         needUpdate: Boolean
     ): Flowable<List<SessionMember>> {
         if (needUpdate) {
-            return Flowable.just(sessionId)
-                .flatMap {
-                    val lastQueryTime =
-                        IMCoreManager.db.sessionDao().findMemberSyncTimeById(sessionId)
-                    if (abs(IMCoreManager.severTime - lastQueryTime) <= 1000 * 60) {
-                        val sessionMembers =
-                            IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
-                        return@flatMap Flowable.just(sessionMembers)
-                    } else {
-                        return@flatMap queryLastSessionMember(
-                            sessionId,
-                            getSessionMemberCountPerRequest()
-                        )
-                    }
-                }
-        } else {
-            return Flowable.create<List<SessionMember>?>({
-                val sessionMembers = IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
-                it.onNext(sessionMembers)
-            }, BackpressureStrategy.LATEST).flatMap {
-                if (it.isEmpty()) {
-                    return@flatMap queryLastSessionMember(
-                        sessionId,
-                        getSessionMemberCountPerRequest()
-                    )
-                } else {
-                    return@flatMap Flowable.just(it)
-                }
+            val lastQueryTime = sessionMemberQueryTimeMap[sessionId] ?: 0
+            if (abs(IMCoreManager.severTime - lastQueryTime) > 1000 * 60) {
+                return queryLastSessionMember(
+                    sessionId,
+                    getSessionMemberCountPerRequest()
+                )
+            }
+            sessionMemberQueryTimeMap[sessionId] = IMCoreManager.severTime
+        }
+        return Flowable.create<List<SessionMember>?>({
+            val sessionMembers = IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
+            it.onNext(sessionMembers)
+        }, BackpressureStrategy.LATEST).flatMap {
+            if (it.isEmpty()) {
+                return@flatMap queryLastSessionMember(
+                    sessionId,
+                    getSessionMemberCountPerRequest()
+                )
+            } else {
+                return@flatMap Flowable.just(it)
             }
         }
     }
 
     private fun queryLastSessionMember(sessionId: Long, count: Int): Flowable<List<SessionMember>> {
-        val requestTime = IMCoreManager.severTime
         return Flowable.just(sessionId).flatMap {
             val mTime = IMCoreManager.db.sessionDao().findMemberSyncTimeById(sessionId)
             return@flatMap Flowable.just(mTime)
@@ -667,7 +659,9 @@ open class DefaultMessageModule : MessageModule {
             return@flatMap IMCoreManager.imApi.queryLatestSessionMembers(sessionId, it, null, count)
         }.flatMap {
             IMCoreManager.db.sessionMemberDao().insertOrReplace(it)
-            IMCoreManager.db.sessionDao().updateMemberSyncTime(sessionId, requestTime)
+            it.lastOrNull()?.mTime?.let { time ->
+                IMCoreManager.db.sessionDao().updateMemberSyncTime(sessionId, time)
+            }
             if (it.size >= count) {
                 return@flatMap queryLastSessionMember(sessionId, count)
             } else {

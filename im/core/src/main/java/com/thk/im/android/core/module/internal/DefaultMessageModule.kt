@@ -237,7 +237,7 @@ open class DefaultMessageModule : MessageModule {
                         val dbSession = IMCoreManager.db.sessionDao().findById(new.id)
                         // 更新session中的在线数据信息
                         if (dbSession != null) {
-                            dbSession.mergeServerSession(new)
+                            dbSession.merge(new)
                             IMCoreManager.db.sessionDao().update(dbSession)
                         }
                     }

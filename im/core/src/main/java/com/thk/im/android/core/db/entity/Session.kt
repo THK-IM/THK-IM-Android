@@ -113,7 +113,7 @@ data class Session(
         0, 0, 0
     )
 
-    fun mergeServerSession(serverSession: Session) {
+    fun merge(serverSession: Session) {
         this.parentId = serverSession.parentId
         this.entityId = serverSession.entityId
         this.name = serverSession.name

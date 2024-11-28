@@ -626,13 +626,11 @@ open class DefaultMessageModule : MessageModule {
         sessionId: Long,
         needUpdate: Boolean
     ): Flowable<List<SessionMember>> {
+        val count = getSessionMemberCountPerRequest()
         if (needUpdate) {
             val lastQueryTime = sessionMemberQueryTimeMap[sessionId] ?: 0
             if (abs(IMCoreManager.severTime - lastQueryTime) > 1000 * 60) {
-                return queryLastSessionMember(
-                    sessionId,
-                    getSessionMemberCountPerRequest()
-                )
+                return queryLastSessionMember(sessionId, count)
             }
             sessionMemberQueryTimeMap[sessionId] = IMCoreManager.severTime
         }
@@ -641,10 +639,7 @@ open class DefaultMessageModule : MessageModule {
             it.onNext(sessionMembers)
         }, BackpressureStrategy.LATEST).flatMap {
             if (it.isEmpty()) {
-                return@flatMap queryLastSessionMember(
-                    sessionId,
-                    getSessionMemberCountPerRequest()
-                )
+                return@flatMap queryLastSessionMember(sessionId, count)
             } else {
                 return@flatMap Flowable.just(it)
             }

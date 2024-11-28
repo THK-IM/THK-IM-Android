@@ -477,6 +477,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
     private fun updateSession(s: Session) {
         if (session?.id == s.id) {
             session?.merge(s)
+            session?.unReadCount = s.unReadCount
             updateUnreadMsgTips()
         }
     }

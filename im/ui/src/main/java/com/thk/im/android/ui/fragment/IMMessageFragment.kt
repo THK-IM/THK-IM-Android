@@ -369,52 +369,46 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
         })
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
-            it?.let {
-                if (it.sid == session!!.id) {
-                    if (it.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0 && it.isAtMe()) {
-                        var contained = false
-                        atMessages.forEach { msg ->
-                            if (msg.msgId == it.msgId) {
-                                contained = true
-                            }
-                        }
-                        if (!contained) {
-                            atMessages.add(it)
-                            updateAtTipsView()
+            if (it.sid == session!!.id) {
+                if (it.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0 && it.isAtMe()) {
+                    var contained = false
+                    atMessages.forEach { msg ->
+                        if (msg.msgId == it.msgId) {
+                            contained = true
                         }
                     }
-                    binding.rcvMessage.insertMessage(it)
+                    if (!contained) {
+                        atMessages.add(it)
+                        updateAtTipsView()
+                    }
                 }
+                binding.rcvMessage.insertMessage(it)
             }
         })
         XEventBus.observe(this, IMEvent.MsgUpdate.value, Observer<Message> {
-            it?.let {
-                if (it.sid == session!!.id) {
-                    if (it.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0 && it.isAtMe()) {
-                        var contained = false
-                        atMessages.forEach { msg ->
-                            if (msg.msgId == it.msgId) {
-                                contained = true
-                            }
-                        }
-                        if (!contained) {
-                            atMessages.add(it)
-                            updateAtTipsView()
+            if (it.sid == session!!.id) {
+                if (it.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0 && it.isAtMe()) {
+                    var contained = false
+                    atMessages.forEach { msg ->
+                        if (msg.msgId == it.msgId) {
+                            contained = true
                         }
                     }
-                    binding.rcvMessage.updateMessage(it)
+                    if (!contained) {
+                        atMessages.add(it)
+                        updateAtTipsView()
+                    }
                 }
+                binding.rcvMessage.updateMessage(it)
             }
         })
         XEventBus.observe(this, IMEvent.MsgDelete.value, Observer<Message> {
-            it?.let {
-                if (it.sid == session!!.id) {
-                    atMessages.removeAll { atMsg ->
-                        atMsg.msgId == it.msgId
-                    }
-                    updateAtTipsView()
-                    binding.rcvMessage.deleteMessage(it)
+            if (it.sid == session!!.id) {
+                atMessages.removeAll { atMsg ->
+                    atMsg.msgId == it.msgId
                 }
+                updateAtTipsView()
+                binding.rcvMessage.deleteMessage(it)
             }
         })
         XEventBus.observe(this, IMEvent.BatchMsgDelete.value, Observer<List<Message>> { messages ->

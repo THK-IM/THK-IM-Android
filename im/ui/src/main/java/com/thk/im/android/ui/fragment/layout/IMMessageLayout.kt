@@ -216,8 +216,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                 startTime,
                 endTime,
                 Int.MAX_VALUE
-            )
-                .compose(RxTransform.flowableToMain())
+            ).compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             this.disposables.add(subscriber)
         }

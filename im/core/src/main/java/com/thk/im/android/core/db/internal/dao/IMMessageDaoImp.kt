@@ -132,6 +132,10 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         return roomDatabase.messageDao().findNewerMessage(sId, msgId, types, cTime, count)
     }
 
+    override fun findOldestUnreadMessage(sid: Long): Message? {
+        return roomDatabase.messageDao().findOldestUnreadMessage(sid)
+    }
+
     override fun findLastMessageBySessionId(sid: Long): Message? {
         return roomDatabase.messageDao().findLastMessageBySessionId(sid)
     }

@@ -27,7 +27,6 @@ import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.SessionType
-import com.thk.im.android.core.SignalStatus
 import com.thk.im.android.core.base.BaseSubscriber
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.RxTransform
@@ -62,6 +61,7 @@ import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
 import com.thk.im.android.ui.utils.ScreenUtils
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
+import java.util.Locale
 
 open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
     private lateinit var keyboardPopupWindow: KeyboardPopupWindow
@@ -141,6 +141,25 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         val bgColor =
             IMUIManager.uiResourceProvider?.inputLayoutBgColor() ?: Color.parseColor("#DDDDDD")
         val textColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#1390f4")
+
+        binding.tvUnreadTip.setShape(bgColor, floatArrayOf(6f, 6f, 6f, 6f), false)
+        binding.tvUnreadTip.setTextColor(textColor)
+        binding.tvUnreadTip.setOnClickListener {
+            binding.tvUnreadTip.visibility = View.GONE
+            binding.rcvMessage.scrollToUnReadMsg()
+        }
+        val unreadCount = session?.unReadCount ?: 0
+        if (unreadCount > 0) {
+            binding.tvUnreadTip.text = String.format(
+                Locale.getDefault(),
+                getString(R.string.x_message_unread),
+                unreadCount
+            )
+            binding.tvUnreadTip.visibility = View.VISIBLE
+        } else {
+            binding.tvUnreadTip.visibility = View.GONE
+        }
+
         binding.tvNewMsgTip.setShape(bgColor, floatArrayOf(6f, 6f, 6f, 6f), false)
         binding.tvNewMsgTip.setTextColor(textColor)
         binding.tvNewMsgTip.text = getString(R.string.new_message_tips)
@@ -168,6 +187,21 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                 IMCoreManager.getImDataBase().messageDao().findSessionAtMeUnreadMessages(it.id)
             Flowable.just(unReadAtMeMessages)
         }.compose(RxTransform.flowableToMain()).subscribe(subscriber)
+    }
+
+    private fun updateUnreadMsgTips() {
+        val unreadCount = session?.unReadCount ?: 0
+        // 如果已经被隐藏 就不在刷新未读消息提示
+        if (binding.tvUnreadTip.visibility != View.GONE) {
+            binding.tvUnreadTip.text = String.format(
+                Locale.getDefault(),
+                getString(R.string.x_message_unread),
+                unreadCount
+            )
+        }
+        if (unreadCount == 0) {
+            binding.tvUnreadTip.visibility = View.GONE
+        }
     }
 
     private fun updateAtTipsView() {
@@ -212,8 +246,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                 binding.rcvMessage.loadMessages()
             }
         }
-        val online = IMCoreManager.signalModule.signalStatus == SignalStatus.Connected
-        IMCoreManager.messageModule.querySessionMembers(session!!.id, online)
+        IMCoreManager.messageModule.querySessionMembers(session!!.id, true)
             .flatMap { members ->
                 val uIds = mutableSetOf<Long>()
                 for (m in members) {
@@ -443,6 +476,26 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                     session.topTimestamp = it.topTimestamp
                     session.unReadCount = it.unReadCount
                     session.memberCount = it.memberCount
+                    updateUnreadMsgTips()
+                }
+            }
+        })
+
+        XEventBus.observe(this, IMEvent.SessionNew.value, Observer<Session> {
+            session?.let { session ->
+                if (it.id == session.id) {
+                    session.mute = it.mute
+                    session.status = it.status
+                    session.draft = it.draft
+                    session.deleted = it.deleted
+                    session.extData = it.extData
+                    session.functionFlag = it.functionFlag
+                    session.parentId = it.parentId
+                    session.lastMsg = it.lastMsg
+                    session.topTimestamp = it.topTimestamp
+                    session.unReadCount = it.unReadCount
+                    session.memberCount = it.memberCount
+                    updateUnreadMsgTips()
                 }
             }
         })

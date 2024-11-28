@@ -86,6 +86,11 @@ interface IMMessageDao {
         count: Int
     ): List<Message>
 
+    /**
+     * 查询session的最早一条未读消息
+     */
+    fun findOldestUnreadMessage(sid: Long): Message?
+
 
     /**
      * 查询session的最后一条消息

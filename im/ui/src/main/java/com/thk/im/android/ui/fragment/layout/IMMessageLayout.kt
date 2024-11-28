@@ -23,6 +23,7 @@ import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
+import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import kotlin.math.abs
 
@@ -169,6 +170,24 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         disposables.add(subscriber)
     }
 
+    fun scrollToUnReadMsg() {
+        val subscriber = object : BaseSubscriber<Message>() {
+            override fun onNext(t: Message?) {
+                t?.let {
+                    scrollToMsg(it)
+                }
+            }
+        }
+
+        Flowable.just(session)
+            .flatMap {
+                val message = IMCoreManager.db.messageDao().findOldestUnreadMessage(it.id)
+                return@flatMap Flowable.just(message)
+            }.compose(RxTransform.flowableToMain())
+            .subscribe(subscriber)
+        this.disposables.add(subscriber)
+    }
+
     fun scrollToLatestMsg(smooth: Boolean = false) {
         if (smooth) {
             smoothScrollToPosition(0)
@@ -189,10 +208,10 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         return -1
     }
 
-    fun scrollToMsg(msg: Message) {
+    fun scrollToMsg(msg: Message, flashing: Boolean = false) {
         var index = indexOfMessage(msg)
         if (index != -1) {
-            scrollToRow(index)
+            scrollToRow(index, flashing)
         } else {
             val subscriber = object : BaseSubscriber<List<Message>>() {
                 override fun onNext(t: List<Message>?) {
@@ -200,7 +219,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
                         msgAdapter.addData(it)
                         index = indexOfMessage(msg)
                         if (index != -1) {
-                            scrollToRow(index)
+                            scrollToRow(index, flashing)
                         }
                     }
                 }
@@ -222,11 +241,13 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
         }
     }
 
-    private fun scrollToRow(row: Int) {
+    private fun scrollToRow(row: Int, flashing: Boolean = false) {
         scrollToPosition(row)
-        postDelayed({
-            msgAdapter.highlightFlashing(row, 6, this)
-        }, 500)
+        if (flashing) {
+            postDelayed({
+                msgAdapter.highlightFlashing(row, 6, this)
+            }, 1000)
+        }
     }
 
     fun refreshMessageUserInfo() {
@@ -270,43 +291,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgReferContentClick(message: Message, view: View) {
-        val position = this.getMessages().indexOf(message)
-        if (position > 0) {
-            scrollToRow(position)
-        } else {
-            val messages = getMessages()
-            val endTime = if (messages.isEmpty()) {
-                IMCoreManager.severTime
-            } else {
-                messages.last().cTime
-            }
-            val subscriber = object : BaseSubscriber<List<Message>>() {
-                override fun onNext(t: List<Message>) {
-                    if (msgAdapter.getMessageCount() == 0) {
-                        msgAdapter.setData(t)
-                    } else {
-                        msgAdapter.addData(t)
-                    }
-                    val pos = msgAdapter.getMessages().indexOf(message)
-                    if (pos > 0) {
-                        scrollToRow(position)
-                    }
-                }
-
-                override fun onComplete() {
-                    super.onComplete()
-                    disposables.remove(this)
-                }
-            }
-            IMCoreManager.messageModule.queryLocalMessages(
-                message.sid,
-                message.cTime,
-                endTime,
-                Int.MAX_VALUE
-            ).compose(RxTransform.flowableToMain())
-                .subscribe(subscriber)
-            disposables.add(subscriber)
-        }
+        scrollToMsg(message, true)
     }
 
 

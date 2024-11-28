@@ -1,7 +1,6 @@
 package com.thk.im.android.core.module.internal
 
 import android.content.Context.MODE_PRIVATE
-import android.text.TextUtils
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
@@ -31,6 +30,7 @@ import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.math.abs
 
 
 /**
@@ -339,6 +339,9 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, entityId, type).flatMap {
                     if (it.id > 0 && it.deleted == 0) {
                         IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
+                        if (it.type == SessionType.SuperGroup.value) {
+                            syncSessionMessage(it)
+                        }
                     }
                     Flowable.just(it)
                 }
@@ -363,6 +366,9 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, sessionId).flatMap {
                     if (it.id > 0 && it.deleted == 0) {
                         IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
+                        if (it.type == SessionType.SuperGroup.value) {
+                            syncSessionMessage(it)
+                        }
                     }
                     Flowable.just(it)
                 }
@@ -557,11 +563,29 @@ open class DefaultMessageModule : MessageModule {
                     return
                 }
                 val unReadCount = messageDao.getUnReadCount(t.id)
-                if (forceNotify || t.mTime <= msg.mTime || t.unReadCount != unReadCount
-                    || TextUtils.isEmpty(t.lastMsg)
-                ) {
+                var needNotify = false
+                if (t.lastMsg != null) {
+                    try {
+                        val lastMsg = Gson().fromJson(t.lastMsg, Message::class.java)
+                        if (lastMsg.cTime <= msg.cTime) {
+                            t.lastMsg = Gson().toJson(msg)
+                            needNotify = true
+                        }
+                    } catch (e: Exception) {
+                        t.lastMsg = Gson().toJson(msg)
+                        needNotify = true
+                        e.printStackTrace()
+                    }
+                } else {
+                    needNotify = true
                     t.lastMsg = Gson().toJson(msg)
-                    if (t.mTime < msg.cTime) {
+                }
+                if (t.unReadCount != unReadCount) {
+                    needNotify = true
+                    t.unReadCount = unReadCount
+                }
+                if (needNotify || forceNotify) {
+                    if (t.mTime <= msg.cTime) {
                         t.mTime = msg.cTime
                     }
                     t.unReadCount = unReadCount
@@ -599,20 +623,37 @@ open class DefaultMessageModule : MessageModule {
 
     override fun querySessionMembers(
         sessionId: Long,
-        forceServer: Boolean
+        needUpdate: Boolean
     ): Flowable<List<SessionMember>> {
-        if (forceServer) {
-            return queryLastSessionMember(sessionId, getSessionMemberCountPerRequest())
-        }
-
-        return Flowable.create<List<SessionMember>?>({
-            val sessionMembers = IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
-            it.onNext(sessionMembers)
-        }, BackpressureStrategy.LATEST).flatMap {
-            if (it.isEmpty()) {
-                return@flatMap queryLastSessionMember(sessionId, getSessionMemberCountPerRequest())
-            } else {
-                return@flatMap Flowable.just(it)
+        if (needUpdate) {
+            return Flowable.just(sessionId)
+                .flatMap {
+                    val lastQueryTime =
+                        IMCoreManager.db.sessionDao().findMemberSyncTimeById(sessionId)
+                    if (abs(IMCoreManager.severTime - lastQueryTime) <= 1000 * 60) {
+                        val sessionMembers =
+                            IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
+                        return@flatMap Flowable.just(sessionMembers)
+                    } else {
+                        return@flatMap queryLastSessionMember(
+                            sessionId,
+                            getSessionMemberCountPerRequest()
+                        )
+                    }
+                }
+        } else {
+            return Flowable.create<List<SessionMember>?>({
+                val sessionMembers = IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
+                it.onNext(sessionMembers)
+            }, BackpressureStrategy.LATEST).flatMap {
+                if (it.isEmpty()) {
+                    return@flatMap queryLastSessionMember(
+                        sessionId,
+                        getSessionMemberCountPerRequest()
+                    )
+                } else {
+                    return@flatMap Flowable.just(it)
+                }
             }
         }
     }
@@ -625,10 +666,7 @@ open class DefaultMessageModule : MessageModule {
             return@flatMap IMCoreManager.imApi.queryLatestSessionMembers(sessionId, it, null, count)
         }.flatMap {
             IMCoreManager.db.sessionMemberDao().insertOrReplace(it)
-            if (it.isNotEmpty()) {
-                val mTime = it.last().mTime
-                IMCoreManager.db.sessionDao().updateMemberSyncTime(sessionId, mTime)
-            }
+            IMCoreManager.db.sessionDao().updateMemberSyncTime(sessionId, IMCoreManager.severTime)
             if (it.size >= count) {
                 return@flatMap queryLastSessionMember(sessionId, count)
             } else {

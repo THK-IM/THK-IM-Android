@@ -114,6 +114,16 @@ internal interface MessageDao {
 
 
     /**
+     * 查询session的最早一条未读消息
+     */
+    @Query("select * from message where session_id = :sid and type >= 0 and opr_status & :oprStatus = 0 order by c_time asc limit 0, 1")
+    fun findOldestUnreadMessage(
+        sid: Long,
+        oprStatus: Int = MsgOperateStatus.ClientRead.value
+    ): Message?
+
+
+    /**
      * 查询session的最后一条消息
      */
     @Query("select * from message where session_id = :sid and type >= 0 order by m_time desc limit 0, 1")

@@ -465,42 +465,29 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         })
 
         XEventBus.observe(this, IMEvent.SessionUpdate.value, Observer<Session> {
-            session?.let { session ->
-                if (it.id == session.id) {
-                    session.mute = it.mute
-                    session.status = it.status
-                    session.draft = it.draft
-                    session.deleted = it.deleted
-                    session.extData = it.extData
-                    session.functionFlag = it.functionFlag
-                    session.parentId = it.parentId
-                    session.lastMsg = it.lastMsg
-                    session.topTimestamp = it.topTimestamp
-                    session.unReadCount = it.unReadCount
-                    session.memberCount = it.memberCount
-                    updateUnreadMsgTips()
-                }
-            }
+            updateSession(it)
         })
 
         XEventBus.observe(this, IMEvent.SessionNew.value, Observer<Session> {
-            session?.let { session ->
-                if (it.id == session.id) {
-                    session.mute = it.mute
-                    session.status = it.status
-                    session.draft = it.draft
-                    session.deleted = it.deleted
-                    session.extData = it.extData
-                    session.functionFlag = it.functionFlag
-                    session.parentId = it.parentId
-                    session.lastMsg = it.lastMsg
-                    session.topTimestamp = it.topTimestamp
-                    session.unReadCount = it.unReadCount
-                    session.memberCount = it.memberCount
-                    updateUnreadMsgTips()
-                }
-            }
+            updateSession(it)
         })
+    }
+
+    private fun updateSession(s: Session) {
+        if (session?.id == s.id) {
+            session?.mute = s.mute
+            session?.status = s.status
+            session?.draft = s.draft
+            session?.deleted = s.deleted
+            session?.extData = s.extData
+            session?.functionFlag = s.functionFlag
+            session?.parentId = s.parentId
+            session?.lastMsg = s.lastMsg
+            session?.topTimestamp = s.topTimestamp
+            session?.unReadCount = s.unReadCount
+            session?.memberCount = s.memberCount
+            updateUnreadMsgTips()
+        }
     }
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {

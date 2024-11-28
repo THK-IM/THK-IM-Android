@@ -563,7 +563,6 @@ open class DefaultMessageModule : MessageModule {
                 if (t.id <= 0 || t.deleted == 1) {
                     return
                 }
-                val unReadCount = messageDao.getUnReadCount(t.id)
                 var needNotify = false
                 if (t.lastMsg != null) {
                     try {
@@ -581,6 +580,8 @@ open class DefaultMessageModule : MessageModule {
                     needNotify = true
                     t.lastMsg = Gson().toJson(msg)
                 }
+
+                val unReadCount = messageDao.getUnReadCount(t.id)
                 if (t.unReadCount != unReadCount) {
                     needNotify = true
                     t.unReadCount = unReadCount

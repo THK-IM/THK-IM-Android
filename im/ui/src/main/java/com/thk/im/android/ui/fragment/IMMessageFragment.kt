@@ -193,7 +193,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
     private fun updateUnreadMsgTips() {
         val unreadCount = session?.unReadCount ?: 0
         // 如果已经被隐藏 就不在刷新未读消息提示
-        if (binding.tvUnreadTip.visibility != View.GONE) {
+        if (binding.tvUnreadTip.visibility == View.VISIBLE) {
             binding.tvUnreadTip.text = String.format(
                 Locale.getDefault(),
                 getString(R.string.x_message_unread),

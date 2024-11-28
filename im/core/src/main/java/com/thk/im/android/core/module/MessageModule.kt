@@ -154,6 +154,12 @@ interface MessageModule : BaseModule {
     fun syncSessionMembers(sessionId: Long)
 
     /**
+     * 清除session下所有已读消息
+     */
+    fun setAllMessageReadBySessionId(sessionId: Long): Flowable<Void>
+
+
+    /**
      * 清除所有已读消息
      */
     fun setAllMessageRead(): Flowable<Void>

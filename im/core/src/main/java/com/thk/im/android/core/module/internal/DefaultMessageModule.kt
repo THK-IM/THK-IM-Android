@@ -658,7 +658,6 @@ open class DefaultMessageModule : MessageModule {
         queryLastSessionMember(sessionId, count).compose(RxTransform.flowableToIo())
             .subscribe(subscriber)
         disposes.add(subscriber)
-
     }
 
     override fun reset() {
@@ -804,6 +803,27 @@ open class DefaultMessageModule : MessageModule {
             .compose(RxTransform.flowableToIo())
             .subscribe(disposable)
         this.disposes.add(disposable)
+    }
+
+    override fun setAllMessageReadBySessionId(sessionId: Long): Flowable<Void> {
+        return Flowable.create({
+            try {
+                val unReadMessages =
+                    IMCoreManager.db.messageDao().findAllUnreadMessagesBySessionId(sessionId)
+                for (m in unReadMessages) {
+                    if (m.fUid != IMCoreManager.uId && m.msgId > 0) {
+                        IMCoreManager.messageModule
+                            .sendMessage(
+                                m.sid, MsgType.Read.value,
+                                null, null, null, m.msgId
+                            )
+                    }
+                }
+            } catch (e: Exception) {
+                it.onError(e)
+            }
+            it.onComplete()
+        }, BackpressureStrategy.LATEST)
     }
 
 

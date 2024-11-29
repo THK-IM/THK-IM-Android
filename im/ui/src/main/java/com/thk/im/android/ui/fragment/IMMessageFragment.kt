@@ -41,7 +41,6 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.exception.CodeMsgException
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
@@ -65,7 +64,7 @@ import io.reactivex.disposables.CompositeDisposable
 import java.util.Locale
 
 open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
-    private lateinit var keyboardPopupWindow: KeyboardPopupWindow
+    private var keyboardPopupWindow: KeyboardPopupWindow? = null
     private lateinit var binding: FragmentMessageBinding
     private var keyboardShowing = false
     private var session: Session? = null
@@ -84,7 +83,8 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
     override fun onDestroyView() {
         super.onDestroyView()
-        keyboardPopupWindow.dismiss()
+        binding.tvUnreadTip.removeCallbacks(null)
+        keyboardPopupWindow?.dismiss()
         disposables.clear()
         saveDraft()
     }
@@ -149,17 +149,19 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
             binding.tvUnreadTip.visibility = View.GONE
             binding.rcvMessage.scrollToUnReadMsg()
         }
-        val unreadCount = session?.unReadCount ?: 0
-        if (unreadCount > 0) {
-            binding.tvUnreadTip.text = String.format(
-                Locale.getDefault(),
-                getString(R.string.x_message_unread),
-                unreadCount
-            )
-            binding.tvUnreadTip.visibility = View.VISIBLE
-        } else {
-            binding.tvUnreadTip.visibility = View.GONE
-        }
+        binding.tvUnreadTip.postDelayed({
+            val unreadCount = session?.unReadCount ?: 0
+            if (unreadCount > 0) {
+                binding.tvUnreadTip.text = String.format(
+                    Locale.getDefault(),
+                    getString(R.string.x_message_unread),
+                    unreadCount
+                )
+                binding.tvUnreadTip.visibility = View.VISIBLE
+            } else {
+                binding.tvUnreadTip.visibility = View.GONE
+            }
+        }, 500)
 
         binding.tvNewMsgTip.setShape(bgColor, floatArrayOf(6f, 6f, 6f, 6f), false)
         binding.tvNewMsgTip.setTextColor(textColor)

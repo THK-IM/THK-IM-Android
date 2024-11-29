@@ -38,7 +38,7 @@ open class IMReeditMessageProcessor : IMBaseMsgProcessor() {
                 super.onError(t)
                 disposables.remove(this)
                 t?.let {
-                    callback?.onResult(msg, Exception(it))
+                    callback?.onResult(msg, t)
                 }
             }
 

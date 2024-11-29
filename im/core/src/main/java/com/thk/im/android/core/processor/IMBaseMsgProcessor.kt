@@ -175,7 +175,7 @@ abstract class IMBaseMsgProcessor {
                 LLog.e("Message Send err $t")
                 originMsg.sendStatus = MsgSendStatus.SendFailed.value
                 insertOrUpdateDb(originMsg)
-                callback?.onResult(originMsg, Exception(t))
+                callback?.onResult(originMsg, t)
             }
 
             override fun onComplete() {
@@ -261,7 +261,7 @@ abstract class IMBaseMsgProcessor {
 
             override fun onError(t: Throwable?) {
                 super.onError(t)
-                callback?.onResult(forwardMessage, Exception(t))
+                callback?.onResult(forwardMessage, t)
             }
 
             override fun onComplete() {

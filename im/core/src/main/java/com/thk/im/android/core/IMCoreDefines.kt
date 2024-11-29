@@ -80,7 +80,7 @@ enum class IMMsgResourceType(val value: String) {
 }
 
 interface IMSendMsgCallback {
-    fun onResult(message: Message, e: Exception?)
+    fun onResult(message: Message, e: Throwable?)
 }
 
 interface Crypto {

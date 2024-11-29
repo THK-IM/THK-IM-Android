@@ -24,7 +24,7 @@ class IMMsgRevokeOperator : IMMessageOperator() {
 
     override fun onClick(sender: IMMsgSender, message: Message) {
         val callback = object : IMSendMsgCallback {
-            override fun onResult(message: Message, e: Exception?) {
+            override fun onResult(message: Message, e: Throwable?) {
                 if (e != null) {
                     sender.showMessage(IMCoreManager.app.getString(R.string.revoke_failed), false)
                 } else {

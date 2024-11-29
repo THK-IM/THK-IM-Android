@@ -731,7 +731,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
     override fun resendMessage(msg: Message) {
         val callback = object : IMSendMsgCallback {
-            override fun onResult(message: Message, e: Exception?) {
+            override fun onResult(message: Message, e: Throwable?) {
                 e?.let {
                     showError(it)
                 }
@@ -742,7 +742,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
     override fun sendMessage(type: Int, body: Any?, data: Any?, atUser: String?) {
         val callback = object : IMSendMsgCallback {
-            override fun onResult(message: Message, e: Exception?) {
+            override fun onResult(message: Message, e: Throwable?) {
                 e?.let {
                     showError(it)
                 }
@@ -912,16 +912,6 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                     return@flatMap Flowable.just(Pair(user, null))
                 }
             }
-    }
-
-    open fun showError(e: Exception) {
-        if (e is CodeMsgException) {
-            showToast(e.msg)
-        } else {
-            e.localizedMessage?.let {
-                showToast(it)
-            }
-        }
     }
 
 }

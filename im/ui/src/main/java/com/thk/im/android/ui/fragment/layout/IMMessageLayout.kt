@@ -358,7 +358,7 @@ class IMMessageLayout : RecyclerView, IMMsgVHOperator {
     }
 
     override fun onMsgResendClick(message: Message) {
-        IMCoreManager.messageModule.resend(message)
+        msgSender?.resendMessage(message)
     }
 
     fun getMessages(): List<Message> {

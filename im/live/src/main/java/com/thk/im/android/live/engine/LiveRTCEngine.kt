@@ -224,7 +224,7 @@ class LiveRTCEngine {
         this.audioProcessingFactory.setRenderPreProcessing(delegate)
     }
 
-    fun captureOriginAudio(ba: ByteArray) {
+    private fun captureOriginAudio(ba: ByteArray) {
         handler.post {
             val db = AudioUtils.calculateDecibel(ba)
             LLog.d("LiveRTCEngine", "captureOriginAudio $db")

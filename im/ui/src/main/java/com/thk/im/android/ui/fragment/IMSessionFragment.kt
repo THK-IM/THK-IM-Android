@@ -39,8 +39,8 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
     private var isLoading = false
     private var parentId: Long = 0L
 
-    private val updateSessions = mutableSetOf<Session>()
-    private var removeSessions = mutableSetOf<Session>()
+    val updateSessions = mutableSetOf<Session>()
+    val removeSessions = mutableSetOf<Session>()
 
     private var sessionClick: OnSessionClick? = null
     private var isTop = false

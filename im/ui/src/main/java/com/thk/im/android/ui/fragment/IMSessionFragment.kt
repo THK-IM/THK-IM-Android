@@ -135,11 +135,6 @@ open class IMSessionFragment : Fragment(), IMSessionVHOperator {
         for (s in updateSessions) {
             sessionAdapter.onSessionUpdate(s)
         }
-        if (updateSessions.isNotEmpty()) {
-            sessionRecyclerView.postDelayed({
-                sessionRecyclerView.smoothScrollToPosition(0)
-            }, 500)
-        }
         updateSessions.clear()
         for (s in removeSessions) {
             sessionAdapter.onSessionRemove(s)

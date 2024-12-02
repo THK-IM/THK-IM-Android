@@ -65,143 +65,143 @@ dependencies {
     implementation rootProject.ext.dependencies["XPopup"]
     implementation rootProject.ext.dependencies["flexbox"]
 
-//    implementation "io.github.thk-im:core:${rootProject.ext.android.versionName}"
+//    implementation "io.github.thk-im:core:${rootProject.ext.android.libVersionName}"
     implementation project(":im:core")
 }
 
 
-//afterEvaluate {
-//    publishing {
-//        repositories {
-//            maven {
-//                name "local"
-//                url = "$buildDir/repo"
-//            }
-//            maven {
-//                name "sonartype-Staging"
-//                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-//                credentials {
-//                    username = System.getenv("ossrhToken")
-//                    password = System.getenv("ossrhTokenPassword")
-//                }
-//            }
-//            // 定义snapshot仓库
-//            maven {
-//                name "sonatype-Snapshots"
-//                url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-//                credentials {
-//                    username = System.getenv("ossrhToken")
-//                    password = System.getenv("ossrhTokenPassword")
-//                }
-//            }
-//        }
-//        publications {
-//            // Creates a Maven publication called "release".
-//            release(MavenPublication) {
-//                // Applies the component for the release build variant.
-//                from components.release
-//                groupId = 'io.github.thk-im'
-//                artifactId = moduleName
-//                version = rootProject.ext.android.versionName
-//                pom {
-//                    name = 'THK-IM Android Plugin Framework'
-//                    description = 'A Android Plugin Framework'
-//                    url = 'https://github.com/THK-IM/THK-IM-Android'
-//                    licenses {
-//                        license {
-//                            name='The Apache Software License, Version 2.0'
-//                            url='http://www.apache.org/licenses/LICENSE-2.0.txt'
-//                        }
-//                    }
-//                    developers {
-//                        developer {
-//                            id = 'thk-im'
-//                            name = 'vizoss'
-//                            email = 'think220216@gmail.com'
-//                        }
-//                    }
-//                    scm {
-//                        connection = 'https://github.com/THK-IM/THK-IM-Android'
-//                        developerConnection = 'https://github.com/THK-IM/THK-IM-Android.git'
-//                        url = 'https://github.com/THK-IM/THK-IM-Android'
-//                    }
-//                    dependencies {
-//                        implementation rootProject.ext.dependencies["glide"]
-//                        implementation rootProject.ext.dependencies["appcompat"]
-//                        implementation rootProject.ext.dependencies["rxjava"]
-//                        implementation rootProject.ext.dependencies["rxandroid"]
-//                        implementation rootProject.ext.dependencies["permission"]
-//                        implementation rootProject.ext.dependencies["gson"]
-//                        implementation rootProject.ext.dependencies["emoji2"]
-//                        implementation rootProject.ext.dependencies["emoji2-bundled"]
-//                        implementation rootProject.ext.dependencies["emoji2-views"]
-//                        implementation rootProject.ext.dependencies["emoji2-views-helper"]
-//                        implementation rootProject.ext.dependencies["recyclerview"]
-//                        implementation rootProject.ext.dependencies["viewpager2"]
-//                        implementation rootProject.ext.dependencies["constraintlayout"]
-//                        implementation rootProject.ext.dependencies["cardview"]
-//                        implementation rootProject.ext.dependencies["SwipeMenuRecyclerView"]
-//                        implementation rootProject.ext.dependencies["XPopup"]
-//                        implementation rootProject.ext.dependencies["flexbox"]
-//                        implementation "io.github.thk-im:core:${rootProject.ext.android.versionName}"
-//                    }
-//                }
-//            }
-//            // Creates a Maven publication called “debug”.
-//            debug(MavenPublication) {
-//                // Applies the component for the debug build variant.
-//                from components.debug
-//                groupId = 'io.github.thk-im'
-//                artifactId = moduleName
-//                version = String.format("%s-SNAPSHOT", rootProject.ext.android.versionName)
-//                pom {
-//                    name = 'THK-IM Android Plugin Framework'
-//                    description = 'A Android Plugin Framework'
-//                    url = 'https://github.com/THK-IM/THK-IM-Android'
-//                    licenses {
-//                        license {
-//                            name='The Apache Software License, Version 2.0'
-//                            url='http://www.apache.org/licenses/LICENSE-2.0.txt'
-//                        }
-//                    }
-//                    developers {
-//                        developer {
-//                            id = 'thk-im'
-//                            name = 'vizoss'
-//                            email = 'think220216@gmail.com'
-//                        }
-//                    }
-//                    scm {
-//                        connection = 'https://github.com/THK-IM/THK-IM-Android'
-//                        developerConnection = 'https://github.com/THK-IM/THK-IM-Android.git'
-//                        url = 'https://github.com/THK-IM/THK-IM-Android'
-//                    }
-//                    dependencies {
-//                        implementation rootProject.ext.dependencies["glide"]
-//                        implementation rootProject.ext.dependencies["appcompat"]
-//                        implementation rootProject.ext.dependencies["rxjava"]
-//                        implementation rootProject.ext.dependencies["rxandroid"]
-//                        implementation rootProject.ext.dependencies["permission"]
-//                        implementation rootProject.ext.dependencies["gson"]
-//                        implementation rootProject.ext.dependencies["emoji2"]
-//                        implementation rootProject.ext.dependencies["emoji2-bundled"]
-//                        implementation rootProject.ext.dependencies["emoji2-views"]
-//                        implementation rootProject.ext.dependencies["emoji2-views-helper"]
-//                        implementation rootProject.ext.dependencies["recyclerview"]
-//                        implementation rootProject.ext.dependencies["viewpager2"]
-//                        implementation rootProject.ext.dependencies["constraintlayout"]
-//                        implementation rootProject.ext.dependencies["cardview"]
-//                        implementation rootProject.ext.dependencies["SwipeMenuRecyclerView"]
-//                        implementation rootProject.ext.dependencies["XPopup"]
-//                        implementation rootProject.ext.dependencies["flexbox"]
-//                        implementation "io.github.thk-im:core:${rootProject.ext.android.versionName}"
-//                    }
-//                }
-//            }
-//        }
-//
-//        signing {
-//            sign publishing.publications.release , publishing.publications.debug
-//        }
-//    }
-//}
+afterEvaluate {
+    publishing {
+        repositories {
+            maven {
+                name "local"
+                url = "$buildDir/repo"
+            }
+            maven {
+                name "sonartype-Staging"
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                credentials {
+                    username = System.getenv("ossrhToken")
+                    password = System.getenv("ossrhTokenPassword")
+                }
+            }
+            // 定义snapshot仓库
+            maven {
+                name "sonatype-Snapshots"
+                url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                credentials {
+                    username = System.getenv("ossrhToken")
+                    password = System.getenv("ossrhTokenPassword")
+                }
+            }
+        }
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+                groupId = 'io.github.thk-im'
+                artifactId = moduleName
+                version = rootProject.ext.android.libVersionName
+                pom {
+                    name = 'THK-IM Android Plugin Framework'
+                    description = 'A Android Plugin Framework'
+                    url = 'https://github.com/THK-IM/THK-IM-Android'
+                    licenses {
+                        license {
+                            name='The Apache Software License, Version 2.0'
+                            url='http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'thk-im'
+                            name = 'vizoss'
+                            email = 'think220216@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'https://github.com/THK-IM/THK-IM-Android'
+                        developerConnection = 'https://github.com/THK-IM/THK-IM-Android.git'
+                        url = 'https://github.com/THK-IM/THK-IM-Android'
+                    }
+                    dependencies {
+                        implementation rootProject.ext.dependencies["glide"]
+                        implementation rootProject.ext.dependencies["appcompat"]
+                        implementation rootProject.ext.dependencies["rxjava"]
+                        implementation rootProject.ext.dependencies["rxandroid"]
+                        implementation rootProject.ext.dependencies["permission"]
+                        implementation rootProject.ext.dependencies["gson"]
+                        implementation rootProject.ext.dependencies["emoji2"]
+                        implementation rootProject.ext.dependencies["emoji2-bundled"]
+                        implementation rootProject.ext.dependencies["emoji2-views"]
+                        implementation rootProject.ext.dependencies["emoji2-views-helper"]
+                        implementation rootProject.ext.dependencies["recyclerview"]
+                        implementation rootProject.ext.dependencies["viewpager2"]
+                        implementation rootProject.ext.dependencies["constraintlayout"]
+                        implementation rootProject.ext.dependencies["cardview"]
+                        implementation rootProject.ext.dependencies["SwipeMenuRecyclerView"]
+                        implementation rootProject.ext.dependencies["XPopup"]
+                        implementation rootProject.ext.dependencies["flexbox"]
+                        implementation "io.github.thk-im:core:${rootProject.ext.android.libVersionName}"
+                    }
+                }
+            }
+            // Creates a Maven publication called “debug”.
+            debug(MavenPublication) {
+                // Applies the component for the debug build variant.
+                from components.debug
+                groupId = 'io.github.thk-im'
+                artifactId = moduleName
+                version = String.format("%s-SNAPSHOT", rootProject.ext.android.libVersionName)
+                pom {
+                    name = 'THK-IM Android Plugin Framework'
+                    description = 'A Android Plugin Framework'
+                    url = 'https://github.com/THK-IM/THK-IM-Android'
+                    licenses {
+                        license {
+                            name='The Apache Software License, Version 2.0'
+                            url='http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'thk-im'
+                            name = 'vizoss'
+                            email = 'think220216@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'https://github.com/THK-IM/THK-IM-Android'
+                        developerConnection = 'https://github.com/THK-IM/THK-IM-Android.git'
+                        url = 'https://github.com/THK-IM/THK-IM-Android'
+                    }
+                    dependencies {
+                        implementation rootProject.ext.dependencies["glide"]
+                        implementation rootProject.ext.dependencies["appcompat"]
+                        implementation rootProject.ext.dependencies["rxjava"]
+                        implementation rootProject.ext.dependencies["rxandroid"]
+                        implementation rootProject.ext.dependencies["permission"]
+                        implementation rootProject.ext.dependencies["gson"]
+                        implementation rootProject.ext.dependencies["emoji2"]
+                        implementation rootProject.ext.dependencies["emoji2-bundled"]
+                        implementation rootProject.ext.dependencies["emoji2-views"]
+                        implementation rootProject.ext.dependencies["emoji2-views-helper"]
+                        implementation rootProject.ext.dependencies["recyclerview"]
+                        implementation rootProject.ext.dependencies["viewpager2"]
+                        implementation rootProject.ext.dependencies["constraintlayout"]
+                        implementation rootProject.ext.dependencies["cardview"]
+                        implementation rootProject.ext.dependencies["SwipeMenuRecyclerView"]
+                        implementation rootProject.ext.dependencies["XPopup"]
+                        implementation rootProject.ext.dependencies["flexbox"]
+                        implementation "io.github.thk-im:core:${rootProject.ext.android.libVersionName}"
+                    }
+                }
+            }
+        }
+
+        signing {
+            sign publishing.publications.release , publishing.publications.debug
+        }
+    }
+}

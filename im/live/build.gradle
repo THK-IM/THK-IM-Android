@@ -67,7 +67,7 @@ dependencies {
     implementation project(":im:core")
 
 
-//    implementation "io.github.thk-im:core:${rootProject.ext.android.versionName}"
+//    implementation "io.github.thk-im:core:${rootProject.ext.android.libVersionName}"
 }
 
 
@@ -99,7 +99,7 @@ dependencies {
 //                from components.release
 //                groupId = 'io.github.thk-im'
 //                artifactId = moduleName
-//                version = rootProject.ext.android.versionName
+//                version = rootProject.ext.android.libVersionName
 //                pom {
 //                    name = 'THK-IM Android Plugin Framework'
 //                    description = 'A Android Plugin Framework'
@@ -142,7 +142,7 @@ dependencies {
 //                from components.debug
 //                groupId = 'io.github.thk-im'
 //                artifactId = moduleName
-//                version = String.format("%s-SNAPSHOT", rootProject.ext.android.versionName)
+//                version = String.format("%s-SNAPSHOT", rootProject.ext.android.libVersionName)
 //                pom {
 //                    name = 'THK-IM Android Plugin Framework'
 //                    description = 'A Android Plugin Framework'

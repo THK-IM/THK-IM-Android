@@ -56,8 +56,8 @@ dependencies {
 //    implementation "io.github.thk-im:core:${rootProject.ext.android.libVersionName}"
 //    implementation "io.github.thk-im:ui:${rootProject.ext.android.libVersionName}"
 }
-
-
+//
+//
 //afterEvaluate {
 //    publishing {
 //        repositories {

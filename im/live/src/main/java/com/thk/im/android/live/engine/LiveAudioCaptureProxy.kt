@@ -6,11 +6,10 @@ import java.nio.ByteBuffer
 
 open class LiveAudioCaptureProxy : AudioProcessing {
 
-    private var lastCal: Long = 0
-
     // int sampleRateHz, int numChannels
     override fun initialize(p0: Int, p1: Int) {
         LLog.d("LiveAudioProxy", "Capture initialize $p0, $p1")
+        LiveRTCEngine.shared().mediaPlayer?.updateRTCParams(p1, p0)
     }
 
     override fun reset(p0: Int) {
@@ -19,13 +18,14 @@ open class LiveAudioCaptureProxy : AudioProcessing {
 
     // int numBands, int numFrames, ByteBuffer buffer
     override fun process(p0: Int, p1: Int, p2: ByteBuffer) {
-        val current = System.currentTimeMillis()
-//        if (current - lastCal > 500) {
-//            val length = min(p1, 256)
-//            val data = ByteArray(length)
-//            p2.get(data, 0, length)
-//            LiveRTCEngine.shared().captureOriginAudio(data)
-//            lastCal = current
-//        }
+        val mediaPlayer = LiveRTCEngine.shared().mediaPlayer ?: return
+        val mediaPCMData = mediaPlayer.fetchRTCPCM(p0 * p1) ?: return
+        LLog.d("LiveAudioProxy", "process $p0 $p1, intercepet")
+        val pcmData = ByteArray(p0 * p1)
+        p2.get(pcmData)
+        val mixPcm = PCMTransUtil.averageMix(arrayOf(pcmData, mediaPCMData))
+        p2.clear()
+        p2.rewind()
+        p2.put(mixPcm)
     }
 }

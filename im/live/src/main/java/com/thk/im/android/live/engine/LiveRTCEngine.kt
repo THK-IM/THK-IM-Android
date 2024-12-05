@@ -12,6 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.AudioUtils
+import com.thk.im.android.live.player.RTCMediaPlayer
 import com.thk.im.android.live.room.RTCRoomManager
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
@@ -53,8 +54,11 @@ class LiveRTCEngine {
     private var lastCaptureTime: Long = 0
     private val handler = Handler(Looper.getMainLooper())
 
+    var mediaPlayer: RTCMediaPlayer? = null
+
     fun init(app: Application) {
         this.app = app
+        this.mediaPlayer = RTCMediaPlayer()
         initEngine()
     }
 
@@ -224,7 +228,7 @@ class LiveRTCEngine {
         this.audioProcessingFactory.setRenderPreProcessing(delegate)
     }
 
-    fun captureOriginAudio(ba: ByteArray) {
+    private fun captureOriginAudio(ba: ByteArray) {
         handler.post {
             val db = AudioUtils.calculateDecibel(ba)
             LLog.d("LiveRTCEngine", "captureOriginAudio $db")

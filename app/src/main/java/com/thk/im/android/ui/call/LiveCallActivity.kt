@@ -2,6 +2,7 @@ package com.thk.im.android.ui.call
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
@@ -25,6 +26,7 @@ import com.thk.im.android.live.KickMemberSignal
 import com.thk.im.android.live.LiveSignal
 import com.thk.im.android.live.LiveSignalType
 import com.thk.im.android.live.RejectRequestSignal
+import com.thk.im.android.live.engine.LiveRTCEngine
 import com.thk.im.android.live.room.BaseParticipant
 import com.thk.im.android.live.room.RTCRoom
 import com.thk.im.android.live.room.RTCRoomCallBack
@@ -226,6 +228,15 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         binding.llRequestCall.visibility = View.VISIBLE
         binding.llCalling.visibility = View.GONE
         startRequestCalling()
+        try {
+            val afd = assets.openFd("sample-340s.mp3")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                LiveRTCEngine.shared().mediaPlayer?.setMediaItem(afd)
+                LiveRTCEngine.shared().mediaPlayer?.play()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun showCallingView() {

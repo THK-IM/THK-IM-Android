@@ -4,6 +4,7 @@ import android.app.Application
 import com.thk.im.android.core.event.XEventBus
 import com.thk.im.android.live.api.DefaultLiveApi
 import com.thk.im.android.live.engine.LiveRTCEngine
+import com.thk.im.android.live.player.RTCMediaPlayer
 import com.thk.im.android.live.room.RTCRoomManager
 
 

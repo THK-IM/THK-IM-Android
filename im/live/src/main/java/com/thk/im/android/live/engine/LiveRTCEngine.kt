@@ -88,8 +88,8 @@ class LiveRTCEngine {
             .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
             .build()
         audioDeviceModule = JavaAudioDeviceModule.builder(app)
-            .setUseHardwareAcousticEchoCanceler(false)
-            .setUseHardwareNoiseSuppressor(false)
+            .setUseHardwareAcousticEchoCanceler(true)
+            .setUseHardwareNoiseSuppressor(true)
             .setAudioAttributes(audioAttributes)
             .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
             .setUseLowLatency(true)
@@ -106,7 +106,8 @@ class LiveRTCEngine {
                 val timeBefore = System.nanoTime()
                 mediaPlayer?.mixBuffer(byteBuffer, bytesRead)
                 val after = System.nanoTime() - timeBefore
-                return@setAudioBufferCallback l + after
+                Log.d("AudioBufferCallback", "$format $channelCount $sampleRate $bytesRead $l $after")
+                return@setAudioBufferCallback l
             }
             .createAudioDeviceModule()
         eglBaseCtx = eglBaseContext

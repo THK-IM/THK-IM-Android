@@ -54,7 +54,7 @@ class IMExternalPageRouter : IMPageRouter {
                     )
                 }
             }
-            RTCRoomManager.shared().createRoom(RoomMode.Video, Media.R169_H180.value)
+            RTCRoomManager.shared().createRoom(RoomMode.Video, Media.R169_H720.value)
                 .compose(RxTransform.flowableToMain())
                 .subscribe(subscriber)
             compositeDisposable.add(subscriber)

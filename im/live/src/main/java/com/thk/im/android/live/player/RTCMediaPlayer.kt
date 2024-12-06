@@ -5,7 +5,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.thk.im.android.core.base.LLog
-import com.thk.im.android.live.engine.LiveRTCEngine
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
 import java.util.concurrent.LinkedBlockingDeque
@@ -48,20 +47,27 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         val rsp = ByteArray(len)
         var copiedLen = 0
         remainByteArray?.let {
-            System.arraycopy(it, 0, rsp, 0, copiedLen)
+            System.arraycopy(it, 0, rsp, 0, it.size)
             copiedLen = it.size
         }
         while (true) {
             val needLen = len - copiedLen
-            val buffer = pcmBufferQueue.pollFirst() ?: return null
+            val buffer = pcmBufferQueue.pollFirst()
+            if (buffer == null) {
+                if (rsp.isNotEmpty()) {
+                    remainByteArray = rsp
+                }
+                return null
+            }
             if (buffer.size > needLen) {
-                System.arraycopy(buffer, 0, rsp, 0, needLen)
+                System.arraycopy(buffer, 0, rsp, copiedLen, needLen)
                 val remain = ByteArray(buffer.size - needLen)
                 System.arraycopy(buffer, needLen, remain, 0, remain.size)
                 remainByteArray = remain
                 return rsp
             } else if (buffer.size == needLen) {
-                System.arraycopy(buffer, 0, rsp, 0, needLen)
+                System.arraycopy(buffer, 0, rsp, copiedLen, needLen)
+                remainByteArray = null
                 return rsp
             } else {
                 System.arraycopy(buffer, 0, rsp, copiedLen, buffer.size)
@@ -145,27 +151,18 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         resample?.let {
             it.feedData(ba, ba.size)
             val outSize = it.convertedSize
-            LLog.d(
-                "RTCMediaPlayer",
-                "feedData: ${ba.size}, out size: $outSize, " +
-                        "channel: ${channelNum}, ${this.numChannels}, " +
-                        "sampleRate: $sampleRate, ${this.sampleRateHz}"
-            )
             if (outSize > 0) {
                 val outBuffer = ByteArray(outSize)
                 it.receiveConvertedData(outBuffer)
                 pcmBufferQueue.add(outBuffer)
-                fetchRTCPCM(outSize)?.let { buffer ->
-                    currentDecodeThread?.playPCM(buffer)
-                }
             }
         }
     }
 
     fun mixBuffer(byteBuffer: ByteBuffer, bytesRead: Int) {
-//        val mediaPCMData = fetchRTCPCM(bytesRead) ?: return
-//        byteBuffer.clear()
-//        byteBuffer.put(mediaPCMData)
+        val mediaPCMData = fetchRTCPCM(bytesRead) ?: return
+        byteBuffer.clear()
+        byteBuffer.put(mediaPCMData)
     }
 
 }

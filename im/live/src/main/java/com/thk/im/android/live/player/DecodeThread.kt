@@ -30,6 +30,7 @@ class DecodeThread(private val callback: DecodeCallback) : Thread() {
     private var mediaCodec: MediaCodec? = null
     private var trackFormat: MediaFormat? = null
     private var audioTrack: AudioTrack? = null
+    private var minBuffSize = 0
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun setDataSource(afd: AssetFileDescriptor) {
@@ -137,10 +138,14 @@ class DecodeThread(private val callback: DecodeCallback) : Thread() {
         }
     }
 
+    fun getBufferSize(): Int {
+        return minBuffSize
+    }
+
     fun initAudioTrack(audioChannels: Int, audioSampleRate: Int) {
         val channelConfig =
             if (audioChannels == 1) AudioFormat.CHANNEL_OUT_MONO else AudioFormat.CHANNEL_OUT_STEREO
-        val minBuffSize = AudioTrack.getMinBufferSize(
+        minBuffSize = AudioTrack.getMinBufferSize(
             audioSampleRate,
             channelConfig,
             AudioFormat.ENCODING_PCM_16BIT
@@ -151,7 +156,7 @@ class DecodeThread(private val callback: DecodeCallback) : Thread() {
                 .setAudioAttributes(
                     AudioAttributes.Builder()
                         .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                         .build()
                 )
                 .setAudioFormat(
@@ -224,7 +229,6 @@ class DecodeThread(private val callback: DecodeCallback) : Thread() {
                     outputBuffer?.let {
                         val pcmData = ByteArray(bufferInfo.size)
                         it.get(pcmData)
-                        LLog.d("RTCMediaPlayer", "pcmData: ${pcmData.size}")
                         it.clear()
                         if (pcmData.isNotEmpty()) {
                             callback.onBuffer(channelNum, sampleRate, pcmData)

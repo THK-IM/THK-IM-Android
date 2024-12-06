@@ -2,20 +2,23 @@ package com.thk.im.android.live.player
 
 import android.content.res.AssetFileDescriptor
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.thk.im.android.core.base.LLog
+import com.thk.im.android.live.engine.LiveRTCEngine
 import java.io.FileDescriptor
-import java.lang.Thread.sleep
+import java.nio.ByteBuffer
 import java.util.concurrent.LinkedBlockingDeque
 
 class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
 
     private var callback: IRTCMediaPlayerCallback? = null
     private var currentDecodeThread: DecodeThread? = null
-    private var numChannels = 1
+    private var numChannels = 2
     private var sampleRateHz = 48000
     private val pcmBufferQueue = LinkedBlockingDeque<ByteArray>()
     private var resample: PcmResample? = null
+    private var remainByteArray: ByteArray? = null
 
     override fun setPlayCallback(callback: IRTCMediaPlayerCallback?) {
         this.callback = callback
@@ -27,7 +30,52 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
     }
 
     override fun fetchRTCPCM(len: Int): ByteArray? {
-        return pcmBufferQueue.pollFirst()
+        if (remainByteArray != null) {
+            if (remainByteArray!!.size > len) {
+                val rsp = ByteArray(len)
+                System.arraycopy(remainByteArray!!, 0, rsp, 0, len)
+                val remain = ByteArray(remainByteArray!!.size - len)
+                System.arraycopy(remainByteArray!!, len, remain, 0, remain.size)
+                remainByteArray = remain
+                return rsp
+            } else if (remainByteArray!!.size == len) {
+                val rsp = ByteArray(len)
+                System.arraycopy(remainByteArray!!, 0, rsp, 0, len)
+                remainByteArray = null
+                return rsp
+            }
+        }
+        val rsp = ByteArray(len)
+        var copiedLen = 0
+        remainByteArray?.let {
+            System.arraycopy(it, 0, rsp, 0, copiedLen)
+            copiedLen = it.size
+        }
+        while (true) {
+            val needLen = len - copiedLen
+            val buffer = pcmBufferQueue.pollFirst() ?: return null
+            if (buffer.size > needLen) {
+                System.arraycopy(buffer, 0, rsp, 0, needLen)
+                val remain = ByteArray(buffer.size - needLen)
+                System.arraycopy(buffer, needLen, remain, 0, remain.size)
+                remainByteArray = remain
+                return rsp
+            } else if (buffer.size == needLen) {
+                System.arraycopy(buffer, 0, rsp, 0, needLen)
+                return rsp
+            } else {
+                System.arraycopy(buffer, 0, rsp, copiedLen, buffer.size)
+                copiedLen += buffer.size
+            }
+        }
+//        val buffer = pcmBufferQueue.pollFirst() ?: return null
+//        if (buffer.size > len) {
+//            val rsp = ByteArray(len)
+//            System.arraycopy(buffer, 0, rsp, 0, len)
+//            return rsp
+//        } else {
+//            return buffer
+//        }
     }
 
     override fun setMediaItem(path: String) {
@@ -53,6 +101,7 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         }
         currentDecodeThread = DecodeThread(this)
         currentDecodeThread?.setDataSource(afd)
+        currentDecodeThread?.initAudioTrack(numChannels, sampleRateHz)
     }
 
     override fun pause() {
@@ -78,27 +127,45 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
     }
 
     override fun onBuffer(channelNum: Int, sampleRate: Int, ba: ByteArray) {
-        if (resample!!.support(this.numChannels, this.sampleRateHz, channelNum, sampleRate)) {
+        if (resample != null && !resample!!.support(
+                channelNum,
+                sampleRate,
+                this.numChannels,
+                this.sampleRateHz,
+            )
+        ) {
             resample?.flush()
             resample?.close()
             resample = null
         }
         if (resample == null) {
             resample = PcmResample()
-            resample?.init(this.numChannels, this.sampleRateHz, channelNum, sampleRate)
+            resample?.init(channelNum, sampleRate, this.numChannels, this.sampleRateHz)
         }
         resample?.let {
             it.feedData(ba, ba.size)
             val outSize = it.convertedSize
-            val outBuffer = ByteArray(outSize)
-            it.receiveConvertedData(outBuffer)
-            pcmBufferQueue.add(outBuffer)
+            LLog.d(
+                "RTCMediaPlayer",
+                "feedData: ${ba.size}, out size: $outSize, " +
+                        "channel: ${channelNum}, ${this.numChannels}, " +
+                        "sampleRate: $sampleRate, ${this.sampleRateHz}"
+            )
+            if (outSize > 0) {
+                val outBuffer = ByteArray(outSize)
+                it.receiveConvertedData(outBuffer)
+                pcmBufferQueue.add(outBuffer)
+                fetchRTCPCM(outSize)?.let { buffer ->
+                    currentDecodeThread?.playPCM(buffer)
+                }
+            }
         }
-        val bufferSize = pcmBufferQueue.size
-        LLog.d("RTCMediaPlayer", "bufferSize: $bufferSize")
-        while (bufferSize > 10 * sampleRate) {
-            sleep(100)
-        }
+    }
+
+    fun mixBuffer(byteBuffer: ByteBuffer, bytesRead: Int) {
+//        val mediaPCMData = fetchRTCPCM(bytesRead) ?: return
+//        byteBuffer.clear()
+//        byteBuffer.put(mediaPCMData)
     }
 
 }

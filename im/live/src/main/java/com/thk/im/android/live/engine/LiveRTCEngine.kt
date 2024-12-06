@@ -5,11 +5,13 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
+import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.AudioUtils
 import com.thk.im.android.live.player.RTCMediaPlayer
@@ -86,8 +88,8 @@ class LiveRTCEngine {
             .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
             .build()
         audioDeviceModule = JavaAudioDeviceModule.builder(app)
-            .setUseHardwareAcousticEchoCanceler(true)
-            .setUseHardwareNoiseSuppressor(true)
+            .setUseHardwareAcousticEchoCanceler(false)
+            .setUseHardwareNoiseSuppressor(false)
             .setAudioAttributes(audioAttributes)
             .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
             .setUseLowLatency(true)
@@ -100,12 +102,18 @@ class LiveRTCEngine {
                     lastCaptureTime = current
                 }
             }
+            .setAudioBufferCallback { byteBuffer, format, channelCount, sampleRate, bytesRead, l ->
+                val timeBefore = System.nanoTime()
+                mediaPlayer?.mixBuffer(byteBuffer, bytesRead)
+                val after = System.nanoTime() - timeBefore
+                return@setAudioBufferCallback l + after
+            }
             .createAudioDeviceModule()
         eglBaseCtx = eglBaseContext
         factory = PeerConnectionFactory.builder().setOptions(options)
             .setVideoEncoderFactory(encoderFactory)
             .setVideoDecoderFactory(decoderFactory)
-            .setAudioProcessingFactory(audioProcessingFactory)
+//            .setAudioProcessingFactory(audioProcessingFactory)
             .setAudioDeviceModule(audioDeviceModule)
             .createPeerConnectionFactory()
         audioDeviceModule.setSpeakerMute(speakerMuted)

@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.main
 
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -7,6 +8,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.get
 import com.thk.im.android.R
 import com.thk.im.android.databinding.ActivityMainBinding
+import com.thk.im.android.live.engine.LiveRTCEngine
 import com.thk.im.android.ui.base.BaseActivity
 import com.thk.im.android.ui.group.GroupActivity
 import com.thk.im.android.ui.main.adpater.MainFragmentAdapter
@@ -34,6 +36,16 @@ class MainActivity : BaseActivity() {
         }
         binding.bnvBottom.selectedItemId = binding.bnvBottom[chooseMenuIndex].id
         setTitle(bottomMenuTitles.elementAt(chooseMenuIndex))
+
+        try {
+            val afd = assets.openFd("sample-111s.mp3")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                LiveRTCEngine.shared().mediaPlayer?.setMediaItem(afd)
+                LiveRTCEngine.shared().mediaPlayer?.play()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun onBottomItemSelected(it: MenuItem): Boolean {

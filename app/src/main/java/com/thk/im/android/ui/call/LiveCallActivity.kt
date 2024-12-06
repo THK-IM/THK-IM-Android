@@ -228,15 +228,15 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         binding.llRequestCall.visibility = View.VISIBLE
         binding.llCalling.visibility = View.GONE
         startRequestCalling()
-        try {
-            val afd = assets.openFd("sample-340s.mp3")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                LiveRTCEngine.shared().mediaPlayer?.setMediaItem(afd)
-                LiveRTCEngine.shared().mediaPlayer?.play()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+//        try {
+//            val afd = assets.openFd("sample-111s.mp3")
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                LiveRTCEngine.shared().mediaPlayer?.setMediaItem(afd)
+//                LiveRTCEngine.shared().mediaPlayer?.play()
+//            }
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
     }
 
     private fun showCallingView() {
@@ -409,6 +409,11 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
     }
 
     override fun onError(function: String, ex: Exception) {
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LiveRTCEngine.shared().mediaPlayer?.release()
     }
 
 }

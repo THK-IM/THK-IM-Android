@@ -9,7 +9,7 @@ public class PcmResample {
     }
 
     @Keep
-    private final long nativeConvertorId = 0L;
+    private long nativeConvertorId = 0L;
 
     @Keep
     private native int nativeInit(int src_channels, int src_sp_format_id, int src_sp_rate,

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
-import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.MediaRecorder
 import android.os.Build
@@ -22,7 +21,6 @@ import org.webrtc.EglBase
 import org.webrtc.ExternalAudioProcessingFactory
 import org.webrtc.ExternalAudioProcessingFactory.AudioProcessing
 import org.webrtc.Loggable
-import org.webrtc.Logging
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.VideoProcessor
 import org.webrtc.audio.JavaAudioDeviceModule
@@ -70,7 +68,7 @@ class LiveRTCEngine {
         }
         PeerConnectionFactory.initialize(
             PeerConnectionFactory.InitializationOptions.builder(app)
-                .setInjectableLogger(logger, Logging.Severity.LS_INFO)
+//                .setInjectableLogger(logger, Logging.Severity.LS_INFO)
                 .createInitializationOptions()
         )
         val eglBase = EglBase.create()
@@ -108,7 +106,10 @@ class LiveRTCEngine {
                 val timeBefore = System.nanoTime()
                 mediaPlayer?.mixBuffer(byteBuffer, format, channelCount, sampleRate, bytesRead)
                 val after = System.nanoTime() - timeBefore
-                Log.d("AudioBufferCallback", "$format $channelCount $sampleRate $bytesRead $l $after")
+                Log.d(
+                    "AudioBufferCallback",
+                    "$format $channelCount $sampleRate $bytesRead $l $after"
+                )
                 return@setAudioBufferCallback l
             }
             .createAudioDeviceModule()

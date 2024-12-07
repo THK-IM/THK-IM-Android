@@ -13,6 +13,7 @@ import com.thk.im.android.live.api.vo.PublishStreamReqVo
 import com.thk.im.android.live.api.vo.PublishStreamResVo
 import com.thk.im.android.live.engine.LiveMediaConstraints
 import com.thk.im.android.live.engine.LiveRTCEngine
+import org.webrtc.AudioTrackSink
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer

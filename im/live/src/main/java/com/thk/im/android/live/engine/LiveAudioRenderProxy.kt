@@ -15,7 +15,7 @@ open class LiveAudioRenderProxy : AudioProcessing {
     }
 
     // int numBands, int numFrames, ByteBuffer buffer
-    override fun process(p0: Int, p1: Int, p2: ByteBuffer) {
+    override fun process(p0: Int, p1: Int, byteBuffer: ByteBuffer) {
 //        p2.clear()
     }
 }

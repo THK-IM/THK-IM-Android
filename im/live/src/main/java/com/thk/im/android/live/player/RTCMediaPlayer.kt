@@ -103,7 +103,7 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
 //        Thread {
 //            run {
 //                while (true) {
-//                    fetchRTCPCM(100)?.let { buffer ->
+//                    fetchRTCPCM(320)?.let { buffer ->
 //                        currentDecodeThread?.playPCM(buffer)
 //                    }
 //                }
@@ -134,6 +134,10 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
     }
 
     override fun onBuffer(channelNum: Int, sampleRate: Int, ba: ByteArray) {
+        Log.d(
+            "RTCMediaPlayer",
+            "$channelNum, $sampleRate, ${this.numChannels}, ${this.sampleRateHz}, "
+        )
         if (resample != null && !resample!!.support(
                 channelNum,
                 sampleRate,
@@ -168,26 +172,17 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         sampleRate: Int,
         bytesRead: Int
     ) {
-
         Log.d(
             "RTCMediaPlayer",
             "$format, $channelCount, $sampleRate, $bytesRead, ${byteBuffer.remaining()}"
         )
-        byteBuffer.clear()
         byteBuffer.rewind()
         val mediaPCMData = fetchRTCPCM(bytesRead) ?: return
-//        val originData = ByteArray(bytesRead)
-//        byteBuffer.get(originData)
-//        for (i in originData.indices) {
-//            originData[i] = (originData[i] + mediaPCMData[i]).toByte()
-//        }
-//        byteBuffer.clear()
-//        byteBuffer.put(originData)
-        byteBuffer.put(mediaPCMData)
-//        PCMTransUtil.averageMix(originData, mediaPCMData)?.let {
-//            byteBuffer.clear()
-//            byteBuffer.put(it)
-//        }
+        val originData = ByteArray(bytesRead)
+        byteBuffer.get(originData)
+        val data = PCMTransUtil.averageMix(arrayOf(originData, mediaPCMData))
+        byteBuffer.clear()
+        byteBuffer.put(data)
     }
 
 }

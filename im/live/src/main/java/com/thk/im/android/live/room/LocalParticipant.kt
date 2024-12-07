@@ -64,6 +64,7 @@ class LocalParticipant(
                     if (sender.track()?.kind() == audioTrack.kind()) {
                         val parameters = sender.parameters
                         for (e in parameters.encodings) {
+                            e.minBitrateBps = mediaParams.audioMaxBitrate
                             e.maxBitrateBps = mediaParams.audioMaxBitrate
                         }
                         sender.parameters = parameters

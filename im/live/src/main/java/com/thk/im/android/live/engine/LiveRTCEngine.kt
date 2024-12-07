@@ -91,6 +91,8 @@ class LiveRTCEngine {
             .setUseHardwareAcousticEchoCanceler(true)
             .setUseHardwareNoiseSuppressor(true)
             .setAudioAttributes(audioAttributes)
+//            .setSampleRate(48000)
+//            .setAudioFormat(AudioFormat.ENCODING_PCM_16BIT)
             .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
             .setUseLowLatency(true)
             .setUseStereoInput(true)
@@ -104,7 +106,7 @@ class LiveRTCEngine {
             }
             .setAudioBufferCallback { byteBuffer, format, channelCount, sampleRate, bytesRead, l ->
                 val timeBefore = System.nanoTime()
-                mediaPlayer?.mixBuffer(byteBuffer, bytesRead)
+                mediaPlayer?.mixBuffer(byteBuffer, format, channelCount, sampleRate, bytesRead)
                 val after = System.nanoTime() - timeBefore
                 Log.d("AudioBufferCallback", "$format $channelCount $sampleRate $bytesRead $l $after")
                 return@setAudioBufferCallback l
@@ -114,7 +116,7 @@ class LiveRTCEngine {
         factory = PeerConnectionFactory.builder().setOptions(options)
             .setVideoEncoderFactory(encoderFactory)
             .setVideoDecoderFactory(decoderFactory)
-//            .setAudioProcessingFactory(audioProcessingFactory)
+            .setAudioProcessingFactory(audioProcessingFactory)
             .setAudioDeviceModule(audioDeviceModule)
             .createPeerConnectionFactory()
         audioDeviceModule.setSpeakerMute(speakerMuted)

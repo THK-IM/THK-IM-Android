@@ -5,7 +5,7 @@ import kotlin.math.log10
 
 object AudioUtils {
 
-    private fun pcmToFloatArray(pcmData: ByteArray): FloatArray {
+    fun pcmToFloatArray(pcmData: ByteArray): FloatArray {
         val floatData = FloatArray(pcmData.size / 2)
         for ((j, i) in (pcmData.indices step 2).withIndex()) {
             val sample = (pcmData[i].toInt() and 0xFF) or (pcmData[i + 1].toInt() shl 8)

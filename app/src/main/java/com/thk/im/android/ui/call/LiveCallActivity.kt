@@ -229,7 +229,7 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         binding.llCalling.visibility = View.GONE
         startRequestCalling()
         try {
-            val afd = assets.openFd("sample-340s.mp3")
+            val afd = assets.openFd("doukou.mp3")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 LiveRTCEngine.shared().mediaPlayer?.setMediaItem(afd)
                 LiveRTCEngine.shared().mediaPlayer?.play()

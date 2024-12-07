@@ -4,7 +4,7 @@ import android.content.res.AssetFileDescriptor
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.thk.im.android.core.base.LLog
+import com.thk.im.android.live.engine.PCMTransUtil
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
 import java.util.concurrent.LinkedBlockingDeque
@@ -74,14 +74,6 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
                 copiedLen += buffer.size
             }
         }
-//        val buffer = pcmBufferQueue.pollFirst() ?: return null
-//        if (buffer.size > len) {
-//            val rsp = ByteArray(len)
-//            System.arraycopy(buffer, 0, rsp, 0, len)
-//            return rsp
-//        } else {
-//            return buffer
-//        }
     }
 
     override fun setMediaItem(path: String) {
@@ -108,6 +100,15 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         currentDecodeThread = DecodeThread(this)
         currentDecodeThread?.setDataSource(afd)
         currentDecodeThread?.initAudioTrack(numChannels, sampleRateHz)
+//        Thread {
+//            run {
+//                while (true) {
+//                    fetchRTCPCM(100)?.let { buffer ->
+//                        currentDecodeThread?.playPCM(buffer)
+//                    }
+//                }
+//            }
+//        }.start()
     }
 
     override fun pause() {
@@ -146,6 +147,7 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         }
         if (resample == null) {
             resample = PcmResample()
+            pcmBufferQueue.clear()
             resample?.init(channelNum, sampleRate, this.numChannels, this.sampleRateHz)
         }
         resample?.let {
@@ -159,10 +161,25 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         }
     }
 
-    fun mixBuffer(byteBuffer: ByteBuffer, bytesRead: Int) {
+    fun mixBuffer(
+        byteBuffer: ByteBuffer,
+        format: Int,
+        channelCount: Int,
+        sampleRate: Int,
+        bytesRead: Int
+    ) {
+        Log.d(
+            "RTCMediaPlayer",
+            "$format, $channelCount, $sampleRate, $bytesRead, ${byteBuffer.remaining()}"
+        )
+        byteBuffer.rewind()
         val mediaPCMData = fetchRTCPCM(bytesRead) ?: return
-        byteBuffer.clear()
-        byteBuffer.put(mediaPCMData)
+        val originData = ByteArray(bytesRead)
+        byteBuffer.get(originData)
+        PCMTransUtil.averageMix(mediaPCMData, originData)?.let {
+            byteBuffer.clear()
+            byteBuffer.put(it)
+        }
     }
 
 }

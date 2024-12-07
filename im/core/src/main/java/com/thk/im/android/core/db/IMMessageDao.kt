@@ -86,6 +86,11 @@ interface IMMessageDao {
         count: Int
     ): List<Message>
 
+    /**
+     * 查询session的最早一条未读消息
+     */
+    fun findOldestUnreadMessage(sid: Long): Message?
+
 
     /**
      * 查询session的最后一条消息
@@ -97,6 +102,17 @@ interface IMMessageDao {
      * 查询session中At我的未读消息
      */
     fun findSessionAtMeUnreadMessages(sessionId: Long): List<Message>
+
+
+    /**
+     * 查询session下所有未读消息
+     */
+    fun findAllUnreadMessagesBySessionId(sessionId: Long): List<Message>
+
+    /**
+     * 查询所有未读消息
+     */
+    fun findAllUnreadMessages(): List<Message>
 
     fun findLatestMessagesByType(msgType: Int, offset: Int, count: Int): List<Message>
 

@@ -11,6 +11,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgTextBinding
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMUnSupportMsgView : LinearLayout, IMsgBodyView {
@@ -35,16 +36,20 @@ class IMUnSupportMsgView : LinearLayout, IMsgBodyView {
         return this
     }
 
+    private var position = IMMsgPosType.Left
+    override fun setPosition(position: IMMsgPosType) {
+        this.position = position
+    }
+
     override fun setMessage(
         message: Message,
         session: Session?,
-        delegate: IMMsgVHOperator?,
-        isReply: Boolean
+        delegate: IMMsgVHOperator?
     ) {
         binding.tvMsgContent.text = context.getString(R.string.not_support_msg_update_client)
         when (message.fUid) {
             0L -> {
-                if (isReply) {
+                if (this.position == IMMsgPosType.Reply) {
                     binding.tvMsgContent.textSize = 12.0f
                     binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
                 } else {
@@ -54,7 +59,7 @@ class IMUnSupportMsgView : LinearLayout, IMsgBodyView {
             }
 
             else -> {
-                if (isReply) {
+                if (this.position == IMMsgPosType.Reply) {
                     binding.tvMsgContent.textSize = 12.0f
                     binding.tvMsgContent.setTextColor(Color.parseColor("#FFFFFF"))
                 } else {

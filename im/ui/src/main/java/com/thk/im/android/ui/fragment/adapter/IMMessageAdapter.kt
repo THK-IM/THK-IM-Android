@@ -136,11 +136,11 @@ class IMMessageAdapter(
 
     fun insertNew(message: Message): Int {
         synchronized(this) {
+            referMessageUpdate(message)
             val pos = findPosition(message)
             if (pos >= 0 && pos < messageList.size) {
                 messageList[pos] = message
                 notifyItemChanged(pos)
-                referMessageUpdate(message)
                 return pos
             } else {
                 val position = findInsertPosition(message)
@@ -165,12 +165,12 @@ class IMMessageAdapter(
 
     fun update(message: Message) {
         synchronized(this) {
+            referMessageUpdate(message)
             val pos = findPosition(message)
             if (pos >= 0 && pos < messageList.size) {
                 messageList[pos] = message
                 notifyItemChanged(pos)
             }
-            referMessageUpdate(message)
         }
     }
 
@@ -230,7 +230,7 @@ class IMMessageAdapter(
 
     private fun referMessageUpdate(message: Message) {
         for ((index, m) in messageList.withIndex()) {
-            if (m.rMsgId == message.id) {
+            if (m.rMsgId == message.msgId) {
                 messageList[index].referMsg = message
                 notifyItemChanged(index)
             }

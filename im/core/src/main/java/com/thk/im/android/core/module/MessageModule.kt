@@ -146,12 +146,18 @@ interface MessageModule : BaseModule {
     /**
      * 查询session下的成员列表
      */
-    fun querySessionMembers(sessionId: Long, forceServer: Boolean): Flowable<List<SessionMember>>
+    fun querySessionMembers(sessionId: Long, needUpdate: Boolean): Flowable<List<SessionMember>>
 
     /**
      * 同步session成员列表
      */
     fun syncSessionMembers(sessionId: Long)
+
+    /**
+     * 清除session下所有已读消息
+     */
+    fun setAllMessageReadBySessionId(sessionId: Long): Flowable<Void>
+
 
     /**
      * 清除所有已读消息

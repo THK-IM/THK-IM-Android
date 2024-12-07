@@ -1,13 +1,13 @@
 package com.thk.im.android.core.module.internal
 
 import android.content.Context.MODE_PRIVATE
-import android.text.TextUtils
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMEvent
 import com.thk.im.android.core.IMSendMsgCallback
 import com.thk.im.android.core.MsgOperateStatus
 import com.thk.im.android.core.MsgSendStatus
+import com.thk.im.android.core.MsgType
 import com.thk.im.android.core.SessionStatus
 import com.thk.im.android.core.SessionType
 import com.thk.im.android.core.api.vo.MessageVo
@@ -30,6 +30,7 @@ import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.math.abs
 
 
 /**
@@ -51,6 +52,7 @@ open class DefaultMessageModule : MessageModule {
     private val snowFlakeMachine: Long = 2 // 雪花算法机器编号 Ios:1 Android:2
     private val needAckMap = HashMap<Long, MutableSet<Long>>()
     private val ackMessagePublishSubject = PublishSubject.create<Int>()
+    private val sessionMemberQueryTimeMap = mutableMapOf<Long, Long>()
 
     init {
         initAckMessagePublishSubject()
@@ -235,7 +237,7 @@ open class DefaultMessageModule : MessageModule {
                         val dbSession = IMCoreManager.db.sessionDao().findById(new.id)
                         // 更新session中的在线数据信息
                         if (dbSession != null) {
-                            dbSession.mergeServerSession(new)
+                            dbSession.merge(new)
                             IMCoreManager.db.sessionDao().update(dbSession)
                         }
                     }
@@ -338,6 +340,9 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, entityId, type).flatMap {
                     if (it.id > 0 && it.deleted == 0) {
                         IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
+                        if (it.type == SessionType.SuperGroup.value) {
+                            syncSessionMessage(it)
+                        }
                     }
                     Flowable.just(it)
                 }
@@ -362,6 +367,9 @@ open class DefaultMessageModule : MessageModule {
                 return@flatMap IMCoreManager.imApi.queryUserSession(uId, sessionId).flatMap {
                     if (it.id > 0 && it.deleted == 0) {
                         IMCoreManager.db.sessionDao().insertOrIgnore(listOf(it))
+                        if (it.type == SessionType.SuperGroup.value) {
+                            syncSessionMessage(it)
+                        }
                     }
                     Flowable.just(it)
                 }
@@ -555,32 +563,31 @@ open class DefaultMessageModule : MessageModule {
                 if (t.id <= 0 || t.deleted == 1) {
                     return
                 }
-                val unReadCount = messageDao.getUnReadCount(t.id)
-                if (forceNotify || t.mTime <= msg.mTime || t.unReadCount != unReadCount
-                    || TextUtils.isEmpty(t.lastMsg)
-                ) {
-                    val processor = getMsgProcessor(msg.type)
-                    var statusText = ""
-                    if (msg.sendStatus == MsgSendStatus.Sending.value ||
-                        msg.sendStatus == MsgSendStatus.Init.value ||
-                        msg.sendStatus == MsgSendStatus.Uploading.value
-                    ) {
-                        statusText = "➡️"
-                    } else if (msg.sendStatus == MsgSendStatus.SendFailed.value) {
-                        statusText = "❗"
-                    }
-                    var sender: String? = null
-                    if (t.type != SessionType.Single.value) {
-                        if (msg.fUid > 0) {
-                            sender = processor.getSenderName(msg)
+                var needNotify = false
+                if (t.lastMsg != null) {
+                    try {
+                        val lastMsg = Gson().fromJson(t.lastMsg, Message::class.java)
+                        if (lastMsg.cTime <= msg.cTime) {
+                            t.lastMsg = Gson().toJson(msg)
+                            needNotify = true
                         }
+                    } catch (e: Exception) {
+                        t.lastMsg = Gson().toJson(msg)
+                        needNotify = true
+                        e.printStackTrace()
                     }
-                    var senderText = ""
-                    if (sender != null) {
-                        senderText = "${sender}:"
-                    }
-                    t.lastMsg = "$statusText$senderText${processor.sessionDesc(msg)}"
-                    if (t.mTime < msg.cTime) {
+                } else {
+                    needNotify = true
+                    t.lastMsg = Gson().toJson(msg)
+                }
+
+                val unReadCount = messageDao.getUnReadCount(t.id)
+                if (t.unReadCount != unReadCount) {
+                    needNotify = true
+                    t.unReadCount = unReadCount
+                }
+                if (needNotify || forceNotify) {
+                    if (t.mTime <= msg.cTime) {
                         t.mTime = msg.cTime
                     }
                     t.unReadCount = unReadCount
@@ -591,11 +598,6 @@ open class DefaultMessageModule : MessageModule {
                         (msg.oprStatus.and(MsgOperateStatus.ServerRead.value) == 0) &&
                         !getMsgProcessor(msg.type).needReprocess(msg)
                     ) {
-                        LLog.d("processSessionByMessage", "notifyNewMessage")
-                        val sessionLog = Gson().toJson(t)
-                        val messageLog = Gson().toJson(msg)
-                        LLog.d("processSessionByMessage", "session: $sessionLog")
-                        LLog.d("processSessionByMessage", "message: $messageLog")
                         notifyNewMessage(t, msg)
                     }
                 }
@@ -623,18 +625,22 @@ open class DefaultMessageModule : MessageModule {
 
     override fun querySessionMembers(
         sessionId: Long,
-        forceServer: Boolean
+        needUpdate: Boolean
     ): Flowable<List<SessionMember>> {
-        if (forceServer) {
-            return queryLastSessionMember(sessionId, getSessionMemberCountPerRequest())
+        val count = getSessionMemberCountPerRequest()
+        if (needUpdate) {
+            val lastQueryTime = sessionMemberQueryTimeMap[sessionId] ?: 0
+            if (abs(IMCoreManager.severTime - lastQueryTime) > 1000 * 60) {
+                return queryLastSessionMember(sessionId, count)
+            }
+            sessionMemberQueryTimeMap[sessionId] = IMCoreManager.severTime
         }
-
         return Flowable.create<List<SessionMember>?>({
             val sessionMembers = IMCoreManager.db.sessionMemberDao().findBySessionId(sessionId)
             it.onNext(sessionMembers)
         }, BackpressureStrategy.LATEST).flatMap {
             if (it.isEmpty()) {
-                return@flatMap queryLastSessionMember(sessionId, getSessionMemberCountPerRequest())
+                return@flatMap queryLastSessionMember(sessionId, count)
             } else {
                 return@flatMap Flowable.just(it)
             }
@@ -649,9 +655,8 @@ open class DefaultMessageModule : MessageModule {
             return@flatMap IMCoreManager.imApi.queryLatestSessionMembers(sessionId, it, null, count)
         }.flatMap {
             IMCoreManager.db.sessionMemberDao().insertOrReplace(it)
-            if (it.isNotEmpty()) {
-                val mTime = it.last().mTime
-                IMCoreManager.db.sessionDao().updateMemberSyncTime(sessionId, mTime)
+            it.lastOrNull()?.mTime?.let { time ->
+                IMCoreManager.db.sessionDao().updateMemberSyncTime(sessionId, time)
             }
             if (it.size >= count) {
                 return@flatMap queryLastSessionMember(sessionId, count)
@@ -682,7 +687,6 @@ open class DefaultMessageModule : MessageModule {
         queryLastSessionMember(sessionId, count).compose(RxTransform.flowableToIo())
             .subscribe(subscriber)
         disposes.add(subscriber)
-
     }
 
     override fun reset() {
@@ -830,12 +834,41 @@ open class DefaultMessageModule : MessageModule {
         this.disposes.add(disposable)
     }
 
+    override fun setAllMessageReadBySessionId(sessionId: Long): Flowable<Void> {
+        return Flowable.create({
+            try {
+                val unReadMessages =
+                    IMCoreManager.db.messageDao().findAllUnreadMessagesBySessionId(sessionId)
+                for (m in unReadMessages) {
+                    if (m.fUid != IMCoreManager.uId && m.msgId > 0) {
+                        IMCoreManager.messageModule
+                            .sendMessage(
+                                m.sid, MsgType.Read.value,
+                                null, null, null, m.msgId
+                            )
+                    }
+                }
+            } catch (e: Exception) {
+                it.onError(e)
+            }
+            it.onComplete()
+        }, BackpressureStrategy.LATEST)
+    }
+
 
     override fun setAllMessageRead(): Flowable<Void> {
         return Flowable.create({
             try {
-                IMCoreManager.getImDataBase().messageDao().updateAllMsgRead()
-                IMCoreManager.getImDataBase().sessionDao().updateAllMsgRead()
+                val unReadMessages = IMCoreManager.db.messageDao().findAllUnreadMessages()
+                for (m in unReadMessages) {
+                    if (m.fUid != IMCoreManager.uId && m.msgId > 0) {
+                        IMCoreManager.messageModule
+                            .sendMessage(
+                                m.sid, MsgType.Read.value,
+                                null, null, null, m.msgId
+                            )
+                    }
+                }
             } catch (e: Exception) {
                 it.onError(e)
             }

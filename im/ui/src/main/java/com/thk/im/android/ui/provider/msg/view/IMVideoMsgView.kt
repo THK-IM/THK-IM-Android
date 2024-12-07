@@ -18,6 +18,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgVideoBinding
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.manager.IMVideoMsgBody
 import com.thk.im.android.ui.manager.IMVideoMsgData
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
@@ -44,13 +45,17 @@ class IMVideoMsgView : LinearLayout, IMsgBodyView {
         return this
     }
 
+    private var position = IMMsgPosType.Left
+    override fun setPosition(position: IMMsgPosType) {
+        this.position = position
+    }
+
     override fun setMessage(
         message: Message,
         session: Session?,
-        delegate: IMMsgVHOperator?,
-        isReply: Boolean
+        delegate: IMMsgVHOperator?
     ) {
-        if (isReply) {
+        if (this.position == IMMsgPosType.Reply) {
             binding.tvVideoDuration.visibility = View.GONE
             val lp = binding.ivVideoPlay.layoutParams
             lp.width = AppUtils.dp2px(10f)
@@ -94,7 +99,7 @@ class IMVideoMsgView : LinearLayout, IMsgBodyView {
             }
         }
         if (width != 0 && height != 0) {
-            setLayoutParams(width, height, isReply)
+            setLayoutParams(width, height, this.position == IMMsgPosType.Reply)
         }
         renderDuration(duration)
         if (imagePath != "") {

@@ -12,6 +12,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.ViewMsgTimelineBinding
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMTimeLineMsgView : LinearLayout, IMsgBodyView {
@@ -36,11 +37,13 @@ class IMTimeLineMsgView : LinearLayout, IMsgBodyView {
         return this
     }
 
+    override fun setPosition(position: IMMsgPosType) {
+    }
+
     override fun setMessage(
         message: Message,
         session: Session?,
-        delegate: IMMsgVHOperator?,
-        isReply: Boolean
+        delegate: IMMsgVHOperator?
     ) {
         val timeText = DateUtils.timeToMsgTime(message.cTime, IMCoreManager.severTime)
         binding.tvMsgContent.text = timeText

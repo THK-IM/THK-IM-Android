@@ -30,10 +30,6 @@ open class IMVideoMsgProcessor : IMBaseMsgProcessor() {
         return MsgType.Video.value
     }
 
-    override fun atMeDesc(msg: Message): String {
-        return IMCoreManager.app.getString(R.string.someone_at_me)
-    }
-
     override fun msgDesc(msg: Message): String {
         return IMCoreManager.app.getString(R.string.im_video_msg)
     }

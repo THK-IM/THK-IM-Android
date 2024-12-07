@@ -41,7 +41,6 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.core.db.entity.SessionMember
 import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.core.event.XEventBus
-import com.thk.im.android.core.exception.CodeMsgException
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.databinding.FragmentMessageBinding
 import com.thk.im.android.ui.fragment.popup.IMAtSessionMemberPopup
@@ -62,9 +61,10 @@ import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
 import com.thk.im.android.ui.utils.ScreenUtils
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
+import java.util.Locale
 
 open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessionMemberAtDelegate {
-    private lateinit var keyboardPopupWindow: KeyboardPopupWindow
+    private var keyboardPopupWindow: KeyboardPopupWindow? = null
     private lateinit var binding: FragmentMessageBinding
     private var keyboardShowing = false
     private var session: Session? = null
@@ -83,7 +83,8 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
     override fun onDestroyView() {
         super.onDestroyView()
-        keyboardPopupWindow.dismiss()
+        binding.tvUnreadTip.removeCallbacks(null)
+        keyboardPopupWindow?.dismiss()
         disposables.clear()
         saveDraft()
     }
@@ -141,6 +142,27 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         val bgColor =
             IMUIManager.uiResourceProvider?.inputLayoutBgColor() ?: Color.parseColor("#DDDDDD")
         val textColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#1390f4")
+
+        binding.tvUnreadTip.setShape(bgColor, floatArrayOf(6f, 6f, 6f, 6f), false)
+        binding.tvUnreadTip.setTextColor(textColor)
+        binding.tvUnreadTip.setOnClickListener {
+            binding.tvUnreadTip.visibility = View.GONE
+            binding.rcvMessage.scrollToUnReadMsg()
+        }
+        binding.tvUnreadTip.postDelayed({
+            val unreadCount = session?.unReadCount ?: 0
+            if (unreadCount > 0) {
+                binding.tvUnreadTip.text = String.format(
+                    Locale.getDefault(),
+                    getString(R.string.x_message_unread),
+                    unreadCount
+                )
+                binding.tvUnreadTip.visibility = View.VISIBLE
+            } else {
+                binding.tvUnreadTip.visibility = View.GONE
+            }
+        }, 500)
+
         binding.tvNewMsgTip.setShape(bgColor, floatArrayOf(6f, 6f, 6f, 6f), false)
         binding.tvNewMsgTip.setTextColor(textColor)
         binding.tvNewMsgTip.text = getString(R.string.new_message_tips)
@@ -168,6 +190,22 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                 IMCoreManager.getImDataBase().messageDao().findSessionAtMeUnreadMessages(it.id)
             Flowable.just(unReadAtMeMessages)
         }.compose(RxTransform.flowableToMain()).subscribe(subscriber)
+    }
+
+    private fun updateUnreadMsgTips() {
+        val unreadCount = session?.unReadCount ?: 0
+        // 如果已经被隐藏 就不在刷新未读消息提示
+        if (unreadCount > 0) {
+            if (binding.tvUnreadTip.visibility == View.VISIBLE) {
+                binding.tvUnreadTip.text = String.format(
+                    Locale.getDefault(),
+                    getString(R.string.x_message_unread),
+                    unreadCount
+                )
+            }
+        } else {
+            binding.tvUnreadTip.visibility = View.GONE
+        }
     }
 
     private fun updateAtTipsView() {
@@ -369,52 +407,46 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
         })
         XEventBus.observe(this, IMEvent.MsgNew.value, Observer<Message> {
-            it?.let {
-                if (it.sid == session!!.id) {
-                    if (it.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0 && it.isAtMe()) {
-                        var contained = false
-                        atMessages.forEach { msg ->
-                            if (msg.msgId == it.msgId) {
-                                contained = true
-                            }
-                        }
-                        if (!contained) {
-                            atMessages.add(it)
-                            updateAtTipsView()
+            if (it.sid == session!!.id) {
+                if (it.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0 && it.isAtMe()) {
+                    var contained = false
+                    atMessages.forEach { msg ->
+                        if (msg.msgId == it.msgId) {
+                            contained = true
                         }
                     }
-                    binding.rcvMessage.insertMessage(it)
+                    if (!contained) {
+                        atMessages.add(it)
+                        updateAtTipsView()
+                    }
                 }
+                binding.rcvMessage.insertMessage(it)
             }
         })
         XEventBus.observe(this, IMEvent.MsgUpdate.value, Observer<Message> {
-            it?.let {
-                if (it.sid == session!!.id) {
-                    if (it.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0 && it.isAtMe()) {
-                        var contained = false
-                        atMessages.forEach { msg ->
-                            if (msg.msgId == it.msgId) {
-                                contained = true
-                            }
-                        }
-                        if (!contained) {
-                            atMessages.add(it)
-                            updateAtTipsView()
+            if (it.sid == session!!.id) {
+                if (it.oprStatus.and(MsgOperateStatus.ClientRead.value) == 0 && it.isAtMe()) {
+                    var contained = false
+                    atMessages.forEach { msg ->
+                        if (msg.msgId == it.msgId) {
+                            contained = true
                         }
                     }
-                    binding.rcvMessage.updateMessage(it)
+                    if (!contained) {
+                        atMessages.add(it)
+                        updateAtTipsView()
+                    }
                 }
+                binding.rcvMessage.updateMessage(it)
             }
         })
         XEventBus.observe(this, IMEvent.MsgDelete.value, Observer<Message> {
-            it?.let {
-                if (it.sid == session!!.id) {
-                    atMessages.removeAll { atMsg ->
-                        atMsg.msgId == it.msgId
-                    }
-                    updateAtTipsView()
-                    binding.rcvMessage.deleteMessage(it)
+            if (it.sid == session!!.id) {
+                atMessages.removeAll { atMsg ->
+                    atMsg.msgId == it.msgId
                 }
+                updateAtTipsView()
+                binding.rcvMessage.deleteMessage(it)
             }
         })
         XEventBus.observe(this, IMEvent.BatchMsgDelete.value, Observer<List<Message>> { messages ->
@@ -436,27 +468,24 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         })
 
         XEventBus.observe(this, IMEvent.SessionUpdate.value, Observer<Session> {
-            session?.let { session ->
-                if (it.id == session.id) {
-                    session.mute = it.mute
-                    session.status = it.status
-                    session.draft = it.draft
-                    session.deleted = it.deleted
-                    session.extData = it.extData
-                    session.functionFlag = it.functionFlag
-                    session.parentId = it.parentId
-                    session.lastMsg = it.lastMsg
-                    session.topTimestamp = it.topTimestamp
-                    session.unReadCount = it.unReadCount
-                    session.memberCount = it.memberCount
-                }
-            }
+            updateSession(it)
+        })
+
+        XEventBus.observe(this, IMEvent.SessionNew.value, Observer<Session> {
+            updateSession(it)
         })
     }
 
+    private fun updateSession(s: Session) {
+        if (session?.id == s.id) {
+            session?.merge(s)
+            session?.unReadCount = s.unReadCount
+            updateUnreadMsgTips()
+        }
+    }
+
     override fun previewMessage(msg: Message, position: Int, originView: View) {
-        LLog.v("previewMessage ${msg.type} $position, $msg")
-        val interceptor = IMUIManager.getMsgIVProviderByMsgType(msg.type).onMsgClick(
+        val interceptor = IMUIManager.getMsgIVProviderByMsgType(msg.type).onMsgBodyClick(
             requireContext(), msg, session, originView
         )
         if (!interceptor) {
@@ -704,7 +733,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
     override fun resendMessage(msg: Message) {
         val callback = object : IMSendMsgCallback {
-            override fun onResult(message: Message, e: Exception?) {
+            override fun onResult(message: Message, e: Throwable?) {
                 e?.let {
                     showError(it)
                 }
@@ -715,7 +744,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
     override fun sendMessage(type: Int, body: Any?, data: Any?, atUser: String?) {
         val callback = object : IMSendMsgCallback {
-            override fun onResult(message: Message, e: Exception?) {
+            override fun onResult(message: Message, e: Throwable?) {
                 e?.let {
                     showError(it)
                 }
@@ -805,6 +834,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
     override fun onSessionMemberAt(user: User, sessionMember: SessionMember?) {
         binding.llInputLayout.addAtSessionMember(user, sessionMember)
+        binding.llInputLayout.openKeyboard()
     }
 
     override fun openAtPopupView() {
@@ -858,6 +888,16 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         return memberMap[userId]
     }
 
+
+    override fun syncGetSessionMemberUserIdByNickname(nick: String): Long? {
+        for ((k, v) in this.memberMap) {
+            if (v.second?.noteName == nick || v.first.nickname == nick) {
+                return k
+            }
+        }
+        return null
+    }
+
     override fun saveSessionMemberInfo(info: Pair<User, SessionMember?>) {
         memberMap[info.first.id] = info
     }
@@ -874,16 +914,6 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                     return@flatMap Flowable.just(Pair(user, null))
                 }
             }
-    }
-
-    open fun showError(e: Exception) {
-        if (e is CodeMsgException) {
-            showToast(e.msg)
-        } else {
-            e.localizedMessage?.let {
-                showToast(it)
-            }
-        }
     }
 
 }

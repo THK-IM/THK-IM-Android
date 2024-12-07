@@ -90,7 +90,7 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
     }
 
     override fun previewMessage(msg: Message, position: Int, originView: View) {
-        val interceptor = IMUIManager.getMsgIVProviderByMsgType(msg.type).onMsgClick(
+        val interceptor = IMUIManager.getMsgIVProviderByMsgType(msg.type).onMsgBodyClick(
             this, msg, null, originView
         )
         if (interceptor) {

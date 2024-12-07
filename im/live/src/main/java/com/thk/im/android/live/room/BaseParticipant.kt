@@ -351,9 +351,6 @@ abstract class BaseParticipant(
     open fun onError(function: String, exception: Exception) {
         LLog.d("RTCRoom", "${this.javaClass} $uId, onError ${exception.message}")
         val room = RTCRoomManager.shared().getRoomById(roomId) ?: return
-        if (room.id != this.roomId) {
-            return
-        }
         room.callback?.onError(function, exception)
     }
 

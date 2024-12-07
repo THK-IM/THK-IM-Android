@@ -53,7 +53,7 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
         if (msg.rMsgId == null) {
             return
         }
-        if (msg.rMsgId!! < 0) {
+        if (msg.rMsgId!! <= 0) {
             return
         }
         val subscriber = object : BaseSubscriber<Message>() {
@@ -76,19 +76,13 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
         }
         Flowable.create<Message>({
             try {
-                IMCoreManager.getImDataBase().messageDao().updateOperationStatus(
-                    msg.sid, mutableSetOf(msg.rMsgId!!), MsgOperateStatus.ClientRead.value
-                )
-                val session = IMCoreManager.getImDataBase().sessionDao().findById(msg.sid)
-                if (session != null) {
-                    val count =
-                        IMCoreManager.getImDataBase().messageDao().getUnReadCount(session.id)
-                    if (session.unReadCount != count) {
-                        session.unReadCount = count
-                        IMCoreManager.getImDataBase().sessionDao().update(session)
-                        XEventBus.post(IMEvent.SessionUpdate.value, session)
+                IMCoreManager.getImDataBase().messageDao().findByMsgId(msg.rMsgId!!, msg.sid)
+                    ?.let { referMsg ->
+                        referMsg.oprStatus =
+                            referMsg.oprStatus.or(MsgOperateStatus.ClientRead.value)
+                                .or(MsgOperateStatus.Ack.value)
+                        insertOrUpdateDb(referMsg, notify = false, notifySession = true)
                     }
-                }
                 it.onNext(msg)
             } catch (e: Exception) {
                 it.onError(e)

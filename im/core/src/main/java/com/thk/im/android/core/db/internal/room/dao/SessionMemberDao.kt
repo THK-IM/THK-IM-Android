@@ -30,4 +30,7 @@ interface SessionMemberDao {
     @Query("select * from session_member where session_id = :sessionId and user_id = :userId")
     fun findSessionMember(sessionId: Long, userId: Long): SessionMember?
 
+    @Query("select * from session_member where session_id = :sessionId and user_id in (:userIds)")
+    fun findSessionMembers(sessionId: Long, userIds: Set<Long>): List<SessionMember>
+
 }

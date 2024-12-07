@@ -110,7 +110,7 @@ dependencies {
 //                from components.release
 //                groupId = 'io.github.thk-im'
 //                artifactId = moduleName
-//                version = rootProject.ext.android.versionName
+//                version = rootProject.ext.android.libVersionName
 //                pom {
 //                    name = 'THK-IM Android Plugin Framework'
 //                    description = 'A Android Plugin Framework'

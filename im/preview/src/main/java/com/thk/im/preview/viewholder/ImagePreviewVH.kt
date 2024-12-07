@@ -36,7 +36,7 @@ class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
             if (body.url == progress.url) {
                 if (progress.state == FileLoadState.Success.value) {
                     progressView.visibility = View.GONE
-                    IMImageLoader.displayImageByPath(ivImage, progress.path)
+                    IMImageLoader.displayDoNotAnimateByPath(ivImage, progress.path)
                     val data =
                         Gson().fromJson(it.data, IMImageMsgData::class.java) ?: IMImageMsgData()
                     data.height = body.height
@@ -65,7 +65,7 @@ class ImagePreviewVH(liftOwner: LifecycleOwner, itemView: View) :
                     IMImageLoader.displayImageByPath(ivImage, data.path!!)
                 } else {
                     if (data.thumbnailPath != null) {
-                        IMImageLoader.displayImageByPath(ivImage, data.thumbnailPath!!)
+                        IMImageLoader.displayDoNotAnimateByPath(ivImage, data.thumbnailPath!!)
                     }
                     downloadOriginImage()
                 }

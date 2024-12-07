@@ -327,12 +327,12 @@ class IMInputLayout : ConstraintLayout {
             val text = it.toString()
             val (_, atUIds) = AtStringUtils.replaceAtNickNamesToUIds(text) { nickname ->
                 for ((k, v) in atMap) {
-                    if (v == nickname) {
-                        return@replaceAtNickNamesToUIds k.toLongOrNull()
-                            ?: return@replaceAtNickNamesToUIds 0L
+                    if (v.trim() == nickname) {
+                        return@replaceAtNickNamesToUIds k.toLongOrNull() ?: 0L
                     }
                 }
-                return@replaceAtNickNamesToUIds 0L
+                val id = msgSender?.syncGetSessionMemberUserIdByNickname(nickname.trim())
+                return@replaceAtNickNamesToUIds id ?: 0L
             }
             if (reeditMsg != null) {
                 val msg = IMReeditMsgData(reeditMsg!!.sid, reeditMsg!!.msgId, text)
@@ -413,8 +413,8 @@ class IMInputLayout : ConstraintLayout {
                     } else {
                         binding.etMessage.text.delete(index - 1, index)
                     }
-                } else {
-                    binding.etMessage.text.delete(index - 1, index)
+                } else if (index == 1){
+                    binding.etMessage.text.delete(0, index)
                 }
             }
         }

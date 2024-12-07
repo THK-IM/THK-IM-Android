@@ -19,6 +19,7 @@ import com.thk.im.android.ui.databinding.ViewMsgAudioBinding
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.manager.IMAudioMsgBody
 import com.thk.im.android.ui.manager.IMAudioMsgData
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 
 class IMAudioMsgView : LinearLayout, IMsgBodyView {
@@ -43,11 +44,15 @@ class IMAudioMsgView : LinearLayout, IMsgBodyView {
         return this
     }
 
+    private var position = IMMsgPosType.Left
+    override fun setPosition(position: IMMsgPosType) {
+        this.position = position
+    }
+
     override fun setMessage(
         message: Message,
         session: Session?,
-        delegate: IMMsgVHOperator?,
-        isReply: Boolean
+        delegate: IMMsgVHOperator?
     ) {
         var duration = 0
         var path: String? = null
@@ -80,7 +85,7 @@ class IMAudioMsgView : LinearLayout, IMsgBodyView {
                 .downloadMsgContent(message, IMMsgResourceType.Thumbnail.value)
         }
 
-        if (isReply) {
+        if (this.position == IMMsgPosType.Reply) {
             binding.tvAudioDuration.textSize = 12.0f
             binding.tvAudioDuration.setTextColor(Color.parseColor("#ff999999"))
         } else {

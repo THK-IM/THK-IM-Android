@@ -156,6 +156,9 @@ class THKVideoPlayerView : RelativeLayout {
         } else {
             url
         }
+        if (binding.playerView.player?.currentMediaItem?.localConfiguration?.uri.toString() == proxyUrl) {
+            return
+        }
         binding.bottomController.updateTime(0, 0, 0)
         binding.playerView.player?.setMediaItem(MediaItem.fromUri(Uri.parse(proxyUrl)))
         binding.playerView.player?.prepare()

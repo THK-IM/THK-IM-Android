@@ -34,6 +34,18 @@ object IMImageLoader {
         Glide.with(imageView.context.applicationContext).load(url).into(imageView)
     }
 
+    fun displayDoNotAnimate(imageView: ImageView, url: String) {
+        Glide.with(imageView.context.applicationContext).load(url).dontAnimate()
+            .placeholder(imageView.getDrawable())
+            .into(imageView)
+    }
+
+    fun displayDoNotAnimateByPath(imageView: ImageView, path: String) {
+        Glide.with(imageView.context.applicationContext).load(File(path)).dontAnimate()
+            .placeholder(imageView.getDrawable())
+            .into(imageView)
+    }
+
     fun preloadFile(
         imageView: ImageView,
         url: String,

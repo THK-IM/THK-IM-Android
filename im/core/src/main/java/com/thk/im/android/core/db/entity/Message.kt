@@ -103,7 +103,7 @@ data class Message(
         val strUIds = this.atUsers!!.split("#")
         strUIds.forEach { strUId ->
             strUId.toLongOrNull()?.let {
-                if (it == -1L || it == IMCoreManager.uId) {
+                if (it == User.all.id || it == IMCoreManager.uId) {
                     return true
                 }
             }

@@ -132,12 +132,16 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
         return roomDatabase.messageDao().findNewerMessage(sId, msgId, types, cTime, count)
     }
 
+    override fun findOldestUnreadMessage(sid: Long): Message? {
+        return roomDatabase.messageDao().findOldestUnreadMessage(sid)
+    }
+
     override fun findLastMessageBySessionId(sid: Long): Message? {
         return roomDatabase.messageDao().findLastMessageBySessionId(sid)
     }
 
     override fun findSessionAtMeUnreadMessages(sessionId: Long): List<Message> {
-        val messages = roomDatabase.messageDao().findSessionAtMeUnreadMessages(sessionId)
+        val messages = roomDatabase.messageDao().findAllUnreadMessagesBySessionId(sessionId)
         val atMeMessages = mutableListOf<Message>()
         messages.forEach {
             if (it.isAtMe()) {
@@ -145,6 +149,14 @@ internal class IMMessageDaoImp(private val roomDatabase: IMRoomDataBase) : IMMes
             }
         }
         return atMeMessages
+    }
+
+    override fun findAllUnreadMessagesBySessionId(sessionId: Long): List<Message> {
+        return roomDatabase.messageDao().findAllUnreadMessagesBySessionId(sessionId)
+    }
+
+    override fun findAllUnreadMessages(): List<Message> {
+        return roomDatabase.messageDao().findAllUnreadMessages()
     }
 
     override fun findLatestMessagesByType(msgType: Int, offset: Int, count: Int): List<Message> {

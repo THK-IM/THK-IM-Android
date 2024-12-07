@@ -6,9 +6,10 @@ import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.MsgType
 import com.thk.im.android.ui.fragment.view.IMsgBodyView
 import com.thk.im.android.ui.fragment.viewholder.msg.IMBaseMsgVH
+import com.thk.im.android.ui.manager.IMMsgPosType
 import com.thk.im.android.ui.protocol.IMBaseMessageIVProvider
 import com.thk.im.android.ui.provider.msg.view.IMImageMsgView
-import com.thk.im.android.ui.provider.msg.viewholder.IMImageMsgVH
+import com.thk.im.android.ui.provider.msg.view.IMRecordMsgView
 
 open class IMImageMsgIVProvider : IMBaseMessageIVProvider() {
 
@@ -24,15 +25,9 @@ open class IMImageMsgIVProvider : IMBaseMessageIVProvider() {
         return true
     }
 
-    override fun replyMsgView(context: Context): IMsgBodyView {
-        return IMImageMsgView(context)
-    }
-
-    override fun createViewHolder(
-        lifecycleOwner: LifecycleOwner,
-        itemView: View,
-        viewType: Int
-    ): IMBaseMsgVH {
-        return IMImageMsgVH(lifecycleOwner, itemView, viewType)
+    override fun msgBodyView(context: Context, position: IMMsgPosType): IMsgBodyView {
+        val v = IMImageMsgView(context)
+        v.setPosition(position)
+        return v
     }
 }

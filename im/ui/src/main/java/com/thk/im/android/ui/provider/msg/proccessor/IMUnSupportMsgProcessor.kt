@@ -16,8 +16,4 @@ open class IMUnSupportMsgProcessor : IMBaseMsgProcessor() {
         return IMCoreManager.app.getString(R.string.im_un_support_msg)
     }
 
-    override fun atMeDesc(msg: Message): String {
-        return IMCoreManager.app.getString(R.string.someone_at_me)
-    }
-
 }

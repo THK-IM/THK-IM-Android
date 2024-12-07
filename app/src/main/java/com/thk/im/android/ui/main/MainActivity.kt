@@ -38,7 +38,7 @@ class MainActivity : BaseActivity() {
         setTitle(bottomMenuTitles.elementAt(chooseMenuIndex))
 
 //        try {
-//            val afd = assets.openFd("sample-340s.mp3")
+//            val afd = assets.openFd("dukou.mp3")
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 //                LiveRTCEngine.shared().mediaPlayer?.setMediaItem(afd)
 //                LiveRTCEngine.shared().mediaPlayer?.play()

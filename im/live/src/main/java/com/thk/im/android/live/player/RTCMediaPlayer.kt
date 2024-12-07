@@ -168,18 +168,26 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         sampleRate: Int,
         bytesRead: Int
     ) {
+
         Log.d(
             "RTCMediaPlayer",
             "$format, $channelCount, $sampleRate, $bytesRead, ${byteBuffer.remaining()}"
         )
+        byteBuffer.clear()
         byteBuffer.rewind()
         val mediaPCMData = fetchRTCPCM(bytesRead) ?: return
-        val originData = ByteArray(bytesRead)
-        byteBuffer.get(originData)
-        PCMTransUtil.averageMix(mediaPCMData, originData)?.let {
-            byteBuffer.clear()
-            byteBuffer.put(it)
-        }
+//        val originData = ByteArray(bytesRead)
+//        byteBuffer.get(originData)
+//        for (i in originData.indices) {
+//            originData[i] = (originData[i] + mediaPCMData[i]).toByte()
+//        }
+//        byteBuffer.clear()
+//        byteBuffer.put(originData)
+        byteBuffer.put(mediaPCMData)
+//        PCMTransUtil.averageMix(originData, mediaPCMData)?.let {
+//            byteBuffer.clear()
+//            byteBuffer.put(it)
+//        }
     }
 
 }

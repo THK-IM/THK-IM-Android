@@ -91,7 +91,7 @@ class LiveRTCEngine {
             .setUseHardwareAcousticEchoCanceler(true)
             .setUseHardwareNoiseSuppressor(true)
             .setAudioAttributes(audioAttributes)
-//            .setSampleRate(48000)
+            .setSampleRate(48000)
 //            .setAudioFormat(AudioFormat.ENCODING_PCM_16BIT)
             .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
             .setUseLowLatency(true)

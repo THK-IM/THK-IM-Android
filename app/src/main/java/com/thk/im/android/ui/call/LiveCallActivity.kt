@@ -228,15 +228,15 @@ class LiveCallActivity : BaseActivity(), RTCRoomCallBack, LiveCallProtocol {
         binding.llRequestCall.visibility = View.VISIBLE
         binding.llCalling.visibility = View.GONE
         startRequestCalling()
-        try {
-            val afd = assets.openFd("dukou.mp3")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                LiveRTCEngine.shared().mediaPlayer?.setMediaItem(afd)
-                LiveRTCEngine.shared().mediaPlayer?.play()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+//        try {
+//            val afd = assets.openFd("dukou.mp3")
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                LiveRTCEngine.shared().mediaPlayer?.setMediaItem(afd)
+//                LiveRTCEngine.shared().mediaPlayer?.play()
+//            }
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
     }
 
     private fun showCallingView() {

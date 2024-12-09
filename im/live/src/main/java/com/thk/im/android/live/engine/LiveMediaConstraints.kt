@@ -7,7 +7,8 @@ object LiveMediaConstraints {
     fun build(
         enable3a: Boolean,
         enableCpu: Boolean,
-        enableGainControl: Boolean
+        enableGainControl: Boolean,
+        enableStereo: Boolean,
     ): MediaConstraints {
         val constraints = MediaConstraints()
         val enable3aStr = if (enable3a) "true" else "false"
@@ -52,10 +53,13 @@ object LiveMediaConstraints {
                 enableGainControlStr
             )
         )
+
+        val enableStereoStr = if (enableStereo) "true" else "false"
+        constraints.mandatory.add(MediaConstraints.KeyValuePair("stereo", enableStereoStr)) // 启用立体声
         return constraints
     }
 
-    fun offerOrAnswerConstraint(isReceive: Boolean): MediaConstraints {
+    fun offerOrAnswerConstraint(isReceive: Boolean, enableStereo: Boolean): MediaConstraints {
         val mediaConstraints = MediaConstraints()
         //是否接收音频
         mediaConstraints.mandatory.add(
@@ -72,6 +76,13 @@ object LiveMediaConstraints {
         mediaConstraints.mandatory.add(
             MediaConstraints.KeyValuePair("googCpuOveruseDetection", "true")
         )
+        val enableStereoStr = if (enableStereo) "true" else "false"
+        mediaConstraints.mandatory.add(
+            MediaConstraints.KeyValuePair(
+                "stereo",
+                enableStereoStr
+            )
+        ) // 启用立体声
         return mediaConstraints
     }
 

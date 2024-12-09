@@ -13,7 +13,6 @@ import com.thk.im.android.live.api.vo.PublishStreamReqVo
 import com.thk.im.android.live.api.vo.PublishStreamResVo
 import com.thk.im.android.live.engine.LiveMediaConstraints
 import com.thk.im.android.live.engine.LiveRTCEngine
-import org.webrtc.AudioTrackSink
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraVideoCapturer
@@ -46,7 +45,10 @@ class LocalParticipant(
             if (audioEnable && role == Role.Broadcaster.value) {
                 val audioSource = LiveRTCEngine.shared().factory.createAudioSource(
                     LiveMediaConstraints.build(
-                        enable3a = true, enableCpu = true, enableGainControl = true
+                        enable3a = true,
+                        enableCpu = true,
+                        enableGainControl = true,
+                        enableStereo = true
                     )
                 )
                 // 创建AudioTrack，音频轨

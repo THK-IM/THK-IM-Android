@@ -55,7 +55,10 @@ abstract class BaseParticipant(
                 LLog.d("RTCRoom", "${this.javaClass} $uId  createOffer onCreateSuccess")
                 p0?.let {
                     if (it.type == SessionDescription.Type.OFFER) {
-                        onLocalSdpCreated(it)
+                        val stereoSdp =
+                            it.description.replace("useinbandfec=1", "useinbandfec=1;stereo=1")
+                        val newSdp = SessionDescription(it.type, stereoSdp)
+                        onLocalSdpCreated(newSdp)
                     }
                 }
             }
@@ -72,7 +75,7 @@ abstract class BaseParticipant(
                 LLog.d("RTCRoom", "${this.javaClass} $uId  createOffer onSetFailure $p0")
             }
 
-        }, LiveMediaConstraints.offerOrAnswerConstraint(this is RemoteParticipant))
+        }, LiveMediaConstraints.offerOrAnswerConstraint(this is RemoteParticipant, true))
     }
 
     fun setAudioMuted(muted: Boolean) {

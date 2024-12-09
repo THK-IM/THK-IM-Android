@@ -178,6 +178,8 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         )
         byteBuffer.rewind()
         val mediaPCMData = fetchRTCPCM(bytesRead) ?: return
+//        byteBuffer.clear()
+//        byteBuffer.put(mediaPCMData)
         val originData = ByteArray(bytesRead)
         byteBuffer.get(originData)
         val data = PCMTransUtil.averageMix(arrayOf(originData, mediaPCMData))

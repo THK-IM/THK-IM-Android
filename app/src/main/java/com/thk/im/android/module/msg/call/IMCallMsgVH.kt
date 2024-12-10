@@ -17,10 +17,6 @@ class IMCallMsgVH(liftOwner: LifecycleOwner, itemView: View, viewType: Int) :
         return view
     }
 
-    override fun onMessageShow() {
-
-    }
-
     override fun onViewBind(
         position: Int,
         messages: List<Message>,

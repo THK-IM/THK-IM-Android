@@ -5,12 +5,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.AudioDeviceInfo
+import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.AudioUtils
 import com.thk.im.android.live.player.RTCMediaPlayer
@@ -21,6 +21,7 @@ import org.webrtc.EglBase
 import org.webrtc.ExternalAudioProcessingFactory
 import org.webrtc.ExternalAudioProcessingFactory.AudioProcessing
 import org.webrtc.Loggable
+import org.webrtc.Logging
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.VideoProcessor
 import org.webrtc.audio.JavaAudioDeviceModule
@@ -68,7 +69,7 @@ class LiveRTCEngine {
         }
         PeerConnectionFactory.initialize(
             PeerConnectionFactory.InitializationOptions.builder(app)
-//                .setInjectableLogger(logger, Logging.Severity.LS_INFO)
+                .setInjectableLogger(logger, Logging.Severity.LS_INFO)
                 .createInitializationOptions()
         )
         val eglBase = EglBase.create()
@@ -90,7 +91,7 @@ class LiveRTCEngine {
             .setUseHardwareNoiseSuppressor(true)
             .setAudioAttributes(audioAttributes)
             .setSampleRate(48000)
-//            .setAudioFormat(AudioFormat.ENCODING_PCM_16BIT)
+            .setAudioFormat(AudioFormat.ENCODING_PCM_16BIT)
             .setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
             .setUseLowLatency(true)
             .setUseStereoInput(true)
@@ -106,11 +107,7 @@ class LiveRTCEngine {
                 val timeBefore = System.nanoTime()
                 mediaPlayer?.mixBuffer(byteBuffer, format, channelCount, sampleRate, bytesRead)
                 val after = System.nanoTime() - timeBefore
-                Log.d(
-                    "AudioBufferCallback",
-                    "$format $channelCount $sampleRate $bytesRead $l $after"
-                )
-                return@setAudioBufferCallback l
+                return@setAudioBufferCallback l + after - timeBefore
             }
             .createAudioDeviceModule()
         eglBaseCtx = eglBaseContext

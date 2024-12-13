@@ -100,15 +100,6 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         currentDecodeThread = DecodeThread(this)
         currentDecodeThread?.setDataSource(afd)
         currentDecodeThread?.initAudioTrack(numChannels, sampleRateHz)
-//        Thread {
-//            run {
-//                while (true) {
-//                    fetchRTCPCM(320)?.let { buffer ->
-//                        currentDecodeThread?.playPCM(buffer)
-//                    }
-//                }
-//            }
-//        }.start()
     }
 
     override fun pause() {
@@ -178,8 +169,6 @@ class RTCMediaPlayer : IRTCMediaPlayer, DecodeCallback {
         )
         byteBuffer.rewind()
         val mediaPCMData = fetchRTCPCM(bytesRead) ?: return
-//        byteBuffer.clear()
-//        byteBuffer.put(mediaPCMData)
         val originData = ByteArray(bytesRead)
         byteBuffer.get(originData)
         val data = PCMTransUtil.averageMix(arrayOf(originData, mediaPCMData))

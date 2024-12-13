@@ -122,9 +122,6 @@ class DecodeThread(private val callback: DecodeCallback) : Thread() {
                 }
             }
             if (trackFormat != null) {
-                val audioChannels = trackFormat!!.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-                val audioSampleRate = trackFormat!!.getInteger(MediaFormat.KEY_SAMPLE_RATE)
-//                initAudioTrack(audioChannels, audioSampleRate)
                 val formatType = trackFormat?.getString(MediaFormat.KEY_MIME) ?: ""
                 mediaCodec = MediaCodec.createDecoderByType(formatType)
                 mediaCodec?.configure(trackFormat, null, null, 0)

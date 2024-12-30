@@ -38,8 +38,8 @@ enum class SessionPrompt(val value: Int) {
  */
 @Keep
 enum class SessionRole(val value: Int) {
-    Member(0),
-    Admin(1),
+    Member(1),
+    Admin(2),
     SuperAdmin(3),
     Owner(4),
 }

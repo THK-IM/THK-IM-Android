@@ -203,9 +203,14 @@ class THKVideoPlayerView : RelativeLayout {
         binding.bottomController.hideTotalTime(hideTotalTime)
     }
 
-    fun hideControllers(hideController: Boolean) {
-        binding.bottomController.visibility = if (hideController) View.GONE else View.VISIBLE
+    fun hideBottomControllers(hide: Boolean) {
+        binding.bottomController.visibility = if (hide) View.GONE else View.VISIBLE
 //        binding.middleController.visibility = if (hideController) View.GONE else View.VISIBLE
+    }
+
+    fun hideAllControllers(hide: Boolean) {
+        binding.bottomController.visibility = if (hide) View.GONE else View.VISIBLE
+        binding.middleController.visibility = if (hide) View.GONE else View.VISIBLE
     }
 
 }

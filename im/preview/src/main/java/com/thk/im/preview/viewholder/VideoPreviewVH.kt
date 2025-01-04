@@ -64,7 +64,7 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
     override fun startPreview(playerView: THKVideoPlayerView) {
         message?.let {
             var played = false
-            playerView.hideControllers(false)
+            playerView.hideBottomControllers(false)
             playerView.attachToParent(lyVideoParent)
             if (it.data != null) {
                 val data = Gson().fromJson(it.data, IMVideoMsgData::class.java)

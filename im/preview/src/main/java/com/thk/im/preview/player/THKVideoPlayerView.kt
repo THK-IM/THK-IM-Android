@@ -197,10 +197,11 @@ class THKVideoPlayerView : RelativeLayout {
         binding.playerView.player?.release()
     }
 
-    fun setupUI(hideSeekbar: Boolean, hidePlayPause: Boolean, hideTotalTime: Boolean) {
+    fun setupUI(hideSeekbar: Boolean, hidePlayPause: Boolean, hideTotalTime: Boolean, hidePlayTime: Boolean) {
         binding.bottomController.hideSeekBar(hideSeekbar)
         binding.bottomController.hidePlayButton(hidePlayPause)
         binding.bottomController.hideTotalTime(hideTotalTime)
+        binding.bottomController.hidePlayTime(hidePlayTime)
     }
 
     fun hideBottomControllers(hide: Boolean) {

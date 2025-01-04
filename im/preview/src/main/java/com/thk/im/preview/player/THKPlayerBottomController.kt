@@ -56,6 +56,10 @@ class THKPlayerBottomController : RelativeLayout {
         binding.tvTimeM.visibility = if (hide) View.GONE else View.VISIBLE
     }
 
+    fun hidePlayTime(hide: Boolean) {
+        binding.tvCurrentTime.visibility = if (hide) View.GONE else View.VISIBLE
+    }
+
     fun hidePlayButton(hide: Boolean) {
         binding.ivPlayPause.visibility = if (hide) View.GONE else View.VISIBLE
     }

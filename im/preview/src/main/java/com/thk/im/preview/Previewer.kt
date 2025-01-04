@@ -19,10 +19,10 @@ import com.thk.im.android.ui.protocol.IMPreviewer
 import io.reactivex.Flowable
 
 @Keep
-class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer {
+class Previewer(app: Application) : IMPreviewer {
 
     init {
-        VideoCache.init(app, token, endpoint)
+        VideoCache.init(app)
     }
 
     override fun previewMediaMessage(
@@ -98,5 +98,9 @@ class Previewer(app: Application, token: String, endpoint: String) : IMPreviewer
                 .subscribe(subscriber)
         }
 
+    }
+
+    override fun setTokenForEndpoint(endPoint: String, token: String) {
+        VideoCache.addEndpointToken(endPoint, token)
     }
 }

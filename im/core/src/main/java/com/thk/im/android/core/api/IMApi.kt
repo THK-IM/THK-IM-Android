@@ -7,6 +7,8 @@ import io.reactivex.Flowable
 
 interface IMApi {
 
+    fun endpoint(): String
+
     /**
      * 根据时间查询群成员
      */

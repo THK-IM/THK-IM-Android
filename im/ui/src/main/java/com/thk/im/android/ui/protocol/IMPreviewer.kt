@@ -17,4 +17,7 @@ interface IMPreviewer {
 
     /// 预览消息记录
     fun previewRecordMessage(activity: Activity, originSession: Session, message: Message)
+
+    /// 设置token
+    fun setTokenForEndpoint(endPoint: String, token: String)
 }

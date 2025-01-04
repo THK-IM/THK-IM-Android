@@ -22,7 +22,7 @@ import top.zibin.luban.Luban
 import top.zibin.luban.OnNewCompressListener
 import java.io.File
 
-class Provider(app: Application, token: String) : IMProvider {
+class Provider(app: Application) : IMProvider {
 
     init {
         OggOpusPlayer.initPlayer(app)

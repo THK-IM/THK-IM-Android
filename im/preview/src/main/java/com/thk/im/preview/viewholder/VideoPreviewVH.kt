@@ -96,7 +96,7 @@ class VideoPreviewVH(liftOwner: LifecycleOwner, itemView: View) :
     private fun getRealUrl(url: String): String {
         var realUrl = url
         if (!url.startsWith("http")) {
-            realUrl = "${VideoCache.getEndpoint()}/session/object/download_url?id=${url}"
+            realUrl = "${IMCoreManager.imApi.endpoint()}/session/object/download_url?id=${url}"
         }
         return realUrl
     }

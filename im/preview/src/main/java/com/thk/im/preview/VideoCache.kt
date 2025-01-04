@@ -13,31 +13,26 @@ object VideoCache {
 
     private const val cacheSize = 5 * 1024 * 1024 * 1024L
     private var proxy: HttpProxyCacheServer? = null
-    private var token: String = ""
-    private var endpoint: String = ""
-    private var app: Application? = null
+    private lateinit var app: Application
+    private val tokenMap = mutableMapOf<String, String>()
 
-    fun init(app: Application, token: String, endpoint: String) {
+    fun init(app: Application) {
         this.app = app
-        this.token = token
-        this.endpoint = endpoint
         synchronized(this) {
             proxy = HttpProxyCacheServer.Builder(app.applicationContext)
                 .maxCacheSize(cacheSize)       // 1 Gb for cache
                 .cacheDirectory(getCacheDir())
                 .headerInjector { url ->
-                    if (url.startsWith(endpoint)) {
-                        mutableMapOf(
-                            APITokenInterceptor.tokenKey to "Bearer $token",
-                            APITokenInterceptor.versionKey to AppUtils.instance().versionName,
-                            APITokenInterceptor.timezoneKey to AppUtils.instance().timeZone,
-                            APITokenInterceptor.deviceKey to AppUtils.instance().deviceName,
-                            APITokenInterceptor.languageKey to AppUtils.instance().language,
-                            APITokenInterceptor.platformKey to "Android"
-                        )
-                    } else {
-                        mutableMapOf()
+                    val header = mutableMapOf<String, String>()
+                    header[APITokenInterceptor.versionKey] = AppUtils.instance().versionName
+                    header[APITokenInterceptor.timezoneKey] = AppUtils.instance().timeZone
+                    header[APITokenInterceptor.deviceKey] = AppUtils.instance().deviceName
+                    header[APITokenInterceptor.languageKey] = AppUtils.instance().language
+                    header[APITokenInterceptor.platformKey] = "Android"
+                    tokenMap[url]?.let {
+                        header[APITokenInterceptor.tokenKey] = "Bearer $tokenMap[url]"
                     }
+                    header
                 }
                 .fileNameGenerator { url ->
                     getUrlFileName(url)
@@ -48,11 +43,11 @@ object VideoCache {
     }
 
     private fun getCacheDir(): File {
-        return File(app!!.cacheDir, "video-cache")
+        return File(app.cacheDir, "video-cache")
     }
 
     private fun getUrlFileName(url: String): String {
-        if (url.startsWith(endpoint)) {
+        if (tokenMap[url] != null) {
             val uri = Uri.parse(url)
             val id = uri.getQueryParameter("id")
             if (id != null) {
@@ -75,8 +70,8 @@ object VideoCache {
         proxy?.unregisterCacheListener(listener)
     }
 
-    fun getEndpoint(): String {
-        return endpoint
+    fun addEndpointToken(endpoint: String, token: String) {
+        tokenMap[endpoint] = token
     }
 
     fun getCachePath(url: String): String? {

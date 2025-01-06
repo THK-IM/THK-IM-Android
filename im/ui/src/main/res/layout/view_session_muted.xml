@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="14dp">
+
+    <androidx.emoji2.widget.EmojiTextView
+        android:id="@+id/tv_session_mute"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="@string/member_muted_open"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="normal" />
+
+</RelativeLayout>

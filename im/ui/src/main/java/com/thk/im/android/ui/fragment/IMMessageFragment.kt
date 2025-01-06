@@ -481,6 +481,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
             session?.merge(s)
             session?.unReadCount = s.unReadCount
             updateUnreadMsgTips()
+            binding.llInputLayout.onSessionUpdate()
         }
     }
 

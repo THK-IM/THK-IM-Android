@@ -27,6 +27,7 @@ import com.lxj.xpopup.core.BasePopupView
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.IMFileFormat
 import com.thk.im.android.core.MsgType
+import com.thk.im.android.core.SessionRole
 import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.extension.setShape
 import com.thk.im.android.core.db.entity.Message
@@ -107,6 +108,7 @@ class IMInputLayout : ConstraintLayout {
         binding.btRecordVoice.setShape(
             inputLayoutColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )
+        binding.viewMuted.setBackgroundColor(inputLayoutColor)
 
         binding.etMessage.setOnKeyListener(object : View.OnKeyListener {
             override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
@@ -319,6 +321,13 @@ class IMInputLayout : ConstraintLayout {
             binding.ivMsgOprForward.visibility = GONE
         } else {
             binding.ivMsgOprForward.visibility = VISIBLE
+        }
+
+        val muted = session.mute > 0 && session.role == SessionRole.Member.value
+        if (muted) {
+            binding.viewMuted.visibility = View.VISIBLE
+        } else {
+            binding.viewMuted.visibility = View.GONE
         }
     }
 
@@ -635,6 +644,19 @@ class IMInputLayout : ConstraintLayout {
             }
         }
 
+    }
+
+    fun onSessionUpdate() {
+        val muted = session.mute > 0 && session.role == SessionRole.Member.value
+        if (muted) {
+            stopAudioRecording()
+            binding.etMessage.text.clearSpans()
+            binding.etMessage.text.clear()
+            binding.etMessage.text = null
+            clearReplyMessage()
+            closeKeyboard()
+        }
+        resetVisible()
     }
 
 }

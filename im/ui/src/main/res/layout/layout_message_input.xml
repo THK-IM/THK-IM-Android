@@ -43,8 +43,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="60dp"
-        android:paddingVertical="10dp"
         android:paddingHorizontal="6dp"
+        android:paddingVertical="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
@@ -53,8 +53,8 @@
             android:id="@+id/iv_audio_record"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_alignParentLeft="true"
             android:layout_alignBottom="@id/et_message"
+            android:layout_alignParentLeft="true"
             android:layout_marginRight="4dp"
             android:layout_marginBottom="5dp"
             android:scaleType="fitXY"
@@ -66,8 +66,8 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/et_message"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="5dp"
-            android:layout_marginHorizontal="4dp">
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginBottom="5dp">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_add_more"
@@ -85,10 +85,10 @@
                 android:layout_toLeftOf="@id/iv_add_more"
                 android:gravity="center"
                 android:scaleType="fitXY"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:textColor="#FFFFFF"
                 android:text="@string/send"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold"
                 android:visibility="gone" />
         </RelativeLayout>
 
@@ -96,9 +96,9 @@
             android:id="@+id/iv_emo"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:layout_alignBottom="@id/et_message"
             android:layout_marginLeft="4dp"
             android:layout_marginBottom="5dp"
-            android:layout_alignBottom="@id/et_message"
             android:layout_toLeftOf="@id/fl_right"
             android:scaleType="fitXY"
             android:src="@drawable/selector_emoji_msg" />
@@ -108,12 +108,12 @@
             android:id="@+id/et_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="40dp"
             android:layout_toLeftOf="@id/iv_emo"
             android:layout_toRightOf="@id/iv_audio_record"
             android:hint="@string/say_something"
             android:inputType="textMultiLine"
             android:maxLines="8"
+            android:minHeight="40dp"
             android:padding="10dp"
             android:textColor="#333333"
             android:textColorHint="#999999"
@@ -126,12 +126,19 @@
             android:layout_height="40dp"
             android:layout_toLeftOf="@id/iv_emo"
             android:layout_toRightOf="@id/iv_audio_record"
+            android:gravity="center"
             android:padding="8dp"
             android:text="@string/press_for_record_voice"
-            android:gravity="center"
             android:textColor="#333333"
             android:textSize="16sp"
             android:visibility="gone" />
+
+        <com.thk.im.android.ui.fragment.view.IMSessionMutedView
+            android:id="@+id/view_muted"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true" />
+
     </RelativeLayout>
 
 
@@ -141,32 +148,32 @@
         android:layout_height="60dp"
         android:paddingHorizontal="12dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/ll_message_input"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/ll_message_input">
+        app:layout_constraintRight_toRightOf="parent">
 
         <View
             android:id="@+id/v_reply_line"
             android:layout_width="4dp"
-            android:layout_marginVertical="4dp"
+            android:layout_height="match_parent"
             android:layout_alignParentStart="true"
-            android:layout_height="match_parent" />
+            android:layout_marginVertical="4dp" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_reply_close"
-            android:src="@drawable/ic_reply_close"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
             android:layout_width="20dp"
-            android:layout_height="20dp" />
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_reply_close" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingHorizontal="10dp"
             android:layout_toLeftOf="@id/iv_reply_close"
-            android:layout_toRightOf="@id/v_reply_line">
+            android:layout_toRightOf="@id/v_reply_line"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp">
 
             <androidx.emoji2.widget.EmojiTextView
                 android:id="@+id/tv_reply_user_nick"
@@ -174,18 +181,18 @@
                 android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:textAlignment="textStart"
-                android:textSize="15sp"
-                android:textColor="#333333" />
+                android:textColor="#333333"
+                android:textSize="15sp" />
 
             <androidx.emoji2.widget.EmojiTextView
                 android:id="@+id/tv_reply_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="left|center_vertical"
-                android:textSize="13sp"
-                android:maxLines="2"
                 android:ellipsize="end"
-                android:textColor="#666666" />
+                android:gravity="left|center_vertical"
+                android:maxLines="2"
+                android:textColor="#666666"
+                android:textSize="13sp" />
         </LinearLayout>
 
     </RelativeLayout>

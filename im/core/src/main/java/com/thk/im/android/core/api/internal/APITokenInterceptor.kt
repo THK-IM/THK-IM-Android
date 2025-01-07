@@ -1,9 +1,11 @@
 package com.thk.im.android.core.api.internal
 
 
+import android.util.Log
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.api.vo.CodeMessage
+import com.thk.im.android.core.base.LLog
 import com.thk.im.android.core.base.utils.AppUtils
 import com.thk.im.android.core.exception.CodeMsgException
 import okhttp3.Interceptor
@@ -92,9 +94,11 @@ class APITokenInterceptor(private var token: String) : Interceptor {
             if (response.body != null) {
                 val content = response.body?.string()
                 if (content != null) {
-                    val contentType = response.body?.contentType() ?: throw CodeMsgException(
-                        response.code, content
-                    )
+                    val contentType = response.body?.contentType()
+                    if (contentType == null) {
+                        LLog.e("APITokenInterceptor", "${response.request.url}")
+                        throw CodeMsgException(response.code, content)
+                    }
                     if (contentType.toString().contains("application/json", true)) {
                         val codeMessage = gson.fromJson(content, CodeMessage::class.java)
                         throw CodeMsgException(codeMessage.code, codeMessage.message)

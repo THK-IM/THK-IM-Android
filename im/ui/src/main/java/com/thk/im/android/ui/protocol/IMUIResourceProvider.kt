@@ -28,4 +28,6 @@ interface IMUIResourceProvider {
     fun messageSelectImageResource(): Int?
 
     fun supportFunction(session: Session, functionFlag: Long): Boolean
+
+    fun canAtAll(session: Session): Boolean
 }

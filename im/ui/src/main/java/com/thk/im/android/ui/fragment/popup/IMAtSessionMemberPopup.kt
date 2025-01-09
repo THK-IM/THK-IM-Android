@@ -14,6 +14,7 @@ import com.thk.im.android.core.db.entity.User
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.adapter.IMOnSessionMemberClick
 import com.thk.im.android.ui.fragment.adapter.IMSessionMemberAdapter
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMSessionMemberAtDelegate
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
@@ -105,7 +106,12 @@ class IMAtSessionMemberPopup(
     private fun updateSessionMember(it: Map<Long, Pair<User, SessionMember?>>) {
         val members = mutableListOf<Pair<User, SessionMember?>>()
         members.addAll(it.values)
-        members.add(Pair(User.all, null))
+        session?.let {
+            val canAtAll = IMUIManager.uiResourceProvider?.canAtAll(it) ?: false
+            if (canAtAll) {
+                members.add(Pair(User.all, null))
+            }
+        }
         sessionMemberAdapter.setData(members)
     }
 

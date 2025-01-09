@@ -24,6 +24,9 @@ interface SessionMemberDao {
     @Query("select * from session_member where session_id = :sessionId and deleted = 0 order by c_time asc limit :offset, :count")
     fun findBySessionId(sessionId: Long, offset: Int, count: Int): List<SessionMember>
 
+    @Query("select * from session_member where session_id = :sessionId and deleted = 0 order by role desc, c_time asc limit :offset, :count")
+    fun findBySessionIdSortByRole(sessionId: Long, offset: Int, count: Int): List<SessionMember>
+
     @Query("select count(0) from session_member where session_id = :sessionId and deleted = 0")
     fun findSessionMemberCount(sessionId: Long): Int
 

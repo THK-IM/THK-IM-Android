@@ -14,6 +14,8 @@ interface IMSessionMemberDao {
 
     fun findBySessionId(sessionId: Long, offset: Int, count: Int): List<SessionMember>
 
+    fun findBySessionIdSortByRole(sessionId: Long, offset: Int, count: Int): List<SessionMember>
+
     fun findSessionMember(sessionId: Long, userId: Long): SessionMember?
 
     fun findSessionMembers(sessionId: Long, userIds: Set<Long>): List<SessionMember>

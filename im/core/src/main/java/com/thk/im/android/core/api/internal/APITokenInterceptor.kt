@@ -96,7 +96,7 @@ class APITokenInterceptor(private var token: String) : Interceptor {
                 if (content != null) {
                     val contentType = response.body?.contentType()
                     if (contentType == null) {
-                        LLog.e("APITokenInterceptor", "${response.request.url}")
+                        LLog.e("APITokenInterceptor", "${response.request.url ?: ""}")
                         throw CodeMsgException(response.code, content)
                     }
                     if (contentType.toString().contains("application/json", true)) {

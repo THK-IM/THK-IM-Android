@@ -63,7 +63,7 @@ public class LLog {
 
     public static void e(@NonNull String tag, @NonNull String message) {
         if (ERROR >= LLog.level) {
-            Log.e(LLog.tag, message + ", " + Log.getStackTraceString(new Throwable()));
+            Log.e(tag, message + ", " + Log.getStackTraceString(new Throwable()));
         }
     }
 

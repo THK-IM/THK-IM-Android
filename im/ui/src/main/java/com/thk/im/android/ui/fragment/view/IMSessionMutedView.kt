@@ -22,11 +22,6 @@ class IMSessionMutedView : RelativeLayout {
         val view =
             LayoutInflater.from(context).inflate(R.layout.view_session_muted, this, true)
         binding = ViewSessionMutedBinding.bind(view)
-
-        binding.tvSessionMute.setShape(
-            Color.parseColor("#7F7F7F"),
-            floatArrayOf(20f, 20f, 20f, 20f), false
-        )
     }
 
 }

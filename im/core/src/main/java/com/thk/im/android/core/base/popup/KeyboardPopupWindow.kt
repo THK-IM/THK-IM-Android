@@ -1,5 +1,6 @@
 package com.thk.im.android.core.base.popup
 
+import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.view.Gravity
@@ -24,7 +25,7 @@ class KeyboardPopupWindow(view: View, val function: (keyboardHeight: Int) -> Uni
         width = 0
         height = ViewGroup.LayoutParams.MATCH_PARENT
         //设置背景
-        setBackgroundDrawable(ColorDrawable(0))
+        setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         //设置键盘弹出模式
         softInputMode =
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE

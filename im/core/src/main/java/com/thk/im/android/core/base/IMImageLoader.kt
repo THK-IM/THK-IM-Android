@@ -34,6 +34,10 @@ object IMImageLoader {
         Glide.with(imageView.context.applicationContext).load(url).into(imageView)
     }
 
+    fun displayImageUrl(imageView: ImageView, url: String, placeholder: Int) {
+        Glide.with(imageView.context.applicationContext).load(url).placeholder(placeholder).into(imageView)
+    }
+
     fun displayDoNotAnimate(imageView: ImageView, url: String) {
         Glide.with(imageView.context.applicationContext).load(url).dontAnimate()
             .placeholder(imageView.getDrawable())

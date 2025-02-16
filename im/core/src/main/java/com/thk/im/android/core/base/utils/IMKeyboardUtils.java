@@ -38,11 +38,6 @@ public final class IMKeyboardUtils {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
-    public static boolean isKeyboardShowing() {
-        InputMethodManager imm = (InputMethodManager) mApp.getSystemService(Context.INPUT_METHOD_SERVICE);
-        return imm.isAcceptingText();
-    }
-
 
     /**
      * Show the soft input.

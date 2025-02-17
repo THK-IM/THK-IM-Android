@@ -2,6 +2,7 @@ package com.thk.im.android.core.base
 
 import android.content.Context
 import android.content.res.Resources
+import android.util.Size
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -34,8 +35,30 @@ object IMImageLoader {
         Glide.with(imageView.context.applicationContext).load(url).into(imageView)
     }
 
+    fun displayImageUrlWithSize(
+        imageView: ImageView, url: String,
+        size: Size,
+    ) {
+        Glide.with(imageView.context.applicationContext).load(url)
+            .apply(RequestOptions().override(size.width, size.height))
+            .into(imageView)
+    }
+
     fun displayImageUrl(imageView: ImageView, url: String, placeholder: Int) {
-        Glide.with(imageView.context.applicationContext).load(url).placeholder(placeholder).into(imageView)
+        Glide.with(imageView.context.applicationContext).load(url).placeholder(placeholder)
+            .into(imageView)
+    }
+
+    fun displayImageUrlWithSize(
+        imageView: ImageView,
+        url: String,
+        placeholder: Int,
+        size: Size,
+    ) {
+        Glide.with(imageView.context.applicationContext).load(url)
+            .apply(RequestOptions().override(size.width, size.height))
+            .placeholder(placeholder)
+            .into(imageView)
     }
 
     fun displayDoNotAnimate(imageView: ImageView, url: String) {
@@ -53,7 +76,7 @@ object IMImageLoader {
     fun preloadFile(
         imageView: ImageView,
         url: String,
-        listener: (url: String, file: File?, e: Exception?) -> Unit
+        listener: (url: String, file: File?, e: Exception?) -> Unit,
     ) {
         Glide.with(imageView.context).asFile().load(url)
             .addListener(object : RequestListener<File> {
@@ -61,7 +84,7 @@ object IMImageLoader {
                     e: GlideException?,
                     model: Any?,
                     target: Target<File>,
-                    isFirstResource: Boolean
+                    isFirstResource: Boolean,
                 ): Boolean {
                     listener(url, null, e)
                     return false
@@ -72,7 +95,7 @@ object IMImageLoader {
                     model: Any,
                     target: Target<File>?,
                     dataSource: DataSource,
-                    isFirstResource: Boolean
+                    isFirstResource: Boolean,
                 ): Boolean {
                     listener(url, resource, null)
                     return true

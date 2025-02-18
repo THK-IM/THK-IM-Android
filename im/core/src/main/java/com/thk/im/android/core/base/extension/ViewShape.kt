@@ -25,7 +25,7 @@ fun View.setGradientShape(
     startColor: Int,
     endColor: Int,
     radius: FloatArray,
-    horizontal: Boolean = true
+    horizontal: Boolean = true,
 ) {
     val scale = Resources.getSystem().displayMetrics.density
     val scalePx = FloatArray(radius.size)
@@ -35,13 +35,38 @@ fun View.setGradientShape(
         i++
     }
 
-    if (horizontal) {
-        background = ShapeUtils.createGradientRectangleDrawable(
+    background = if (horizontal) {
+        ShapeUtils.createGradientRectangleDrawable(
             startColor, endColor, Orientation.LEFT_RIGHT, scalePx
         )
     } else {
-        background = ShapeUtils.createGradientRectangleDrawable(
+        ShapeUtils.createGradientRectangleDrawable(
             startColor, endColor, Orientation.TOP_BOTTOM, scalePx
+        )
+    }
+
+}
+
+fun View.setGradientShape(
+    colors: IntArray,
+    radius: FloatArray,
+    horizontal: Boolean = true,
+) {
+    val scale = Resources.getSystem().displayMetrics.density
+    val scalePx = FloatArray(radius.size)
+    var i = 0
+    radius.forEach {
+        scalePx[i] = it * scale
+        i++
+    }
+
+    background = if (horizontal) {
+        ShapeUtils.createGradientRectangleDrawable(
+            colors, Orientation.LEFT_RIGHT, scalePx
+        )
+    } else {
+        ShapeUtils.createGradientRectangleDrawable(
+            colors, Orientation.TOP_BOTTOM, scalePx
         )
     }
 

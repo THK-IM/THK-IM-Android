@@ -22,7 +22,7 @@ object ShapeUtils {
         @ColorInt color: Int,
         @ColorInt strokeColor: Int,
         strokeWidth: Int,
-        radius: FloatArray?
+        radius: FloatArray?,
     ): GradientDrawable {
         val radiusBg = GradientDrawable()
         //设置Shape类型
@@ -47,7 +47,7 @@ object ShapeUtils {
         @ColorInt startColor: Int,
         @ColorInt endColor: Int,
         strokeWidth: Int,
-        radius: FloatArray?
+        radius: FloatArray?,
     ): GradientDrawable {
         val radiusBg = GradientDrawable()
         //设置Shape类型
@@ -73,7 +73,7 @@ object ShapeUtils {
         @ColorInt startColor: Int,
         @ColorInt endColor: Int,
         orientation: Orientation = Orientation.LEFT_RIGHT,
-        radius: FloatArray?
+        radius: FloatArray?,
     ): GradientDrawable {
         val radiusBg = GradientDrawable()
         //设置Shape类型
@@ -98,7 +98,7 @@ object ShapeUtils {
     fun createGradientRectangleDrawable(
         @ColorInt startColor: Int,
         @ColorInt endColor: Int,
-        orientation: GradientDrawable.Orientation,
+        orientation: Orientation,
     ): GradientDrawable {
         val radiusBg = GradientDrawable()
         //设置Shape类型
@@ -109,9 +109,34 @@ object ShapeUtils {
         return radiusBg
     }
 
+    fun createGradientRectangleDrawable(
+        colors: IntArray,
+        orientation: Orientation,
+        radius: FloatArray? = null,
+    ): GradientDrawable {
+        val radiusBg = GradientDrawable()
+        //设置Shape类型
+        radiusBg.shape = GradientDrawable.RECTANGLE
+        //设置填充颜色
+        radiusBg.colors = colors
+        radiusBg.orientation = orientation
+
+        radiusBg.setStroke(0, Color.TRANSPARENT)
+        //每连续的两个数值表示是一个角度,四组:左上,右上,右下,左下
+        if (radius != null && radius.size == 4) {
+            radiusBg.cornerRadii = floatArrayOf(
+                radius[0], radius[0],
+                radius[1], radius[1],
+                radius[2], radius[2],
+                radius[3], radius[3]
+            )
+        }
+        return radiusBg
+    }
+
     fun roundedRect(
         left: Float, top: Float, right: Float, bottom: Float, rX: Float, rY: Float,
-        tl: Boolean = true, tr: Boolean = true, br: Boolean = true, bl: Boolean = true
+        tl: Boolean = true, tr: Boolean = true, br: Boolean = true, bl: Boolean = true,
     ): Path {
         var rx = rX
         var ry = rY
@@ -165,7 +190,7 @@ object ShapeUtils {
 
     fun roundedRect(
         left: Float, top: Float, right: Float, bottom: Float,
-        ttl: Float, ttr: Float, btr: Float, btl: Float
+        ttl: Float, ttr: Float, btr: Float, btl: Float,
     ): Path {
         var tl = ttl
         var tr = ttr

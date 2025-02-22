@@ -73,7 +73,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
     private val atMessages = mutableListOf<Message>()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View {
         binding = FragmentMessageBinding.inflate(
             inflater, container, false
@@ -113,12 +113,6 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
             arguments?.getParcelable("session", Session::class.java) as Session
         } else {
             arguments?.getParcelable("session")!!
-        }
-        IMUIManager.uiResourceProvider?.inputBgColor()?.let { color ->
-            binding.rcvMessage.setBackgroundColor(color)
-        }
-        IMUIManager.uiResourceProvider?.layoutBgColor()?.let { color ->
-            binding.root.setBackgroundColor(color)
         }
         binding.rcvMessage.init(this, session!!, this, this)
         binding.llInputLayout.init(this, session!!, this, this)
@@ -508,7 +502,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
                         val success =
                             IMUIManager.mediaProvider?.startPlayAudio(path, object : AudioCallback {
                                 override fun audioData(
-                                    path: String, second: Int, db: Double, state: AudioStatus
+                                    path: String, second: Int, db: Double, state: AudioStatus,
                                 ) {
 
                                 }

@@ -35,7 +35,7 @@ open class IMReplyMsgContainerView : LinearLayout {
         val view =
             LayoutInflater.from(context).inflate(R.layout.view_reply_msg_container, this, true)
         binding = ViewReplyMsgContainerBinding.bind(view)
-        val color = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#08AAFF")
+        val color = IMUIManager.uiResourceProvider?.tintColor() ?: Color.BLUE
         binding.tvReplyMsgUserNick.setTextColor(color)
         binding.vReplyMsgLine.setShape(color, floatArrayOf(2f, 2f, 2f, 2f), false)
     }
@@ -43,12 +43,13 @@ open class IMReplyMsgContainerView : LinearLayout {
     fun setMessage(
         message: Message,
         session: Session,
-        delegate: IMMsgVHOperator?
+        delegate: IMMsgVHOperator?,
     ) {
         binding.flReplyContent.children.forEach {
             binding.flReplyContent.removeView(it)
         }
-        val view = IMUIManager.getMsgIVProviderByMsgType(message.type).msgBodyView(context, IMMsgPosType.Reply)
+        val view = IMUIManager.getMsgIVProviderByMsgType(message.type)
+            .msgBodyView(context, IMMsgPosType.Reply)
         binding.flReplyContent.addView(view.contentView())
         view.setMessage(message, session, delegate)
         replyBodyView = view

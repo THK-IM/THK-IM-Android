@@ -1,5 +1,6 @@
 package com.thk.im.android.ui.fragment.viewholder.sessionmember
 
+import android.graphics.Color
 import android.text.TextUtils
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
@@ -19,9 +20,15 @@ class IMSessionMemberVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private var onSessionMemberClick: IMOnSessionMemberClick? = null
     private lateinit var member: Pair<User, SessionMember?>
 
+    init {
+        val inputTextColor =
+            IMUIManager.uiResourceProvider?.inputTextColor() ?: Color.parseColor("#333333")
+        nicknameView.setTextColor(inputTextColor)
+    }
+
     fun bindSessionMember(
         member: Pair<User, SessionMember?>,
-        onSessionMemberClick: IMOnSessionMemberClick?
+        onSessionMemberClick: IMOnSessionMemberClick?,
     ) {
         this.member = member
         this.onSessionMemberClick = onSessionMemberClick

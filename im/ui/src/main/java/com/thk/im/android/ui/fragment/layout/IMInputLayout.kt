@@ -136,6 +136,8 @@ class IMInputLayout : ConstraintLayout {
         binding.vReplyLine.setShape(
             tintColor, floatArrayOf(2f, 2f, 2f, 2f), false
         )
+        binding.tvReplyUserNick.setTextColor(inputTextColor)
+        binding.tvReplyContent.setTextColor(tipsTextColor)
         binding.etMessage.setShape(
             inputColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )

@@ -36,7 +36,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="2dp"
         android:layout_marginRight="4dp"
         android:layout_toLeftOf="@+id/avatar_container"
         android:layout_toRightOf="@+id/iv_msg_select"
@@ -85,7 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="16dp"
                 android:layout_gravity="end"
-                android:layout_marginBottom="4dp"
+                android:layout_marginBottom="8dp"
                 android:ellipsize="end"
                 android:lines="1"
                 android:textColor="#666666"

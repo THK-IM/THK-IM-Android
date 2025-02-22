@@ -1,8 +1,10 @@
 package com.thk.im.android.ui.fragment.popup
 
 import android.content.Context
+import android.graphics.Color
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentActivity
 import com.lxj.xpopup.core.BottomPopupView
 import com.thk.im.android.core.IMCoreManager
@@ -17,6 +19,7 @@ import com.thk.im.android.core.db.entity.Session
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.IMSessionFragment
 import com.thk.im.android.ui.manager.IMRecordMsgBody
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import io.reactivex.Flowable
 
@@ -41,6 +44,9 @@ class IMSessionChoosePopup(
             dismiss()
             return
         }
+        val inputBgColor =
+            IMUIManager.uiResourceProvider?.inputBgColor() ?: Color.parseColor("#EEEEEE")
+        findViewById<ConstraintLayout>(R.id.ly_root).setBackgroundColor(inputBgColor)
         initToolbar()
         val supportFragmentManager = (context as FragmentActivity).supportFragmentManager
         var sessionFragment =
@@ -68,9 +74,14 @@ class IMSessionChoosePopup(
     }
 
     private fun initToolbar() {
+        val inputTextColor =
+            IMUIManager.uiResourceProvider?.inputTextColor() ?: Color.parseColor("#333333")
         val toolbar = findViewById<Toolbar>(R.id.tb_session_choose)
-        toolbar.navigationIcon = AppCompatResources.getDrawable(context, R.drawable.icon_back)
+        val drawable = AppCompatResources.getDrawable(context, R.drawable.icon_back)
+        drawable?.setTint(inputTextColor)
+        toolbar.navigationIcon = drawable
         toolbar.title = context.getString(R.string.choose_one_session)
+        toolbar.setTitleTextColor(inputTextColor)
         toolbar.setNavigationOnClickListener {
             dismiss()
         }

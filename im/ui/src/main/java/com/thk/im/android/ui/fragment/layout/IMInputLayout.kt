@@ -96,7 +96,7 @@ class IMInputLayout : ConstraintLayout {
         val tipsTextColor =
             IMUIManager.uiResourceProvider?.tipTextColor() ?: Color.parseColor("#666666")
         val tintColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.BLUE
-        val inputColor =
+        val inputBgColor =
             IMUIManager.uiResourceProvider?.inputBgColor() ?: Color.parseColor("#EEEEEE")
 
         binding.root.setBackgroundColor(bgLayoutColor)
@@ -139,12 +139,12 @@ class IMInputLayout : ConstraintLayout {
         binding.tvReplyUserNick.setTextColor(inputTextColor)
         binding.tvReplyContent.setTextColor(tipsTextColor)
         binding.etMessage.setShape(
-            inputColor, floatArrayOf(20f, 20f, 20f, 20f), false
+            inputBgColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )
         binding.btRecordVoice.setShape(
-            inputColor, floatArrayOf(20f, 20f, 20f, 20f), false
+            inputBgColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )
-        binding.viewMuted.setBackgroundColor(inputColor)
+        binding.viewMuted.setBackgroundColor(inputBgColor)
 
         binding.etMessage.setOnKeyListener(object : View.OnKeyListener {
             override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {

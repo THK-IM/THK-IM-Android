@@ -1,11 +1,14 @@
 package com.thk.im.android.ui.fragment.popup
 
 import android.content.Context
+import android.graphics.Color
+import androidx.cardview.widget.CardView
 import com.google.android.flexbox.FlexboxLayout
 import com.lxj.xpopup.core.AttachPopupView
 import com.thk.im.android.core.db.entity.Message
 import com.thk.im.android.ui.R
 import com.thk.im.android.ui.fragment.view.IMMessageOperatorItemView
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.IMMessageOperator
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 
@@ -17,6 +20,10 @@ class IMMessageOperatorPopup(context: Context) : AttachPopupView(context) {
 
     override fun onCreate() {
         super.onCreate()
+        val bgLayoutColor =
+            IMUIManager.uiResourceProvider?.panelBgColor() ?: Color.parseColor("#FFFFFF")
+        findViewById<CardView>(R.id.cd_root).setCardBackgroundColor(bgLayoutColor)
+
         val operatorLayout = findViewById<FlexboxLayout>(R.id.layout_operators)
         for (operator in operators) {
             val operatorView = IMMessageOperatorItemView(context)

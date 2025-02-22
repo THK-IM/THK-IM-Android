@@ -578,7 +578,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         view.getLocationOnScreen(locations)
         context?.let {
             val point = PointF()
-            var popupWidth = 20.dp2px()
+            var popupWidth = 28.dp2px()
             val operators = IMUIManager.getMsgOperators(message, this.session!!)
             val rowCount = 5
             popupWidth += if (operators.size < 5) {
@@ -586,7 +586,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
             } else {
                 300.dp2px()
             }
-            var popupHeight = ((operators.size / rowCount) * 60 + 30).dp2px()
+            var popupHeight = ((operators.size / rowCount) * 60 + 38).dp2px()
             if (operators.size % rowCount > 0) {
                 popupHeight += 60.dp2px()
             }

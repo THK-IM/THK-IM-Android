@@ -29,7 +29,7 @@ interface IMMsgSender {
         type: Int,
         body: Any?,
         data: Any?,
-        atUser: String? = null
+        atUser: String? = null,
     )
 
     /// 输入框添加内容
@@ -104,6 +104,7 @@ interface IMMsgSender {
     ///  打开at会话成员控制器
     fun openAtPopupView()
 
+    /// At用户
     fun addAtUser(user: User, sessionMember: SessionMember?)
 
     /// 回复消息

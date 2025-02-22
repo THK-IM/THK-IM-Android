@@ -13,7 +13,6 @@
         android:layout_height="44dp"
         android:layout_alignParentLeft="true"
         android:padding="7dp"
-        android:src="@drawable/icon_msg_select"
         android:visibility="gone" />
 
     <androidx.cardview.widget.CardView

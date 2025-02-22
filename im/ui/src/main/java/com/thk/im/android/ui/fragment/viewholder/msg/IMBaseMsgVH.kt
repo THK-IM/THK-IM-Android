@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.lifecycle.LifecycleOwner
 import com.thk.im.android.core.IMCoreManager
@@ -57,6 +58,10 @@ open class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val viewT
         itemView.findViewById(R.id.msg_reply_content)
 
     init {
+        val tintColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.BLUE
+        val drawable = ContextCompat.getDrawable(itemView.context, R.drawable.icon_msg_select)
+        drawable?.setTint(tintColor)
+        selectView.setImageDrawable(drawable)
         IMUIManager.uiResourceProvider?.messageSelectImageResource()?.let {
             selectView.setImageResource(it)
         }
@@ -76,7 +81,7 @@ open class IMBaseMsgVH(liftOwner: LifecycleOwner, itemView: View, open val viewT
         position: Int,
         messages: List<Message>,
         session: Session,
-        msgVHOperator: IMMsgVHOperator
+        msgVHOperator: IMMsgVHOperator,
     ) {
         this.pos = position
         this.message = messages[position]

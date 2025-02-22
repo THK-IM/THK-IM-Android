@@ -17,6 +17,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.text.getSpans
 import androidx.emoji2.widget.EmojiEditText
 import androidx.lifecycle.LifecycleOwner
@@ -88,27 +89,60 @@ class IMInputLayout : ConstraintLayout {
         binding.tvSendMsg.setOnClickListener {
             sendInputContent()
         }
+        val bgLayoutColor =
+            IMUIManager.uiResourceProvider?.panelBgColor() ?: Color.parseColor("#FFFFFF")
+        val inputTextColor =
+            IMUIManager.uiResourceProvider?.inputTextColor() ?: Color.parseColor("#333333")
+        val tipsTextColor =
+            IMUIManager.uiResourceProvider?.tipTextColor() ?: Color.parseColor("#666666")
+        val tintColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.BLUE
+        val inputColor =
+            IMUIManager.uiResourceProvider?.inputBgColor() ?: Color.parseColor("#EEEEEE")
 
-        val sendBgColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#2610F5")
-        binding.tvSendMsg.setShape(sendBgColor, floatArrayOf(15f, 15f, 15f, 15f), false)
+        binding.root.setBackgroundColor(bgLayoutColor)
+        binding.etMessage.setTextColor(inputTextColor)
+        binding.etMessage.setHintTextColor(tipsTextColor)
 
-        val tintColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#999999")
+        ContextCompat.getDrawable(context, R.drawable.ic_msg_emoji)?.let {
+            it.setTint(inputTextColor)
+            binding.ivEmo.setImageDrawable(it)
+        }
+        ContextCompat.getDrawable(context, R.drawable.ic_msg_voice)?.let {
+            it.setTint(inputTextColor)
+            binding.ivAudioRecord.setImageDrawable(it)
+        }
+        ContextCompat.getDrawable(context, R.drawable.ic_msg_more)?.let {
+            it.setTint(inputTextColor)
+            binding.ivAddMore.setImageDrawable(it)
+        }
+        ContextCompat.getDrawable(context, R.drawable.ic_reply_close)?.let {
+            it.setTint(inputTextColor)
+            binding.ivReplyClose.setImageDrawable(it)
+        }
+        ContextCompat.getDrawable(context, R.drawable.ic_msg_opr_delete)?.let {
+            it.setTint(inputTextColor)
+            binding.ivMsgOprDelete.setImageDrawable(it)
+        }
+        ContextCompat.getDrawable(context, R.drawable.ic_msg_opr_forward)?.let {
+            it.setTint(inputTextColor)
+            binding.ivMsgOprForward.setImageDrawable(it)
+        }
+        ContextCompat.getDrawable(context, R.drawable.ic_msg_opr_cancel)?.let {
+            it.setTint(inputTextColor)
+            binding.ivMsgOprCancel.setImageDrawable(it)
+        }
+        binding.tvSendMsg.setShape(tintColor, floatArrayOf(15f, 15f, 15f, 15f), false)
+        binding.tvSendMsg.setTextColor(Color.WHITE)
         binding.vReplyLine.setShape(
             tintColor, floatArrayOf(2f, 2f, 2f, 2f), false
         )
-
-        val inputColor =
-            IMUIManager.uiResourceProvider?.inputBgColor() ?: Color.parseColor("#EEEEEE")
         binding.etMessage.setShape(
             inputColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )
-
-        val inputLayoutColor =
-            IMUIManager.uiResourceProvider?.inputLayoutBgColor() ?: Color.parseColor("#EEEEEE")
         binding.btRecordVoice.setShape(
-            inputLayoutColor, floatArrayOf(20f, 20f, 20f, 20f), false
+            inputColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )
-        binding.viewMuted.setBackgroundColor(inputLayoutColor)
+        binding.viewMuted.setBackgroundColor(inputColor)
 
         binding.etMessage.setOnKeyListener(object : View.OnKeyListener {
             override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
@@ -118,7 +152,6 @@ class IMInputLayout : ConstraintLayout {
                         return true
                     }
                 }
-
                 return false
             }
 
@@ -280,7 +313,7 @@ class IMInputLayout : ConstraintLayout {
         lifecycleOwner: LifecycleOwner,
         session: Session,
         sender: IMMsgSender?,
-        previewer: IMMsgPreviewer?
+        previewer: IMMsgPreviewer?,
     ) {
         this.lifecycleOwner = lifecycleOwner
         this.session = session
@@ -422,7 +455,7 @@ class IMInputLayout : ConstraintLayout {
                     } else {
                         binding.etMessage.text.delete(index - 1, index)
                     }
-                } else if (index == 1){
+                } else if (index == 1) {
                     binding.etMessage.text.delete(0, index)
                 }
             }
@@ -526,7 +559,7 @@ class IMInputLayout : ConstraintLayout {
             recordPopupView.dismiss()
         }
         val inputLayoutBgColor =
-            IMUIManager.uiResourceProvider?.inputLayoutBgColor() ?: Color.parseColor("#EEEEEE")
+            IMUIManager.uiResourceProvider?.inputBgColor() ?: Color.parseColor("#EEEEEE")
         binding.btRecordVoice.setShape(
             inputLayoutBgColor, floatArrayOf(20f, 20f, 20f, 20f), false
         )

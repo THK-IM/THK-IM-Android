@@ -25,7 +25,7 @@ class IMRecordPreviewActivity : AppCompatActivity(), IMMsgPreviewer {
         super.onCreate(savedInstanceState)
         binding = ActivityRecordPreviewBinding.inflate(layoutInflater)
         ImmersionBar.with(this).transparentStatusBar().statusBarDarkFont(true).init()
-        IMUIManager.uiResourceProvider?.inputLayoutBgColor()?.let {
+        IMUIManager.uiResourceProvider?.layoutBgColor()?.let {
             binding.clContent.setBackgroundColor(it)
         }
         setContentView(binding.root)

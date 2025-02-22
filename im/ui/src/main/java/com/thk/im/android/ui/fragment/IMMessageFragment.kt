@@ -117,7 +117,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
         IMUIManager.uiResourceProvider?.inputBgColor()?.let { color ->
             binding.rcvMessage.setBackgroundColor(color)
         }
-        IMUIManager.uiResourceProvider?.inputLayoutBgColor()?.let { color ->
+        IMUIManager.uiResourceProvider?.layoutBgColor()?.let { color ->
             binding.root.setBackgroundColor(color)
         }
         binding.rcvMessage.init(this, session!!, this, this)
@@ -140,7 +140,7 @@ open class IMMessageFragment : Fragment(), IMMsgPreviewer, IMMsgSender, IMSessio
 
     private fun initMsgTipsView() {
         val bgColor =
-            IMUIManager.uiResourceProvider?.inputLayoutBgColor() ?: Color.parseColor("#DDDDDD")
+            IMUIManager.uiResourceProvider?.panelBgColor() ?: Color.parseColor("#DDDDDD")
         val textColor = IMUIManager.uiResourceProvider?.tintColor() ?: Color.parseColor("#1390f4")
 
         binding.tvUnreadTip.setShape(bgColor, floatArrayOf(6f, 6f, 6f, 6f), false)

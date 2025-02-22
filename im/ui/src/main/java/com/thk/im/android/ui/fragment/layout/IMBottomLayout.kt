@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.GridLayoutManager
@@ -18,6 +19,7 @@ import com.thk.im.android.ui.databinding.LayoutMessageBottomBinding
 import com.thk.im.android.ui.fragment.adapter.IMEmojiFragmentAdapter
 import com.thk.im.android.ui.fragment.adapter.IMEmojiTitleAdapter
 import com.thk.im.android.ui.fragment.adapter.IMFunctionAdapter
+import com.thk.im.android.ui.manager.IMUIManager
 import com.thk.im.android.ui.protocol.internal.IMMsgPreviewer
 import com.thk.im.android.ui.protocol.internal.IMMsgSender
 import com.thk.im.android.ui.utils.ScreenUtils
@@ -40,7 +42,15 @@ class IMBottomLayout : ConstraintLayout {
     init {
         val view = LayoutInflater.from(context).inflate(R.layout.layout_message_bottom, this, true)
         binding = LayoutMessageBottomBinding.bind(view)
-        binding.lyEmojiTab.setBackgroundColor(Color.parseColor("#F5F5F5"))
+        val bgLayoutColor =
+            IMUIManager.uiResourceProvider?.panelBgColor() ?: Color.parseColor("#FFFFFF")
+        val inputTextColor =
+            IMUIManager.uiResourceProvider?.inputTextColor() ?: Color.parseColor("#333333")
+        binding.lyEmojiTab.setBackgroundColor(bgLayoutColor)
+        ContextCompat.getDrawable(context, R.drawable.ic_emoji_del)?.let {
+            it.setTint(inputTextColor)
+            binding.ivEmojiDel.setImageDrawable(it)
+        }
     }
 
     fun init(

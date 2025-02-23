@@ -567,7 +567,7 @@ open class DefaultMessageModule : MessageModule {
                 if (t.lastMsg != null) {
                     try {
                         val lastMsg = Gson().fromJson(t.lastMsg, Message::class.java)
-                        if (lastMsg.cTime <= msg.cTime) {
+                        if (lastMsg.cTime <= msg.cTime || forceNotify) {
                             t.lastMsg = Gson().toJson(msg)
                             needNotify = true
                         }

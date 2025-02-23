@@ -14,7 +14,7 @@ import kotlin.math.abs
 class IMMessageAdapter(
     private val session: Session,
     private val lifecycleOwner: LifecycleOwner,
-    private val imMessageLayout: IMMessageLayout
+    private val imMessageLayout: IMMessageLayout,
 ) :
     RecyclerView.Adapter<IMBaseMsgVH>() {
 
@@ -107,10 +107,17 @@ class IMMessageAdapter(
 
     fun addData(messages: List<Message>) {
         synchronized(this) {
+            val needAdd = mutableListOf<Message>()
+            for (m in messages) {
+                val pos = findPosition(m)
+                if (pos == -1) {
+                    needAdd.add(m)
+                }
+            }
             val oldSize = messageList.size
             lastMessageTime = messageList[oldSize - 1].cTime
-            messageList.addAll(addTimelineMessages(messages))
-            notifyItemRangeInserted(oldSize, messages.size)
+            messageList.addAll(addTimelineMessages(needAdd))
+            notifyItemRangeInserted(oldSize, needAdd.size)
         }
     }
 

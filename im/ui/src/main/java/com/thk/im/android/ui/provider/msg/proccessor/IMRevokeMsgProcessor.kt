@@ -27,7 +27,6 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
         val subscriber = object : BaseSubscriber<Void>() {
 
             override fun onNext(t: Void?) {
-                callback?.onResult(msg, null)
             }
 
             override fun onError(t: Throwable?) {
@@ -37,6 +36,7 @@ open class IMRevokeMsgProcessor : IMBaseMsgProcessor() {
 
             override fun onComplete() {
                 super.onComplete()
+                callback?.onResult(msg, null)
                 disposables.remove(this)
             }
         }

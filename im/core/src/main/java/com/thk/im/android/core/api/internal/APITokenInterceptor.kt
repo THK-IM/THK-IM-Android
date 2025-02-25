@@ -1,7 +1,6 @@
 package com.thk.im.android.core.api.internal
 
 
-import android.util.Log
 import com.google.gson.Gson
 import com.thk.im.android.core.IMCoreManager
 import com.thk.im.android.core.api.vo.CodeMessage
@@ -75,9 +74,7 @@ class APITokenInterceptor(private var token: String) : Interceptor {
                             val decryptText = it.decrypt(encryptText)
                             decryptText?.let { text ->
                                 val newBody = text.toResponseBody(jsonType)
-                                return response.newBuilder()
-                                    .body(newBody)
-                                    .build()
+                                return response.newBuilder().body(newBody).build()
                             }
                         }
                     }
@@ -96,7 +93,7 @@ class APITokenInterceptor(private var token: String) : Interceptor {
                 if (content != null) {
                     val contentType = response.body?.contentType()
                     if (contentType == null) {
-                        LLog.e("APITokenInterceptor", "${response.request.url ?: ""}")
+                        LLog.e("APITokenInterceptor", "${response.request.url}")
                         throw CodeMsgException(response.code, content)
                     }
                     if (contentType.toString().contains("application/json", true)) {
@@ -158,8 +155,7 @@ class APITokenInterceptor(private var token: String) : Interceptor {
                     val originContent = buffer.readUtf8()
                     val decryptContent = it.encrypt(originContent)
                     decryptContent?.let { content ->
-                        val encryptedBody =
-                            content.toRequestBody(jsonType)
+                        val encryptedBody = content.toRequestBody(jsonType)
                         return origin.newBuilder().method(origin.method, encryptedBody).build()
                     }
                 }

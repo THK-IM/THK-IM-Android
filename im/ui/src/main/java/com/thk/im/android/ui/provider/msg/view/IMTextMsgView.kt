@@ -21,7 +21,7 @@ import com.thk.im.android.ui.protocol.internal.IMMsgVHOperator
 import com.thk.im.android.ui.utils.AtStringUtils
 import java.lang.ref.WeakReference
 
-class IMTextMsgView : LinearLayout, IMsgBodyView {
+open class IMTextMsgView : LinearLayout, IMsgBodyView {
 
     private var binding: ViewMsgTextBinding
 
@@ -60,10 +60,12 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
                 binding.tvMsgContent.ellipsize = android.text.TextUtils.TruncateAt.END
                 binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
             }
+
             IMMsgPosType.Mid -> {
                 binding.tvMsgContent.textSize = 12.0f
                 binding.tvMsgContent.setTextColor(Color.parseColor("#FFFFFF"))
             }
+
             else -> {
                 binding.tvMsgContent.textSize = 16.0f
                 binding.tvMsgContent.setTextColor(Color.parseColor("#0A0E10"))
@@ -74,7 +76,8 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
             content = replaceIdToNickname(content, message.getAtUIds())
         }
         val updated = message.oprStatus.and(MsgOperateStatus.Update.value) != 0
-        render(content, updated)
+        val spannable = render(message, content, updated)
+        binding.tvMsgContent.text = spannable
     }
 
 
@@ -93,7 +96,7 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
         }
     }
 
-    private fun render(content: String, updated: Boolean) {
+    open fun render(message: Message, content: String, updated: Boolean): SpannableStringBuilder {
         val regex = AtStringUtils.atRegex
         val sequence = regex.findAll(content)
         val highlightColor =
@@ -116,6 +119,6 @@ class IMTextMsgView : LinearLayout, IMsgBodyView {
             editSpannable.setSpan(editSpan, 0, editStr.length, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
             contentSpannable.append(editSpannable)
         }
-        binding.tvMsgContent.text = contentSpannable
+        return contentSpannable
     }
 }

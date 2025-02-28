@@ -105,16 +105,20 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
             return
         }
         msg.rMsgId?.let {
-            // 别人发给自己的已读消息
             val referMsg =
                 IMCoreManager.getImDataBase().messageDao().findByMsgId(it, msg.sid)
+            // 本地有已读消息指向的原始消息，并且原始消息的发送者是自己
             if (referMsg != null) {
                 referMsg.oprStatus = referMsg.oprStatus.or(MsgOperateStatus.ServerRead.value)
                     .or(MsgOperateStatus.ClientRead.value)
                     .or(MsgOperateStatus.Ack.value)
                 if (msg.fUid == IMCoreManager.uId) {
                     // 自己发的已读消息不插入数据库，更新rMsgId的消息状态为服务端已读
-                    insertOrUpdateDb(referMsg, notify = true, notifySession = false)
+                    insertOrUpdateDb(
+                        referMsg,
+                        notify = (referMsg.fUid == IMCoreManager.uId),
+                        notifySession = false
+                    )
                     val session = IMCoreManager.getImDataBase().sessionDao().findById(msg.sid)
                     if (session != null) {
                         val count =
@@ -131,13 +135,11 @@ open class IMReadMessageProcessor : IMBaseMsgProcessor() {
                     } else {
                         referMsg.rUsers = "${msg.fUid}"
                     }
-                    insertOrUpdateDb(referMsg, notify = true, notifySession = false)
-                    msg.sendStatus = MsgSendStatus.Success.value
-                    // 状态操作消息对用户不可见，默认状态即位本身已读
-                    msg.oprStatus =
-                        MsgOperateStatus.ClientRead.value or MsgOperateStatus.ServerRead.value
-                    // 已读消息入库，并ack
-                    insertOrUpdateDb(msg, notify = false, notifySession = false)
+                    insertOrUpdateDb(
+                        referMsg,
+                        notify = (referMsg.fUid == IMCoreManager.uId),
+                        notifySession = false
+                    )
                     if (msg.oprStatus.and(MsgOperateStatus.Ack.value) == 0) {
                         IMCoreManager.messageModule.ackMessageToCache(msg)
                     }
